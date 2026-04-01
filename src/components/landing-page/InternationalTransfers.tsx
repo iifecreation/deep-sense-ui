@@ -5,7 +5,7 @@ import { CheckCircle2 } from "lucide-react";
 export default function InternationalTransfers() {
   return (
     <section className="py-16 md:py-24 px-4 md:px-24 bg-white overflow-hidden">
-      <div className="max-w-[1240px] mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
+      <div className="max-w-[1300px] mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
         {/* Left Side Content */}
         <div className="flex-1 flex flex-col gap-8 max-w-[453px]">
           <div className="flex flex-col gap-5">

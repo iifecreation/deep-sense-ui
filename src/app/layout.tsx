@@ -13,8 +13,8 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Investo - Revolutionizing Finance",
-  description: "Fintech services leveraging technology to enhance financial processes.",
+  title: "Deep Sense - Industrial-Grade Fraud Prevention",
+  description: "Secure your financial platform with Deep Sense AI - the world's most advanced fraud detection infrastructure.",
 };
 
 export default function RootLayout({

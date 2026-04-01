@@ -39,31 +39,36 @@ export default function Hero() {
         </div>
 
         {/* Title */}
-        <h1 className="max-w-[900px] text-center text-4xl md:text-5xl lg:text-[72px] font-bold font-manrope leading-[1.05] mb-6 tracking-tight">
-          Revolutionizing Finance for a <span className="text-neutral-900/40">Better Tomorrow</span>, Today
+        <h1 className="max-w-[1000px] text-center text-4xl md:text-5xl lg:text-[72px] font-bold font-manrope leading-[1.05] mb-6 tracking-tight">
+          Detect Fraud in Real Time. <span className="text-neutral-900/40">Stop Losses</span> Before They Happen.
         </h1>
 
         {/* Subtitle */}
-        <p className="max-w-[500px] text-center text-zinc-600 text-sm md:text-lg font-normal font-inter mb-10 leading-relaxed">
-          Fintech services leverage technology to enhance financial processes, offering innovative solutions for banking
+        <p className="max-w-[700px] text-center text-zinc-600 text-sm md:text-lg font-normal font-inter mb-10 leading-relaxed">
+          Deep Sense is an AI-powered fraud intelligence platform that analyzes transactions, detects anomalies, and prevents fraud across banks, fintech, and payment systems — in milliseconds.
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-20 px-4 w-full justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 mb-6 px-4 w-full justify-center">
           <button className="px-10 py-4 bg-brand-lime rounded-full shadow-[0_8px_20px_-6px_rgba(209,247,1,0.4)] text-neutral-900 text-lg font-bold font-manrope hover:opacity-95 transition-all hover:scale-105 active:scale-95">
-            Get Started
+            Request Demo
           </button>
-          <button className="px-10 py-4 bg-indigo-600 rounded-full shadow-[0_8px_20px_-6px_rgba(79,70,229,0.4)] text-white text-lg font-bold font-manrope hover:bg-indigo-700 transition-all hover:scale-105 active:scale-95">
-            Sign Up Now
+          <button className="px-10 py-4 border border-zinc-200 bg-white rounded-full text-lg font-bold font-manrope hover:bg-zinc-50 transition-all hover:scale-105 active:scale-95">
+            View Documentation
           </button>
         </div>
+
+        {/* Supporting Line */}
+        <p className="text-zinc-400 text-sm font-medium font-inter mb-20">
+          No-code rules. Real-time scoring. Enterprise-ready.
+        </p>
 
         {/* Phone Mockup Area */}
         <div className="relative w-full max-w-[1050px] flex justify-center mt-8">
           <div className="relative z-20 w-[280px] md:w-[380px]">
              <Image
               src="/assets/images/home/iPhone hero section.svg"
-              alt="Investo Mobile App"
+              alt="Deep Sense Mobile App"
               width={380}
               height={770}
               className="w-full h-auto drop-shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)]"
