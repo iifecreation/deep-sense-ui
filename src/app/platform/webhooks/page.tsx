@@ -271,7 +271,7 @@ export default function PlatformWebhooksPage() {
               <div className="bg-white/5 border border-white/10 p-12 lg:p-24 rounded-[80px] shadow-3xl relative overflow-hidden backdrop-blur-xl group">
                  <Activity className="w-40 h-40 absolute bottom-0 right-0 p-12 text-white opacity-5 group-hover:scale-110 transition-transform duration-1000" />
                  <h3 className="text-3xl font-bold italic uppercase tracking-tight mb-8">Business Impact.</h3>
-                 <p className="text-white/40 text-sm font-inter italic mb-10 leading-relaxed italic">By reducing response time from minutes to milliseconds, Deep Sense webhooks significantly reduce operational risk and fraud loss exposure.</p>
+                 <p className="text-white/40 text-sm font-inter italic mb-10 leading-relaxed">By reducing response time from minutes to milliseconds, Deep Sense webhooks significantly reduce operational risk and fraud loss exposure.</p>
                  <div className="space-y-6">
                     {["Reduce response window", "Automate fraud handling", "Improve ops efficiency", "Enable real-time logic"].map((it, i) => (
                       <div key={i} className="flex gap-4 items-center">

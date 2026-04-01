@@ -241,7 +241,7 @@ export default function WebhooksPage() {
               <div className="bg-zinc-50 p-12 lg:p-24 rounded-[80px] border border-gray-100 relative group overflow-hidden">
                  <Network className="w-40 h-40 absolute top-0 right-0 p-12 text-zinc-200 opacity-20 transform translate-x-1/2 -translate-y-1/2 group-hover:scale-110 transition-transform duration-1000" />
                  <div className="relative z-10 space-y-12 text-left">
-                    <h3 className="text-3xl font-bold italic uppercase tracking-tight italic">Act Instantly on Fraud Signals</h3>
+                    <h3 className="text-3xl font-bold italic uppercase tracking-tight">Act Instantly on Fraud Signals</h3>
                     <p className="text-zinc-400 text-lg italic pr-12 font-inter leading-relaxed">Configure your backend to respond the moment critical signals arrive.</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                        {[

@@ -89,7 +89,7 @@ export default function AboutPage() {
               <div className="bg-zinc-50 p-12 lg:p-24 rounded-[80px] border border-gray-100 relative group overflow-hidden">
                  <TrendingUp className="w-40 h-40 absolute top-0 right-0 p-12 text-zinc-200 opacity-20 transform translate-x-1/2 -translate-y-1/2 group-hover:rotate-12 transition-transform duration-1000" />
                  <div className="relative z-10 space-y-12">
-                    <h3 className="text-3xl font-bold italic uppercase tracking-tight italic">Changing the Paradigm.</h3>
+                    <h3 className="text-3xl font-bold italic uppercase tracking-tight">Changing the Paradigm.</h3>
                     <p className="text-zinc-400 text-lg italic pr-12 font-inter leading-relaxed">We focus on building a future where fraud detection is pro-active, learning from every signal to stay ahead of coordinated attacks.</p>
                     <div className="flex gap-4 p-4 bg-white rounded-full border border-gray-100 shadow-sm w-fit">
                        <div className="w-3 h-3 bg-brand-lime rounded-full animate-pulse" />
@@ -187,7 +187,7 @@ export default function AboutPage() {
               <div className="bg-white/5 border border-white/5 p-12 lg:p-24 rounded-[80px] shadow-3xl text-center group relative overflow-hidden backdrop-blur-xl">
                  <Lock className="w-40 h-40 absolute top-0 left-0 p-12 text-brand-lime opacity-5 group-hover:scale-110 transition-transform duration-1000" />
                  <h3 className="text-3xl font-bold italic uppercase tracking-tight mb-8">Secure by Default</h3>
-                 <p className="text-white/40 text-sm italic max-w-[350px] mx-auto mb-10 leading-relaxed italic">Deep Sense is built to the highest security standards, ensuring your data isolated and protected across every layer of the platform.</p>
+                 <p className="text-white/40 text-sm italic max-w-[350px] mx-auto mb-10 leading-relaxed">Deep Sense is built to the highest security standards, ensuring your data isolated and protected across every layer of the platform.</p>
                  <div className="flex gap-4 justify-center">
                     <div className="px-6 py-3 bg-white/5 rounded-2xl text-[9px] font-bold uppercase tracking-widest border border-white/5 hover:bg-brand-lime/10 hover:text-brand-lime transition-all cursor-default">SOC2 Ready</div>
                     <div className="px-6 py-3 bg-white/5 rounded-2xl text-[9px] font-bold uppercase tracking-widest border border-white/5 hover:bg-brand-lime/10 hover:text-brand-lime transition-all cursor-default">PCI Compliant</div>

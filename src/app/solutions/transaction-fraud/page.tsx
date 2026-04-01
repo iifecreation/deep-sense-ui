@@ -94,7 +94,7 @@ export default function TransactionFraudPage() {
               <div className="bg-white/5 border border-white/10 p-12 lg:p-24 rounded-[80px] shadow-3xl group relative overflow-hidden backdrop-blur-xl">
                  <Activity className="w-40 h-40 absolute top-0 right-0 p-12 text-white opacity-5 group-hover:scale-110 transition-transform duration-1000" />
                  <h3 className="text-3xl font-bold italic uppercase tracking-tight mb-8">The Solution.</h3>
-                 <p className="text-white/40 text-sm font-inter italic mb-10 leading-relaxed italic">Deep Sense monitors and evaluates every transaction as it happens, delivering absolute protection without latency.</p>
+                 <p className="text-white/40 text-sm font-inter italic mb-10 leading-relaxed">Deep Sense monitors and evaluates every transaction as it happens, delivering absolute protection without latency.</p>
                  <div className="grid grid-cols-2 gap-4">
                     {[
                       { l: "Real-Time Scoring", i: <Zap /> },
@@ -148,7 +148,7 @@ export default function TransactionFraudPage() {
            <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
               <div className="space-y-12">
                  <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-zinc-200 decoration-8 underline-offset-16 font-manrope text-neutral-900">Multi-Signal Intelligence.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[500px] leading-relaxed italic">Deep Sense uses a layered approach, combining advanced machine learning with traditional rule engines and graph intelligence.</p>
+                 <p className="text-xl text-zinc-500 font-inter italic max-w-[500px] leading-relaxed">Deep Sense uses a layered approach, combining advanced machine learning with traditional rule engines and graph intelligence.</p>
                  <div className="grid grid-cols-2 gap-8">
                     {detectionLayers.map((layer, i) => (
                       <div key={i} className="flex gap-4 items-start group">
@@ -191,7 +191,7 @@ export default function TransactionFraudPage() {
            <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 md:grid-cols-2 gap-12">
               <div className="p-12 lg:p-24 bg-white border border-gray-100 rounded-[80px] shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative">
                  <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-10 font-manrope text-neutral-900 underline decoration-zinc-100 decoration-8 underline-offset-16">Revenue Protection.</h3>
-                 <p className="text-zinc-500 text-lg font-inter italic mb-10 leading-relaxed italic">Smarter scoring reduces false positives, ensuring legitimate customers aren&apos;t blocked and your revenue keeps growing.</p>
+                 <p className="text-zinc-500 text-lg font-inter italic mb-10 leading-relaxed">Smarter scoring reduces false positives, ensuring legitimate customers aren&apos;t blocked and your revenue keeps growing.</p>
                  <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
                        <div className="text-3xl font-black text-neutral-900 italic tracking-tighter mb-1">-45%</div>

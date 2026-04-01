@@ -13,7 +13,6 @@ import {
   Activity, 
   Lock, 
   CheckCircle2, 
-  Globe,
   Settings,
   Database,
   Search,

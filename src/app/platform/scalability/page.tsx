@@ -92,7 +92,7 @@ export default function PerformancePage() {
               <div className="p-12 lg:p-24 bg-white border border-gray-100 rounded-[80px] shadow-sm hover:shadow-2xl transition-all relative group overflow-hidden">
                  <Cpu className="w-24 h-24 absolute -top-8 -right-8 text-neutral-900 opacity-5 group-hover:rotate-12 transition-transform duration-1000" />
                  <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-8 font-manrope">Low Latency Engine</h3>
-                 <p className="text-lg text-zinc-500 font-inter italic mb-10 leading-relaxed italic">Every single transaction is evaluated against thousands of signals in real-time, delivering sub-35ms response stability.</p>
+                 <p className="text-lg text-zinc-500 font-inter italic mb-10 leading-relaxed">Every single transaction is evaluated against thousands of signals in real-time, delivering sub-35ms response stability.</p>
                  <div className="space-y-6">
                     {[
                       "Optimized scoring pipelines",
@@ -111,7 +111,7 @@ export default function PerformancePage() {
               <div className="p-12 lg:p-24 bg-neutral-900 text-white rounded-[80px] shadow-3xl relative group overflow-hidden border border-white/5">
                  <Network className="w-24 h-24 absolute -bottom-8 -left-8 text-brand-lime opacity-5 group-hover:rotate-12 transition-transform duration-1000" />
                  <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-8 font-manrope">High Throughput</h3>
-                 <p className="text-lg text-white/40 font-inter italic mb-10 leading-relaxed italic">Deep Sense handles large volumes of transaction metadata without any detection degradation, supported by a massive ingestion layer.</p>
+                 <p className="text-lg text-white/40 font-inter italic mb-10 leading-relaxed">Deep Sense handles large volumes of transaction metadata without any detection degradation, supported by a massive ingestion layer.</p>
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     {[
                       { l: "Request Rates", d: "Millions of daily events." },
@@ -134,7 +134,7 @@ export default function PerformancePage() {
            <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center text-center lg:text-left">
               <div className="space-y-12">
                  <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-neutral-100 decoration-8 underline-offset-16 font-manrope text-neutral-900">Optimized Distribution.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[500px] leading-relaxed italic">We decouple real-time scoring from heavy background analytics to ensure your user-facing responses remain ultra-fast, always.</p>
+                 <p className="text-xl text-zinc-500 font-inter italic max-w-[500px] leading-relaxed">We decouple real-time scoring from heavy background analytics to ensure your user-facing responses remain ultra-fast, always.</p>
                  <div className="flex flex-wrap justify-center lg:justify-start gap-4">
                     {["Analytical Computations", "Model Updates", "Graph Intelligence", "Alert Delivery"].map((tag, i) => (
                       <span key={i} className="px-6 py-3 bg-neutral-900 text-white rounded-full text-[10px] font-bold uppercase tracking-widest">{tag}</span>
@@ -150,7 +150,7 @@ export default function PerformancePage() {
                       <div className={`w-14 h-14 bg-neutral-900 rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform ${b.color}`}>
                          {React.cloneElement(b.i as React.ReactElement<{ className: string }>, { className: "w-6 h-6" })}
                       </div>
-                      <h3 className="text-xl font-bold italic uppercase tracking-tighter mb-8 italic">{b.t}</h3>
+                      <h3 className="text-xl font-bold italic uppercase tracking-tighter mb-8">{b.t}</h3>
                       <p className="text-[11px] text-zinc-400 font-inter leading-relaxed">{b.d}</p>
                    </div>
                  ))}
@@ -273,7 +273,7 @@ export default function PerformancePage() {
 
               <div className="bg-neutral-900 rounded-[80px] p-12 lg:p-24 text-white relative overflow-hidden group border border-white/5 shadow-3xl">
                  <MessageSquareQuote className="w-24 h-24 text-brand-lime opacity-10 absolute bottom-0 left-0 p-8" />
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-12 italic font-manrope">System Reliability.</h3>
+                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-12 font-manrope">System Reliability.</h3>
                  <ul className="space-y-12">
                     {[
                       "We processed thousands of transactions per second without a single latency spike.",
