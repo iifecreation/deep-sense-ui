@@ -5,24 +5,28 @@ import { Plus, Minus } from "lucide-react";
 
 const faqs = [
   {
-    question: "Can I use the service for business transactions?",
-    answer: "Yes, our platform supports both personal and business transactions. Businesses can benefit from our secure and efficient transfer options tailored to their needs.",
+    question: "How does Deep Sense detect fraud?",
+    answer: "We use a hybrid approach combining machine learning models, custom rule engines, and graph intelligence. This allows us to detect known fraud patterns and adaptive threats in milliseconds.",
   },
   {
-    question: "What is the maximum amount I can transfer?",
-    answer: "Transfer limits vary based on your account level and verification status. Most users can transfer up to $10,000 per day initially.",
+    question: "Can I integrate via API?",
+    answer: "Yes, Deep Sense is API-first. You can send transaction data via our REST API or stream it in real-time using our SDKs and webhooks.",
   },
   {
-    question: "How do I update my account information?",
-    answer: "You can update your profile, email, and contact details directly in the app settings under the 'Profile' section.",
+    question: "Is it really real-time?",
+    answer: "Absolutely. Decisions are typically returned in under 100ms, making it suitable for inline blocking of payments and authentication flows.",
   },
   {
-    question: "Are there any benefits for frequent users?",
-    answer: "Yes! Frequent users earn reward points on every transaction which can be redeemed for cashback or reduced transfer fees.",
+    question: "Can I customize fraud rules?",
+    answer: "Yes, our no-code rule engine allows your fraud analysts to create, test, and deploy rules instantly without needing any engineering support.",
   },
   {
-    question: "Can I access my account from multiple devices?",
-    answer: "Absolutely. Your account is synced across all devices. We use multi-factor authentication to ensure your data stays secure.",
+    question: "Does it support multi-tenant systems?",
+    answer: "Yes, our architecture is designed for enterprise scale and supports secure multi-tenancy with isolated data and custom configurations for different business units.",
+  },
+  {
+    question: "What industries is Deep Sense built for?",
+    answer: "While we support any high-volume transaction system, we specialize in Banking, Fintech, E-commerce, and Payment Processing platforms.",
   },
 ];
 
@@ -31,7 +35,7 @@ export default function FAQ() {
 
   return (
     <section id="pricing" className="py-20 px-4 md:px-24 bg-white">
-      <div className="max-w-[1240px] mx-auto flex flex-col lg:flex-row justify-between items-start gap-12 lg:gap-24">
+      <div className="max-w-[1300px] mx-auto flex flex-col lg:flex-row justify-between items-start gap-12 lg:gap-24">
         {/* Left Side Content */}
         <div className="flex flex-col gap-10 max-w-sm">
           <div className="flex flex-col gap-4">
@@ -43,8 +47,8 @@ export default function FAQ() {
           
           <div className="flex flex-col gap-2">
             <p className="text-zinc-500 text-base font-inter">Ask any questions</p>
-            <a href="mailto:investo@fintech.com" className="text-indigo-600 text-xl md:text-2xl font-semibold font-manrope hover:underline transition-all">
-              investo@fintech.com
+            <a href="mailto:hello@deepsense.ai" className="text-indigo-600 text-xl md:text-2xl font-semibold font-manrope hover:underline transition-all">
+              hello@deepsense.ai
             </a>
           </div>
         </div>
