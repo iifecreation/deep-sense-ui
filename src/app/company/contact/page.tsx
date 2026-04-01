@@ -262,7 +262,7 @@ export default function ContactPage() {
         <section className="py-40 bg-zinc-50 border-y border-gray-100">
            <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
               <div className="space-y-8">
-                 <h2 className="text-4xl lg:text-5xl font-bold uppercase italic tracking-tighter italic font-manrope">Quick Questions.</h2>
+                 <h2 className="text-4xl lg:text-5xl font-bold uppercase italic tracking-tighter font-manrope">Quick Questions.</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10 font-manrope">
                  {[

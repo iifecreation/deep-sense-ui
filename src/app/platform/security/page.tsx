@@ -267,9 +267,9 @@ export default function SecurityPage() {
                  <table className="w-full text-left border-collapse font-manrope italic">
                     <thead>
                        <tr className="border-b border-white/10 uppercase tracking-widest text-[11px] text-zinc-500">
-                          <th className="py-10 px-8 font-bold italic italic">Security Capability</th>
-                          <th className="py-10 px-8 font-bold text-brand-lime italic italic">Deep Sense</th>
-                          <th className="py-10 px-8 font-bold italic italic">Typical Systems</th>
+                          <th className="py-10 px-8 font-bold italic">Security Capability</th>
+                          <th className="py-10 px-8 font-bold text-brand-lime italic">Deep Sense</th>
+                          <th className="py-10 px-8 font-bold italic">Typical Systems</th>
                        </tr>
                     </thead>
                     <tbody className="italic">

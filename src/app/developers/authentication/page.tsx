@@ -302,7 +302,7 @@ export default function AuthenticationPage() {
         {/* 🆚 COMPARISON TABLE */}
         <section className="py-40">
            <div className="max-w-[1000px] mx-auto px-8 text-center mb-24">
-              <h2 className="text-4xl lg:text-6xl font-bold uppercase italic tracking-tighter italic font-manrope">Enterprise-Grade by Design.</h2>
+              <h2 className="text-4xl lg:text-6xl font-bold uppercase italic tracking-tighter font-manrope">Enterprise-Grade by Design.</h2>
            </div>
            
            <div className="max-w-[900px] mx-auto px-8 font-bold italic uppercase tracking-widest text-[10px]">

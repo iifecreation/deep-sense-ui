@@ -5,11 +5,10 @@ import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
 import { 
   Database, Zap, BrainCircuit, ShieldCheck, 
-  Search, Share2, Smartphone, BarChart3, 
-  ArrowRight, FileCode, Lock, Cpu, Globe,
-  Activity, Layers, MousePointer2
+  Share2, Smartphone, BarChart3, 
+  ArrowRight, FileCode, Lock, Cpu,
+  Activity, Layers
 } from "lucide-react";
-import Link from "next/link";
 
 export default function ProductOverview() {
   return (
@@ -244,7 +243,7 @@ export default function ProductOverview() {
                     <p className="text-zinc-600 text-lg font-inter leading-relaxed max-w-[500px]">Integrate Deep Sense into your high-volume stream or batch system in minutes via standard REST APIs and Webhooks.</p>
                     <div className="p-8 bg-zinc-900 rounded-[32px] text-brand-lime font-mono text-sm overflow-hidden relative group">
                        <div className="flex flex-col gap-1">
-                          <span className="text-white/40">// Example Score Request</span>
+                          <span className="text-white/40">{"// Example Score Request"}</span>
                           <span>POST /v1/score</span>
                           <span className="text-white opacity-40">{`{ "transaction_id": "tx_892", "amount": 1024.50 ... }`}</span>
                        </div>
@@ -344,7 +343,7 @@ export default function ProductOverview() {
 }
 
 // Minimal missing component definitions
-function Bell(props: any) {
+function Bell(props: React.SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}
@@ -364,7 +363,7 @@ function Bell(props: any) {
     )
 }
 
-function FolderSearch(props: any) {
+function FolderSearch(props: React.SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}
