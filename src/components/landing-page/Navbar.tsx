@@ -4,7 +4,25 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { ChevronDown, Menu, X, ArrowRight, Zap, Shield, BarChart2, Cpu, Database, Users, Code, BookOpen, Layers } from "lucide-react";
 
-const navConfig = [
+interface NavItem {
+  label: string;
+  href: string;
+  icon?: React.ReactNode;
+  badge?: string;
+  featured?: boolean;
+}
+
+interface NavGroup {
+  title: string;
+  items: NavItem[];
+}
+
+interface NavMenu {
+  title: string;
+  groups: NavGroup[];
+}
+
+const navConfig: NavMenu[] = [
   {
     title: "Product",
     groups: [
@@ -27,7 +45,7 @@ const navConfig = [
         title: "Intelligence",
         items: [
           { label: "Device Intelligence", href: "/product/device-intelligence", icon: <Layers className="w-4 h-4" /> },
-          { label: "Graph Detection", href: "/product/graph-detection", icon: <Database className="w-4 h-4" /> },
+          { label: "Graph & Ring Detection", href: "/product/graph-analysis", icon: <Database className="w-4 h-4" /> },
           { label: "Behavioral Biometrics", href: "/product/behavioral", badge: "Soon" },
         ]
       },
