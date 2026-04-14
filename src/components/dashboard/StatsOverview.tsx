@@ -1,42 +1,57 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
-
-const stats = [
-  { name: "Jane Cooper", date: "08 Sep, 2022", amount: 4590, currency: "US Dollar", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" },
-  { name: "Jane Cooper", date: "08 Sep, 2022", amount: 4590, currency: "US Dollar", avatar: "https://images.unsplash.com/photo-1531746020798-e795c5399c47?w=100&h=100&fit=crop" },
-  { name: "Jane Cooper", date: "08 Sep, 2022", amount: 4590, currency: "US Dollar", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop" },
-];
+import { ShieldCheck, Activity, Cpu, Zap, BarChart3, Database, Globe, History, TrendingUp } from "lucide-react";
 
 export default function StatsOverview() {
+  const metrics = [
+    { label: "Engine Confidence", value: "98.4%", stat: "Stable", icon: <ShieldCheck />, color: "text-neutral-900", bg: "bg-brand-lime" },
+    { label: "Active Connections", value: "841/s", stat: "Elevated", icon: <Activity />, color: "text-emerald-600", bg: "bg-emerald-500/5" },
+    { label: "Compute Utilization", value: "42.1%", stat: "Optimized", icon: <Cpu />, color: "text-blue-600", bg: "bg-blue-500/5" },
+    { label: "Network Propagation", value: "12ms", stat: "Synced", icon: <Globe />, color: "text-brand-lime", bg: "bg-zinc-50" }
+  ];
+
   return (
-    <div className="bg-white p-8 rounded-[40px] shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-gray-800 text-xl font-bold font-manrope">Overview</h3>
-        <button className="text-gray-500 text-sm font-bold hover:text-gray-800 transition-colors underline-offset-4 hover:underline">See All</button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {stats.map((item, i) => (
-          <div key={i} className="flex-1 bg-gray-50/50 hover:bg-gray-50 p-5 rounded-[28px] border border-gray-100/50 flex items-center justify-between transition-all duration-300 hover:shadow-lg hover:shadow-indigo-600/5 group">
-             <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full overflow-hidden relative border-2 border-white shadow-sm transition-transform group-hover:rotate-12">
-                   <Image src={item.avatar} alt={item.name} fill className="object-cover" />
-                </div>
-                <div className="flex flex-col gap-0.5">
-                   <span className="text-gray-800 text-sm font-bold font-manrope tracking-tight leading-none">{item.name}</span>
-                   <span className="text-gray-400 text-[10px] font-bold opacity-60 uppercase">{item.date}</span>
-                </div>
-             </div>
-
-             <div className="flex flex-col items-end gap-0.5 pr-2">
-                <span className="text-indigo-600 text-lg font-black leading-none">{item.amount}</span>
-                <span className="text-gray-400 text-[9px] font-bold opacity-50 uppercase tracking-tighter">US Dollar</span>
-             </div>
+    <div className="p-10 bg-white rounded-[56px] border border-neutral-100 shadow-xl flex flex-col h-full group hover:shadow-2xl transition-all cursor-default overflow-hidden relative">
+       <div className="flex items-center justify-between mb-10 italic">
+          <h3 className="text-xl font-black italic tracking-tighter text-neutral-900 uppercase italic leading-none">System Vital Status.</h3>
+          <div className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2 italic font-black">
+             <Zap className="w-3.5 h-3.5 text-[#D1F701]" /> 100.0% Uptime
           </div>
-        ))}
-      </div>
+       </div>
+
+       <div className="flex-1 grid grid-cols-2 gap-8 mb-10">
+          {metrics.map((m, i) => (
+            <div key={i} className="p-6 bg-zinc-50 rounded-[32px] border border-neutral-100 flex flex-col justify-between hover:border-neutral-200 cursor-pointer shadow-sm group/item">
+               <div className="flex items-center justify-between mb-6 italic">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${m.bg} ${m.color} shadow-sm group-hover/item:scale-110 transition-transform`}>
+                     {React.cloneElement(m.icon as React.ReactElement<{ className: string }>, { className: "w-4 h-4" })}
+                  </div>
+                  <span className={`text-[8px] font-black uppercase tracking-widest ${m.stat === 'Elevated' ? 'text-emerald-600 animate-pulse' : 'text-neutral-300'}`}>
+                     {m.stat}
+                  </span>
+               </div>
+               <div className="italic">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-neutral-400 mb-1 italic">{m.label}</p>
+                  <div className="text-2xl font-black italic tracking-tighter text-neutral-900 italic leading-none">{m.value}</div>
+               </div>
+            </div>
+          ))}
+       </div>
+
+       <div className="mt-auto pt-10 border-t border-neutral-100 space-y-4 font-bold">
+          <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-neutral-300 italic">
+             <span>Regional Engine Load (EU-1)</span>
+             <span className="text-neutral-900">72%</span>
+          </div>
+          <div className="h-1.5 w-full bg-neutral-100 rounded-full overflow-hidden shadow-inner">
+             <div className="h-full bg-brand-lime w-[72%] transition-all duration-1000 group-hover:w-full shadow-sm" />
+          </div>
+          <div className="flex items-center gap-3 pt-4 text-[9px] font-black text-neutral-300 uppercase tracking-widest italic group-hover:text-neutral-900 transition-all italic">
+             <History className="w-3.5 h-3.5" />
+             Last sync with global relay: 14s ago
+          </div>
+       </div>
     </div>
   );
 }
