@@ -1,63 +1,69 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
-import { Search, Bell, Settings, LayoutDashboard, MessageSquare, PieChart, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { Search, Bell, HelpCircle, ShieldCheck, Zap, MoreVertical } from "lucide-react";
 
 export default function DashboardHeader() {
   return (
-    <header className="w-full h-20 px-8 bg-white rounded-[40px] flex items-center justify-between shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-gray-50 mb-8">
-      <div className="flex items-center gap-12">
-        {/* Logo */}
-        <div className="flex items-center gap-2">
-          <div className="flex gap-0.5">
-             <div className="w-2.5 h-3 bg-brand-lime rounded-full scale-105" />
-             <div className="w-4 h-5 bg-[#001D3D] rounded-sm transform -rotate-12" />
+    <header className="w-full flex items-center justify-between p-10 bg-white/80 backdrop-blur-3xl rounded-[40px] border border-neutral-200/50 relative shadow-xl">
+       <div className="flex items-center gap-12">
+          {/* Dashboard Logo/Indicator */}
+          <Link href="/" className="group flex items-center gap-4">
+             <div className="w-10 h-10 bg-brand-lime rounded-xl flex items-center justify-center text-neutral-900 group-hover:rotate-12 transition-transform shadow-lg">
+                <ShieldCheck className="w-6 h-6" />
+             </div>
+             <div className="hidden md:block">
+                <h5 className="text-neutral-900 font-black italic tracking-tighter text-2xl leading-none italic">DEEP SENSE</h5>
+                <p className="text-[9px] font-black uppercase tracking-widest text-[#D1F701] mt-1 italic drop-shadow-sm">Enterprise Gateway</p>
+             </div>
+          </Link>
+
+          <div className="h-10 w-px bg-neutral-200 hidden lg:block" />
+
+          {/* Quick Search */}
+          <div className="hidden lg:block">
+             <div className="relative group w-96">
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-300 group-focus-within:text-neutral-900 transition-all font-bold" />
+                <input 
+                   type="text" 
+                   placeholder="Global Intelligence Search... (⌘K)"
+                   className="w-full pl-14 pr-4 py-4 bg-zinc-50 border border-neutral-200 rounded-2xl text-[13px] font-bold text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-brand-lime transition-all font-manrope italic"
+                />
+             </div>
           </div>
-          <span className="text-gray-800 text-2xl font-bold font-manrope">FiscalFit</span>
-        </div>
+       </div>
 
-        {/* Global Nav */}
-        <nav className="hidden lg:flex items-center bg-gray-50 rounded-full p-1.5 gap-1">
-          {["Overview", "Wallet", "Payment", "Activity"].map((item, i) => (
-            <button
-              key={item}
-              className={`px-6 py-2.5 rounded-full text-base font-medium transition-all ${
-                i === 0 ? "bg-white text-gray-800 shadow-sm" : "text-gray-500 hover:text-gray-800"
-              }`}
-            >
-              {item}
-            </button>
-          ))}
-        </nav>
-      </div>
+       <div className="flex items-center gap-6 font-bold">
+          {/* Notification Gateway */}
+          <div className="flex items-center gap-2">
+             <button className="w-12 h-12 rounded-2xl bg-zinc-50 border border-neutral-200 flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:border-neutral-300 transition-all relative group">
+                <div className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full border-2 border-white group-hover:scale-125 transition-transform animate-pulse" />
+                <Bell className="w-5 h-5" />
+             </button>
+             <button className="w-12 h-12 rounded-2xl bg-zinc-50 border border-neutral-200 flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:border-neutral-300 transition-all italic">
+                <HelpCircle className="w-5 h-5" />
+             </button>
+          </div>
 
-      <div className="flex items-center gap-6">
-        {/* Search */}
-        <div className="relative hidden md:block">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search..."
-            className="pl-12 pr-6 py-3 bg-gray-50 rounded-full border border-transparent focus:border-indigo-600/20 focus:bg-white outline-none w-64 transition-all font-inter"
-          />
-        </div>
+          <div className="h-10 w-px bg-neutral-200 mx-2 hidden md:block" />
 
-        {/* Action icons */}
-        <div className="flex items-center gap-2 px-4">
-           <button className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors">
-              <Bell className="w-5 h-5" />
-           </button>
-           <button className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-100 overflow-hidden relative border border-gray-100">
-              <Image 
-                src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop" 
-                alt="Profile" 
-                fill 
-                className="object-cover" 
-              />
-           </button>
-        </div>
-      </div>
+          {/* Identity Mock */}
+          <div className="flex items-center gap-4 bg-zinc-50 border border-neutral-200 p-2 pr-6 rounded-[24px] group cursor-pointer hover:bg-white hover:border-brand-lime/20 transition-all shadow-sm">
+             <div className="w-10 h-10 rounded-xl bg-neutral-100 p-0.5 shadow-md">
+                <img 
+                   src="https://api.dicebear.com/7.x/pixel-art/svg?seed=FraudAgent" 
+                   alt="Agent" 
+                   className="w-full h-full rounded-[10px] bg-white border border-neutral-100" 
+                />
+             </div>
+             <div className="hidden sm:block">
+                <p className="text-neutral-900 text-xs font-black italic tracking-tight italic">ALEX REED</p>
+                <p className="text-[8px] font-bold uppercase tracking-widest text-[#D1F701] italic drop-shadow-sm">ID: NODE-8820</p>
+             </div>
+             <MoreVertical className="w-4 h-4 text-neutral-300 group-hover:text-neutral-900 transition-all ml-2" />
+          </div>
+       </div>
     </header>
   );
 }

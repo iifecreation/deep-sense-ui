@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MarketplaceCards from "@/components/dashboard/MarketplaceCards";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import EarningChart from "@/components/dashboard/EarningChart";
@@ -10,35 +8,42 @@ import StatsOverview from "@/components/dashboard/StatsOverview";
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-[#F4F5F7] p-8 font-manrope">
-      <div className="max-w-[1680px] mx-auto flex flex-col gap-8 h-full">
-        {/* Top Header */}
-        <DashboardHeader />
+    <div className="flex-1 flex flex-col gap-12 min-w-0">
+       {/* 1. Tactical Metric Layer */}
+       <div className="space-y-4">
+          <div className="flex items-center justify-between px-6">
+             <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-neutral-300 italic">Tactical Intelligence Layer.</h2>
+             <span className="text-[10px] font-bold text-brand-lime animate-pulse italic">Live Engine Stream Active</span>
+          </div>
+          <MarketplaceCards />
+       </div>
 
-        <div className="flex gap-8 h-full min-h-[1100px]">
-          {/* Main Sidebar Section */}
-          <DashboardSidebar />
+       {/* 2. Analytical Distribution Layer */}
+       <div className="flex flex-col xl:flex-row gap-12">
+          {/* Real-time Alert Matrix */}
+          <div className="w-full xl:w-[500px] flex flex-col">
+             <div className="px-6 mb-4">
+                <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/20 italic">Prioritized Risk Signal.</h2>
+             </div>
+             <RecentActivity />
+          </div>
 
-          {/* Right Content Section */}
-          <main className="flex-1 flex flex-col gap-8">
-            {/* Marketplace Card Section */}
-            <MarketplaceCards />
-
-            <div className="flex flex-col lg:flex-row gap-8 w-full">
-              {/* Recent Activity Card */}
-              <div className="w-full lg:w-[480px]">
-                <RecentActivity />
-              </div>
-
-              {/* Chart and Overview Section */}
-              <div className="flex-1 flex flex-col gap-8">
+          {/* Performance & Health Core */}
+          <div className="flex-1 flex flex-col gap-12">
+             <div className="w-full h-full flex flex-col">
+                <div className="px-6 mb-4">
+                   <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/20 italic">Anomaly Distribution.</h2>
+                </div>
                 <EarningChart />
+             </div>
+             <div className="w-full h-full flex flex-col">
+                <div className="px-6 mb-4 text-right">
+                   <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/20 italic">Engine Diagnostics.</h2>
+                </div>
                 <StatsOverview />
-              </div>
-            </div>
-          </main>
-        </div>
-      </div>
+             </div>
+          </div>
+       </div>
     </div>
   );
 }
