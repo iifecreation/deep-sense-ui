@@ -15,6 +15,9 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "Deep Sense - Industrial-Grade Fraud Prevention",
   description: "Secure your financial platform with Deep Sense AI - the world's most advanced fraud detection infrastructure.",
+  icons: {
+    icon: "/assets/logo/icon-bg.svg",
+  },
 };
 
 export default function RootLayout({

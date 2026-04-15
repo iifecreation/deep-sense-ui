@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Search, Bell, HelpCircle, ShieldCheck, Zap, MoreVertical } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 export default function DashboardHeader() {
   return (
@@ -10,13 +11,7 @@ export default function DashboardHeader() {
        <div className="flex items-center gap-12">
           {/* Dashboard Logo/Indicator */}
           <Link href="/" className="group flex items-center gap-4">
-             <div className="w-10 h-10 bg-brand-lime rounded-xl flex items-center justify-center text-neutral-900 group-hover:rotate-12 transition-transform shadow-lg">
-                <ShieldCheck className="w-6 h-6" />
-             </div>
-             <div className="hidden md:block">
-                <h5 className="text-neutral-900 font-black italic tracking-tighter text-2xl leading-none italic">DEEP SENSE</h5>
-                <p className="text-[9px] font-black uppercase tracking-widest text-[#D1F701] mt-1 italic drop-shadow-sm">Enterprise Gateway</p>
-             </div>
+             <Logo variant="primary" className="h-10" iconClassName="h-10 w-10" nameClassName="h-6" />
           </Link>
 
           <div className="h-10 w-px bg-neutral-200 hidden lg:block" />

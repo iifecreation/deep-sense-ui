@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Globe, Mail, Link as LinkIcon, Share2, Send, Camera, X } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 export default function Footer() {
   const socialLinks = [
@@ -37,55 +38,47 @@ export default function Footer() {
 
   const footerLinks = [
     {
-      title: "Product",
+      title: "Product & AML",
       links: [
-        { name: "Overview", href: "/product/overview" },
         { name: "Fraud Detection", href: "/product/fraud-detection" },
-        { name: "Risk Scoring", href: "/product/scoring-engine" },
-        { name: "Rules Engine", href: "/product/rules-engine" },
-        { name: "Case Management", href: "/product/case-management" },
-        { name: "Device Intelligence", href: "/product/device-intelligence" },
-        { name: "Graph Detection", href: "/product/graph-detection" }
+        { name: "AML Monitoring", href: "/product/aml-monitoring" },
+        { name: "Risk Profiling", href: "/product/risk-profiling" },
+        { name: "Sanctions Screening", href: "/product/sanctions-screening" },
+        { name: "Regulatory Reporting", href: "/product/regulatory-reporting" },
+        { name: "Compliance Operations", href: "/product/compliance-ops" }
       ],
     },
     {
       title: "Solutions",
       links: [
-        { name: "Banking", href: "/solutions/banking" },
-        { name: "Fintech", href: "/solutions/fintech" },
-        { name: "Payments", href: "/solutions/payments" },
-        { name: "E-commerce", href: "/solutions/ecommerce" },
-        { name: "Account Takeover", href: "/solutions/account-takeover" },
-        { name: "Transaction Fraud", href: "/solutions/transaction-fraud" }
+        { name: "Banking & Fintech", href: "/solutions/banking" },
+        { name: "AML Automation", href: "/solutions/aml-automation" },
+        { name: "CBN Compliance", href: "/solutions/cbn-compliance", badge: "New" },
+        { name: "PEP Monitoring", href: "/solutions/pep-monitoring" },
+        { name: "Transaction Fraud", href: "/solutions/transaction-fraud" },
+        { name: "Account Takeover", href: "/solutions/account-takeover" }
       ],
     },
     {
-      title: "Developers & Resources",
+      title: "Platform & Dev",
       links: [
-        { name: "API Docs", href: "/resources/docs" },
-        { name: "Authentication", href: "/developers/auth" },
+        { name: "Core Banking", href: "/platform/core-banking" },
+        { name: "API Integrations", href: "/developers/api-overview" },
+        { name: "Auth Service", href: "/developers/auth" },
         { name: "Webhooks", href: "/platform/webhooks" },
-        { name: "SDKs", href: "/developers/sdks", badge: "Soon" },
-        { name: "Status Page", href: "/status" },
-        { name: "Blog", href: "/resources/blog" },
-        { name: "Documentation", href: "/resources/docs" },
-        { name: "Guides", href: "/resources/guides" },
-        { name: "Case Studies", href: "/resources/case-studies" },
-        { name: "Whitepapers", href: "/resources/whitepapers" }
+        { name: "Audit & Governance", href: "/platform/audit-trail" },
+        { name: "Security & Trust", href: "/platform/security" }
       ],
     },
     {
-      title: "Company & Legal",
+      title: "Resources & Legal",
       links: [
-        { name: "About", href: "/company/about" },
-        { name: "Contact", href: "/company/contact" },
-        { name: "Careers", href: "/company/careers" },
-        { name: "Partners", href: "/company/partners" },
+        { name: "Compliance Center", href: "/resources/compliance-center" },
+        { name: "CBN AML Guide", href: "/resources/cbn-guide" },
+        { name: "AML Checklist", href: "/resources/aml-checklist" },
         { name: "Privacy Policy", href: "/privacy" },
         { name: "Terms of Service", href: "/terms" },
-        { name: "Security", href: "/security" },
-        { name: "Compliance", href: "/compliance" },
-        { name: "Data Processing (DPA)", href: "/dpa" }
+        { name: "Contact Us", href: "/company/contact" }
       ],
     },
   ];
@@ -97,12 +90,7 @@ export default function Footer() {
           {/* Logo & Subscribe */}
           <div className="flex flex-col gap-10 max-w-sm">
             <div className="flex items-center gap-2">
-              <div className="flex gap-0.5">
-                {[1, 2, 3, 2, 1].map((i, idx) => (
-                  <div key={idx} className="bg-brand-lime" style={{ height: `${(i * 4) + 4}px`, width: '4px' }} />
-                ))}
-              </div>
-              <span className="text-neutral-900 text-2xl font-bold font-manrope tracking-tight">Deep Sense</span>
+              <Logo variant="black" className="h-10" iconClassName="h-8 w-8" nameClassName="h-6" />
             </div>
             
             <p className="text-zinc-600 text-base font-inter leading-relaxed">

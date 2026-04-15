@@ -1,370 +1,219 @@
 "use client";
 
 import React from "react";
-import Navbar from "@/components/landing-page/Navbar";
-import Footer from "@/components/landing-page/Footer";
 import { 
+  Zap, 
   ShieldCheck, 
+  ArrowRight, 
+  CheckCircle2, 
   Activity, 
+  Layers, 
+  Cpu, 
   Network, 
   BarChart3, 
-  ArrowRight,
-  Database,
+  Workflow,
+  Search,
+  FileText,
   Users,
-  CheckCircle2,
-  Zap,
-  Share2,
-  Lock,
-  Eye,
-  Gavel,
+  Building,
+  Scale,
+  Globe,
+  Database,
   History,
-  FileSearch,
-  MessageSquareQuote,
-  Layers
+  Lock
 } from "lucide-react";
+import Navbar from "@/components/landing-page/Navbar";
+import Footer from "@/components/landing-page/Footer";
 
-export default function AMLPage() {
+export default function AmlSolutionPage() {
   return (
-    <div className="min-h-screen bg-white font-manrope">
+    <div className="min-h-screen bg-white font-manrope text-neutral-900">
       <Navbar />
-
-      <main className="pt-40 pb-24 overflow-hidden">
-        {/* 1. 🔥 HERO SECTION */}
-        <section className="max-w-[1440px] mx-auto px-8 mb-32 relative text-center">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-lime/10 rounded-full blur-[140px] pointer-events-none" />
-          <div className="max-w-[1000px] mx-auto relative z-10">
-             <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-brand-lime text-[11px] font-bold uppercase tracking-widest mb-10 shadow-2xl">
-               <Gavel className="w-3.5 h-3.5" />
-               Financial Intelligence Layer
-             </div>
-             <h1 className="text-6xl lg:text-9xl font-bold leading-[0.95] mb-10 tracking-tight text-neutral-900 uppercase italic">
-               Detect Financial <br />
-               <span className="text-zinc-300 italic">Activity Risks.</span>
-             </h1>
-             <p className="text-xl text-zinc-500 font-inter leading-relaxed max-w-[800px] mx-auto mb-14">
-               Deep Sense helps organizations identify suspicious transactions, detect hidden patterns, and support compliance workflows in real time.
-             </p>
-             <div className="flex flex-wrap gap-8 justify-center">
-                <button className="px-10 py-5 bg-neutral-900 text-white rounded-full font-bold text-lg hover:scale-110 transition-all shadow-3xl flex items-center gap-3">
-                  Request Demo
-                  <ArrowRight className="w-5 h-5 text-brand-lime" />
-                </button>
-                <button className="px-10 py-5 bg-white text-neutral-900 border border-gray-100 rounded-full font-bold text-lg hover:bg-gray-50 transition-all shadow-xl">
-                  Talk to Sales
-                </button>
-             </div>
+      
+      <main>
+        {/* 1. Hero Section */}
+        <section className="pt-48 pb-24 px-8 overflow-hidden relative font-manrope italic">
+          <div className="absolute top-0 right-0 -z-10 w-[700px] h-[700px] bg-indigo-50 rounded-full blur-[140px] opacity-60 translate-x-1/4 -translate-y-1/4" />
+          <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-brand-lime text-[11px] font-extrabold uppercase tracking-widest mb-8 shadow-2xl font-manrope">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Institutional AML Framework</span>
+            </div>
+            <h1 className="text-6xl md:text-8xl font-black leading-[1.05] mb-8 tracking-tighter max-w-5xl uppercase italic font-manrope">
+               The Unified <br /><span className="text-indigo-600">AML Operating</span> System.
+            </h1>
+            <p className="text-xl md:text-2xl text-zinc-500 font-inter leading-relaxed max-w-4xl mb-12 italic">
+               Deep Sense provides the end-to-end framework for institutional AML compliance—from automated onboarding and global screening to real-time monitoring and reporting.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-5 font-bold italic font-manrope">
+              <button className="px-12 py-6 bg-neutral-900 text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all text-lg tracking-tighter uppercase">
+                 Request Demo
+              </button>
+              <button className="px-12 py-6 bg-white border-2 border-neutral-200 text-neutral-900 rounded-full hover:bg-zinc-50 transition-all text-lg tracking-tighter uppercase font-manrope">
+                 View Compliance Docs
+              </button>
+            </div>
           </div>
         </section>
 
-        {/* 2. 🚨 THE PROBLEM & 3. 💡 THE SOLUTION */}
-        <section className="py-24 bg-neutral-900 text-white rounded-[100px] mx-4 overflow-hidden relative border border-white/5 shadow-3xl">
-           <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
-           <div className="max-w-[1440px] mx-auto px-8 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-              <div className="space-y-12">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-brand-lime decoration-8 underline-offset-16 font-manrope">Financial Crime.</h2>
-                 <p className="text-xl text-white/40 font-inter italic max-w-[500px]">Money laundering involves complex networks and accounts. Traditional static rules fail to detect hidden patterns across segmented systems.</p>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+        {/* 2. The Challenge */}
+        <section className="py-24 bg-zinc-50 px-8 rounded-[64px] mx-4 border border-zinc-100 font-manrope italic pr-12 pr-12 group">
+           <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center font-manrope">
+              <div>
+                 <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase pr-10 leading-tight">Fragmented AML Complexity.</h2>
+                 <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed font-manrope pr-12 pr-12">Relying on separate vendors for KYC, Sanctions, Monitoring, and Reporting creates massive data silos, operational friction, and critical regulatory blind spots.</p>
+                 <div className="space-y-4 font-manrope pr-6">
                     {[
-                      { l: "Complex Networks", d: "Crime involves multiple obscured accounts." },
-                      { l: "Hidden Patterns", d: "Activity is often buried across systems." },
-                      { l: "Static Dependency", d: "Traditional rules miss evolving threats." },
-                      { l: "Compliance Burden", d: "High workloads for manual audit teams." }
+                       "KYC/Onboarding doesn't talk to transaction monitoring.",
+                       "Sanctions screening lists are not updated in real-time.",
+                       "Manual reporting processes are slow and error-prone.",
+                       "Fragmented audit trails fail institutional regulatory reviews."
                     ].map((it, i) => (
-                      <div key={i} className="flex gap-4 items-start group">
-                         <div className="w-1.5 h-1.5 bg-brand-lime rounded-full mt-2" />
-                         <div>
-                            <h5 className="font-bold text-white text-[10px] uppercase tracking-widest mb-1 font-manrope italic">{it.l}</h5>
-                            <p className="text-[10px] text-white/20 font-inter leading-relaxed">{it.d}</p>
-                         </div>
-                      </div>
-                    ))}
-                 </div>
-                 <div className="bg-white/5 p-8 rounded-[40px] border border-white/5 font-manrope">
-                    <p className="text-xl font-bold italic text-white">“Financial crime is not always obvious — it requires deeper intelligence.”</p>
-                 </div>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 p-12 lg:p-24 rounded-[80px] shadow-3xl group relative overflow-hidden backdrop-blur-xl">
-                 <ShieldCheck className="w-40 h-40 absolute top-0 right-0 p-12 text-white opacity-5 group-hover:scale-110 transition-transform duration-1000" />
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tight mb-8 font-manrope">Activity Detection.</h3>
-                 <p className="text-white/40 text-sm font-inter italic mb-10 leading-relaxed">Deep Sense analyzes transaction patterns, relationships, and behavior to identify potential financial crime risks.</p>
-                 <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { l: "Pattern Analysis", i: <Zap /> },
-                      { l: "Anomaly Detection", i: <Activity /> },
-                      { l: "Graph Intelligence", i: <Network /> },
-                      { l: "Investigation Support", i: <FileSearch /> }
-                    ].map((it, i) => (
-                      <div key={i} className="p-6 bg-white/5 rounded-[32px] border border-white/5 hover:border-brand-lime/20 transition-all group/it">
-                         <div className="text-brand-lime mb-4 group-hover/it:scale-110 transition-transform">{it.i}</div>
-                         <h6 className="text-[10px] font-bold uppercase tracking-widest text-white">{it.l}</h6>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-           </div>
-        </section>
-
-        {/* 4. ⚙️ HOW IT WORKS (FLOW) */}
-        <section className="py-40">
-           <div className="max-w-[1440px] mx-auto px-8 text-center">
-              <div className="mb-32 max-w-[800px] mx-auto">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter mb-8 font-manrope underline decoration-zinc-100 decoration-8 underline-offset-16">Intelligence Path.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[600px] mx-auto">Transforming transactions into structured insights for risk and compliance operations.</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 items-center">
-                 {[
-                   { l: "Monitor", d: "Transaction activity tracking." },
-                   { l: "Detect", d: "Pattern & anomaly identification." },
-                   { l: "Analyze", d: "Linked entity cross-check." },
-                   { l: "Identify", d: "Suspicious activity scoring." },
-                   { l: "Alert", d: "Case & workflow generation." }
-                 ].map((step, i) => (
-                   <React.Fragment key={i}>
-                    <div className="p-10 bg-white border border-gray-100 rounded-[56px] shadow-sm hover:shadow-2xl transition-all group flex flex-col items-center">
-                       <div className="w-12 h-12 bg-neutral-900 rounded-2xl flex items-center justify-center text-brand-lime mb-6 group-hover:scale-110 transition-transform">
-                          <span className="font-bold text-sm italic">0{i+1}</span>
+                       <div key={i} className="flex gap-4 items-center group font-manrope">
+                          <div className="w-1.5 h-10 bg-indigo-600 transition-all rounded-full shrink-0" />
+                          <span className="text-sm font-bold italic uppercase tracking-tight italic pr-12 group-hover:text-indigo-600 transition-colors">{it}</span>
                        </div>
-                       <h4 className="text-lg font-bold italic uppercase tracking-tight mb-2 font-manrope">{step.l}</h4>
-                       <p className="text-[10px] text-zinc-400 font-inter uppercase tracking-widest leading-relaxed font-manrope">{step.d}</p>
-                    </div>
-                    {i < 4 && <div className="hidden lg:flex justify-center"><ArrowRight className="w-6 h-6 text-zinc-100" /></div>}
-                   </React.Fragment>
-                 ))}
-              </div>
-           </div>
-        </section>
-
-        {/* 5. 🧠 PATTERN & 6. 🕸️ NETWORK DETECTION */}
-        <section className="py-40 bg-zinc-50 border-y border-gray-100 mt-24">
-           <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-              <div className="space-y-12">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-zinc-200 decoration-8 underline-offset-16 font-manrope text-neutral-900">Behavior Patterns.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[500px]">Identify sophisticated money movement patterns using advanced signal logic.</p>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    {[
-                      { l: "Structuring (Smurfing)", d: "Small deposits to avoid threshold alerts.", i: <Zap /> },
-                      { l: "Rapid fund movement", d: "Detect funds moving through account layers.", i: <Activity /> },
-                      { l: "Unusual flows", d: "Identify non-standard transaction volumes.", i: <History /> },
-                      { l: "Historical Analysis", d: "Compare current activity to base patterns.", i: <Database /> }
-                    ].map((sig, i) => (
-                      <div key={i} className="p-8 bg-white border border-gray-100 shadow-sm rounded-[44px] hover:shadow-xl transition-all group">
-                         <div className="text-neutral-900 mb-6 group-hover:text-brand-lime transition-all">{React.cloneElement(sig.i as React.ReactElement<{ className: string }>, { className: "w-6 h-6" })}</div>
-                         <h5 className="font-bold text-neutral-900 text-xs mb-1 uppercase tracking-tight italic font-manrope">{sig.l}</h5>
-                         <p className="text-[10px] text-zinc-400 font-inter leading-relaxed">{sig.d}</p>
-                      </div>
                     ))}
                  </div>
               </div>
-
-              <div className="bg-neutral-900 rounded-[88px] p-12 lg:p-24 text-white shadow-3xl relative overflow-hidden group border border-white/10">
-                 <Share2 className="w-40 h-40 absolute top-0 right-0 p-12 text-zinc-600 opacity-5 group-hover:scale-110 transition-transform" />
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-12">Hidden Relationships.</h3>
-                 <div className="space-y-10">
-                    {[
-                      { l: "Linked Accounts", d: "Identify accounts sharing PII or device footprints." },
-                      { l: "Shared Indicators", d: "Discover commonalities across obscured entities." },
-                      { l: "Network Coordination", d: "Detect simultaneous flows across clusters." },
-                      { l: "Infrastructure Mapping", d: "Map the relationships between high-risk actors." }
-                    ].map((it, i) => (
-                      <div key={i} className="flex gap-8 group/item">
-                         <div className="w-1.5 h-12 bg-brand-lime/10 group-hover/item:bg-brand-lime transition-all duration-500" />
-                         <div>
-                            <h5 className="font-bold text-white uppercase text-[11px] mb-1 tracking-tight">{it.l}</h5>
-                            <p className="text-[11px] text-white/30 font-inter leading-relaxed max-w-[300px] italic">{it.d}</p>
-                         </div>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-           </div>
-        </section>
-
-        {/* 7. 📊 SCORING & 8. 🚨 ALERTS */}
-        <section className="py-40">
-           <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 md:grid-cols-2 gap-12 text-center lg:text-left">
-              <div className="p-12 lg:p-24 bg-white border border-gray-100 rounded-[80px] hover:shadow-2xl transition-all group overflow-hidden relative">
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-10 font-manrope text-neutral-900 underline decoration-zinc-100 decoration-8 underline-offset-16">Activity Scoring.</h3>
-                <p className="text-zinc-500 text-lg font-inter italic mb-10 leading-relaxed">Risk scores are assigned to every activity sequence, allowing for aggregated risk assessment across the entire user lifecycle.</p>
-                 <div className="grid grid-cols-2 gap-4">
-                    <div className="p-6 bg-zinc-50 rounded-[32px] text-center">
-                       <div className="text-3xl font-black text-neutral-900 italic tracking-tighter">High</div>
-                       <div className="text-[10px] font-bold uppercase text-zinc-300">Confidence</div>
-                    </div>
-                    <div className="p-6 bg-neutral-900 rounded-[32px] text-center">
-                       <div className="text-3xl font-black text-brand-lime italic tracking-tighter">Instant</div>
-                       <div className="text-[10px] font-bold uppercase text-white/30">Alerts</div>
-                    </div>
-                 </div>
-              </div>
-
-              <div className="p-12 lg:p-24 bg-neutral-900 text-white rounded-[80px] shadow-3xl group overflow-hidden relative border border-white/5">
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-10 font-manrope">Case Management.</h3>
-                 <p className="text-white/40 text-lg font-inter italic mb-10 leading-relaxed">Structured investigation workflows with automatic alert creation and full auditability.</p>
-                 <ul className="space-y-4">
-                    {[
-                      "Automatic alert creation",
-                      "Case management tools",
-                      "Investigation timelines",
-                      "Full audit logs"
-                    ].map((it, i) => (
-                      <li key={i} className="flex gap-4 items-center">
-                         <CheckCircle2 className="w-5 h-5 text-brand-lime" />
-                         <span className="text-[10px] uppercase font-bold tracking-widest">{it}</span>
-                      </li>
-                    ))}
-                 </ul>
-              </div>
-           </div>
-        </section>
-
-        {/* 9. 🧑💻 COMPLIANCE & 10. 🔍 TRANSPARENCY */}
-        <section className="py-40 bg-zinc-50 border-y border-gray-100">
-           <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-              <div className="space-y-12 text-center lg:text-left">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-neutral-100 decoration-8 underline-offset-16 font-manrope text-neutral-900">Explainable Detection.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[500px]">Understand every decision with clear contributing signals and investigation context.</p>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    {[
-                       { t: "Audit Trails", i: <History /> },
-                       { t: "Logic Explainability", i: <Eye /> },
-                       { t: "Structured Workflows", i: <Layers /> },
-                       { t: "Investigation Support", i: <Users /> }
-                    ].map((it, i) => (
-                      <div key={i} className="flex gap-4 items-center justify-center lg:justify-start">
-                         <div className="text-neutral-900">{React.cloneElement(it.i as React.ReactElement<{ className: string }>, { className: "w-5 h-5" })}</div>
-                         <h5 className="font-bold text-neutral-900 text-xs uppercase italic tracking-tighter font-manrope">{it.t}</h5>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-
-              <div className="bg-white rounded-[72px] p-12 lg:p-24 border border-gray-100 shadow-sm relative overflow-hidden group">
-                 <Lock className="w-40 h-40 absolute bottom-0 right-0 p-8 text-neutral-900 opacity-5 group-hover:scale-110 transition-transform font-manrope" />
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-12 font-manrope">Designed for Risk Teams.</h3>
-                 <p className="text-zinc-500 font-inter italic mb-10 leading-relaxed">By combining real-time alerts with deep historical analysis, compliance teams can pinpoint risks long before external audits occur.</p>
-                 <div className="space-y-6">
-                    {[
-                      { l: "Signal Breakdown", d: "Detailed visibility into score drivers." },
-                      { l: "Contextual Evidence", d: "Visual mapping of suspicious signals." },
-                      { l: "Historical Context", d: "Compare currents to life-to-date behavior." }
-                    ].map((it, i) => (
-                      <div key={i} className="flex gap-6 items-center group/item">
-                         <div className="w-1.5 h-12 bg-zinc-100 group-hover/item:bg-neutral-900 transition-all duration-500" />
-                         <div>
-                            <h5 className="text-[11px] font-bold uppercase tracking-widest text-neutral-900 italic font-manrope">{it.l}</h5>
-                            <p className="text-[10px] text-zinc-400 font-inter uppercase tracking-tight">{it.d}</p>
-                         </div>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-           </div>
-        </section>
-
-        {/* 12. 🆚 COMPARISON & 13. 📈 BUSINESS IMPACT */}
-        <section className="py-40">
-           <div className="max-w-[1440px] mx-auto px-8 relative z-10 text-center">
-              <div className="mb-32 max-w-[800px] mx-auto">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter mb-8 font-manrope text-neutral-900 underline decoration-zinc-100 decoration-8 underline-offset-16">Beyond Rules.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[600px] mx-auto">See how Deep Sense intelligence enhances traditional compliance and AML systems.</p>
-              </div>
-
-              <div className="overflow-x-auto text-left mb-40">
-                 <table className="w-full border-collapse font-manrope">
-                    <thead>
-                       <tr className="border-b border-gray-200 uppercase tracking-widest text-[11px] text-zinc-400">
-                          <th className="py-10 px-8 font-bold italic text-left">Security Capability</th>
-                          <th className="py-10 px-8 font-bold text-neutral-900 italic text-left">Deep Sense</th>
-                          <th className="py-10 px-8 font-bold text-zinc-200 italic text-left">Traditional Systems</th>
-                       </tr>
-                    </thead>
-                    <tbody className="italic">
+              <div className="p-16 bg-neutral-900 text-white rounded-[64px] shadow-3xl relative overflow-hidden group border border-white/5 font-manrope italic pr-12">
+                 <div className="absolute inset-0 bg-indigo-600/10 blur-[150px] opacity-20 pointer-events-none" />
+                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-10 border-b border-white/10 pb-10 font-manrope">Compliance Tax</h3>
+                 <div className="space-y-8 relative z-10 font-manrope italic pr-12">
+                    <p className="text-zinc-500 text-sm italic pr-12 italic font-manrope italic pr-24">"Institutional compliance costs have risen 60% in the last decade, primarily driven by manual efforts and technical fragmentation."</p>
+                    <div className="grid grid-cols-2 gap-6 italic">
                        {[
-                         { c: "Real-Time Detection", d: "Yes (Instant)", s: "Delayed (Batch)" },
-                         { c: "Graph Analysis", d: "Yes (Advanced)", s: "Limited / Manual" },
-                         { c: "Pattern Intelligence", d: "Yes (Evolving)", s: "Rule-Based (Static)" },
-                         { c: "Decision Explainability", d: "Yes (Comprehensive)", s: "Partial / Hidden" }
-                       ].map((row, i) => (
-                         <tr key={i} className="border-b border-gray-100 group hover:bg-neutral-100 transition-all font-manrope">
-                            <td className="py-10 px-8 text-lg font-bold italic uppercase tracking-tight text-neutral-900 font-manrope">{row.c}</td>
-                            <td className="py-10 px-8 text-neutral-900 font-black">
-                               <div className="flex items-center gap-3">
-                                  <CheckCircle2 className="w-5 h-5 text-brand-lime" />
-                                  {row.d}
-                               </div>
-                            </td>
-                            <td className="py-10 px-8 text-zinc-200 font-bold">{row.s}</td>
-                         </tr>
+                         { l: "Manual Effort", v: "70% Reduc." },
+                         { l: "Audit Ready", v: "100% Always" }
+                       ].map((it, i) => (
+                         <div key={i} className="p-6 bg-white/5 border border-white/10 rounded-3xl hover:border-brand-lime transition-all">
+                            <span className="text-[9px] font-black uppercase text-brand-lime tracking-widest italic font-manrope">{it.l}</span>
+                            <span className="block text-2xl font-black italic">{it.v}</span>
+                         </div>
                        ))}
-                    </tbody>
-                 </table>
+                    </div>
+                 </div>
               </div>
+           </div>
+        </section>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* 3. The Solution & 4-7. Use Cases */}
+        <section className="py-32 px-8 overflow-hidden font-manrope italic pr-10">
+           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
+              <h2 className="text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase underline decoration-indigo-100 decoration-8 underline-offset-16 font-manrope italic pr-12 pr-12">One Platform, Complete Compliance</h2>
+              <p className="text-xl text-zinc-500 max-w-3xl mx-auto italic mb-32 pr-10 pr-10 font-manrope italic">Deep Sense unifies the four core pillars of AML into a single, high-performance operating system.</p>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 w-full text-left font-manrope italic pr-10 pr-12 group">
                  {[
-                   { l: "Detect Earlier", d: "Identify crime as it attempts to move." },
-                   { l: "Reduce Compliance Risk", d: "Minimize exposure across your systems." },
-                   { l: "Improve Efficiency", d: "Automate routine detection signals." },
-                   { l: "Support Regulations", d: "Build robust audit-ready evidence pools." }
+                   { t: "KYC & Onboarding", d: "Automated identity verification (eIDV) and customer due diligence (CDD).", c: "Frictionless Onboarding", i: <Users /> },
+                   { t: "Global Screening", d: "Real-time Sanctions, PEP, and adverse media screening across global watchlists.", c: "Watchlist Integrity", i: <Globe /> },
+                   { t: "Transaction Monitoring", d: "Real-time behavioral and pattern-based surveillance for suspicious activity.", i: <Activity />, c: "Real-Time Detection" },
+                   { t: "Regulatory Reporting", d: "Automatic generation and submission of STR and CTR regulatory files.", i: <FileText />, c: "Submission Ready" }
                  ].map((it, i) => (
-                   <div key={i} className="p-10 bg-white border border-gray-100 rounded-[56px] shadow-sm hover:shadow-2xl transition-all group flex flex-col items-center">
-                      <div className="text-neutral-900 mb-6 group-hover:text-brand-lime transition-all font-manrope"><BarChart3 className="w-8 h-8" /></div>
-                      <h5 className="font-bold text-neutral-900 text-[10px] uppercase tracking-widest italic font-manrope">{it.l}</h5>
-                      <p className="text-[10px] text-zinc-400 font-inter mt-2 font-manrope uppercase tracking-widest">{it.d}</p>
+                   <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[48px] shadow-sm hover:shadow-3xl transition-all duration-700 hover:-translate-y-2 group overflow-hidden relative font-manrope italic pr-12 pr-6 group">
+                      <div className="w-12 h-12 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform shadow-lg shadow-black/10">
+                        {React.cloneElement(it.i as React.ReactElement, { className: "w-5 h-5 border-zinc-100" })}
+                      </div>
+                      <h4 className="text-xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope italic pr-4">{it.t}</h4>
+                      <p className="text-zinc-500 font-inter italic leading-relaxed text-xs mb-10 italic pr-8 italic pr-6 group-hover:text-neutral-900 transition-colors">{it.d}</p>
+                      <div className="flex items-center gap-3 text-indigo-600 font-black uppercase text-[10px] tracking-widest font-manrope italic border-t border-zinc-50 pt-6">
+                         <CheckCircle2 className="w-4 h-4" />
+                         {it.c}
+                      </div>
                    </div>
                  ))}
               </div>
            </div>
         </section>
 
-        {/* 14. ⚠️ IMPORTANT POSITIONING NOTE */}
-        <section className="max-w-[1300px] mx-auto px-4 mb-24 mt-24">
-           <div className="bg-zinc-900 rounded-[80px] p-12 md:p-32 text-center relative overflow-hidden group">
-              <div className="absolute inset-0 bg-brand-lime/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
-              <div className="relative z-10 space-y-12">
-                 <h2 className="text-2xl md:text-5xl font-bold tracking-tighter leading-none italic uppercase text-white mb-8">Complementary Intelligence.</h2>
-                 <p className="text-lg md:text-xl text-white/40 max-w-[800px] mx-auto italic leading-relaxed font-manrope">Deep Sense enhances fraud and suspicious activity detection but should be integrated into your broader compliance and AML processes. We position ourselves as the intelligence layer that powers your existing regulatory framework.</p>
-                 <div className="flex justify-center flex-wrap gap-4 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-lime">
-                    <span>Audit Ready</span>
-                    <span>Explainable ML</span>
-                    <span>Pattern Recognition</span>
+        {/* 8. Intelligence Layers */}
+        <section className="py-32 px-8 bg-neutral-900 text-white mx-4 rounded-[64px] border border-white/5 relative overflow-hidden font-manrope italic pr-10">
+           <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-32 items-center relative z-10 font-manrope italic pr-10 pr-12">
+              <div className="order-2 lg:order-1 font-manrope italic pr-12 pr-6">
+                  {[
+                    { t: "Dynamic Risk Profiling", d: "Automatically update customer risk levels based on behavior and profile changes in real-time.", i: <BarChart3 /> },
+                    { t: "Entity Resolution Graph", d: "Discover hidden corporate structures and ultimate beneficial owners (UBO) at scale.", i: <Network /> },
+                    { t: "Institutional Audit Trails", d: "Maintain immutable, time-stamped logs of every decision, rule change, and risk score revision.", i: <History /> }
+                  ].map((it, i) => (
+                    <div key={i} className="flex gap-8 group font-manrope italic mb-10 last:mb-0">
+                       <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all font-manrope">
+                          {React.cloneElement(it.i as React.ReactElement, { className: "w-6 h-6 border-white/10 font-manrope" })}
+                       </div>
+                       <div>
+                          <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter font-manrope italic">{it.t}</h4>
+                          <p className="text-zinc-500 text-sm leading-relaxed italic pr-12 italic font-manrope italic">{it.d}</p>
+                       </div>
+                    </div>
+                  ))}
+              </div>
+              <div className="order-1 lg:order-2 font-manrope italic pr-12">
+                 <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase italic leading-tight font-manrope pr-16 pr-12">The Ecosystem, <br />Not the Rule.</h2>
+                 <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed pr-8 font-manrope italic pr-16 pr-12">AML is not a series of checkpoints—it's a continuous institutional culture. Deep Sense provides the infrastructure to operationalize that culture with total technical integrity.</p>
+                 <div className="p-10 bg-white/5 border border-white/10 rounded-[48px] font-bold text-xs uppercase italic tracking-tighter font-inter pr-12 leading-tight italic pr-10 pr-12 group hover:border-brand-lime transition-all">
+                    "Deep Sense unifies disparate compliance workflows into a single data stream, providing a 360-degree view of institutional risk."
                  </div>
               </div>
            </div>
         </section>
 
-        {/* 15. 💬 TRUST & 16. 📣 CTA SECTION */}
-        <section className="py-40">
-           <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-              <div className="bg-neutral-900 rounded-[80px] p-12 lg:p-24 text-white relative overflow-hidden group border border-white/5 shadow-3xl">
-                 <MessageSquareQuote className="w-24 h-24 text-brand-lime opacity-10 absolute bottom-0 right-0 p-8" />
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-12">Compliance Impact.</h3>
-                 <ul className="space-y-12 font-manrope italic">
-                    {[
-                      "We uncovered suspicious activity patterns we previously missed with legacy tools.",
-                      "Deep Sense has significantly improved our investigation workflows and clarity.",
-                      "The level of transparency in every decision is unmatched by traditional systems."
-                    ].map((quote, i) => (
-                      <li key={i} className="flex gap-8 group/quote">
-                         <div className="w-1.5 h-12 bg-brand-lime group-hover/quote:h-16 transition-all duration-500" />
-                         <p className="text-xl font-manrope italic text-white/60 group-hover/quote:text-white transition-colors">“{quote}”</p>
-                      </li>
-                    ))}
-                 </ul>
+        {/* 10. Comparison Table */}
+        <section className="py-32 px-8 font-manrope italic">
+           <div className="max-w-[1000px] mx-auto text-center flex flex-col items-center">
+              <h2 className="text-4xl font-bold font-manrope text-neutral-900 mb-10 uppercase italic">Institutional Regulatory Defense</h2>
+              <div className="bg-white rounded-[40px] border border-zinc-200 overflow-hidden shadow-2xl w-full text-left font-manrope italic pr-6 group overflow-hidden">
+                 <table className="w-full text-left border-collapse font-manrope italic">
+                    <thead>
+                       <tr className="bg-neutral-900 text-white font-manrope text-left font-black tracking-widest text-[10px] uppercase">
+                          <th className="p-8 font-black uppercase tracking-widest text-[10px] italic">Institutional Capability</th>
+                          <th className="p-8 font-black uppercase tracking-widest text-[10px] italic border-l border-white/10 text-center bg-indigo-600">Deep Sense</th>
+                          <th className="p-8 font-black uppercase tracking-widest text-[10px] italic border-l border-white/10 text-center">Standard Compliance</th>
+                       </tr>
+                    </thead>
+                    <tbody className="font-bold text-sm text-neutral-600 italic">
+                       {[
+                         "Unified risk-based approach",
+                         "Automatic STR/CTR generation",
+                         "Real-time UBO entity resolution",
+                         "Multi-jurisdictional rule handling",
+                         "Immutable governance audit logs"
+                       ].map((feat, i) => (
+                         <tr key={i} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50/50 transition-colors">
+                            <td className="p-8 font-manrope">{feat}</td>
+                            <td className="p-8 text-center border-l border-zinc-50">
+                               <CheckCircle2 className="w-6 h-6 text-brand-lime mx-auto font-manrope" strokeWidth={3} />
+                               <span className="text-[9px] font-black uppercase text-zinc-400 mt-1 block font-manrope tracking-tighter pr-4">Framework Ready</span>
+                            </td>
+                            <td className="p-8 text-center border-l border-zinc-50 italic text-zinc-300 font-medium font-manrope leading-tight pr-6">
+                               Manual / Fragmented
+                            </td>
+                         </tr>
+                       ))}
+                    </tbody>
+                 </table>
               </div>
+           </div>
+        </section>
 
-              <div className="text-center lg:text-left space-y-12">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-neutral-100 decoration-8 underline-offset-16 font-manrope text-neutral-900">Detect with <br /><span className="text-zinc-300">Confidence.</span></h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[500px]">Empower your compliance teams with the intelligence they need to stay ahead of financial crime.</p>
-                 <div className="flex flex-col sm:flex-row gap-8 justify-center lg:justify-start">
-                    <button className="px-14 py-7 bg-neutral-900 text-white rounded-full font-bold text-xl hover:scale-110 transition-all shadow-2xl font-manrope">
-                      Request Demo
-                    </button>
-                    <button className="px-14 py-7 bg-white text-neutral-900 border border-gray-100 rounded-full font-bold text-xl hover:bg-gray-50 transition-all shadow-xl font-manrope">
-                      Talk to Sales
-                    </button>
+        {/* 12. Final CTA */}
+        <section className="pt-24 pb-48 px-8 flex flex-col items-center text-center font-manrope italic">
+           <div className="max-w-[1200px] mx-auto bg-neutral-900 rounded-[64px] p-24 relative overflow-hidden group shadow-3xl text-white">
+              <div className="absolute inset-0 bg-indigo-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+              <div className="relative z-10 flex flex-col items-center text-center font-manrope italic pr-12">
+                 <span className="text-zinc-500 font-black tracking-widest text-[10px] uppercase mb-8 italic">Protect Your Institutional Reputation</span>
+                 <h2 className="text-5xl md:text-7xl font-bold font-manrope text-white mb-10 tracking-tight leading-[1.1] uppercase italic font-manrope pr-6 pr-6 italic font-manrope pr-10 leading-tight">
+                   Modernize Your <br />
+                   <span className="text-brand-lime font-black text-6xl italic leading-none font-manrope italic">AML Infrastructure.</span>
+                 </h2>
+                 <p className="text-zinc-400 text-lg mb-16 max-w-3xl mx-auto leading-relaxed italic pr-6 group-hover:text-white transition-colors pr-12 font-manrope italic pr-10">
+                    Eliminate compliance blind spots, reduce operational friction, and protect your institutional license with the unified AML operating system.
+                 </p>
+                 <div className="flex flex-col sm:flex-row gap-6 justify-center italic font-bold">
+                   <button className="px-14 py-7 bg-white text-neutral-900 rounded-full hover:bg-brand-lime transition-all hover:scale-105 active:scale-95 text-xl tracking-tighter uppercase font-manrope italic font-manrope">
+                     Request AML Demo
+                   </button>
+                   <button className="px-14 py-7 bg-white/5 border border-white/10 text-white rounded-full hover:bg-white hover:text-neutral-900 transition-all text-xl tracking-tighter uppercase font-manrope italic pr-12 font-manrope">
+                     Contact Compliance Advisory
+                   </button>
                  </div>
               </div>
            </div>
@@ -372,13 +221,6 @@ export default function AMLPage() {
       </main>
 
       <Footer />
-
-      <style jsx global>{`
-        .bg-grid-pattern {
-          background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
-          background-size: 50px 50px;
-        }
-      `}</style>
     </div>
   );
 }

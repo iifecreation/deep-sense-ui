@@ -1,164 +1,214 @@
 "use client";
 
 import React from "react";
+import { 
+  Zap, 
+  CreditCard, 
+  Send, 
+  Globe, 
+  ShieldCheck, 
+  Activity, 
+  CheckCircle2, 
+  ArrowRight, 
+  Layers, 
+  RefreshCw, 
+  Cpu, 
+  Network, 
+  Users, 
+  BarChart3,
+  Building,
+  ArrowUpRight,
+  Workflow
+} from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  CreditCard, 
-  Zap, 
-  Shield, 
-  Activity, 
-  ArrowRight,
-  Lock,
-  RefreshCcw,
-  BarChart3,
-  Globe,
-  Database
-} from "lucide-react";
 
-export default function PaymentsSolution() {
+export default function PaymentsSolutionPage() {
   return (
-    <div className="min-h-screen bg-white font-manrope">
+    <div className="min-h-screen bg-white font-manrope text-neutral-900">
       <Navbar />
-
-      <main className="pt-40 pb-24 overflow-hidden">
-        {/* 1. 🔥 HERO SECTION */}
-        <section className="max-w-[1440px] mx-auto px-8 mb-32 relative text-center">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-lime/10 rounded-full blur-[140px] pointer-events-none" />
-          <div className="max-w-[1100px] mx-auto relative z-10 text-center">
-             <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-brand-lime text-[11px] font-bold uppercase tracking-widest mb-10 shadow-2xl">
-               <CreditCard className="w-3.5 h-3.5" />
-               Global Payment Intelligence
-             </div>
-             <h1 className="text-6xl lg:text-9xl font-bold leading-[0.95] mb-10 tracking-tight text-neutral-900 uppercase italic">
-               Secure Payments at <br />
-               <span className="text-zinc-300 italic">Global Scale.</span>
-             </h1>
-             <p className="text-xl text-zinc-500 font-inter leading-relaxed max-w-[800px] mx-auto mb-14">
-                Deep Sense provides institutional-grade transaction monitoring for payment processors, gateways, and acquirers — stopping fraud before settlement.
-             </p>
-             <div className="flex flex-wrap gap-8 justify-center">
-                <button className="px-10 py-5 bg-neutral-900 text-white rounded-full font-bold text-lg hover:scale-110 transition-all shadow-3xl flex items-center gap-3 italic">
-                  Explore API
-                  <ArrowRight className="w-5 h-5 text-brand-lime" />
-                </button>
-                <button className="px-10 py-5 bg-white text-neutral-900 border border-gray-100 rounded-full font-bold text-lg hover:bg-gray-50 transition-all shadow-xl italic">
-                  Talk to Sales
-                </button>
-             </div>
+      
+      <main>
+        {/* 1. Hero Section */}
+        <section className="pt-48 pb-24 px-8 overflow-hidden relative font-manrope italic">
+          <div className="absolute top-0 right-0 -z-10 w-[7000px] h-[700px] bg-indigo-50 rounded-full blur-[140px] opacity-60 translate-x-1/4 -translate-y-1/4" />
+          <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-brand-lime text-[11px] font-extrabold uppercase tracking-widest mb-8 shadow-2xl">
+              <Send className="w-3.5 h-3.5" />
+              <span>Payments Infrastructure Hub</span>
+            </div>
+            <h1 className="text-6xl md:text-8xl font-black leading-[1.05] mb-8 tracking-tighter max-w-5xl uppercase italic font-manrope">
+               Secure Payment <br /><span className="text-indigo-600">Integrity</span> at Scale.
+            </h1>
+            <p className="text-xl md:text-2xl text-zinc-500 font-inter leading-relaxed max-w-4xl mb-12 italic">
+               Deep Sense provides the real-time surveillance and risk automated controls for payment gateways, networks, and processors.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-5 font-bold italic font-manrope">
+              <button className="px-12 py-6 bg-neutral-900 text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all text-lg tracking-tighter uppercase">
+                 Request Demo
+              </button>
+              <button className="px-12 py-6 bg-white border-2 border-neutral-200 text-neutral-900 rounded-full hover:bg-zinc-50 transition-all text-lg tracking-tighter uppercase">
+                 Talk to Sales
+              </button>
+            </div>
           </div>
         </section>
 
-        {/* 2. THE PROBLEM (PAYMENT FRAUD) */}
-        <section className="py-24 bg-neutral-900 text-white rounded-[100px] mx-4 overflow-hidden relative border border-white/5 shadow-3xl">
-           <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
-           <div className="max-w-[1440px] mx-auto px-8 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-              <div className="space-y-12">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-brand-lime decoration-8 underline-offset-16 font-manrope">Payment Risk.</h2>
-                 <p className="text-xl text-white/40 font-inter italic max-w-[500px]">Payment ecosystems face coordinated card testing, account takeovers, and fraudulent chargeback schemes that drain revenue.</p>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+        {/* 2. The Challenge */}
+        <section className="py-24 bg-zinc-50 px-8 rounded-[64px] mx-4 border border-zinc-100 font-manrope italic pr-10">
+           <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+              <div>
+                 <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase pr-10">High-Volume Settlement Risk Is Growing.</h2>
+                 <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed font-manrope pr-6">Payment processors must balance instant settlement expectations with the massive operational risk of undetected fraud rings and money laundering.</p>
+                 <div className="space-y-4 font-manrope">
                     {[
-                      { l: "Card Testing", d: "Bots validating stolen credentials at rapid velocity." },
-                      { l: "Chargeback Abuse", d: "Sophisticated schemes exploiting merchant policies." },
-                      { l: "Cross-Border Fraud", d: "High-risk signals hidden in global traffic." },
-                      { l: "Settlement Risk", d: "Fraudulent funds reaching payouts before detection." }
+                       "Instant settlement creates narrow investigation windows.",
+                       "Merchant fraud (bust-out/carding) causes irreversible loss.",
+                       "Cross-border transaction complexity increases blind spots.",
+                       "Legacy screening tools cannot process real-time payment volumes."
                     ].map((it, i) => (
-                      <div key={i} className="flex gap-4 items-start group">
-                         <div className="w-1.5 h-1.5 bg-brand-lime rounded-full mt-2" />
-                         <div>
-                            <h5 className="font-bold text-white text-[10px] uppercase tracking-widest mb-1 italic">{it.l}</h5>
-                            <p className="text-[10px] text-white/20 font-inter leading-relaxed italic">{it.d}</p>
-                         </div>
-                      </div>
+                       <div key={i} className="flex gap-4 items-center group font-manrope">
+                          <div className="w-1.5 h-10 bg-indigo-600 transition-all rounded-full shrink-0" />
+                          <span className="text-sm font-bold italic uppercase tracking-tight italic">{it}</span>
+                       </div>
                     ))}
-                 </div>
-                 <div className="bg-white/5 p-8 rounded-[40px] border border-white/5">
-                    <p className="text-xl font-bold italic text-white leading-relaxed">“Real-time detection is the only viable defense for modern payments.”</p>
                  </div>
               </div>
-
-              <div className="bg-white/5 border border-white/10 p-12 lg:p-24 rounded-[80px] shadow-3xl group relative overflow-hidden backdrop-blur-xl">
-                 <Globe className="w-40 h-40 absolute top-0 right-0 p-12 text-white opacity-5 group-hover:scale-110 transition-transform duration-1000" />
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tight mb-8 font-manrope">The Payment Layer.</h3>
-                 <p className="text-white/40 text-sm font-inter italic mb-10 leading-relaxed">Unified intelligence across every stage of the payment lifecycle.</p>
-                 <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { l: "Velocity Rules", i: <Zap /> },
-                      { l: "Card Intel", i: <CreditCard /> },
-                      { l: "Geospatial", i: <Globe /> },
-                      { l: "ML Scoring", i: <BarChart3 /> }
-                    ].map((it, i) => (
-                      <div key={i} className="p-6 bg-white/5 rounded-[32px] border border-white/5 hover:border-brand-lime/20 transition-all group/it">
-                         <div className="text-brand-lime mb-4 group-hover/it:scale-110 transition-transform">{it.i}</div>
-                         <h6 className="text-[10px] font-bold uppercase tracking-widest text-white italic">{it.l}</h6>
-                      </div>
-                    ))}
+              <div className="p-16 bg-neutral-900 text-white rounded-[64px] shadow-3xl relative overflow-hidden group border border-white/5">
+                 <div className="absolute inset-0 bg-indigo-600/10 blur-[150px] opacity-20 pointer-events-none" />
+                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-10 border-b border-white/10 pb-10">Risk Exposure</h3>
+                 <div className="space-y-8 relative z-10 font-manrope italic">
+                    <p className="text-zinc-500 text-sm italic pr-12 font-manrope">"Every second of delay in payment fraud detection increases the probability of capital loss by 22%."</p>
+                    <div className="grid grid-cols-1 gap-6">
+                       <div className="p-8 bg-white/5 border border-white/10 rounded-3xl flex justify-between items-center group-hover:border-brand-lime transition-all">
+                          <div>
+                             <span className="text-[9px] font-black uppercase text-brand-lime tracking-widest italic font-manrope">Processing Time</span>
+                             <span className="block text-xl font-black italic">&lt; 150ms per Tx</span>
+                          </div>
+                          <Zap className="text-brand-lime w-6 h-6" />
+                       </div>
+                    </div>
                  </div>
               </div>
            </div>
         </section>
 
-        {/* 3. KEY CAPABILITIES */}
-        <section className="py-40">
-           <div className="max-w-[1440px] mx-auto px-8 relative z-10">
-              <div className="text-center mb-32 max-w-[800px] mx-auto">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter mb-8 font-manrope text-neutral-900 underline decoration-zinc-100 decoration-8 underline-offset-16">Protecting the Network.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[600px] mx-auto">Designed to secure every transaction, merchant, and user endpoint.</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* 3. The Solution & 4-6. Use Cases */}
+        <section className="py-32 px-8 overflow-hidden font-manrope italic pr-10">
+           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
+              <h2 className="text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase underline decoration-indigo-200 decoration-8 underline-offset-16 font-manrope italic pr-12 pr-12">Automated Payment Integrity</h2>
+              <p className="text-xl text-zinc-500 max-w-3xl mx-auto italic mb-32 pr-10">Deep Sense provides the end-to-end framework for protecting every transaction from authorization to final settlement.</p>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full max-w-6xl text-left font-manrope italic">
                  {[
-                   { l: "Card Testing Shield", d: "Block rapid-fire card validation attempts.", i: <Shield /> },
-                   { l: "Refund Protection", d: "Identify suspicious refund and reversal patterns.", i: <RefreshCcw /> },
-                   { l: "Merchant Monitoring", d: "Detect fraudulent sellers within your gateway.", i: <Database /> },
-                   { l: "ATO Protection", d: "Secure customer accounts from unauthorized access.", i: <Lock /> }
+                   { t: "Processing Security", d: "High-speed screening for card-not-present and instant credit transactions.", c: "Identify Carding & Triangulation", i: <ShieldCheck /> },
+                   { t: "Settlement Safety", d: "Automatic hold triggers on high-risk settlements to prevent bust-out loss.", c: "Prevent Settlement Leakage", i: <Building /> },
+                   { t: "Merchant Risk", d: "Continuous monitoring of merchant behavior to detect sudden shifts in volume.", c: "Detect Transaction Laundering", i: <Workflow /> }
                  ].map((it, i) => (
-                   <div key={i} className="p-12 bg-white border border-gray-100 rounded-[72px] shadow-sm hover:shadow-2xl transition-all group flex flex-col items-center text-center">
-                      <div className="w-16 h-16 bg-neutral-900 rounded-2xl flex items-center justify-center text-brand-lime mb-10 group-hover:scale-110 transition-transform">
-                         {React.cloneElement(it.i as React.ReactElement<{ className: string }>, { className: "w-6 h-6" })}
+                   <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-3xl transition-all duration-700 hover:-translate-y-2 group overflow-hidden relative font-manrope italic">
+                      <div className="w-14 h-14 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform shadow-lg">
+                        {React.cloneElement(it.i as React.ReactElement, { className: "w-6 h-6 border-zinc-100" })}
                       </div>
-                      <h4 className="text-xl font-bold italic uppercase tracking-tight mb-4">{it.l}</h4>
-                      <p className="text-sm text-zinc-400 font-inter leading-relaxed italic">{it.d}</p>
+                      <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope italic">{it.t}</h4>
+                      <p className="text-zinc-500 font-inter italic leading-relaxed text-sm mb-10 italic pr-8 italic">{it.d}</p>
+                      <div className="flex items-center gap-3 text-indigo-600 font-black uppercase text-[10px] tracking-widest font-manrope italic">
+                         <div className="w-2 h-2 rounded-full bg-brand-lime animate-pulse" />
+                         {it.c}
+                      </div>
                    </div>
                  ))}
               </div>
            </div>
         </section>
 
-        {/* 4. PERFORMANCE METRICS */}
-        <section className="py-40 bg-zinc-50 border-y border-gray-100">
-           <div className="max-w-[1440px] mx-auto px-8 text-center text-neutral-900">
-              <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter mb-24 font-manrope underline decoration-zinc-200 decoration-8 underline-offset-16 max-w-[800px] mx-auto">Payment Performance.</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                 {[
-                   { v: "0.5%", l: "Target Chargeback Rate", i: <Shield /> },
-                   { v: "<50ms", l: "Average Decision Latency", i: <Zap /> },
-                   { v: "250M+", l: "Daily Events Processed", i: <Activity /> }
-                 ].map((m, i) => (
-                   <div key={i} className="p-12 bg-white border border-gray-100 rounded-[56px] shadow-sm hover:shadow-xl transition-all">
-                      <div className="text-neutral-900 mb-8 flex justify-center">{m.i}</div>
-                      <div className="text-6xl font-black text-neutral-900 italic tracking-tighter mb-4">{m.v}</div>
-                      <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-300 italic">{m.l}</div>
-                   </div>
-                 ))}
+        {/* 7. Fraud Patterns in Payments */}
+        <section className="py-32 px-8 bg-neutral-900 text-white mx-4 rounded-[64px] border border-white/5 relative overflow-hidden font-manrope italic pr-12">
+           <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-32 items-center relative z-10">
+              <div className="order-2 lg:order-1 flex flex-col gap-12">
+                  {[
+                    { t: "Carding Detection", d: "Identify low-value authorization testing patterns used to validate stolen credentials.", i: <CreditCard /> },
+                    { t: "Smurfing & Structuring", d: "Detect rapid, fragmented fund movements designed to bypass traditional reporting thresholds.", i: <Layers /> },
+                    { t: "Merchant Bust-Out", d: "Spot sudden, unnatural surges in merchant transaction volume before settlement happens.", i: <ArrowUpRight /> }
+                  ].map((it, i) => (
+                    <div key={i} className="flex gap-8 group italic font-manrope">
+                       <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all shadow-sm">
+                          {React.cloneElement(it.i as React.ReactElement, { className: "w-6 h-6 border-white/10" })}
+                       </div>
+                       <div>
+                          <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter italic font-manrope">{it.t}</h4>
+                          <p className="text-zinc-500 text-sm leading-relaxed italic pr-12 italic font-manrope">{it.d}</p>
+                       </div>
+                    </div>
+                  ))}
+              </div>
+              <div className="order-1 lg:order-2">
+                 <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase italic leading-tight">Identify <br />Payment Patterns.</h2>
+                 <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed pr-8 font-manrope italic pr-24">Our intelligence layer identifies complex financial crime patterns that traditional rule-based systems miss entirely.</p>
+                 <div className="p-10 bg-white/5 border border-white/10 rounded-[48px] font-bold text-xs uppercase italic tracking-tighter font-inter pr-24 leading-tight italic">
+                    "Deep Sense analyzes transaction velocity, IP geolocation, device fingerprints, and merchant category codes simultaneously to return a definitive risk score."
+                 </div>
               </div>
            </div>
         </section>
 
-        {/* 5. CTA SECTION */}
-        <section className="max-w-[1300px] mx-auto px-4 mb-24 mt-24 text-center">
-           <div className="bg-neutral-900 rounded-[80px] p-12 md:p-32 relative overflow-hidden group border border-white/10 shadow-3xl">
-              <div className="absolute inset-0 bg-brand-lime/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
-              <div className="relative z-10 space-y-12">
-                 <h2 className="text-4xl md:text-8xl font-bold tracking-tighter leading-none italic uppercase text-white font-manrope">Secure Your <br /><span className="text-white/20">Payments.</span></h2>
-                 <p className="text-xl md:text-2xl mb-12 max-w-[600px] mx-auto opacity-70 tracking-tight leading-relaxed font-manrope italic text-white">Experience institutional-grade transaction monitoring at global scale.</p>
-                 <div className="flex flex-col sm:flex-row gap-8 justify-center">
-                    <button className="px-14 py-7 bg-brand-lime text-neutral-900 rounded-full font-bold text-xl hover:scale-110 transition-all shadow-2xl font-manrope italic">
-                      Request Demo
-                    </button>
-                    <button className="px-14 py-7 bg-white text-neutral-900 border border-transparent rounded-full font-bold text-xl hover:bg-gray-50 transition-all shadow-xl active:scale-95 font-manrope italic">
-                      Talk to Sales
-                    </button>
+        {/* 10. Comparison Table */}
+        <section className="py-32 px-8">
+           <div className="max-w-[1000px] mx-auto text-center flex flex-col items-center">
+              <h2 className="text-4xl font-bold font-manrope text-neutral-900 mb-10 uppercase italic">Enterprise Payment Oversight</h2>
+              <div className="bg-white rounded-[40px] border border-zinc-200 overflow-hidden shadow-2xl w-full text-left font-manrope italic pr-6 group overflow-hidden">
+                 <table className="w-full text-left border-collapse">
+                    <thead>
+                       <tr className="bg-neutral-900 text-white font-manrope text-left font-black tracking-widest text-[10px]">
+                          <th className="p-8 font-black uppercase tracking-widest text-[10px] italic">Payment Capability</th>
+                          <th className="p-8 font-black uppercase tracking-widest text-[10px] italic border-l border-white/10 text-center bg-indigo-600">Deep Sense</th>
+                          <th className="p-8 font-black uppercase tracking-widest text-[10px] italic border-l border-white/10 text-center">Standard PSP Tools</th>
+                       </tr>
+                    </thead>
+                    <tbody className="font-bold text-sm text-neutral-600 italic">
+                       {[
+                         "Real-time settlement hold logic",
+                         "Merchant risk behavioral monitoring",
+                         "Cross-gateway transaction graph",
+                         "Automatic STR disclosure files",
+                         "Global sanction re-screening"
+                       ].map((feat, i) => (
+                         <tr key={i} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50/50 transition-colors">
+                            <td className="p-8">{feat}</td>
+                            <td className="p-8 text-center border-l border-zinc-50">
+                               <CheckCircle2 className="w-6 h-6 text-brand-lime mx-auto font-manrope" strokeWidth={3} />
+                               <span className="text-[9px] font-black uppercase text-zinc-400 mt-1 block">Institutional Ready</span>
+                            </td>
+                            <td className="p-8 text-center border-l border-zinc-50 italic text-zinc-300 font-medium font-manrope leading-tight pr-6">
+                               Partial / Delayed
+                            </td>
+                         </tr>
+                       ))}
+                    </tbody>
+                 </table>
+              </div>
+           </div>
+        </section>
+
+        {/* 12. Final CTA */}
+        <section className="pt-24 pb-48 px-8 flex flex-col items-center text-center font-manrope italic">
+           <div className="max-w-[1200px] mx-auto bg-neutral-900 rounded-[64px] p-24 relative overflow-hidden group shadow-3xl text-white">
+              <div className="absolute inset-0 bg-indigo-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+              <div className="relative z-10 flex flex-col items-center text-center font-manrope italic">
+                 <span className="text-zinc-500 font-black tracking-widest text-[10px] uppercase mb-8 italic">Secure Payment Liquidity</span>
+                 <h2 className="text-5xl md:text-7xl font-bold font-manrope text-white mb-10 tracking-tight leading-[1.1] uppercase italic font-manrope pr-6 pr-6 italic font-manrope pr-10">
+                   Protect Your <br />
+                   <span className="text-brand-lime font-black text-6xl italic leading-none font-manrope italic">Payment Ecosystem.</span>
+                 </h2>
+                 <p className="text-zinc-400 text-lg mb-16 max-w-3xl mx-auto leading-relaxed italic pr-6 group-hover:text-white transition-colors pr-12">
+                    Enable secure processing, prevent settlement fraud, and scale your gateway with institutional-grade risk infrastructure.
+                 </p>
+                 <div className="flex flex-col sm:flex-row gap-6 justify-center italic font-bold">
+                   <button className="px-14 py-7 bg-white text-neutral-900 rounded-full hover:bg-brand-lime transition-all hover:scale-105 active:scale-95 text-xl tracking-tighter uppercase font-manrope italic">
+                     Request Payment Demo
+                   </button>
+                   <button className="px-14 py-7 bg-white/5 border border-white/10 text-white rounded-full hover:bg-white hover:text-neutral-900 transition-all text-xl tracking-tighter uppercase font-manrope italic pr-12">
+                     Contact Risk Advisory
+                   </button>
                  </div>
               </div>
            </div>
@@ -166,13 +216,6 @@ export default function PaymentsSolution() {
       </main>
 
       <Footer />
-
-      <style jsx global>{`
-        .bg-grid-pattern {
-          background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
-          background-size: 50px 50px;
-        }
-      `}</style>
     </div>
   );
 }

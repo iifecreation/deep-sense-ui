@@ -1,378 +1,217 @@
 "use client";
 
 import React from "react";
-import Navbar from "@/components/landing-page/Navbar";
-import Footer from "@/components/landing-page/Footer";
 import { 
-  Store, 
-  ShieldAlert, 
+  Zap, 
+  Building, 
+  ArrowRight, 
+  CheckCircle2, 
+  ShieldCheck, 
   Activity, 
+  Layers, 
+  Cpu, 
   Network, 
   BarChart3, 
-  Search, 
-  Bell, 
-  ArrowRight,
-  Database,
-  Building2,
-  Users,
-  CheckCircle2,
-  Zap,
-  Share2,
-  ShieldCheck
+  Workflow,
+  Search,
+  ShoppingCart,
+  Store,
+  RefreshCw,
+  AlertTriangle,
+  History,
+  Scale
 } from "lucide-react";
+import Navbar from "@/components/landing-page/Navbar";
+import Footer from "@/components/landing-page/Footer";
 
 export default function MerchantFraudPage() {
   return (
-    <div className="min-h-screen bg-white font-manrope">
+    <div className="min-h-screen bg-white font-manrope text-neutral-900">
       <Navbar />
-
-      <main className="pt-40 pb-24 overflow-hidden">
-        {/* 1. 🔥 HERO SECTION */}
-        <section className="max-w-[1440px] mx-auto px-8 mb-32 relative text-center">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-lime/10 rounded-full blur-[140px] pointer-events-none" />
-          <div className="max-w-[1000px] mx-auto relative z-10">
-             <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-brand-lime text-[11px] font-bold uppercase tracking-widest mb-10 shadow-2xl">
-               <Store className="w-3.5 h-3.5" />
-               Ecosystem Protection
-             </div>
-             <h1 className="text-6xl lg:text-9xl font-bold leading-[0.95] mb-10 tracking-tight text-neutral-900 uppercase italic">
-               Detect & Prevent <br />
-               <span className="text-zinc-300 italic">Merchant Fraud.</span>
-             </h1>
-             <p className="text-xl text-zinc-500 font-inter leading-relaxed max-w-[800px] mx-auto mb-14">
-                Deep Sense identifies fraudulent merchants, suspicious activity, and platform abuse — protecting your ecosystem and your customers.
-             </p>
-             <div className="flex flex-wrap gap-8 justify-center">
-                <button className="px-10 py-5 bg-neutral-900 text-white rounded-full font-bold text-lg hover:scale-110 transition-all shadow-3xl flex items-center gap-3">
-                  Request Demo
-                  <ArrowRight className="w-5 h-5 text-brand-lime" />
-                </button>
-                <button className="px-10 py-5 bg-white text-neutral-900 border border-gray-100 rounded-full font-bold text-lg hover:bg-gray-50 transition-all shadow-xl">
-                  Talk to Sales
-                </button>
-             </div>
+      
+      <main>
+        {/* 1. Hero Section */}
+        <section className="pt-48 pb-24 px-8 overflow-hidden relative font-manrope italic">
+          <div className="absolute top-0 right-0 -z-10 w-[700px] h-[700px] bg-emerald-50 rounded-full blur-[140px] opacity-60 translate-x-1/4 -translate-y-1/4" />
+          <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-brand-lime text-[11px] font-extrabold uppercase tracking-widest mb-8 shadow-2xl font-manrope">
+              <Building className="w-3.5 h-3.5" />
+              <span>Merchant Portfolio Shield</span>
+            </div>
+            <h1 className="text-6xl md:text-8xl font-black leading-[1.05] mb-8 tracking-tighter max-w-5xl uppercase italic font-manrope">
+               Stop Merchant <br /><span className="text-emerald-600">Laundering.</span>
+            </h1>
+            <p className="text-xl md:text-2xl text-zinc-500 font-inter leading-relaxed max-w-4xl mb-12 italic">
+               Deep Sense provides the continuous surveillance layer to identify high-risk merchants, bust-out fraud, and transaction laundering across your entire portfolio.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-5 font-bold italic font-manrope">
+              <button className="px-12 py-6 bg-neutral-900 text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all text-lg tracking-tighter uppercase">
+                 Request Demo
+              </button>
+              <button className="px-12 py-6 bg-white border-2 border-neutral-200 text-neutral-900 rounded-full hover:bg-zinc-50 transition-all text-lg tracking-tighter uppercase font-manrope">
+                 Talk to Sales
+              </button>
+            </div>
           </div>
         </section>
 
-        {/* 2. 🚨 THE PROBLEM & 3. 💡 THE SOLUTION */}
-        <section className="py-24 bg-neutral-900 text-white rounded-[100px] mx-4 overflow-hidden relative border border-white/5 shadow-3xl">
-           <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
-           <div className="max-w-[1440px] mx-auto px-8 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-              <div className="space-y-12">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-brand-lime decoration-8 underline-offset-16 font-manrope">The Internal Threat.</h2>
-                 <p className="text-xl text-white/40 font-inter italic max-w-[500px]">Fraud doesn’t just come from users. Fake businesses and fraudulent merchants exploit platforms for laundering funds or processing illegitimate transactions.</p>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+        {/* 2. The Challenge */}
+        <section className="py-24 bg-zinc-50 px-8 rounded-[64px] mx-4 border border-zinc-100 font-manrope italic pr-12 pr-12 group">
+           <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 items-center font-manrope">
+              <div>
+                 <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase pr-10 leading-tight">Legacy Acquirer Monitoring is Reactive.</h2>
+                 <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed font-manrope pr-12 pr-12">Relying on monthly volume reviews is insufficient for detecting professional merchant fraud. By the time a "bust-out" or "transaction laundering" scheme is detected, the capital has already been drained.</p>
+                 <div className="space-y-4 font-manrope pr-6">
                     {[
-                      { l: "Fake Businesses", d: "Shell merchants processing illegitimate volume." },
-                      { l: "Payment Laundering", d: "Using clean accounts to hide dirty funds." },
-                      { l: "Undetected Abuse", d: "Bad actors often hide for long periods." },
-                      { l: "Platform Exposure", d: "A single merchant can risk your entire brand." }
+                       "Transaction laundering (front companies) bypasses onboarding filters.",
+                       "Bust-out fraud rings execute massive surges and drain accounts in hours.",
+                       "Marketplace seller identity theft leads to large-scale consumer loss.",
+                       "High-velocity refunds used as a mechanism for institutional cash-out."
                     ].map((it, i) => (
-                      <div key={i} className="flex gap-4 items-start group">
-                         <div className="w-1.5 h-1.5 bg-red-400 rounded-full mt-2" />
-                         <div>
-                            <h5 className="font-bold text-white text-[10px] uppercase tracking-widest mb-1">{it.l}</h5>
-                            <p className="text-[10px] text-white/20 font-inter leading-relaxed">{it.d}</p>
-                         </div>
-                      </div>
-                    ))}
-                 </div>
-                 <div className="bg-white/5 p-8 rounded-[40px] border border-white/5">
-                    <p className="text-xl font-bold italic text-brand-lime">“A single bad merchant can expose your entire platform to risk.”</p>
-                 </div>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 p-12 lg:p-24 rounded-[80px] shadow-3xl group relative overflow-hidden backdrop-blur-xl">
-                 <ShieldAlert className="w-40 h-40 absolute top-0 right-0 p-12 text-white opacity-5 group-hover:scale-110 transition-transform duration-1000" />
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tight mb-8">Risk Intelligence.</h3>
-                 <p className="text-white/40 text-sm font-inter italic mb-10 leading-relaxed">Deep Sense monitors merchant behavior, transactions, and relationships to detect suspicious activity early.</p>
-                 <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { l: "Risk Scoring", i: <BarChart3 /> },
-                      { l: "Behavior Monitoring", i: <Activity /> },
-                      { l: "Pattern Analysis", i: <Zap /> },
-                      { l: "Network Detection", i: <Network /> }
-                    ].map((it, i) => (
-                      <div key={i} className="p-6 bg-white/5 rounded-[32px] border border-white/5 hover:border-brand-lime/20 transition-all group/it">
-                         <div className="text-brand-lime mb-4 group-hover/it:scale-110 transition-transform">{it.i}</div>
-                         <h6 className="text-[10px] font-bold uppercase tracking-widest text-white">{it.l}</h6>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-           </div>
-        </section>
-
-        {/* 4. ⚙️ HOW IT WORKS */}
-        <section className="py-40">
-           <div className="max-w-[1440px] mx-auto px-8 relative z-10 text-center">
-              <div className="mb-32 max-w-[800px] mx-auto">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter mb-8 font-manrope underline decoration-zinc-100 decoration-8 underline-offset-16">Detection Flow.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[600px] mx-auto">See how Deep Sense identifies suspicious merchant activity throughout their lifecycle on your platform.</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 items-center">
-                 {[
-                   { l: "Tracking", d: "Continuous activity monitoring." },
-                   { l: "Analysis", d: "In-depth transaction evaluation." },
-                   { l: "Signals", d: "Generation of high-risk markers." },
-                   { l: "Scoring", d: "Real-time risk computation." },
-                   { l: "Response", d: "Automated flag or block." }
-                 ].map((step, i) => (
-                   <React.Fragment key={i}>
-                    <div className="p-10 bg-white border border-gray-100 rounded-[56px] shadow-sm hover:shadow-2xl transition-all group flex flex-col items-center text-center">
-                       <div className="w-12 h-12 bg-neutral-900 rounded-2xl flex items-center justify-center text-brand-lime mb-6 group-hover:scale-110 transition-transform">
-                          <span className="font-bold text-sm italic">0{i+1}</span>
+                       <div key={i} className="flex gap-4 items-center group font-manrope">
+                          <div className="w-1.5 h-10 bg-emerald-600 transition-all rounded-full shrink-0" />
+                          <span className="text-sm font-bold italic uppercase tracking-tight italic pr-12 group-hover:text-emerald-600 transition-colors">{it}</span>
                        </div>
-                       <h4 className="text-lg font-bold italic uppercase tracking-tight mb-2">{step.l}</h4>
-                       <p className="text-[10px] text-zinc-400 font-inter uppercase tracking-widest leading-relaxed">{step.d}</p>
-                    </div>
-                    {i < 4 && <div className="hidden lg:flex justify-center"><ArrowRight className="w-6 h-6 text-zinc-100" /></div>}
-                   </React.Fragment>
-                 ))}
-              </div>
-           </div>
-        </section>
-
-        {/* 5. 🧠 BEHAVIORAL & 6. 🕸️ NETWORK DETECTION */}
-        <section className="py-40 bg-zinc-50 border-y border-gray-100">
-           <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-              <div className="space-y-12">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-zinc-200 decoration-8 underline-offset-16 font-manrope text-neutral-900">Abnormal Behavior.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[500px] leading-relaxed">Identify deviations from healthy merchant behavior using sophisticated behavioral and network patterns.</p>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    {[
-                      { l: "Transaction Spikes", d: "Sudden, unexplained volume increases.", i: <Zap /> },
-                      { l: "Inconsistent Flows", d: "Payment patterns that don't match the vertical.", i: <Activity /> },
-                      { l: "High Reversals", d: "Abnormal chargeback or refund ratios.", i: <ShieldAlert /> },
-                      { l: "Network Graph", d: "Identify shared devices and linked identities.", i: <Network /> }
-                    ].map((sig, i) => (
-                      <div key={i} className="p-8 bg-white border border-gray-100 shadow-sm rounded-[44px] hover:shadow-xl transition-all group">
-                         <div className="text-neutral-900 mb-6 group-hover:text-brand-lime transition-all">{React.cloneElement(sig.i as React.ReactElement<{ className: string }>, { className: "w-6 h-6" })}</div>
-                         <h5 className="font-bold text-neutral-900 text-xs mb-1 uppercase tracking-tight italic font-manrope">{sig.l}</h5>
-                         <p className="text-[10px] text-zinc-400 font-inter leading-relaxed">{sig.d}</p>
-                      </div>
                     ))}
                  </div>
               </div>
-
-              <div className="bg-neutral-900 rounded-[88px] p-12 lg:p-24 text-white shadow-3xl relative overflow-hidden group border border-white/10">
-                 <div className="absolute inset-0 bg-linear-to-br from-brand-lime/10 to-transparent opacity-50" />
-                 <Share2 className="w-40 h-40 absolute top-0 right-0 p-12 text-zinc-600 opacity-5 group-hover:scale-110 transition-transform" />
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-12">Uncover Networks.</h3>
-                 <div className="space-y-10">
-                    {[
-                      { l: "Shared Devices", d: "Identify multiple merchants using the same hardware." },
-                      { l: "Linked Identities", d: "Discover common PII across suspicious entities." },
-                      { l: "Coordinated Activity", d: "Detect simultaneous bursts across merchant pools." },
-                      { l: "Hidden Patterns", d: "Unveiling relationships that traditional tools miss." }
-                    ].map((it, i) => (
-                      <div key={i} className="flex gap-8 group/item">
-                         <div className="w-1.5 h-12 bg-brand-lime group-hover/item:bg-white transition-all duration-500" />
-                         <div>
-                            <h5 className="font-bold text-white uppercase text-[11px] mb-1 tracking-tight">{it.l}</h5>
-                            <p className="text-[11px] text-white/30 font-inter leading-relaxed max-w-[300px]">{it.d}</p>
-                         </div>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-           </div>
-        </section>
-
-        {/* 7. 📊 SCORING & 8. 🔍 TRANSACTION MONITORING */}
-        <section className="py-40">
-           <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 md:grid-cols-2 gap-12">
-              <div className="p-12 lg:p-24 bg-white border border-gray-100 rounded-[80px] shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative">
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-10 font-manrope text-neutral-900 underline decoration-zinc-100 decoration-8 underline-offset-16">Continuous Scoring.</h3>
-                <p className="text-zinc-500 text-lg font-inter italic mb-10 leading-relaxed">Every merchant is evaluated continuously based on transaction behavior, device usage, and linked entities.</p>
-                 <div className="grid grid-cols-1 gap-6 relative z-10">
-                    {[
-                      { l: "Transaction Behavior", v: "High Influence" },
-                      { l: "Device Persistence", v: "Medium Influence" },
-                      { l: "Graph Connections", v: "Critical Signal" }
-                    ].map((it, i) => (
-                      <div key={i} className="flex justify-between items-center py-4 border-b border-gray-50">
-                         <span className="text-xs font-bold uppercase tracking-widest text-neutral-900 italic">{it.l}</span>
-                         <span className="text-[10px] font-bold uppercase tracking-widest text-brand-lime bg-neutral-900 px-3 py-1 rounded-full">{it.v}</span>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-
-              <div className="p-12 lg:p-24 bg-neutral-900 text-white rounded-[80px] shadow-3xl group overflow-hidden relative border border-white/5">
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-10 font-manrope">Platform Integrity.</h3>
-                 <p className="text-white/40 text-lg font-inter italic mb-10 leading-relaxed">Deep Sense detects fraudulent transactions at the merchant level, identifying patterns across multiple accounts.</p>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 relative z-10">
-                    {[
-                      { l: "Laundering Detection", i: <Database /> },
-                      { l: "Velocity Control", i: <Zap /> },
-                      { l: "Cross-Entity Risk", i: <Network /> },
-                      { l: "Policy Enforcement", i: <CheckCircle2 /> }
-                    ].map((it, i) => (
-                      <div key={i} className="flex gap-4 items-center">
-                         <div className="text-brand-lime">{React.cloneElement(it.i as React.ReactElement<{ className: string }>, { className: "w-5 h-5" })}</div>
-                         <h5 className="font-bold text-white text-[10px] uppercase mb-1 tracking-widest">{it.l}</h5>
-                      </div>
-                    ))}
-                 </div>
-                 <div className="absolute inset-0 bg-linear-to-br from-brand-lime/5 to-transparent pointer-events-none" />
-              </div>
-           </div>
-        </section>
-
-        {/* 9. ⚡ ALERTS & 10. 🧑💻 INVESTIGATION TOOLS */}
-        <section className="py-40 bg-zinc-50 border-y border-gray-100">
-           <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-              <div className="bg-neutral-900 rounded-[80px] p-12 lg:p-24 relative overflow-hidden group">
-                 <Search className="w-40 h-40 absolute bottom-0 right-0 p-8 text-white opacity-5 group-hover:scale-110 transition-transform" />
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-12">Investigation Tools.</h3>
-                 <ul className="space-y-8 relative z-10 font-manrope italic">
-                    {[
-                      { s: "Merchant Activity Timeline", d: "See every event in chronological order." },
-                      { s: "Linked Entity Analysis", d: "Visual explore relationships and clusters." },
-                      { s: "Transaction History", d: "Deep dive into specific payment patterns." },
-                      { s: "Automated Case Workflow", d: "Move from alert to resolution in minutes." }
-                    ].map((it, i) => (
-                      <li key={i} className="flex gap-8 group/quote">
-                         <div className="w-1 h-12 bg-brand-lime/40 group-hover/quote:bg-brand-lime transition-all duration-500" />
-                         <div>
-                            <h5 className="text-[11px] font-bold uppercase tracking-widest text-white">{it.s}</h5>
-                            <p className="text-[10px] text-white/30 font-inter">{it.d}</p>
-                         </div>
-                      </li>
-                    ))}
-                 </ul>
-              </div>
-
-              <div className="space-y-12">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-neutral-100 decoration-8 underline-offset-16 font-manrope text-neutral-900">Act Immediately.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[500px]">Don&apos;t wait for chargebacks. Identify risky merchants before they impact your financial bottom line.</p>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    {[
-                      { l: "Flag High-Risk", i: <ShieldAlert /> },
-                      { l: "Block Transactions", i: <CheckCircle2 /> },
-                      { l: "Trigger Alerts", i: <Bell /> },
-                      { l: "Notify Teams", i: <Users /> }
-                    ].map((it, i) => (
-                      <div key={i} className="p-8 bg-white rounded-[40px] border border-gray-100 shadow-sm hover:shadow-xl transition-all flex flex-col items-center text-center">
-                         <div className="text-neutral-900 mb-6">{React.cloneElement(it.i as React.ReactElement<{ className: string }>, { className: "w-6 h-6" })}</div>
-                         <h4 className="font-bold text-neutral-900 text-xs uppercase tracking-tight italic font-manrope">{it.l}</h4>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-           </div>
-        </section>
-
-        {/* 11. 🏭 USE CASES & 12. 🆚 COMPARISON */}
-        <section className="py-40">
-           <div className="max-w-[1440px] mx-auto px-8 relative z-10 text-center">
-              <div className="mb-32 max-w-[800px] mx-auto">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter mb-8 font-manrope text-neutral-900 underline decoration-zinc-100 decoration-8 underline-offset-16">Ecosystem Protection.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[600px] mx-auto">See why Deep Sense is the preferred choice for marketplaces and modern payment providers.</p>
-              </div>
-
-              <div className="overflow-x-auto text-left mb-40">
-                 <table className="w-full border-collapse font-manrope">
-                    <thead>
-                       <tr className="border-b border-gray-200 uppercase tracking-widest text-[11px] text-zinc-400">
-                          <th className="py-10 px-8 font-bold italic">Capability</th>
-                          <th className="py-10 px-8 font-bold text-neutral-900 italic">Deep Sense</th>
-                          <th className="py-10 px-8 font-bold text-zinc-200 italic">Traditional Systems</th>
-                       </tr>
-                    </thead>
-                    <tbody className="italic">
+              <div className="p-16 bg-neutral-900 text-white rounded-[64px] shadow-3xl relative overflow-hidden group border border-white/5 font-manrope italic pr-12">
+                 <div className="absolute inset-0 bg-emerald-600/10 blur-[150px] opacity-20 pointer-events-none" />
+                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-10 border-b border-white/10 pb-10 font-manrope">Portfolio Risk</h3>
+                 <div className="space-y-8 relative z-10 font-manrope italic pr-12">
+                    <p className="text-zinc-500 text-sm italic pr-12 italic font-manrope italic pr-24">"Institutional acquirers lose billions annually to bust-out fraud that goes undetected due to fragmented surveillance layers."</p>
+                    <div className="grid grid-cols-2 gap-6 italic">
                        {[
-                         { c: "Merchant Risk Scoring", d: "Yes (Continuous)", s: "Limited / Periodic" },
-                         { c: "Network Ring Detection", d: "Yes (Graph-Based)", s: "None / Manual" },
-                         { c: "Real-Time Monitoring", d: "Yes", s: "Often Delayed (Batch)" },
-                         { c: "Behavior Analysis", d: "Yes (Advanced)", s: "Basic / Threshold-Based" }
-                       ].map((row, i) => (
-                         <tr key={i} className="border-b border-gray-100 group hover:bg-neutral-100 transition-all">
-                            <td className="py-10 px-8 text-lg font-bold italic uppercase tracking-tight text-neutral-900">{row.c}</td>
-                            <td className="py-10 px-8 text-neutral-900 font-black">
-                               <div className="flex items-center gap-3">
-                                  <CheckCircle2 className="w-5 h-5 text-brand-lime" />
-                                  {row.d}
-                               </div>
-                            </td>
-                            <td className="py-10 px-8 text-zinc-200 font-bold">{row.s}</td>
-                         </tr>
+                         { l: "Bust-out Detect", v: "Real-Time" },
+                         { l: "Laundering Stop", v: "Instant" }
+                       ].map((it, i) => (
+                         <div key={i} className="p-6 bg-white/5 border border-white/10 rounded-3xl hover:border-brand-lime transition-all">
+                            <span className="text-[9px] font-black uppercase text-brand-lime tracking-widest italic font-manrope">{it.l}</span>
+                            <span className="block text-2xl font-black italic">{it.v}</span>
+                         </div>
                        ))}
-                    </tbody>
-                 </table>
+                    </div>
+                 </div>
               </div>
+           </div>
+        </section>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* 3. The Solution & 4-7. Use Cases */}
+        <section className="py-32 px-8 overflow-hidden font-manrope italic pr-10">
+           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
+              <h2 className="text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase underline decoration-emerald-100 decoration-8 underline-offset-16 font-manrope italic pr-12 pr-12">Continuous Merchant Surveillance</h2>
+              <p className="text-xl text-zinc-500 max-w-3xl mx-auto italic mb-32 pr-10 pr-10 font-manrope italic">Deep Sense provides the cross-entity intelligence to detect merchant fraud before it becomes a chargeback or liability liability.</p>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full max-w-6xl text-left font-manrope italic pr-10 pr-12 group">
                  {[
-                   { l: "Fake Account Prevention", i: <Building2 /> },
-                   { l: "Payment Laundering", i: <Zap /> },
-                   { l: "Merchant Collusion", i: <Network /> },
-                   { l: "Policy Enforcement", i: <ShieldCheck /> }
+                   { t: "Transaction Laundering", d: "Detect front companies using your processing rails to wash funds for illegal goods.", c: "Identify Front Entities", i: <Search /> },
+                   { t: "Bust-out Fraud", d: "Stop merchants from processing massive fake volumes and draining settlements in hours.", c: "Identify Surge Anomalies", i: <AlertTriangle /> },
+                   { t: "Marketplace seller risk", d: "Verify and monitor marketplace sellers to prevent identity theft and large-scale consumer fraud.", c: "Protect Consumer Trust", i: <Store /> }
                  ].map((it, i) => (
-                   <div key={i} className="p-10 bg-white border border-gray-100 rounded-[56px] shadow-sm hover:shadow-2xl transition-all group flex flex-col items-center">
-                      <div className="text-neutral-900 mb-6 group-hover:text-brand-lime transition-all">{React.cloneElement(it.i as React.ReactElement<{ className: string }>, { className: "w-8 h-8" })}</div>
-                      <h5 className="font-bold text-neutral-900 text-[10px] uppercase tracking-widest">{it.l}</h5>
+                   <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-3xl transition-all duration-700 hover:-translate-y-2 group overflow-hidden relative font-manrope italic pr-12 pr-6 group">
+                      <div className="w-14 h-14 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform shadow-lg shadow-black/10">
+                        {React.cloneElement(it.i as React.ReactElement, { className: "w-6 h-6 border-zinc-100" })}
+                      </div>
+                      <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope italic">{it.t}</h4>
+                      <p className="text-zinc-500 font-inter italic leading-relaxed text-sm mb-10 italic pr-8 italic pr-6">{it.d}</p>
+                      <div className="flex items-center gap-3 text-emerald-600 font-black uppercase text-[10px] tracking-widest font-manrope italic">
+                         <div className="w-2 h-2 rounded-full bg-brand-lime animate-pulse font-manrope" />
+                         {it.c}
+                      </div>
                    </div>
                  ))}
               </div>
            </div>
         </section>
 
-        {/* 13. 📈 BUSINESS IMPACT & 14. 💬 TRUST */}
-        <section className="py-40 bg-zinc-50 border-y border-gray-100">
-           <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-              <div className="space-y-12">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-neutral-100 decoration-8 underline-offset-16 font-manrope text-neutral-900">Platform Integrity.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[500px]">Protect your reputation and financial assets by ensuring your merchant pool is clean and compliant.</p>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    {[
-                      { l: "Reduce Abuse", d: "Mitigate platform-wide risk." },
-                      { l: "Prevent Reputational Damage", d: "Protect your ecosystem integrity." },
-                      { l: "Improve Partner Trust", d: "Build confidence with providers." },
-                      { l: "Maintain Integrity", d: "Ensure high-quality merchant pools." }
-                    ].map((it, i) => (
-                      <div key={i} className="p-8 bg-white rounded-[40px] border border-gray-100 shadow-sm hover:shadow-xl transition-all">
-                         <h5 className="font-bold text-neutral-900 text-xs mb-1 uppercase tracking-tight italic">{it.l}</h5>
-                         <p className="text-[10px] text-zinc-400 font-inter">{it.d}</p>
-                      </div>
-                    ))}
-                 </div>
+        {/* 8. Intelligence Layers */}
+        <section className="py-32 px-8 bg-neutral-900 text-white mx-4 rounded-[64px] border border-white/5 relative overflow-hidden font-manrope italic pr-10">
+           <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-32 items-center relative z-10 font-manrope italic pr-10 pr-12">
+              <div className="order-2 lg:order-1 font-manrope italic pr-12 pr-6">
+                  {[
+                    { t: "Entity Graphing", d: "Identify clusters of merchants sharing bank accounts, devices, or physical addresses used in fraud ring attacks.", i: <Network /> },
+                    { t: "MCC Consistency Checks", d: "Perform real-time validation of merchant category consistency against actual transaction behavior.", i: <BarChart3 /> },
+                    { t: "Settlement Risk Guard", d: "Automatically trigger holds on high-risk settlements when sudden volume surges or refund spikes occur.", i: <Building /> }
+                  ].map((it, i) => (
+                    <div key={i} className="flex gap-8 group font-manrope italic mb-10 last:mb-0">
+                       <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all font-manrope">
+                          {React.cloneElement(it.i as React.ReactElement, { className: "w-6 h-6 border-white/10 font-manrope" })}
+                       </div>
+                       <div>
+                          <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter font-manrope italic">{it.t}</h4>
+                          <p className="text-zinc-500 text-sm leading-relaxed italic pr-12 italic font-manrope italic">{it.d}</p>
+                       </div>
+                    </div>
+                  ))}
               </div>
-
-              <div className="bg-neutral-900 rounded-[80px] p-12 lg:p-24 text-white relative overflow-hidden group border border-white/5 shadow-3xl">
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-12">Ecosystem Trust.</h3>
-                 <ul className="space-y-12">
-                    {[
-                      "We identified fraudulent merchants early before they could cascade risk.",
-                      "Deep Sense helped us protect our marketplace ecosystem integrity.",
-                      "The network ring detection is a critical asset for our compliance team."
-                    ].map((quote, i) => (
-                      <li key={i} className="flex gap-8 group/quote italic">
-                         <div className="w-1 h-12 bg-white/10 group-hover/quote:bg-brand-lime transition-all duration-500" />
-                         <p className="text-xl font-manrope font-italic text-white/50 group-hover/quote:text-white transition-colors leading-relaxed">“{quote}”</p>
-                      </li>
-                    ))}
-                 </ul>
+              <div className="order-1 lg:order-2 font-manrope italic pr-12">
+                 <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase italic leading-tight font-manrope pr-16">The Merchant, <br />Not the Volume.</h2>
+                 <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed pr-8 font-manrope italic pr-16 pr-12">Merchant fraud is rarely about a single transaction. Deep Sense analyzes the *ecosystem* of the merchant to identify the hidden relationships of fraud rings.</p>
+                 <div className="p-10 bg-white/5 border border-white/10 rounded-[48px] font-bold text-xs uppercase italic tracking-tighter font-inter pr-12 leading-tight italic pr-10 pr-12 group hover:border-emerald-400 transition-all">
+                    "Deep Sense analyzes merchant velocity, refund ratios, and MCC consistency simultaneously to return a definitive risk score for every settlement cycle."
+                 </div>
               </div>
            </div>
         </section>
 
-        {/* 15. 📣 CTA SECTION */}
-        <section className="max-w-[1300px] mx-auto px-4 mb-24 mt-24 text-center">
-           <div className="bg-brand-lime rounded-[80px] p-12 md:p-32 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-neutral-900 rounded-[80px] scale-x-0 group-hover:scale-x-100 transition-transform duration-1000 origin-right pointer-events-none" />
-              <div className="relative z-10 space-y-12 transition-colors group-hover:text-white duration-1000">
-                 <h2 className="text-4xl md:text-8xl font-bold tracking-tighter leading-none italic uppercase">Protect Your <br /><span className="opacity-30">Platform.</span></h2>
-                 <p className="text-xl md:text-2xl mb-12 max-w-[600px] mx-auto opacity-70 tracking-tight leading-relaxed font-manrope italic">Stop merchant fraud before it cascades through your ecosystem.</p>
-                 <div className="flex flex-col sm:flex-row gap-8 justify-center">
-                    <button className="px-14 py-7 bg-neutral-900 text-white rounded-full font-bold text-xl hover:scale-110 transition-all shadow-2xl group-hover:bg-white group-hover:text-neutral-900 font-manrope">
-                      Request Demo
-                    </button>
-                    <button className="px-14 py-7 bg-white text-neutral-900 border border-transparent rounded-full font-bold text-xl hover:bg-gray-50 transition-all shadow-xl active:scale-95 group-hover:bg-neutral-800 group-hover:text-white group-hover:border-white/10 font-manrope">
-                      Talk to Sales
-                    </button>
+        {/* 10. Comparison Table */}
+        <section className="py-32 px-8 font-manrope italic">
+           <div className="max-w-[1000px] mx-auto text-center flex flex-col items-center">
+              <h2 className="text-4xl font-bold font-manrope text-neutral-900 mb-10 uppercase italic">Adaptive Acquirer Defense</h2>
+              <div className="bg-white rounded-[40px] border border-zinc-200 overflow-hidden shadow-2xl w-full text-left font-manrope italic pr-6 group overflow-hidden">
+                 <table className="w-full text-left border-collapse font-manrope italic">
+                    <thead>
+                       <tr className="bg-neutral-900 text-white font-manrope text-left font-black tracking-widest text-[10px] uppercase">
+                          <th className="p-8 font-black uppercase tracking-widest text-[10px] italic">Merchant Detection Capability</th>
+                          <th className="p-8 font-black uppercase tracking-widest text-[10px] italic border-l border-white/10 text-center bg-emerald-600">Deep Sense</th>
+                          <th className="p-8 font-black uppercase tracking-widest text-[10px] italic border-l border-white/10 text-center">Legacy Review</th>
+                       </tr>
+                    </thead>
+                    <tbody className="font-bold text-sm text-neutral-600 italic">
+                       {[
+                         "Real-time bust-out surge triggers",
+                         "Automatic transaction laundering checks",
+                         "Merchant entity graph resolution",
+                         "Refund-to-sale anomaly detection",
+                         "Continuous portfolio health monitoring"
+                       ].map((feat, i) => (
+                         <tr key={i} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50/50 transition-colors">
+                            <td className="p-8 font-manrope">{feat}</td>
+                            <td className="p-8 text-center border-l border-zinc-50">
+                               <CheckCircle2 className="w-6 h-6 text-brand-lime mx-auto font-manrope" strokeWidth={3} />
+                               <span className="text-[9px] font-black uppercase text-zinc-400 mt-1 block font-manrope tracking-tighter pr-4">Portfolio Ready</span>
+                            </td>
+                            <td className="p-8 text-center border-l border-zinc-50 italic text-zinc-300 font-medium font-manrope leading-tight pr-6">
+                               No / Monthly
+                            </td>
+                         </tr>
+                       ))}
+                    </tbody>
+                 </table>
+              </div>
+           </div>
+        </section>
+
+        {/* 12. Final CTA */}
+        <section className="pt-24 pb-48 px-8 flex flex-col items-center text-center font-manrope italic">
+           <div className="max-w-[1200px] mx-auto bg-neutral-900 rounded-[64px] p-24 relative overflow-hidden group shadow-3xl text-white">
+              <div className="absolute inset-0 bg-emerald-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+              <div className="relative z-10 flex flex-col items-center text-center font-manrope italic pr-12">
+                 <span className="text-zinc-500 font-black tracking-widest text-[10px] uppercase mb-8 italic">Secure Your Portfolio Integrity</span>
+                 <h2 className="text-5xl md:text-7xl font-bold font-manrope text-white mb-10 tracking-tight leading-[1.1] uppercase italic font-manrope pr-6 pr-6 italic font-manrope pr-10 leading-tight">
+                   Expose the Hidden Risk <br />
+                   <span className="text-brand-lime font-black text-6xl italic leading-none font-manrope italic">In Your Portfolio.</span>
+                 </h2>
+                 <p className="text-zinc-400 text-lg mb-16 max-w-3xl mx-auto leading-relaxed italic pr-6 group-hover:text-white transition-colors pr-12 font-manrope italic pr-10">
+                    Defend your acquirer or marketplace rails from transaction laundering and bust-out fraud with the continuous surveillance engine built for institutional trust.
+                 </p>
+                 <div className="flex flex-col sm:flex-row gap-6 justify-center italic font-bold">
+                   <button className="px-14 py-7 bg-white text-neutral-900 rounded-full hover:bg-emerald-600 hover:text-white transition-all hover:scale-105 active:scale-95 text-xl tracking-tighter uppercase font-manrope italic font-manrope">
+                     Request Merchant Demo
+                   </button>
+                   <button className="px-14 py-7 bg-white/5 border border-white/10 text-white rounded-full hover:bg-white hover:text-neutral-900 transition-all text-xl tracking-tighter uppercase font-manrope italic pr-12 font-manrope">
+                     Contact Risk Advisory
+                   </button>
                  </div>
               </div>
            </div>
@@ -380,13 +219,6 @@ export default function MerchantFraudPage() {
       </main>
 
       <Footer />
-
-      <style jsx global>{`
-        .bg-grid-pattern {
-          background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
-          background-size: 50px 50px;
-        }
-      `}</style>
     </div>
   );
 }

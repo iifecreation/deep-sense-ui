@@ -2,7 +2,28 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { ChevronDown, Menu, X, ArrowRight, Zap, Shield, BarChart2, Cpu, Database, Users, Code, BookOpen, Layers } from "lucide-react";
+import { 
+  ChevronDown, 
+  Menu, 
+  X, 
+  ArrowRight, 
+  Zap, 
+  Shield, 
+  BarChart2, 
+  Cpu, 
+  Database, 
+  Users, 
+  Code, 
+  BookOpen, 
+  Layers, 
+  Globe, 
+  BadgeCheck, 
+  LayoutDashboard, 
+  History, 
+  Lock, 
+  AlertTriangle 
+} from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 interface NavItem {
   label: string;
@@ -27,15 +48,10 @@ const navConfig: NavMenu[] = [
     title: "Product",
     groups: [
       {
-        title: "Overview",
+        title: "Core Detection",
         items: [
-          { label: "Core Capabilities", href: "/product/overview", icon: <Zap className="w-4 h-4" /> },
+          { label: "Overview", href: "/product/overview", icon: <Zap className="w-4 h-4" /> },
           { label: "How It Works", href: "/product/how-it-works", icon: <Database className="w-4 h-4" /> },
-        ]
-      },
-      {
-        title: "Detection Engine",
-        items: [
           { label: "Real-Time Fraud Detection", href: "/product/fraud-detection", icon: <Shield className="w-4 h-4" /> },
           { label: "Fraud Scoring Engine", href: "/product/scoring-engine", icon: <BarChart2 className="w-4 h-4" /> },
           { label: "Rules Engine", href: "/product/rules-engine", icon: <Cpu className="w-4 h-4" /> },
@@ -44,16 +60,32 @@ const navConfig: NavMenu[] = [
       {
         title: "Intelligence",
         items: [
+          { label: "Graph & Fraud Ring Detection", href: "/product/graph-analysis", icon: <Database className="w-4 h-4" /> },
           { label: "Device Intelligence", href: "/product/device-intelligence", icon: <Layers className="w-4 h-4" /> },
-          { label: "Graph & Ring Detection", href: "/product/graph-analysis", icon: <Database className="w-4 h-4" /> },
+          { label: "AI Investigation Assistant", href: "/product/ai-assistant", featured: true },
           { label: "Behavioral Biometrics", href: "/product/behavioral", badge: "Soon" },
         ]
       },
       {
-        title: "Operations",
+        title: "AML & Compliance",
         items: [
-          { label: "Case Management", href: "/product/case-management", icon: <BookOpen className="w-4 h-4" /> },
-          { label: "AI Investigation Assistant", href: "/product/ai-assistant", featured: true },
+          { label: "AML Monitoring", href: "/product/aml-monitoring", icon: <Shield className="w-4 h-4" /> },
+          { label: "Customer Risk Profiling", href: "/product/risk-profiling", icon: <Users className="w-4 h-4" /> },
+          { label: "Sanctions & Watchlist Screening", href: "/product/sanctions-screening", icon: <Globe className="w-4 h-4" /> },
+          { label: "PEP Screening", href: "/product/pep-screening", icon: <Users className="w-4 h-4" /> },
+          { label: "Regulatory Reporting", href: "/product/regulatory-reporting", icon: <BookOpen className="w-4 h-4" /> },
+          { label: "Customer Onboarding / KYC", href: "/product/kyc-onboarding", icon: <BadgeCheck className="w-4 h-4" /> },
+          { label: "Compliance Operations", href: "/product/compliance-ops", icon: <Layers className="w-4 h-4" /> },
+          { label: "AML Dashboard / Compliance Workspace", href: "/product/compliance-dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
+        ]
+      },
+      {
+        title: "Operations & Integrations",
+        items: [
+          { label: "Case Management & Alerts", href: "/product/case-management", icon: <AlertTriangle className="w-4 h-4" /> },
+          { label: "Core Banking Integration", href: "/product/core-banking", icon: <Database className="w-4 h-4" /> },
+          { label: "Audit Trails", href: "/product/audit-trails", icon: <History className="w-4 h-4" /> },
+          { label: "Data Security", href: "/product/data-security", icon: <Lock className="w-4 h-4" /> },
         ]
       }
     ]
@@ -69,6 +101,16 @@ const navConfig: NavMenu[] = [
           { label: "Payments", href: "/solutions/payments" },
           { label: "E-commerce", href: "/solutions/ecommerce" },
           { label: "Crypto / Web3", href: "/solutions/crypto" },
+        ]
+      },
+      {
+        title: "AML & Regulatory",
+        items: [
+          { label: "AML Automation for Banks", href: "/solutions/banking" },
+          { label: "Sanctions Screening", href: "/solutions/sanctions-screening" },
+          { label: "PEP & High-Risk Customer", href: "/solutions/pep-monitoring" },
+          { label: "Suspicious Transaction Reporting", href: "/solutions/str-reporting" },
+          { label: "CBN Compliance Readiness", href: "/solutions/cbn-compliance", badge: "New" },
         ]
       },
       {
@@ -89,6 +131,7 @@ const navConfig: NavMenu[] = [
       {
         title: "Enterprise Core",
         items: [
+          { label: "AI & Decision Intelligence", href: "/platform/ai-intelligence" },
           { label: "Architecture", href: "/platform/architecture" },
           { label: "Security & Compliance", href: "/platform/security" },
           { label: "Data & Privacy", href: "/platform/privacy" },
@@ -96,10 +139,19 @@ const navConfig: NavMenu[] = [
         ]
       },
       {
-        title: "Connectivity",
+        title: "Integrations & Connectivity",
         items: [
+          { label: "Core Banking Integrations", href: "/platform/core-banking" },
+          { label: "Customer Onboarding", href: "/platform/onboarding" },
           { label: "Integrations (APIs)", href: "/platform/integrations" },
           { label: "Webhooks", href: "/platform/webhooks" },
+        ]
+      },
+      {
+        title: "Governance",
+        items: [
+          { label: "Audit & Governance Framework", href: "/platform/governance" },
+          { label: "Reporting & Regulatory Workflows", href: "/platform/reporting" },
         ]
       }
     ]
@@ -129,6 +181,15 @@ const navConfig: NavMenu[] = [
     title: "Resources",
     groups: [
       {
+        title: "Compliance",
+        items: [
+          { label: "Compliance Center", href: "/resources/compliance-center", featured: true },
+          { label: "CBN AML Readiness Guide", href: "/resources/cbn-guide" },
+          { label: "AML Implementation Checklist", href: "/resources/aml-checklist" },
+          { label: "Regulatory Reporting Guide", href: "/resources/reporting-guide" },
+        ]
+      },
+      {
         title: "Learn",
         items: [
           { label: "Blog", href: "/resources/blog" },
@@ -141,6 +202,12 @@ const navConfig: NavMenu[] = [
         items: [
           { label: "Docs", href: "/resources/docs" },
           { label: "Cases", href: "/resources/case-studies", badge: "Soon" },
+        ]
+      },
+      {
+        title: "Featured Resource",
+        items: [
+          { label: "State of Fraud 2026", href: "/resources/report-2026", featured: true },
         ]
       }
     ]
@@ -167,16 +234,7 @@ export default function Navbar() {
       <div className="max-w-[1300px] mx-auto bg-neutral-900 rounded-[100px] border border-white/10 px-4 md:px-6 py-2.5 flex justify-between items-center transition-all duration-500 backdrop-blur-md relative">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="flex gap-0.5">
-             {[1, 2, 3, 2, 1].map((i, idx) => (
-               <div 
-                 key={idx} 
-                 className="bg-brand-lime group-hover:scale-y-110 transition-transform duration-300" 
-                 style={{ height: `${(i * 3) + 3}px`, width: '3.5px' }} 
-               />
-             ))}
-          </div>
-          <span className="text-white text-lg font-bold font-manrope tracking-tight">Deep Sense</span>
+          <Logo variant="white" className="h-8" iconClassName="h-7 w-7" nameClassName="h-5" />
         </Link>
         
         {/* Desktop Nav Links */}
@@ -276,18 +334,19 @@ export default function Navbar() {
                           <li key={item.label}>
                             <Link 
                               href={item.href} 
-                              className="flex items-center gap-2.5 text-zinc-600 hover:text-indigo-600 text-[13px] font-semibold transition-colors group"
+                              className={`flex items-center gap-2.5 p-2 rounded-xl transition-all group ${item.featured ? "bg-indigo-50/50 border border-indigo-100/50 text-indigo-600" : "text-zinc-600 hover:text-indigo-600 hover:bg-zinc-50"}`}
                               onClick={() => setActiveMenu(null)}
                             >
-                               {item.icon && <span className="text-zinc-300 group-hover:text-indigo-600 transition-colors">{item.icon}</span>}
+                               {item.icon && <span className={`${item.featured ? "text-indigo-600" : "text-zinc-300 group-hover:text-indigo-600"} transition-colors`}>{item.icon}</span>}
                                <div className="flex items-center gap-1.5">
-                                 {item.label}
+                                 <span className="text-[13px] font-semibold">{item.label}</span>
                                  {item.badge && (
                                    <span className="px-1.5 py-0.5 bg-brand-lime/10 text-brand-lime text-[9px] font-bold uppercase rounded">
                                      {item.badge}
                                    </span>
                                  )}
                                </div>
+                               {item.featured && <ArrowRight className="w-3.5 h-3.5 ml-auto opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />}
                             </Link>
                           </li>
                         ))}
