@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Shield, Zap, Lock, Earth as Globe, CircleCheck as CheckCircle2 } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 export default function AuthLayout({
   children,
@@ -13,13 +14,7 @@ export default function AuthLayout({
       <div className="flex flex-1 flex-col justify-center px-6 py-12 sm:px-12 lg:flex-none lg:px-20 xl:px-28">
         <div className="mx-auto w-full max-w-sm lg:w-[400px]">
           <Link href="/" className="flex items-center gap-2.5 mb-12 group transition-all duration-300">
-            <div className="w-12 h-12 bg-[#D1F701] rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(209,247,1,0.2)] group-hover:scale-110 transition-transform duration-300">
-                <Shield className="w-7 h-7 text-black stroke-[2.5px]" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-2xl font-bold font-heading tracking-tight text-foreground">Deep Sense</span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 leading-none">Security Infrastructure</span>
-            </div>
+            <Logo variant="primary" className="h-14" iconClassName="h-14 w-14" nameClassName="h-7" />
           </Link>
           
           <div className="relative">
