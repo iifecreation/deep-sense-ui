@@ -11,7 +11,10 @@ import {
   Copy, 
   CheckCircle2,
   Trash2,
-  Plus
+  Plus,
+  FileText,
+  History,
+  Lock
 } from "lucide-react";
 
 export default function SettingsPage() {
@@ -40,18 +43,21 @@ export default function SettingsPage() {
         {/* Navigation Sidebar (Local) */}
         <div className="lg:col-span-3 space-y-4">
            {[
-             { n: "Profile", i: <Globe /> },
-             { n: "API Keys", i: <Key /> },
+             { n: "Organization", i: <Globe /> },
              { n: "Team & Roles", i: <Users /> },
-             { n: "Security", i: <ShieldCheck /> },
-             { n: "Alert Hooks", i: <Bell /> }
+             { n: "API Keys", i: <Key /> },
+             { n: "Webhooks", i: <Bell /> },
+             { n: "Screening Settings", i: <ShieldCheck /> },
+             { n: "Reporting Settings", i: <FileText /> },
+             { n: "Retention Policies", i: <History /> },
+             { n: "Security & Access", i: <Lock /> }
            ].map((nav, i) => (
              <button key={i} className={`w-full flex items-center justify-between px-8 py-4 rounded-3xl transition-all font-bold italic ${
                nav.n === "API Keys" ? "bg-white text-neutral-900 shadow-xl border border-neutral-100" : "text-neutral-400 hover:text-neutral-900"
              }`}>
                 <div className="flex items-center gap-4">
                    <div className="opacity-40">{nav.i}</div>
-                   <span className="text-[13px] tracking-tight">{nav.n}</span>
+                   <span className="text-[12px] tracking-tight">{nav.n}</span>
                 </div>
                 {nav.n === "API Keys" && <div className="w-1.5 h-1.5 bg-brand-lime rounded-full shadow-[0_0_8px_#D1F701]" />}
              </button>

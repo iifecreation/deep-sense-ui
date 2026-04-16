@@ -1,116 +1,134 @@
-"use client";
-
-import React from "react";
 import { 
   Smartphone, 
   Search, 
-  ArrowRight, 
+  Filter, 
+  Download,
   ShieldCheck, 
   ShieldAlert, 
   ChevronRight,
-  Zap
+  Zap,
+  RefreshCcw,
+  Plus
 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
-export default function DevicesPage() {
+export default function DevicesRegistry() {
   return (
-    <div className="space-y-12">
-      {/* 1. HEADER */}
-      <div className="flex flex-col lg:row justify-between items-start lg:items-center gap-8 font-manrope">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-           <h1 className="text-4xl font-black italic tracking-tighter text-neutral-900 uppercase leading-tight mb-2">Devices.</h1>
-           <p className="text-neutral-400 text-xs font-bold uppercase tracking-widest italic font-black">842.1K Known Fingerprints • Global Coverage</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Device Registry</h1>
+          <p className="text-sm text-slate-500 mt-1">Managed device fingerprints and forensic signals.</p>
         </div>
-        <div className="flex gap-4">
-           <div className="relative group w-96 font-bold">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-300 group-focus-within:text-neutral-900 transition-all font-bold" />
-              <input 
-                 type="text" 
-                 placeholder="Search Device MD5, Label, or Model..."
-                 className="w-full pl-14 pr-8 py-4 bg-white border border-neutral-200 rounded-2xl text-[13px] font-bold text-neutral-900 placeholder:text-neutral-300 focus:border-brand-lime shadow-xl italic"
-              />
-           </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="font-semibold">
+            <Download className="w-4 h-4 mr-2" /> Export
+          </Button>
+          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 font-semibold shadow-sm">
+            <Plus className="w-4 h-4 mr-2" /> Register Device
+          </Button>
         </div>
       </div>
 
-      {/* 2. DEVICE STATS */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-         {[
-           { l: "High Risk Devices", v: "842", d: "Alert active", c: "text-red-500", i: <ShieldAlert className="w-5 h-5" /> },
-           { l: "Known Emulators", v: "1,241", d: "Block active", c: "text-orange-500", i: <Zap className="w-5 h-5" /> },
-           { l: "Trusted Mobile", v: "642K", d: "White-listed", c: "text-emerald-500", i: <ShieldCheck className="w-5 h-5" /> }
-         ].map((stat, i) => (
-           <div key={i} className="p-8 bg-white rounded-[40px] border border-neutral-100 shadow-xl hover:shadow-2xl transition-all group overflow-hidden font-bold italic">
-              <div className="relative z-10 flex items-center justify-between mb-6">
-                 <div className={`w-10 h-10 rounded-xl bg-zinc-50 border border-neutral-100 flex items-center justify-center ${stat.c} shadow-sm group-hover:scale-110 transition-transform`}>
-                    {stat.i}
-                 </div>
-                 <div className="text-[10px] font-black uppercase tracking-widest text-neutral-300 italic">{stat.d}</div>
+      {/* KPI Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { label: "High-Risk Devices", value: "842", subtext: "Active threat fingerprints", icon: <ShieldAlert className="text-red-500" />, color: "border-red-100 bg-red-50/20" },
+          { label: "Emulator Detection", value: "1,241", subtext: "Blocked simulation nodes", icon: <Zap className="text-amber-500" />, color: "border-amber-100 bg-amber-50/20" },
+          { label: "Trusted Mobile Fleet", value: "642K", subtext: "Whitelisted institutional devices", icon: <ShieldCheck className="text-emerald-500" />, color: "border-emerald-100 bg-emerald-50/20" },
+        ].map((kpi, i) => (
+          <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
+                {kpi.icon}
               </div>
-              <div className="relative z-10">
-                 <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-1 italic leading-none">{stat.l}</p>
-                 <div className={`text-3xl font-black italic tracking-tighter ${stat.c} leading-none`}>{stat.v}</div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{kpi.label}</p>
+                <div className="text-xl font-bold text-slate-900">{kpi.value}</div>
+                <p className="text-[10px] text-slate-400 font-medium">{kpi.subtext}</p>
               </div>
-           </div>
-         ))}
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* 3. TABLE */}
-      <div className="bg-white rounded-[56px] border border-neutral-200 overflow-hidden shadow-2xl">
-         <div className="overflow-x-auto">
-            <table className="w-full text-left font-manrope">
-               <thead>
-                  <tr className="border-b border-neutral-100">
-                     <th className="p-10 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 italic">Fingerprint / ID</th>
-                     <th className="p-10 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 italic">Model / Platform</th>
-                     <th className="p-10 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 italic text-center">Risk Score</th>
-                     <th className="p-10 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 italic text-center">Accounts</th>
-                     <th className="p-10 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 italic">Last Seen</th>
-                     <th className="p-10"></th>
-                  </tr>
-               </thead>
-               <tbody className="text-neutral-900">
-                  {[
-                    { id: "dv_981a_8820", m: "iPhone 15 Pro", p: "iOS 17.4", s: 12, a: 1, t: "Now", r: "WHITE" },
-                    { id: "dv_223b_1102", m: "Simulator.x86", p: "Android 12", s: 92, a: 42, t: "2m ago", r: "RED" },
-                    { id: "dv_451c_6625", m: "MacBook Pro M3", p: "macOS 14.2", s: 22, a: 2, t: "14m ago", r: "WHITE" },
-                    { id: "dv_779d_4921", m: "Galaxy S24 Ultra", p: "Android 14", s: 64, a: 8, t: "1h ago", r: "ORANGE" }
-                  ].map((row, i) => (
-                    <tr key={i} className="border-b border-neutral-50 last:border-0 hover:bg-zinc-50 transition-all group/row cursor-pointer font-bold italic">
-                       <td className="p-10">
-                          <code className="text-[10px] font-mono text-neutral-900 group-hover/row:text-brand-lime transition-all">{row.id}</code>
-                       </td>
-                       <td className="p-10">
-                          <div className="flex items-center gap-4">
-                             <div className="w-10 h-10 rounded-xl bg-zinc-50 flex items-center justify-center text-neutral-300 border border-neutral-100 group-hover/row:border-brand-lime/20 group-hover/row:bg-white transition-all">
-                                <Smartphone className="w-4.5 h-4.5" />
-                             </div>
-                             <div>
-                                <div className="text-[12px] font-black italic tracking-tight text-neutral-900 italic leading-none">{row.m}</div>
-                                <div className="text-[9px] text-neutral-300 uppercase tracking-widest font-black italic leading-none">{row.p}</div>
-                             </div>
-                          </div>
-                       </td>
-                       <td className="p-10 text-center">
-                          <div className={`text-2xl font-black italic tracking-tighter ${row.s > 80 ? "text-red-500 scale-110" : row.s > 40 ? "text-orange-400" : "text-brand-lime"}`}>
-                             {row.s}
-                          </div>
-                          <div className="text-[8px] font-black uppercase text-neutral-300">pts</div>
-                       </td>
-                       <td className="p-10 text-center font-black italic text-neutral-900 text-xl italic">{row.a}</td>
-                       <td className="p-10">
-                          <div className="text-[11px] font-bold text-neutral-400 lowercase">{row.t}</div>
-                       </td>
-                       <td className="p-10 text-right">
-                          <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-neutral-300 group-hover/row:text-neutral-900 transition-all ml-auto drop-shadow-sm">
-                             Trace <ChevronRight className="w-4 h-4 shadow-[0_0_8px_#D1F701]" />
-                          </button>
-                       </td>
-                    </tr>
-                  ))}
-               </tbody>
-            </table>
-         </div>
-      </div>
+      {/* Device Table */}
+      <Card className="rounded-xl shadow-sm border bg-white overflow-hidden">
+        <div className="p-4 border-b border-slate-100 bg-slate-50/30 flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input placeholder="Search Device ID, Model, OS..." className="pl-9 bg-white text-sm" />
+          </div>
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold">
+              <Filter className="w-4 h-4 mr-2" /> All Platforms
+            </Button>
+            <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold">
+               <RefreshCcw className="w-4 h-4 mr-2" /> Refresh
+            </Button>
+          </div>
+        </div>
+        <Table>
+          <TableHeader className="bg-slate-50/50">
+            <TableRow>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-6">Fingerprint / ID</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Model / Platform</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">Risk Score</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">Accounts</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Last Seen</TableHead>
+              <TableHead className="text-right pr-6"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[
+              { id: "dv_981a_8820", m: "iPhone 15 Pro", p: "iOS 17.4", s: 12, a: 1, t: "Just now", r: "Low" },
+              { id: "dv_223b_1102", m: "Simulator.x86", p: "Android 12", s: 92, a: 42, t: "2m ago", r: "Critical" },
+              { id: "dv_451c_6625", m: "MacBook Pro M3", p: "macOS 14.2", s: 22, a: 2, t: "14m ago", r: "Low" },
+              { id: "dv_779d_4921", m: "Galaxy S24 Ultra", p: "Android 14", s: 64, a: 8, t: "1h ago", r: "Medium" },
+              { id: "dv_3311_9901", m: "Pixel 8 Pro", p: "Android 14", s: 14, a: 1, t: "3h ago", r: "Low" },
+            ].map((device, i) => (
+              <TableRow key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer">
+                <TableCell className="pl-6 py-4">
+                  <code className="text-[10px] font-mono font-bold text-slate-900">{device.id}</code>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                      <Smartphone className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-900">{device.m}</div>
+                      <div className="text-[10px] text-slate-400 font-medium uppercase">{device.p}</div>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center font-bold text-slate-900">
+                  <Badge variant="outline" className={`rounded-full px-2 py-0 border-none ${
+                    device.s > 80 ? 'bg-red-500 text-white' : device.s > 40 ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white'
+                  }`}>
+                    {device.s}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-center text-xs font-bold text-slate-900">{device.a}</TableCell>
+                <TableCell className="text-xs font-medium text-slate-500">{device.t}</TableCell>
+                <TableCell className="text-right pr-6">
+                  <Link href={`/dashboard/devices/${device.id}`}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 group-hover:text-blue-600">
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   );
 }

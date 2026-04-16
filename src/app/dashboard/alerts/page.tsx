@@ -1,121 +1,167 @@
-"use client";
-
-import React from "react";
 import { 
   AlertCircle, 
   Search, 
-  ChevronRight, 
-  Clock, 
-  User, 
   ArrowRight,
   ShieldAlert,
-  Zap,
-  Filter
+  Filter,
+  Download,
+  CheckCircle2,
+  Clock,
+  ArrowUpRight,
+  UserCheck,
+  ChevronRight
 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 
-export default function AlertsPage() {
-  const alerts = [
-    { id: "alt_842a", t: "High Velocity Transaction", u: "user_9102", d: "2m ago", r: 94, s: "Critical" },
-    { id: "alt_110b", t: "Multiple IP Ingress", u: "anon_shadow", d: "14m ago", r: 82, s: "High" },
-    { id: "alt_452c", t: "New Device Profiling", u: "mike.jones", d: "1h ago", r: 56, s: "Medium" },
-    { id: "alt_772d", t: "Geographic Drift", u: "alex_reed", d: "3h ago", r: 42, s: "Low" }
-  ];
-
+export default function AlertsCenter() {
   return (
-    <div className="space-y-12">
-      {/* 1. HEADER */}
-      <div className="flex flex-col lg:row justify-between items-start lg:items-center gap-8">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-           <h1 className="text-4xl font-black italic tracking-tighter text-neutral-900 uppercase leading-tight mb-2">Alerts.</h1>
-           <p className="text-neutral-400 text-xs font-bold uppercase tracking-widest italic font-black">Situational Risk Feed • 1,284 Ongoing Signals</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Alerts Center</h1>
+          <p className="text-sm text-slate-500 mt-1">Situational risk feed and incident response gateway.</p>
         </div>
-        <div className="flex gap-4 font-bold">
-           <button className="px-10 py-4 bg-zinc-100 text-neutral-900 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-neutral-200 transition-all shadow-sm italic">
-              Batch Acknowledge
-           </button>
-           <button className="px-10 py-4 bg-neutral-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl active:scale-95 italic">
-              Signal Triage (Auto)
-           </button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="font-semibold">
+            Batch Acknowledge
+          </Button>
+          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 font-semibold shadow-sm">
+            <UserCheck className="w-4 h-4 mr-2" /> Start Triage
+          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        {/* 2. LIVE FEED */}
-        <div className="lg:col-span-8 space-y-6">
-           {alerts.map((alt, i) => (
-             <div key={i} className="p-10 bg-white rounded-[56px] border border-neutral-100 flex items-center justify-between shadow-xl hover:shadow-2xl transition-all group cursor-pointer relative overflow-hidden font-bold">
-                <div className="flex items-center gap-10 flex-1">
-                   <div className={`w-16 h-16 rounded-3xl flex items-center justify-center border shadow-sm ${
-                     alt.s === "Critical" ? "bg-red-500/10 border-red-500/20 text-red-500" :
-                     alt.s === "High" ? "bg-orange-500/10 border-orange-500/20 text-orange-500" :
-                     "bg-zinc-100 border-neutral-200 text-neutral-400"
-                   }`}>
-                      <ShieldAlert className="w-8 h-8" />
-                   </div>
-                   <div className="space-y-2">
-                      <div className="flex items-center gap-4">
-                         <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${
-                           alt.s === "Critical" ? "bg-red-500/10 border-red-500/20 text-red-500" :
-                           alt.s === "High" ? "bg-orange-500/10 border-orange-500/20 text-orange-500" :
-                           "bg-zinc-50 border-neutral-100 text-neutral-400"
-                         }`}>
-                           {alt.s}
-                         </span>
-                         <span className="text-[10px] font-bold text-neutral-300 italic">ID: {alt.id}</span>
-                      </div>
-                      <h4 className="text-2xl font-bold italic uppercase tracking-tight text-neutral-900 group-hover:text-brand-lime transition-colors italic leading-none">{alt.t}</h4>
-                      <p className="text-[10px] text-neutral-400 uppercase font-black italic tracking-widest leading-none">{alt.u} • {alt.d} • SCORED {alt.r} PTS</p>
-                   </div>
-                </div>
-
-                <div className="flex items-center gap-8">
-                   <div className="text-right hidden sm:block">
-                      <div className={`text-3xl font-black italic tracking-tighter ${alt.r > 80 ? "text-red-500 scale-110" : "text-neutral-900"}`}>{alt.r}</div>
-                      <p className="text-[8px] font-black uppercase text-neutral-300">PTS</p>
-                   </div>
-                   <button className="w-12 h-12 bg-zinc-50 border border-neutral-200 rounded-2xl flex items-center justify-center text-neutral-300 group-hover:text-neutral-900 transition-all shadow-sm">
-                      <ChevronRight className="w-5 h-5 shadow-[0_0_8px_#D1F701]" />
-                   </button>
-                </div>
-             </div>
-           ))}
-        </div>
-
-        {/* 3. PRIORITIZATION ENGINE (METRICS) */}
-        <div className="lg:col-span-4 space-y-12">
-           <div className="p-12 bg-neutral-900 rounded-[64px] shadow-3xl space-y-12 group transition-all font-bold">
-              <h3 className="text-2xl font-black italic tracking-tighter text-white uppercase italic leading-none">Severity Distribution.</h3>
-              <div className="space-y-8 italic">
-                 {[
-                   { l: "Critical Signals", v: "12", c: "bg-red-500", p: "12%" },
-                   { l: "High Priority", v: "42", c: "bg-orange-500", p: "42%" },
-                   { l: "Operational", v: "841", c: "bg-brand-lime", p: "84%" }
-                 ].map((sev, j) => (
-                   <div key={j} className="space-y-4">
-                      <div className="flex justify-between text-[11px] font-black uppercase tracking-widest text-white/40">
-                         <span>{sev.l}</span>
-                         <span className="text-white">{sev.v}</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden shadow-inner">
-                         <div style={{ width: sev.p }} className={`h-full ${sev.c} shadow-sm transition-all duration-1000 group-hover:scale-x-110 origin-left`} />
-                      </div>
-                   </div>
-                 ))}
+      {/* KPI Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { label: "Active Alerts", value: "1,284", subtext: "12 critical signals", icon: <ShieldAlert className="text-red-500" />, color: "border-red-100 bg-red-50/20" },
+          { label: "Triage SLA", value: "98.2%", subtext: "Meeting target", icon: <Clock className="text-blue-500" />, color: "border-blue-100 bg-blue-50/20" },
+          { label: "Resolved Today", value: "412", subtext: "+15% vs yesterday", icon: <CheckCircle2 className="text-emerald-500" />, color: "border-emerald-100 bg-emerald-50/20" },
+        ].map((kpi, i) => (
+          <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
+                {kpi.icon}
               </div>
-           </div>
-
-           <div className="p-12 bg-white rounded-[64px] border border-neutral-100 shadow-2xl space-y-8 group transition-all font-bold italic">
-              <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 italic">Analyst Assigned</h5>
-              <div className="flex -space-x-4">
-                 {[1,2,3,4].map((a) => (
-                   <div key={a} className="w-12 h-12 rounded-2xl border-4 border-white bg-zinc-100 flex items-center justify-center text-neutral-400 font-bold text-xs shadow-sm overflow-hidden group-hover:translate-x-2 transition-transform">
-                      <img src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=Analyst${a}`} alt="Analyst" />
-                   </div>
-                 ))}
-                 <div className="w-12 h-12 rounded-2xl border-4 border-white bg-brand-lime flex items-center justify-center text-neutral-900 font-black text-xs shadow-sm italic shadow-md animate-pulse">+</div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{kpi.label}</p>
+                <div className="text-xl font-bold text-slate-900">{kpi.value}</div>
+                <p className="text-[10px] text-slate-400 font-medium">{kpi.subtext}</p>
               </div>
-              <p className="text-[10px] text-neutral-400 italic font-inter leading-relaxed italic">Engine running in high-alert mode. 12 critical signals pending triage.</p>
-           </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Main Content Layout */}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        {/* Alerts Table */}
+        <Card className="xl:col-span-3 rounded-xl shadow-sm border bg-white overflow-hidden">
+          <div className="p-4 border-b border-slate-100 bg-slate-50/30 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="relative w-full md:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input placeholder="Search alerts, customers..." className="pl-9 bg-white text-sm" />
+            </div>
+            <div className="flex items-center gap-2 w-full md:w-auto">
+              <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold">
+                <Filter className="w-4 h-4 mr-2" /> Filter By Severity
+              </Button>
+            </div>
+          </div>
+          <Table>
+            <TableHeader className="bg-slate-50/50">
+              <TableRow>
+                <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-6">Alert ID / Signal</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Customer</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Severity</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Score</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Time</TableHead>
+                <TableHead className="text-right pr-6"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[
+                { id: "alt_842a", title: "High Velocity Transaction", entity: "user_9102", risk: "Critical", score: 94, time: "2m ago" },
+                { id: "alt_110b", title: "Multiple IP Ingress", entity: "anon_shadow", risk: "High", score: 82, time: "14m ago" },
+                { id: "alt_452c", title: "New Device Profiling", entity: "mike.jones", risk: "Medium", score: 56, time: "1h ago" },
+                { id: "alt_772d", title: "Geographic Drift", entity: "alex_reed", risk: "Low", score: 42, time: "3h ago" },
+                { id: "alt_991e", title: "Large OTC Value Transfer", entity: "nexus_otc", risk: "High", score: 88, time: "5h ago" },
+              ].map((alt, i) => (
+                <TableRow key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer">
+                  <TableCell className="pl-6">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs font-bold text-slate-900 line-clamp-1">{alt.title}</span>
+                      <span className="text-[10px] font-medium text-slate-400">{alt.id}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-xs font-bold text-slate-900">{alt.entity}</TableCell>
+                  <TableCell>
+                    <Badge className={`rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide border-none ${
+                        alt.risk === 'Critical' ? 'bg-red-900 text-white' : 
+                        alt.risk === 'High' ? 'bg-red-100 text-red-600' : 
+                        alt.risk === 'Medium' ? 'bg-amber-100 text-amber-700' : 
+                        'bg-emerald-100 text-emerald-700'
+                      }`}>
+                      {alt.risk}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-sm font-bold text-slate-900">{alt.score}</TableCell>
+                  <TableCell className="text-xs text-slate-500 font-medium">{alt.time}</TableCell>
+                  <TableCell className="text-right pr-6">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-blue-600">
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+
+        {/* Analytics Sidebar */}
+        <div className="space-y-6">
+          <Card className="rounded-xl shadow-sm border bg-white p-6 space-y-4">
+            <h4 className="text-sm font-bold text-slate-900">Severity Distribution</h4>
+            <div className="space-y-4">
+              {[
+                { label: "Critical", value: 12, percentage: 12, color: "bg-red-500" },
+                { label: "High", value: 42, percentage: 42, color: "bg-red-400" },
+                { label: "Medium", value: 841, percentage: 84, color: "bg-amber-400" },
+              ].map((sev, i) => (
+                <div key={i} className="space-y-1.5">
+                  <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <span>{sev.label}</span>
+                    <span className="text-slate-900">{sev.value}</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div className={`h-full ${sev.color}`} style={{ width: `${sev.percentage}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="rounded-xl shadow-sm border bg-white p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-bold text-slate-900">Active Analysts</h4>
+              <Badge variant="outline" className="text-[10px] font-bold bg-emerald-50 text-emerald-600 border-none">Live</Badge>
+            </div>
+            <div className="flex -space-x-2">
+              {[1, 2, 3, 4].map((a) => (
+                <div key={a} className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 overflow-hidden shadow-sm">
+                  <img src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=Analyst${a}`} alt="Analyst" />
+                </div>
+              ))}
+              <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-50 flex items-center justify-center text-[10px] font-bold text-slate-400 shadow-sm">+</div>
+            </div>
+            <p className="text-[11px] text-slate-500 leading-relaxed font-medium">12 high-priority alerts are currently unassigned.</p>
+            <Button size="sm" variant="outline" className="w-full text-xs font-bold border-slate-200">View Workforce</Button>
+          </Card>
         </div>
       </div>
     </div>
