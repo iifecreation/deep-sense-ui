@@ -10,30 +10,29 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-zinc-50 text-neutral-900 selection:bg-brand-lime selection:text-neutral-900 overflow-x-hidden font-manrope">
-      {/* GLOBAL LIGHT GLOWS - SUBTLE TINTS */}
-      <div className="fixed top-0 left-1/4 w-[800px] h-[600px] bg-brand-lime/10 rounded-full blur-[120px] pointer-events-none -z-10 animate-pulse" />
-      <div className="fixed bottom-0 right-1/4 w-[600px] h-[500px] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none -z-10" />
-
-      <div className="max-w-[1720px] mx-auto p-8 lg:p-12 flex flex-col gap-12">
+    <div className="h-screen bg-zinc-50 text-slate-900 overflow-hidden font-sans selection:bg-blue-100 selection:text-blue-900">
+      <div className="h-full flex flex-col p-6 gap-6">
         {/* Global Dashboard Header */}
         <DashboardHeader />
 
-        <div className="flex flex-col lg:flex-row gap-12 min-h-screen">
+        <div className="flex-1 flex flex-row gap-6 overflow-hidden">
           {/* Global Dashboard Sidebar */}
-          <DashboardSidebar />
+          <div className="w-72 shrink-0 h-full overflow-hidden">
+            <DashboardSidebar />
+          </div>
 
-          {/* Page-Specific Content Slot */}
-          <main className="flex-1 flex flex-col gap-12 min-w-0">
-             {children}
+          {/* Independent Content Scroll */}
+          <main className="flex-1 overflow-y-auto no-scrollbar bg-white rounded-xl border border-slate-200 shadow-sm">
+             <div className="p-6">
+               {children}
+               
+               <footer className="py-12 mt-12 text-center opacity-40 border-t border-slate-100">
+                 <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-400">Deep Sense Security v4.2.0 • Enterprise Edition</p>
+               </footer>
+             </div>
           </main>
         </div>
       </div>
-
-       {/* FOOTER WATERMARK */}
-       <footer className="p-12 text-center opacity-30">
-         <p className="text-[10px] font-black uppercase tracking-[0.5em] italic text-neutral-400">Deep Sense Integrated Security Suite v4.2.0-Production</p>
-      </footer>
     </div>
   );
 }

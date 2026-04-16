@@ -1,120 +1,139 @@
-"use client";
-
-import React from "react";
 import { 
   Search, 
   Filter, 
   ArrowUpRight, 
-  ArrowDownLeft, 
-  MoreHorizontal, 
-  ChevronRight,
   Download,
-  AlertCircle
+  AlertCircle,
+  FileText,
+  Activity,
+  History,
+  ArrowDownLeft,
+  Calendar,
+  Layers,
+  MoreVertical
 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 
 export default function TransactionsPage() {
   return (
-    <div className="space-y-12">
-      {/* 1. HEADER */}
-      <div className="flex flex-col lg:row justify-between items-start lg:items-center gap-8">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-           <h1 className="text-4xl font-black italic tracking-tighter text-neutral-900 uppercase leading-tight mb-2">Transactions.</h1>
-           <p className="text-neutral-400 text-xs font-bold uppercase tracking-widest italic font-black">Audit Trail • Real-time Processing Engine</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Transactions</h1>
+          <p className="text-sm text-slate-500 mt-1">Real-time inspection of institutional value flows.</p>
         </div>
-        <div className="flex gap-4 font-bold">
-           <button className="px-10 py-4 bg-zinc-100 text-neutral-900 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-neutral-200 transition-all shadow-sm italic">
-              Export CSV <Download className="w-4 h-4 ml-2 inline" />
-           </button>
-           <button className="px-10 py-4 bg-brand-lime text-neutral-900 rounded-2xl font-bold text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl active:scale-95 italic">
-              New Inspection +
-           </button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="font-semibold">
+            <Download className="w-4 h-4 mr-2" /> Export
+          </Button>
+          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 font-semibold">
+            Run Analysis
+          </Button>
         </div>
       </div>
 
-      {/* 2. FILTERS */}
-      <div className="p-8 bg-white rounded-[40px] border border-neutral-100 flex items-center justify-between shadow-xl">
-         <div className="flex items-center gap-8 flex-1">
-            <div className="relative group flex-1 max-w-md">
-               <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-300 group-focus-within:text-neutral-900 transition-all font-bold" />
-               <input 
-                  type="text" 
-                  placeholder="Search by ID, User, or Amount..."
-                  className="w-full pl-14 pr-4 py-4 bg-zinc-50 border border-neutral-100 rounded-2xl text-[13px] font-bold text-neutral-900 focus:border-brand-lime transition-all italic"
-               />
-            </div>
-            <div className="flex items-center gap-4">
-               {["High Risk", "Verified", "Pending"].map((f, i) => (
-                 <button key={i} className="px-6 py-3 rounded-xl border border-neutral-100 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-50 transition-all text-neutral-400 hover:text-neutral-900 italic font-black">
-                    {f}
-                 </button>
-               ))}
-            </div>
-         </div>
-         <button className="flex items-center gap-2 p-4 bg-neutral-900 text-white rounded-2xl shadow-xl hover:scale-110 transition-all italic font-bold">
-            <Filter className="w-4 h-4" />
-         </button>
+      {/* KPI Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { label: "Total Volume", value: "$182.4M", trend: "+12.5%", icon: <Activity className="text-blue-600" /> },
+          { label: "Flagged Value", value: "$4.1M", trend: "+2.1%", icon: <AlertCircle className="text-red-500" /> },
+          { label: "Processing Avg", value: "42ms", trend: "-4ms", icon: <Layers className="text-slate-400" /> },
+        ].map((stat, i) => (
+          <Card key={i} className="rounded-xl shadow-sm border bg-white">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center">
+                {stat.icon}
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{stat.label}</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xl font-bold text-slate-900">{stat.value}</span>
+                  <span className={`text-[10px] font-bold ${stat.trend.startsWith('+') ? 'text-emerald-500' : 'text-blue-500'}`}>{stat.trend}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* 3. TABLE */}
-      <div className="bg-white rounded-[56px] border border-neutral-200 overflow-hidden shadow-2xl">
-         <div className="overflow-x-auto">
-            <table className="w-full text-left font-manrope">
-               <thead>
-                  <tr className="border-b border-neutral-100">
-                     <th className="p-10 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 italic">Reference / Entity</th>
-                     <th className="p-10 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 italic">Method</th>
-                     <th className="p-10 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 italic">Value</th>
-                     <th className="p-10 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 italic">PTS Score</th>
-                     <th className="p-10 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 italic">Status</th>
-                     <th className="p-10"></th>
-                  </tr>
-               </thead>
-               <tbody className="text-neutral-900">
-                  {[
-                    { id: "tx_9921_0x1", u: "alex_reed", m: "VISA • 4281", v: "$14,281.00", s: 12, st: "Authorized" },
-                    { id: "tx_1102_88a", u: "unknown_8102", m: "CRYPTO • BTC", v: "$42.1M", s: 92, st: "Flagged" },
-                    { id: "tx_452b_ck9", u: "mike.jones", m: "ACH • CHASE", v: "$840.42", s: 22, st: "Verified" },
-                    { id: "tx_7721_pr2", u: "user_4910", m: "APPLE PAY", v: "$1,200.00", s: 64, st: "In Review" }
-                  ].map((row, i) => (
-                    <tr key={i} className="border-b border-neutral-50 last:border-0 hover:bg-zinc-50 transition-all group/row cursor-pointer font-bold italic">
-                       <td className="p-10">
-                          <div className="flex items-center gap-4">
-                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${row.s > 80 ? 'bg-red-500/10 text-red-500' : 'bg-neutral-100 text-neutral-400 group-hover/row:text-neutral-900'} transition-all shadow-sm`}>
-                                {row.s > 80 ? <AlertCircle className="w-5 h-5 shadow-sm" /> : <ArrowUpRight className="w-5 h-5" />}
-                             </div>
-                             <div>
-                                <div className="text-[14px] font-black italic tracking-tight italic">{row.id}</div>
-                                <div className="text-[10px] text-neutral-300 font-black uppercase tracking-widest italic drop-shadow-sm">{row.u}</div>
-                             </div>
-                          </div>
-                       </td>
-                       <td className="p-10 text-[11px] font-black uppercase tracking-widest text-neutral-400 italic">{row.m}</td>
-                       <td className="p-10 text-[14px] font-black italic tracking-tighter text-neutral-900 italic">{row.v}</td>
-                       <td className="p-10">
-                          <div className={`text-2xl font-black italic tracking-tighter ${row.s > 80 ? "text-red-500" : row.s > 40 ? "text-orange-400" : "text-brand-lime"}`}>
-                             {row.s}
-                          </div>
-                       </td>
-                       <td className="p-10">
-                          <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border ${
-                            row.st === 'Authorized' ? 'bg-emerald-500/5 border-emerald-500/10 text-emerald-600' : 
-                            row.st === 'Flagged' ? 'bg-red-500/5 border-red-500/10 text-red-600' : 
-                            'bg-neutral-100 border-neutral-200 text-neutral-400'
-                          }`}>
-                             {row.st}
-                          </div>
-                       </td>
-                       <td className="p-10 text-right">
-                          <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-neutral-300 group-hover/row:text-neutral-900 transition-all ml-auto drop-shadow-sm">
-                             Trace <ChevronRight className="w-4 h-4 shadow-[0_0_8px_#D1F701]" />
-                          </button>
-                       </td>
-                    </tr>
-                  ))}
-               </tbody>
-            </table>
-         </div>
-      </div>
+      {/* Table Section */}
+      <Card className="rounded-xl shadow-sm border bg-white overflow-hidden">
+        {/* Table Filters */}
+        <div className="p-4 border-b border-slate-100 bg-slate-50/30 flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input 
+              placeholder="Search reference, customer..." 
+              className="pl-9 bg-white text-sm"
+            />
+          </div>
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold">
+              <Calendar className="w-4 h-4 mr-2" /> Last 24h
+            </Button>
+            <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold">
+              <Filter className="w-4 h-4 mr-2" /> All Filters
+            </Button>
+          </div>
+        </div>
+
+        <Table>
+          <TableHeader className="bg-slate-50/50">
+            <TableRow>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-6">Reference / Customer</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Method</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Value</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Score</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Status</TableHead>
+              <TableHead className="text-right pr-6"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[
+              { id: "tx_9921_0x1", name: "Global Trade Solutions", method: "VISA • 4281", value: "$14,281.00", score: 12, status: "Active" },
+              { id: "tx_1102_88a", name: "Elena Volkov", method: "CRYPTO • BTC", value: "$4.2M", score: 92, status: "Under Review" },
+              { id: "tx_452b_ck9", name: "Mike Jones", method: "ACH • CHASE", value: "$840.42", score: 22, status: "Active" },
+              { id: "tx_7721_pr2", name: "Nexus OTC", method: "APAY", value: "$1,200.00", score: 64, status: "Pending" },
+              { id: "tx_0012_qw4", name: "Sarah O'Connell", method: "VISA • 8820", value: "$9,102.50", score: 8, status: "Active" },
+            ].map((tx, i) => (
+              <TableRow key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer">
+                <TableCell className="pl-6">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-slate-900">{tx.name}</span>
+                    <span className="text-[10px] font-medium text-slate-400">{tx.id}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-[11px] font-semibold text-slate-500">{tx.method}</TableCell>
+                <TableCell className="text-xs font-bold text-slate-900">{tx.value}</TableCell>
+                <TableCell>
+                  <span className={`text-sm font-bold ${tx.score > 80 ? 'text-red-600' : tx.score > 40 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                    {tx.score}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide border-none ${
+                    tx.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 
+                    tx.status === 'Under Review' ? 'bg-amber-100 text-amber-700' : 
+                    'bg-blue-100 text-blue-700'
+                  }`}>
+                    {tx.status}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right pr-6">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-blue-600">
+                    <ArrowUpRight className="w-4 h-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   );
 }
