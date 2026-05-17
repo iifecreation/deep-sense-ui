@@ -19,7 +19,8 @@ import {
   BarChart3,
   Lightbulb,
   Building,
-  GraduationCap
+  GraduationCap,
+  Users
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
