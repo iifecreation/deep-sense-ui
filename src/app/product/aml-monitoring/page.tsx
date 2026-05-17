@@ -118,13 +118,13 @@ export default function AMLMonitoringPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
               {[
                 { title: "Real-Time Transaction Monitoring", desc: "Monitor transactions as they happen, detecting unusual size, timing, and flow patterns instantly.", icon: <Clock /> },
-                { title: "Behavioural Analytics", desc: "Identify suspicious changes in customer behavior, detecting structuring and rapid movement of funds.", icon: <BrainCircuit /> },
+                { title: "Behavioural Analytics", desc: "Identify suspicious changes in customer behavior, detecting structuring and rapid movement of funds.", icon: <BrainCircuitIcon /> },
                 { title: "Risk-Based Detection", desc: "Score activity based on customer, device, pattern, and network risk profiles.", icon: <UserCheck /> },
                 { title: "Automated Alert Generation", desc: "Create alerts automatically when suspicious thresholds are met, reducing operational noise.", icon: <Zap /> }
               ].map((item, i) => (
                 <div key={i} className="p-10 bg-zinc-50 rounded-[40px] border border-zinc-100 hover:bg-white hover:shadow-2xl transition-all duration-500 group">
                   <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform">
-                    {React.cloneElement(item.icon as React.ReactElement, { className: "w-7 h-7" })}
+                    {React.cloneElement(item.icon as any, { className: "w-7 h-7" })}
                   </div>
                   <h3 className="text-xl font-bold mb-4">{item.title}</h3>
                   <p className="text-zinc-500 text-sm leading-relaxed">{item.desc}</p>
@@ -146,7 +146,7 @@ export default function AMLMonitoringPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-8 text-center relative">
               {[
                 { step: 1, label: "Ingestion", sub: "Transaction enters platform", icon: <Database /> },
-                { step: 2, label: "Evaluation", sub: "Rules and risk models evaluate", icon: <Cpu /> },
+                { step: 2, label: "Evaluation", sub: "Rules and risk models evaluate", icon: <CpuIcon /> },
                 { step: 3, label: "Identification", sub: "Patterns identified", icon: <Search /> },
                 { step: 4, label: "Alert", sub: "Generated automatically", icon: <AlertTriangle /> },
                 { step: 5, label: "Review", sub: "Case opened for review", icon: <Users /> },
@@ -154,7 +154,7 @@ export default function AMLMonitoringPage() {
               ].map((item, i) => (
                 <div key={i} className="flex flex-col items-center group">
                   <div className="w-20 h-20 bg-white/5 border border-white/10 rounded-full flex items-center justify-center mb-6 relative group-hover:bg-brand-lime group-hover:text-black transition-all">
-                    {React.cloneElement(item.icon as React.ReactElement, { className: "w-8 h-8" })}
+                    {React.cloneElement(item.icon as any, { className: "w-8 h-8" })}
                     <div className="absolute -top-2 -right-2 w-8 h-8 bg-brand-lime text-black rounded-full flex items-center justify-center text-xs font-black italic">
                       {item.step}
                     </div>
@@ -234,7 +234,7 @@ export default function AMLMonitoringPage() {
             ].map((item, i) => (
               <div key={i} className="p-8 bg-white/10 border border-white/20 rounded-[32px] backdrop-blur-xl flex flex-col items-center text-center">
                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-indigo-600 mb-6 shadow-xl">
-                   {React.cloneElement(item.icon as React.ReactElement, { className: "w-8 h-8" })}
+                   {React.cloneElement(item.icon as any, { className: "w-8 h-8" })}
                 </div>
                 <h4 className="font-bold mb-2">{item.label}</h4>
                 <p className="text-xs text-indigo-200 uppercase tracking-widest">{item.sub}</p>
@@ -259,7 +259,7 @@ export default function AMLMonitoringPage() {
                 ].map((item, i) => (
                   <div key={i} className="flex gap-6">
                     <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center shrink-0">
-                      {React.cloneElement(item.icon as React.ReactElement, { className: "w-6 h-6 text-indigo-600" })}
+                      {React.cloneElement(item.icon as any, { className: "w-6 h-6 text-indigo-600" })}
                     </div>
                     <div>
                       <h4 className="font-bold mb-1">{item.title}</h4>

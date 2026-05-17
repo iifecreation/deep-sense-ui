@@ -71,7 +71,7 @@ export default function PlatformAiPage() {
                 ].map((step, i) => (
                   <div key={i} className="p-10 bg-white border border-zinc-200 rounded-[40px] flex flex-col items-center gap-6 group hover:bg-neutral-900 transition-all shadow-sm hover:shadow-2xl">
                      <div className="text-indigo-600 group-hover:text-brand-lime transition-colors">
-                        {React.cloneElement(step.i as React.ReactElement, { className: "w-10 h-10" })}
+                        {React.cloneElement(step.i as any, { className: "w-10 h-10" })}
                      </div>
                      <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-white transition-colors italic">{step.l}</span>
                   </div>
@@ -149,7 +149,7 @@ export default function PlatformAiPage() {
                  ].map((it, i) => (
                    <div key={i} className="p-12 bg-white border border-zinc-200 rounded-[56px] shadow-sm group hover:shadow-2xl hover:-translate-y-2 transition-all">
                       <div className="w-16 h-16 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform">
-                        {React.cloneElement(it.icon as React.ReactElement, { className: "w-8 h-8" })}
+                        {React.cloneElement(it.icon as any, { className: "w-8 h-8" })}
                       </div>
                       <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope italic">{it.title}</h4>
                       <p className="text-zinc-500 font-inter italic leading-relaxed text-sm pr-12 italic">{it.desc}</p>
@@ -222,7 +222,7 @@ export default function PlatformAiPage() {
                  ].map((it, i) => (
                    <div key={i} className="flex flex-col gap-6 p-10 bg-white/5 border border-white/10 rounded-[40px] hover:bg-white hover:text-neutral-900 transition-all group">
                       <div className="text-indigo-400 group-hover:scale-110 transition-transform">
-                        {React.cloneElement(it.icon as React.ReactElement, { className: "w-8 h-8" })}
+                        {React.cloneElement(it.icon as any, { className: "w-8 h-8" })}
                       </div>
                       <h4 className="text-2xl font-bold uppercase italic tracking-tighter italic font-manrope">{it.title}</h4>
                       <p className="text-zinc-500 text-sm group-hover:text-neutral-600 italic leading-relaxed pr-8 italic">{it.desc}</p>

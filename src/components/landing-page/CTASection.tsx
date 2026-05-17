@@ -30,7 +30,7 @@ export default function CTASection() {
 
         <div className="flex-1 w-full flex flex-col gap-8">
            <div className="flex items-center gap-5 p-8 bg-white rounded-3xl shadow-2xl border border-white/50 animate-in fade-in slide-in-from-right-10 duration-700">
-              <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600">
+              <div className="w-12 h-12 bg-brand-lime/10 rounded-full flex items-center justify-center text-brand-lime">
                 <span className="text-xl font-bold font-manrope">1</span>
               </div>
               <div className="flex flex-col">

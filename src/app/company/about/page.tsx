@@ -18,7 +18,8 @@ import {
   Scale,
   Search,
   Activity,
-  Briefcase
+  Briefcase,
+  RefreshCw
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -76,7 +77,7 @@ export default function AboutUsPage() {
                   ].map((it, i) => (
                     <div key={i} className="flex gap-8 group font-manrope italic mb-10 last:mb-0">
                        <div className="w-14 h-14 bg-zinc-50 border border-zinc-100 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-neutral-900 group-hover:text-brand-lime transition-all font-manrope">
-                          {React.cloneElement(it.i as React.ReactElement, { className: "w-6 h-6 font-manrope" })}
+                          {React.cloneElement(it.i as any, { className: "w-6 h-6 font-manrope" })}
                        </div>
                        <div>
                           <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter font-manrope italic">{it.t}</h4>
@@ -111,7 +112,7 @@ export default function AboutUsPage() {
                  ].map((v, i) => (
                    <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 group overflow-hidden relative font-manrope italic pr-12 pr-6">
                       <div className="w-14 h-14 bg-neutral-900 text-white rounded-2xl flex items-center justify-center mb-10 group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all shadow-lg shadow-black/10">
-                        {React.cloneElement(v.i as React.ReactElement, { className: "w-6 h-6" })}
+                        {React.cloneElement(v.i as any, { className: "w-6 h-6" })}
                       </div>
                       <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope italic pr-4">{v.t}</h4>
                       <p className="text-zinc-500 font-inter italic leading-relaxed text-xs mb-10 italic pr-8 italic pr-6 group-hover:text-neutral-900 transition-colors">{v.d}</p>

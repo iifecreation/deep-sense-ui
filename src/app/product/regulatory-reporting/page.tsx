@@ -17,7 +17,8 @@ import {
   BookOpen,
   Send,
   History,
-  Scale
+  Scale,
+  Users
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -102,13 +103,13 @@ export default function RegulatoryReportingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
               {[
                 { title: "Auto Report Gen", desc: "Pre-populate STRs and CTRs using data from your investigation cases.", icon: <FileText /> },
-                { title: "Structured Workflows", desc: "Follow state-mandated steps from alert to final submission.", icon: <Layers /> },
+                { title: "Structured Workflows", desc: "Follow state-mandated steps from alert to final submission.", icon: <LayersIcon /> },
                 { title: "Investigation Linked", desc: "Attach evidence, risk scores, and notes directly to the report.", icon: <Search /> },
                 { title: "Audit-Ready Output", desc: "Generate formatted outputs ready for immediate regulatory portal upload.", icon: <CheckCircle2 /> }
               ].map((item, i) => (
                 <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 group">
                   <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                    {React.cloneElement(item.icon as React.ReactElement, { className: "w-7 h-7" })}
+                    {React.cloneElement(item.icon as any, { className: "w-7 h-7" })}
                   </div>
                   <h3 className="text-xl font-bold mb-3 group-hover:text-indigo-600 transition-colors">{item.title}</h3>
                   <p className="text-zinc-500 text-sm leading-relaxed">{item.desc}</p>
@@ -135,7 +136,7 @@ export default function RegulatoryReportingPage() {
                  ].map((item, i) => (
                    <div key={i} className="flex flex-col items-center group">
                       <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center mb-8 group-hover:bg-brand-lime group-hover:text-black transition-all shadow-xl group-hover:scale-105">
-                         {React.cloneElement(item.icon as React.ReactElement, { className: "w-10 h-10" })}
+                         {React.cloneElement(item.icon as any, { className: "w-10 h-10" })}
                       </div>
                       <h4 className="text-xl font-bold mb-2">{item.label}</h4>
                       <p className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest leading-relaxed px-4">{item.sub}</p>
@@ -222,7 +223,7 @@ export default function RegulatoryReportingPage() {
                     ].map((item, i) => (
                       <div key={i} className="flex gap-6">
                         <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center shrink-0 border border-indigo-100">
-                           {React.cloneElement(item.icon as React.ReactElement, { className: "w-6 h-6 text-indigo-600" })}
+                           {React.cloneElement(item.icon as any, { className: "w-6 h-6 text-indigo-600" })}
                         </div>
                         <div>
                            <h4 className="font-bold text-neutral-900 mb-1">{item.title}</h4>
@@ -267,7 +268,7 @@ export default function RegulatoryReportingPage() {
                     ].map((item, i) => (
                       <div key={i} className="p-8 bg-white/5 border border-white/10 rounded-[32px] group hover:bg-white hover:text-neutral-900 transition-all cursor-default">
                          <div className="text-brand-lime mb-6 group-hover:text-indigo-600 transition-colors">
-                            {React.cloneElement(item.icon as React.ReactElement, { className: "w-8 h-8" })}
+                            {React.cloneElement(item.icon as any, { className: "w-8 h-8" })}
                          </div>
                          <h4 className="font-bold">{item.title}</h4>
                       </div>
@@ -285,7 +286,7 @@ export default function RegulatoryReportingPage() {
                        ].map((item, i) => (
                          <div key={i} className="flex gap-6">
                             <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center shrink-0">
-                               {React.cloneElement(item.icon as React.ReactElement, { className: "w-6 h-6 text-brand-lime" })}
+                               {React.cloneElement(item.icon as any, { className: "w-6 h-6 text-brand-lime" })}
                             </div>
                             <div>
                                <h4 className="font-bold mb-1">{item.title}</h4>

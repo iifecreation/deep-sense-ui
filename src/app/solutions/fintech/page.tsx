@@ -109,7 +109,7 @@ export default function FintechSolutionPage() {
                  ].map((it, i) => (
                    <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-3xl transition-all duration-700 hover:-translate-y-2 group overflow-hidden relative font-manrope italic">
                       <div className="w-14 h-14 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform shadow-lg">
-                        {React.cloneElement(it.i as React.ReactElement, { className: "w-6 h-6" })}
+                        {React.cloneElement(it.i as any, { className: "w-6 h-6" })}
                       </div>
                       <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope italic">{it.t}</h4>
                       <p className="text-zinc-500 font-inter italic leading-relaxed text-sm mb-10 italic pr-8">{it.d}</p>

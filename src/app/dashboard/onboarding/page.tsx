@@ -408,7 +408,7 @@ export default function OnboardingReviewsPage() {
                 <button key={i} className={`flex-1 p-6 rounded-3xl font-black text-[10px] uppercase tracking-widest italic hover:scale-[1.03] active:scale-95 transition-all group flex items-center justify-between min-h-[80px] ${action.color}`}>
                    <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center shrink-0 group-hover:scale-110 transition-all">
-                         {React.cloneElement(action.icon as React.elements, { className: "w-5 h-5 shadow-sm" })}
+                         {React.cloneElement(action.icon as any, { className: "w-5 h-5 shadow-sm" })}
                       </div>
                       {action.label}
                    </div>

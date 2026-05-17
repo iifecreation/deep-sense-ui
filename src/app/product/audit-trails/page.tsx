@@ -19,6 +19,7 @@ import {
   Settings,
   Users,
   FileSearch,
+  Briefcase,
   Filter,
   AlertTriangle
 } from "lucide-react";
@@ -108,11 +109,11 @@ export default function AuditTrailsPage() {
                 { title: "Full Activity Tracking", desc: "Every user interaction across the UI and API.", icon: <History /> },
                 { title: "Decision Traceability", desc: "Understand exactly why a score was assigned.", icon: <Scale /> },
                 { title: "Investigation Logs", desc: "Complete timeline of analyst cases and notes.", icon: <FileSearch /> },
-                { title: "Compliance-Ready", desc: "Formatted datasets ready for regulatory review.", icon: <BadgeCheck /> }
+                { title: "Compliance-Ready", desc: "Formatted datasets ready for regulatory review.", icon: <BadgeCheckIcon /> }
               ].map((item, i) => (
                 <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 group">
                   <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                    {React.cloneElement(item.icon as React.ReactElement, { className: "w-7 h-7" })}
+                    {React.cloneElement(item.icon as any, { className: "w-7 h-7" })}
                   </div>
                   <h3 className="text-xl font-bold mb-3 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-tight italic">{item.title}</h3>
                   <p className="text-zinc-500 text-sm leading-relaxed italic">{item.desc}</p>
@@ -129,15 +130,15 @@ export default function AuditTrailsPage() {
               <h2 className="text-5xl font-bold font-manrope mb-20 tracking-tight">Capture Every Action Automatically</h2>
               <div className="grid grid-cols-1 md:grid-cols-5 gap-8 relative">
                  {[
-                   { l: "Action Occurs", s: "User or system event", i: <Zap /> },
-                   { l: "Record", s: "Automatic event capture", i: <历史 /> },
+                   { l: "Action Occurs", s: "User or system event", i: <ZapIcon /> },
+                   { l: "Record", s: "Automatic event capture", i: <History /> },
                    { l: "Secure", s: "Tamper-resistant storage", i: <Lock /> },
                    { l: "Review", s: "Accessible for oversight", i: <Search /> },
                    { l: "Actionable", s: "Supports reporting", i: <FileText /> }
                  ].map((it, i) => (
                    <div key={i} className="flex flex-col items-center group">
                       <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-[32px] flex items-center justify-center mb-6 relative group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all shadow-xl group-hover:scale-105">
-                         {React.cloneElement(it.i as React.ReactElement, { className: "w-10 h-10" })}
+                         {React.cloneElement(it.i as any, { className: "w-10 h-10" })}
                          <div className="absolute -top-3 -right-3 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-black border-4 border-zinc-900">
                            {i+1}
                          </div>
@@ -163,7 +164,7 @@ export default function AuditTrailsPage() {
                       { icon: <CheckCircle2 />, label: "Alert Handling Outcomes" },
                       { icon: <Briefcase />, label: "Case Updates & Notes" },
                       { icon: <Settings />, label: "Rules & Configuration Changes" },
-                      { icon: <Send />, label: "Report Submissions" },
+                      { icon: <SendIcon />, label: "Report Submissions" },
                       { icon: <Users />, label: "User Access Audits" }
                     ].map((it, i) => (
                       <div key={i} className="flex items-center gap-4 group">
@@ -260,7 +261,7 @@ export default function AuditTrailsPage() {
                 <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] text-left hover:shadow-3xl transition-all group overflow-hidden relative">
                    <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-brand-lime/20 transition-colors" />
                    <div className="w-14 h-14 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform">
-                      {React.cloneElement(it.icon as React.ReactElement, { className: "w-6 h-6" })}
+                      {React.cloneElement(it.icon as any, { className: "w-6 h-6" })}
                    </div>
                    <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter">{it.title}</h4>
                    <p className="text-zinc-500 italic text-sm leading-relaxed">{it.desc}</p>

@@ -243,7 +243,7 @@ export default function OnboardingReviewDetailPage() {
                      ].map((factor, i) => (
                        <div key={i} className="flex items-center gap-4 p-5 bg-muted/20 border border-border/50 rounded-3xl group hover:bg-muted font-bold italic h-16 leading-none whitespace-nowrap">
                           <div className="w-8 h-8 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center shrink-0">
-                             {React.cloneElement(factor.icon as React.elements, { className: "w-3.5 h-3.5" })}
+                             {React.cloneElement(factor.icon as any, { className: "w-3.5 h-3.5" })}
                           </div>
                           <div className="flex-1">
                              <div className="text-[12px] font-black italic uppercase tracking-tighter">{factor.f}</div>

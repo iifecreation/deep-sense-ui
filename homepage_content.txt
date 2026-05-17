@@ -1,0 +1,191 @@
+DEEP SENSE HOME PAGE - FULL CONTENT AND STRUCTURE
+
+================================================================================
+1. NAVBAR STRUCTURE
+================================================================================
+Logo: Deep Sense (White variant)
+
+Navigation Links (Desktop):
+- Product (Dropdown)
+    * Core Detection: Overview, How It Works, Real-Time Fraud Detection, Fraud Scoring Engine, Rules Engine
+    * Intelligence: Graph & Fraud Ring Detection, Device Intelligence, AI Investigation Assistant (Featured), Behavioral Biometrics (Soon)
+    * AML & Compliance: AML Monitoring, Customer Risk Profiling, Sanctions & Watchlist Screening, PEP Screening, Regulatory Reporting, Customer Onboarding / KYC, Compliance Operations, AML Dashboard / Compliance Workspace
+    * Operations & Integrations: Case Management & Alerts, Core Banking Integration, Audit Trails, Data Security
+- Solutions (Dropdown)
+    * By Industry: Banking, Fintech, Payments, E-commerce, Crypto / Web3
+    * AML & Regulatory: AML Automation for Banks, Sanctions Screening, PEP & High-Risk Customer, Suspicious Transaction Reporting, CBN Compliance Readiness (New)
+    * By Use Case: Transaction Fraud, Account Takeover, Payment Fraud, Merchant Fraud, AML
+- Platform (Dropdown)
+    * Enterprise Core: AI & Decision Intelligence, Architecture, Security & Compliance, Data & Privacy, Performance & Scalability
+    * Integrations & Connectivity: Core Banking Integrations, Customer Onboarding, Integrations (APIs), Webhooks
+    * Governance: Audit & Governance Framework, Reporting & Regulatory Workflows
+- Developers (Dropdown)
+    * Quickstart: API Overview, Authentication, SDKs (Soon)
+    * APIs: Transaction, Scoring API, Postman
+- Resources (Dropdown)
+    * Compliance: Compliance Center (Featured), CBN AML Readiness Guide, AML Implementation Checklist, Regulatory Reporting Guide
+    * Learn: Blog, Guides, Whitepapers
+    * Support: Docs, Cases (Soon)
+    * Featured Resource: State of Fraud 2026 (Featured)
+- Pricing (Link)
+- Company (Dropdown)
+    * About: Our Story, Mission & Values, Contact Us
+    * Growth: Careers (Soon), Partners
+
+Right Side Actions:
+- Log in
+- Get Start App (Button)
+
+================================================================================
+2. HOME PAGE SECTIONS & CONTENT
+================================================================================
+
+--------------------------------------------------------------------------------
+SECTION: HERO
+--------------------------------------------------------------------------------
+Badge: Smart Finance, Smart Living
+Title: Detect Fraud in Real Time. Stop Losses Before They Happen.
+Subtitle: Deep Sense is an AI-powered fraud intelligence platform that analyzes transactions, detects anomalies, and prevents fraud across banks, fintech, and payment systems — in milliseconds.
+CTAs: Request Demo, View Documentation
+Supporting Line: No-code rules. Real-time scoring. Enterprise-ready.
+Visuals: iPhone hero mockup, floating cards showing Total Income ($234.98K, +12.5%), Total Profit (347.23%), and Satisfied Users (+12k).
+
+--------------------------------------------------------------------------------
+SECTION: PROBLEM (The Challenge)
+--------------------------------------------------------------------------------
+Title: Fraud Is Getting Smarter — Most Systems Aren’t
+Points:
+1. Fraudsters operate in networks: Traditional systems look at isolated transactions and miss large-scale coordinated attacks.
+2. Rule-based systems are fragile: Static rules are too slow to adapt to new, evolving fraud patterns in modern finance.
+3. Delayed detection costs millions: By the time you identify a fraudulent transaction, the funds have already left your platform.
+4. Analysts are overwhelmed: High false-positive rates waste resources and lead to burnout for security teams.
+Quote: "You need intelligence — not just alerts."
+
+--------------------------------------------------------------------------------
+SECTION: SOLUTION (Meet Deep Sense)
+--------------------------------------------------------------------------------
+Description: Deep Sense combines machine learning, behavioral analysis, and graph intelligence to detect fraud in real time and give your team the tools to act instantly.
+Points:
+- Real-time Monitoring: Continuously analyze every transaction as it happens, not after the money has left.
+- AI-Powered Scoring: Advanced machine learning models that learn from your platform's specific data trends.
+- Adaptive Rule Engine: A hybrid approach that combines ML accuracy with human-driven rules and heuristics.
+- Entity & Ring Detection: Graph intelligence that spots coordinated fraud networks and linked accounts instantly.
+- Self-Learning Intelligence: Patterns are automatically updated to detect new, emerging fraud signatures.
+Visuals: High Risk Transaction Score (98/100), Fraud Ring Detected alert.
+
+--------------------------------------------------------------------------------
+SECTION: HOW IT WORKS
+--------------------------------------------------------------------------------
+Title: How Deep Sense Works
+Steps:
+1. Ingest Transactions: Send transaction data via API or stream in real time. We support multiple ingestion formats for instant processing.
+2. Analyze & Score: AI models + rules + behavioral signals evaluate risk instantly. Our hybrid approach ensures both accuracy and speed.
+3. Detect Patterns: Identify anomalies, linked accounts, and fraud rings. We look beyond single transactions to find larger threats.
+4. Take Action: Trigger alerts, block transactions, or escalate cases. Decisive real-time orchestration for your platform's safety.
+
+--------------------------------------------------------------------------------
+SECTION: FEATURES (Platform Core)
+--------------------------------------------------------------------------------
+Title: Built for Modern Fraud Detection
+Features:
+- Real-Time Fraud Scoring: Score every transaction instantly using ML and pre-defined rules to stop threats before they clear.
+- Rule Engine: Create and manage complex fraud rules without any engineering effort using our no-code platform.
+- Graph Intelligence: Detect fraud rings and hidden connections across accounts using advanced linked-entity analysis.
+- Device Intelligence: Identify suspicious devices and repeated abuse patterns using unique hardware fingerprinting.
+- Case Management: Investigate, track, and resolve fraud cases in one place with built-in collaboration tools.
+- AI Investigation Assistant: Understand why transactions are flagged and get immediate recommendations on what to do next.
+
+--------------------------------------------------------------------------------
+SECTION: DASHBOARD PREVIEW (Live UI)
+--------------------------------------------------------------------------------
+Title: Full Visibility Into Fraud Activity
+Subtitle: Our intuitive dashboard gives your team the real-time insights they need to monitor transactions and manage cases.
+Stats: Alerts (1,248), Blocked ($4.2M), Cases (142)
+Capabilities: Transaction monitoring dashboard, Risk score breakdowns, Alerts and case workflows, Linked entity visualization.
+Security Status: Protected.
+
+--------------------------------------------------------------------------------
+SECTION: USE CASES (Industry Solutions)
+--------------------------------------------------------------------------------
+Title: Built for High-Risk Industries
+Industries:
+- Banking: Prevent account takeovers and card fraud with behavioral biometrics and transaction monitoring.
+- Fintech: Secure payments and onboarding with AI-driven risk scoring and real-time identity verification.
+- E-commerce: Detect payment abuse, promo abuse, and sophisticated bots trying to clear your checkout.
+- Payments: Stop high-velocity transaction fraud and suspicious clearing patterns in real-time.
+
+--------------------------------------------------------------------------------
+SECTION: SECURITY & TRUST
+--------------------------------------------------------------------------------
+Title: Enterprise-Ready Security
+Features:
+- Secure multi-tenant architecture: Data isolation and multi-layer security for enterprise scale.
+- Data encryption at rest & transit: Industry-standard AES-256 and TLS encryption for all data.
+- Role-based access control (RBAC): Granular control over team permissions and sensitive workflows.
+- Audit logging & compliance: Comprehensive audit trails for all decisions and rule changes.
+Badge: Full SOC2 Type II Compliance Ready.
+
+--------------------------------------------------------------------------------
+SECTION: PERFORMANCE (Why Deep Sense)
+--------------------------------------------------------------------------------
+Title: Designed for Real-Time Decisioning
+Points:
+- Millisecond-level scoring: Get decisions in under 100ms, even with complex rules and ML scoring.
+- Hybrid AI + rules approach: Combines the accuracy of ML with the explainability of rules for perfect control.
+- Graph-based detection: Find coordinated fraud networks that look like normal behavior to traditional systems.
+- Scalable architecture: Process billions of monthly transactions without latency or compromise.
+
+--------------------------------------------------------------------------------
+SECTION: TRUSTED BY (Social Proof)
+--------------------------------------------------------------------------------
+Title: Trusted by Modern Fraud Teams
+Testimonials:
+1. "Deep Sense reduced our fraud losses significantly within the first month of deployment." — VP of Risk, Digital Bank
+2. "We finally understand fraud patterns across accounts. The graph intelligence is a game changer." — Fraud Lead, Global Payments
+Partners: Google, SIEMENS, Microsoft, slack, TESLA, Walmart, Adobe, Evernote, OpenAI.
+
+--------------------------------------------------------------------------------
+SECTION: CTA SECTION (Protect Your Platform)
+--------------------------------------------------------------------------------
+Title: Start Detecting Fraud Today
+Description: See how Deep Sense can protect your platform in real time. Request a demo or get started for free.
+Process:
+1. Schedule Demo: Connect with our product expert.
+2. Setup Core UI: Integrated within 15 minutes.
+
+--------------------------------------------------------------------------------
+SECTION: FAQ
+--------------------------------------------------------------------------------
+Title: Frequently Asked Questions
+Questions:
+1. How does Deep Sense detect fraud?
+   Answer: We use a hybrid approach combining machine learning models, custom rule engines, and graph intelligence. This allows us to detect known fraud patterns and adaptive threats in milliseconds.
+2. Can I integrate via API?
+   Answer: Yes, Deep Sense is API-first. You can send transaction data via our REST API or stream it in real-time using our SDKs and webhooks.
+3. Is it really real-time?
+   Answer: Absolutely. Decisions are typically returned in under 100ms, making it suitable for inline blocking of payments and authentication flows.
+4. Can I customize fraud rules?
+   Answer: Yes, our no-code rule engine allows your fraud analysts to create, test, and deploy rules instantly without needing any engineering support.
+5. Does it support multi-tenant systems?
+   Answer: Yes, our architecture is designed for enterprise scale and supports secure multi-tenancy with isolated data and custom configurations for different business units.
+6. What industries is Deep Sense built for?
+   Answer: While we support any high-volume transaction system, we specialize in Banking, Fintech, E-commerce, and Payment Processing platforms.
+
+--------------------------------------------------------------------------------
+SECTION: BOTTOM CTA
+--------------------------------------------------------------------------------
+Badge: Ready to Secure Your Future?
+Title: Stop fraud before it costs you.
+Action: Request Demo
+
+--------------------------------------------------------------------------------
+SECTION: FOOTER
+--------------------------------------------------------------------------------
+Slogan: Industrial-grade fraud prevention infrastructure for the future of global finance. Secure your platform with Deep Sense AI.
+Links:
+- Product & AML: Fraud Detection, AML Monitoring, Risk Profiling, Sanctions Screening, Regulatory Reporting, Compliance Operations.
+- Solutions: Banking & Fintech, AML Automation, CBN Compliance (New), PEP Monitoring, Transaction Fraud, Account Takeover.
+- Platform & Dev: Core Banking, API Integrations, Auth Service, Webhooks, Audit & Governance, Security & Trust.
+- Resources & Legal: Compliance Center, CBN AML Guide, AML Checklist, Privacy Policy, Terms of Service, Contact Us.
+Social: LinkedIn, X (Twitter), GitHub.
+Copy: © 2026 Deep Sense | "Built for real-time fraud intelligence"

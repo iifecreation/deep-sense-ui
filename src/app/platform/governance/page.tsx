@@ -70,7 +70,7 @@ export default function PlatformGovernancePage() {
                   <div key={i} className="p-12 bg-white border border-zinc-200 rounded-[56px] shadow-sm hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 group overflow-hidden relative">
                      <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-brand-lime/20 transition-colors" />
                      <div className="w-14 h-14 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform shadow-lg shadow-black/10">
-                        {React.cloneElement(it.icon as React.ReactElement, { className: "w-6 h-6" })}
+                        {React.cloneElement(it.icon as any, { className: "w-6 h-6" })}
                      </div>
                      <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter font-manrope">{it.title}</h4>
                      <p className="text-zinc-500 font-inter italic leading-relaxed text-sm pr-4">{it.desc}</p>
@@ -157,7 +157,7 @@ export default function PlatformGovernancePage() {
                  ].map((it, i) => (
                    <div key={i} className="p-12 bg-white border border-zinc-200 rounded-[56px] shadow-sm group hover:shadow-3xl hover:-translate-y-2 transition-all">
                       <div className="w-16 h-16 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform shadow-lg">
-                        {React.cloneElement(it.icon as React.ReactElement, { className: "w-8 h-8" })}
+                        {React.cloneElement(it.icon as any, { className: "w-8 h-8" })}
                       </div>
                       <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope">{it.title}</h4>
                       <p className="text-zinc-500 font-inter italic leading-relaxed text-sm pr-4 italic">{it.desc}</p>

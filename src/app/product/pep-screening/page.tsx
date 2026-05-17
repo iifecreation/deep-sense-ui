@@ -106,13 +106,13 @@ export default function PEPScreeningPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
               {[
                 { title: "Automated Screening", desc: "Instantly check every customer against verified global PEP lists.", icon: <UserCheck /> },
-                { title: "Continuous Monitoring", desc: "Track status changes and list updates in real-time.", icon: <RefreshCw /> },
+                { title: "Continuous Monitoring", desc: "Track status changes and list updates in real-time.", icon: <RefreshCwIcon /> },
                 { title: "EDD Triggers", desc: "Automatically trigger Enhanced Due Diligence when a PEP is found.", icon: <Zap /> },
                 { title: "AML Integration", desc: "Seamlessly push matches into your core compliance workflows.", icon: <Layers /> }
               ].map((item, i) => (
                 <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 group">
                   <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                    {React.cloneElement(item.icon as React.ReactElement, { className: "w-7 h-7" })}
+                    {React.cloneElement(item.icon as any, { className: "w-7 h-7" })}
                   </div>
                   <h3 className="text-xl font-bold mb-3 group-hover:text-indigo-600 transition-colors">{item.title}</h3>
                   <p className="text-zinc-500 text-sm leading-relaxed">{item.desc}</p>
@@ -139,7 +139,7 @@ export default function PEPScreeningPage() {
                  ].map((item, i) => (
                    <div key={i} className="flex flex-col items-center group">
                       <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center mb-8 group-hover:bg-brand-lime group-hover:text-black transition-all shadow-xl group-hover:scale-105">
-                         {React.cloneElement(item.icon as React.ReactElement, { className: "w-10 h-10" })}
+                         {React.cloneElement(item.icon as any, { className: "w-10 h-10" })}
                       </div>
                       <h4 className="text-xl font-bold mb-2">{item.label}</h4>
                       <p className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest leading-relaxed px-4">{item.sub}</p>
@@ -189,7 +189,7 @@ export default function PEPScreeningPage() {
               </div>
               <div className="aspect-square bg-white rounded-[56px] shadow-2xl p-16 relative overflow-hidden flex flex-col items-center justify-center">
                  <div className="absolute top-0 right-0 p-8">
-                    <History className="w-32 h-32 text-indigo-50 opacity-50" />
+                    <HistoryIcon className="w-32 h-32 text-indigo-50 opacity-50" />
                  </div>
                  <div className="relative z-10 text-center">
                     <div className="w-32 h-32 bg-indigo-50 rounded-full flex items-center justify-center mb-10 mx-auto">
@@ -217,7 +217,7 @@ export default function PEPScreeningPage() {
                     ].map((item, i) => (
                       <div key={i} className="flex gap-6">
                         <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center shrink-0 border border-indigo-100">
-                           {React.cloneElement(item.icon as React.ReactElement, { className: "w-6 h-6 text-indigo-600" })}
+                           {React.cloneElement(item.icon as any, { className: "w-6 h-6 text-indigo-600" })}
                         </div>
                         <div>
                            <h4 className="font-bold text-neutral-900 mb-1">{item.title}</h4>
@@ -284,7 +284,7 @@ export default function PEPScreeningPage() {
                        ].map((item, i) => (
                          <div key={i} className="flex gap-6">
                             <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center shrink-0">
-                               {React.cloneElement(item.icon as React.ReactElement, { className: "w-6 h-6 text-brand-lime" })}
+                               {React.cloneElement(item.icon as any, { className: "w-6 h-6 text-brand-lime" })}
                             </div>
                             <div>
                                <h4 className="font-bold mb-1">{item.title}</h4>

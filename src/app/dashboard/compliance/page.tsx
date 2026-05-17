@@ -614,7 +614,7 @@ export default function ComplianceWorkspacePage() {
                        <div key={i} className="flex gap-4 relative">
                           {i !== 4 && <div className="absolute left-[13px] top-8 bottom-[-32px] w-[2px] bg-border/50" />}
                           <div className="w-7 h-7 rounded-full bg-background border border-border/50 flex items-center justify-center shrink-0 z-10 shadow-sm">
-                             {React.cloneElement(activity.icon as React.elements, { className: "w-3 h-3 " + (activity.icon as React.elements).props.className })}
+                             {React.cloneElement(activity.icon as any, { className: "w-3 h-3 " + (activity.icon as any).props.className })}
                           </div>
                           <div className="space-y-1">
                              <div className="flex items-center gap-2">
@@ -758,7 +758,7 @@ export default function ComplianceWorkspacePage() {
                 ].map((action, i) => (
                   <button key={i} className={`w-full p-4 rounded-2xl flex items-center gap-4 text-left transition-all group ${action.color}`}>
                      <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors">
-                        {React.cloneElement(action.icon as React.elements, { className: "w-4 h-4" })}
+                        {React.cloneElement(action.icon as any, { className: "w-4 h-4" })}
                      </div>
                      <span className="text-[10px] font-black uppercase italic tracking-widest">{action.label}</span>
                   </button>

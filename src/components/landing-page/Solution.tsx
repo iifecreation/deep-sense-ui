@@ -47,7 +47,7 @@ export default function Solution() {
           <div className="flex flex-col gap-6">
             {points.map((point, idx) => (
               <div key={idx} className="flex items-center gap-4 group p-4 border border-transparent hover:border-gray-100 hover:bg-zinc-50/50 rounded-2xl transition-all">
-                <div className="w-10 h-10 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                <div className="w-10 h-10 bg-brand-lime/10 border border-brand-lime/20 rounded-xl flex items-center justify-center text-brand-lime group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all">
                   {point.icon}
                 </div>
                 <div className="flex flex-col">

@@ -15,6 +15,7 @@ import {
   Zap, 
   FileText,
   BadgeCheck,
+  Cpu,
   History,
   LockIcon,
   HardDrive,
@@ -76,7 +77,7 @@ export default function DataSecurityPage() {
                         ].map((item, i) => (
                           <div key={i} className="flex flex-col gap-3 group/p">
                              <div className="text-indigo-600 group-hover/p:text-brand-lime transition-colors">
-                                {React.cloneElement(item.i as React.ReactElement, { className: "w-5 h-5" })}
+                                {React.cloneElement(item.i as any, { className: "w-5 h-5" })}
                              </div>
                              <h4 className="font-bold text-sm uppercase tracking-tight italic">{item.l}</h4>
                              <p className="text-[10px] text-zinc-400 font-inter italic leading-relaxed">{item.d}</p>
@@ -159,7 +160,7 @@ export default function DataSecurityPage() {
                  ].map((it, i) => (
                    <div key={i} className="p-12 bg-white/5 border border-white/10 rounded-[56px] text-left hover:bg-brand-lime hover:text-neutral-900 transition-all group">
                       <div className="text-brand-lime group-hover:text-neutral-900 mb-8 transition-colors">
-                         {React.cloneElement(it.icon as React.ReactElement, { className: "w-8 h-8" })}
+                         {React.cloneElement(it.icon as any, { className: "w-8 h-8" })}
                       </div>
                       <h4 className="text-2xl font-bold mb-4 uppercase italic tracking-tighter">{it.title}</h4>
                       <p className="text-zinc-500 group-hover:text-neutral-800 italic text-sm leading-relaxed">{it.desc}</p>
@@ -218,7 +219,7 @@ export default function DataSecurityPage() {
               ].map((it, i) => (
                 <div key={i} className="p-8 bg-zinc-50 border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative">
                    <div className="w-12 h-12 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                      {React.cloneElement(it.icon as React.ReactElement, { className: "w-6 h-6" })}
+                      {React.cloneElement(it.icon as any, { className: "w-6 h-6" })}
                    </div>
                    <h4 className="text-lg font-bold mb-4 uppercase italic tracking-tighter leading-tight font-manrope">{it.title}</h4>
                    <p className="text-zinc-500 italic text-[11px] leading-relaxed">{it.desc}</p>

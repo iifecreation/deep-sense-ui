@@ -136,7 +136,7 @@ export default function CbnGuidePage() {
                  ].map((sec, i) => (
                    <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all group overflow-hidden">
                       <div className="w-12 h-12 bg-zinc-50 border border-zinc-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-10 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
-                         {React.cloneElement(sec.i as React.ReactElement, { className: "w-6 h-6" })}
+                         {React.cloneElement(sec.i as any, { className: "w-6 h-6" })}
                       </div>
                       <h4 className="text-emerald-500 font-extrabold uppercase text-[10px] tracking-widest mb-4">Section {i+1}</h4>
                       <h5 className="text-lg font-bold uppercase italic tracking-tighter mb-4 leading-tight">{sec.t}</h5>
