@@ -11,7 +11,7 @@ export default function DashboardHeader() {
        <div className="flex items-center gap-8">
           {/* Dashboard Logo */}
           <Link href="/dashboard" className="group flex items-center gap-3">
-             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-200">
+             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-neutral-900 shadow-lg shadow-primary/20">
                 <ShieldCheck className="w-6 h-6" />
              </div>
              <span className="text-xl font-bold tracking-tight text-slate-900 hidden sm:block">Deep Sense</span>
@@ -22,11 +22,11 @@ export default function DashboardHeader() {
           {/* Quick Search */}
           <div className="hidden lg:block">
              <div className="relative group w-96">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-all" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-all" />
                 <input 
                    type="text" 
                    placeholder="Search anything... (⌘K)"
-                   className="w-full pl-11 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all font-sans"
+                   className="w-full pl-11 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-sans"
                 />
              </div>
           </div>
@@ -47,7 +47,7 @@ export default function DashboardHeader() {
           <div className="h-6 w-px bg-slate-200 mx-1 hidden md:block" />
 
           {/* Identity */}
-          <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 p-1.5 pr-4 rounded-lg group cursor-pointer hover:bg-white hover:border-blue-200 transition-all transition-shadow shadow-sm">
+          <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 p-1.5 pr-4 rounded-lg group cursor-pointer hover:bg-white hover:border-primary/30 transition-all transition-shadow shadow-sm">
              <div className="w-8 h-8 rounded-md bg-slate-200 overflow-hidden shadow-sm">
                 <img 
                    src="https://api.dicebear.com/7.x/pixel-art/svg?seed=FraudAgent" 

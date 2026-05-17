@@ -30,7 +30,7 @@ export default function DevicesRegistry() {
           <Button variant="outline" size="sm" className="font-semibold">
             <Download className="w-4 h-4 mr-2" /> Export
           </Button>
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 font-semibold shadow-sm">
+          <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-sm">
             <Plus className="w-4 h-4 mr-2" /> Register Device
           </Button>
         </div>
@@ -119,7 +119,7 @@ export default function DevicesRegistry() {
                 <TableCell className="text-xs font-medium text-slate-500">{device.t}</TableCell>
                 <TableCell className="text-right pr-6">
                   <Link href={`/dashboard/devices/${device.id}`}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 group-hover:text-blue-600">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 group-hover:text-primary">
                       <ChevronRight className="w-4 h-4" />
                     </Button>
                   </Link>

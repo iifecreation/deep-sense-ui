@@ -47,7 +47,7 @@ export default function FAQ() {
           
           <div className="flex flex-col gap-2">
             <p className="text-zinc-500 text-base font-inter">Ask any questions</p>
-            <a href="mailto:hello@deepsense.ai" className="text-indigo-600 text-xl md:text-2xl font-semibold font-manrope hover:underline transition-all">
+            <a href="mailto:hello@deepsense.ai" className="text-brand-lime text-xl md:text-2xl font-semibold font-manrope hover:underline transition-all">
               hello@deepsense.ai
             </a>
           </div>

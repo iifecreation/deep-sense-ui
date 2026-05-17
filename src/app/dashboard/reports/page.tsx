@@ -504,7 +504,7 @@ export default function RegulatoryReportsPage() {
                   ].map((log, i) => (
                     <div key={i} className="flex gap-4 group">
                        <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5 group-hover:border-white/20 transition-all">
-                          {React.cloneElement(log.icon as React.elements, { className: "w-3.5 h-3.5" })}
+                          {React.cloneElement(log.icon as any, { className: "w-3.5 h-3.5" })}
                        </div>
                        <div>
                           <div className="text-[11px] font-black italic tracking-tight">{log.e}</div>
@@ -556,7 +556,7 @@ export default function RegulatoryReportsPage() {
                ].map((action, i) => (
                  <button key={i} className={`flex flex-col items-center justify-center gap-3 p-6 rounded-3xl font-black text-[9px] uppercase tracking-widest italic hover:scale-105 active:scale-95 transition-all group ${action.color}`}>
                     <div className="w-8 h-8 rounded-xl bg-black/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-all">
-                      {React.cloneElement(action.icon as React.elements, { className: "w-4 h-4" })}
+                      {React.cloneElement(action.icon as any, { className: "w-4 h-4" })}
                     </div>
                     {action.label}
                  </button>

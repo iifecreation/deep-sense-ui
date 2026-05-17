@@ -18,6 +18,7 @@ import {
   Users,
   Briefcase,
   History,
+  Cpu,
   Lock,
   Globe,
   Network,
@@ -202,7 +203,7 @@ export default function ComplianceDashboardPage() {
               ].map((it, i) => (
                 <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 relative group overflow-hidden">
                    <div className="w-14 h-14 bg-indigo-600 text-white rounded-[24px] flex items-center justify-center mb-10 group-hover:scale-110 transition-transform">
-                      {React.cloneElement(it.icon as React.ReactElement, { className: "w-7 h-7" })}
+                      {React.cloneElement(it.icon as any, { className: "w-7 h-7" })}
                    </div>
                    <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight">{it.title}</h4>
                    <p className="text-zinc-500 font-inter italic leading-relaxed text-sm">{it.desc}</p>
@@ -273,7 +274,7 @@ export default function ComplianceDashboardPage() {
               ].map((it, i) => (
                 <div key={i} className="flex gap-6 items-start group">
                    <div className="w-14 h-14 bg-indigo-50 border border-indigo-100 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
-                      {React.cloneElement(it.icon as React.ReactElement, { className: "w-6 h-6 border-indigo-100" })}
+                      {React.cloneElement(it.icon as any, { className: "w-6 h-6 border-indigo-100" })}
                    </div>
                    <div>
                       <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter">{it.title}</h4>

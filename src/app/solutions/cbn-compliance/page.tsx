@@ -117,7 +117,7 @@ export default function CbnComplianceSolutionPage() {
               ].map((item, i) => (
                 <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 group">
                   <div className="w-14 h-14 bg-emerald-600 text-white rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-emerald-500/10 shadow-lg">
-                    {React.cloneElement(item.icon as React.ReactElement, { className: "w-7 h-7" })}
+                    {React.cloneElement(item.icon as any, { className: "w-7 h-7" })}
                   </div>
                   <h3 className="text-xl font-bold mb-3 group-hover:text-emerald-600 transition-colors uppercase tracking-tight leading-tight italic">{item.title}</h3>
                   <p className="text-zinc-500 text-sm leading-relaxed italic">{item.desc}</p>
@@ -241,7 +241,7 @@ export default function CbnComplianceSolutionPage() {
               ].map((it, i) => (
                 <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative">
                    <div className="w-14 h-14 bg-neutral-900 text-emerald-500 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-lg">
-                      {React.cloneElement(it.icon as React.ReactElement, { className: "w-6 h-6" })}
+                      {React.cloneElement(it.icon as any, { className: "w-6 h-6" })}
                    </div>
                    <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope">{it.title}</h4>
                    <p className="text-zinc-500 font-inter italic leading-relaxed text-[11px] italic pr-4">{it.desc}</p>

@@ -18,7 +18,8 @@ import {
   Lock,
   RefreshCw,
   Scale,
-  CheckCircle2
+  CheckCircle2,
+  Users
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -105,13 +106,13 @@ export default function KYCOnboardingPage() {
               {[
                 { title: "Risk Assessment", desc: "Evaluate onboarding risk signals in real-time.", icon: <Scale /> },
                 { title: "Identity Verification", desc: "Support for automated ID validation and biometrics.", icon: <UserCheck /> },
-                { title: "Watchlist Screening", desc: "Automated Sanctions and PEP checks on application.", icon: <Globe /> },
+                { title: "Watchlist Screening", desc: "Automated Sanctions and PEP checks on application.", icon: <GlobeIcon /> },
                 { title: "Classification", desc: "Assign initial enterprise risk scores immediately.", icon: <Layers /> },
                 { title: "Escalation", desc: "Route high-risk apps to manual review queues.", icon: <AlertTriangle /> }
               ].map((item, i) => (
                 <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 group">
                   <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                    {React.cloneElement(item.icon as React.ReactElement, { className: "w-7 h-7" })}
+                    {React.cloneElement(item.icon as any, { className: "w-7 h-7" })}
                   </div>
                   <h3 className="text-xl font-bold mb-3 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-tight">{item.title}</h3>
                   <p className="text-zinc-500 text-sm leading-relaxed italic">{item.desc}</p>
@@ -137,7 +138,7 @@ export default function KYCOnboardingPage() {
                  ].map((item, i) => (
                    <div key={i} className="flex flex-col items-center group">
                       <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-[32px] flex items-center justify-center mb-8 relative group-hover:bg-brand-lime group-hover:text-black transition-all shadow-xl group-hover:scale-105">
-                         {React.cloneElement(item.icon as React.ReactElement, { className: "w-10 h-10" })}
+                         {React.cloneElement(item.icon as any, { className: "w-10 h-10" })}
                          <div className="absolute -top-3 -right-3 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-black border-4 border-zinc-900">
                            {i+1}
                          </div>
@@ -226,14 +227,14 @@ export default function KYCOnboardingPage() {
                  
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {[
-                      { title: "Sanctions Screening", icon: <Globe /> },
+                      { title: "Sanctions Screening", icon: <GlobeIcon /> },
                       { title: "Terrorism Watchlists", icon: <Shield /> },
-                      { title: "Internal Watchlists", icon: <History /> },
+                      { title: "Internal Watchlists", icon: <HistoryIcon /> },
                       { title: "PEP Screening", icon: <Users /> }
                     ].map((item, i) => (
                       <div key={i} className="p-8 bg-white border border-zinc-100 rounded-[32px] group hover:bg-neutral-900 transition-all shadow-sm">
                          <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 group-hover:bg-brand-lime group-hover:text-neutral-900 transition-colors">
-                            {React.cloneElement(item.icon as React.ReactElement, { className: "w-6 h-6" })}
+                            {React.cloneElement(item.icon as any, { className: "w-6 h-6" })}
                          </div>
                          <h4 className="font-bold group-hover:text-white transition-colors">{item.title}</h4>
                       </div>
@@ -283,7 +284,7 @@ export default function KYCOnboardingPage() {
                  <p className="text-zinc-500 text-lg mb-12">Deep Sense integrates seamlessly with your customer onboarding platforms, IDV providers, and internal compliance systems.</p>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {[
-                      { icon: <Code color="indigo" />, label: "Onboarding Platforms" },
+                      { icon: <CodeIcon color="indigo" />, label: "Onboarding Platforms" },
                       { icon: <UserCheck color="indigo" />, label: "IDV Providers" },
                       { icon: <Database color="indigo" />, label: "Banking Applications" },
                       { icon: <Shield color="indigo" />, label: "Compliance Systems" }
@@ -307,7 +308,7 @@ export default function KYCOnboardingPage() {
                     ].map((item, i) => (
                       <div key={i} className="flex gap-6">
                          <div className="w-12 h-12 bg-white border border-zinc-100 rounded-2xl flex items-center justify-center shrink-0 shadow-sm group hover:bg-neutral-900 transition-colors">
-                            {React.cloneElement(item.icon as React.ReactElement, { className: "w-6 h-6 text-indigo-600" })}
+                            {React.cloneElement(item.icon as any, { className: "w-6 h-6 text-indigo-600" })}
                          </div>
                          <div>
                             <h4 className="font-bold text-neutral-900 mb-1 leading-tight">{item.title}</h4>

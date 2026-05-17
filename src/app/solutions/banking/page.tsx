@@ -21,7 +21,9 @@ import {
   Scale,
   Building,
   Target,
-  RefreshCw
+  RefreshCw,
+  Bell,
+  FileSearch
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -34,14 +36,14 @@ export default function BankingSolutionPage() {
       <main>
         {/* 1. Hero Section */}
         <section className="pt-48 pb-24 px-8 overflow-hidden relative">
-          <div className="absolute top-0 right-0 -z-10 w-[700px] h-[700px] bg-indigo-50 rounded-full blur-[140px] opacity-60 translate-x-1/4 -translate-y-1/4" />
+          <div className="absolute top-0 right-0 -z-10 w-[700px] h-[700px] bg-brand-lime/5 rounded-full blur-[140px] opacity-60 translate-x-1/4 -translate-y-1/4" />
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-brand-lime text-[11px] font-extrabold uppercase tracking-widest mb-8 shadow-2xl">
               <Building className="w-3.5 h-3.5" />
               <span>Institutional Grade Solutions</span>
             </div>
             <h1 className="text-6xl md:text-8xl font-bold leading-[1.05] mb-8 tracking-tighter max-w-5xl">
-              Automated <span className="text-indigo-600 italic">AML</span> for Modern Banks.
+              Automated <span className="text-brand-lime italic">AML</span> for Modern Banks.
             </h1>
             <p className="text-xl md:text-2xl text-zinc-500 font-inter leading-relaxed max-w-4xl mb-12 italic">
               Deep Sense helps banks automate transaction monitoring, customer risk profiling, screening, investigations, and regulatory reporting in one unified platform.
@@ -113,10 +115,10 @@ export default function BankingSolutionPage() {
                 { title: "Reporting", desc: "Integrated support for STR, CTR, and compliance reports.", icon: <FileText /> }
               ].map((item, i) => (
                 <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 group">
-                  <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-indigo-500/10 shadow-lg">
-                    {React.cloneElement(item.icon as React.ReactElement, { className: "w-7 h-7" })}
+                  <div className="w-14 h-14 bg-brand-lime text-neutral-900 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-brand-lime/10 shadow-lg">
+                    {React.cloneElement(item.icon as any, { className: "w-7 h-7" })}
                   </div>
-                  <h3 className="text-xl font-bold mb-3 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-tight italic">{item.title}</h3>
+                  <h3 className="text-xl font-bold mb-3 group-hover:text-brand-lime transition-colors uppercase tracking-tight leading-tight italic">{item.title}</h3>
                   <p className="text-zinc-500 text-sm leading-relaxed italic">{item.desc}</p>
                 </div>
               ))}
@@ -138,7 +140,7 @@ export default function BankingSolutionPage() {
                   ].map((ent, i) => (
                     <div key={i} className="flex items-center gap-4 group">
                        <CheckCircle2 className="w-4 h-4 text-brand-lime" />
-                       <span className="text-xs font-bold uppercase tracking-widest text-indigo-100 italic group-hover:translate-x-2 transition-transform">{ent}</span>
+                       <span className="text-xs font-bold uppercase tracking-widest text-zinc-100 italic group-hover:translate-x-2 transition-transform">{ent}</span>
                     </div>
                   ))}
                </div>
@@ -160,8 +162,8 @@ export default function BankingSolutionPage() {
                    { l: "Report", s: "Filing and tracking", i: <FileText /> }
                  ].map((it, i) => (
                    <div key={i} className="flex flex-col items-center group">
-                      <div className="w-24 h-24 bg-white border border-zinc-100 rounded-[32px] flex items-center justify-center mb-6 relative group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-xl group-hover:scale-105">
-                         {React.cloneElement(it.i as React.ReactElement, { className: "w-10 h-10" })}
+                      <div className="w-24 h-24 bg-white border border-zinc-100 rounded-[32px] flex items-center justify-center mb-6 relative group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all shadow-xl group-hover:scale-105">
+                         {React.cloneElement(it.i as any, { className: "w-10 h-10" })}
                          <div className="absolute -top-3 -right-3 w-10 h-10 bg-brand-lime text-neutral-900 rounded-full flex items-center justify-center text-sm font-black border-4 border-zinc-50">
                            {i+1}
                          </div>
@@ -190,7 +192,7 @@ export default function BankingSolutionPage() {
                       { l: "Behavioral Risk Analytics", d: "Apply machine learning to identify shifting habits." }
                     ].map((item, i) => (
                       <div key={i} className="flex gap-6 items-start group">
-                        <div className="w-1.5 h-16 bg-indigo-50 group-hover:bg-brand-lime transition-all rounded-full shrink-0 mt-1" />
+                        <div className="w-1.5 h-16 bg-brand-lime/10 group-hover:bg-brand-lime transition-all rounded-full shrink-0 mt-1" />
                         <div>
                            <h4 className="font-bold text-neutral-900 uppercase italic text-sm tracking-tight mb-1">{item.l}</h4>
                            <p className="text-xs text-zinc-400 font-inter italic leading-relaxed pr-8">{item.d}</p>
@@ -203,7 +205,7 @@ export default function BankingSolutionPage() {
                  <p className="text-zinc-500 text-sm mb-12 italic">Transition from static compliance to a dynamic risk framework that constantly evaluates customer profiles.</p>
                  <div className="grid grid-cols-2 gap-6">
                     {[
-                      { l: "Dynamic Risk Rating", i: <Scale className="text-indigo-600" /> },
+                      { l: "Dynamic Risk Rating", i: <Scale className="text-brand-lime" /> },
                       { l: "High-Risk Customer Identification", i: <Target className="text-red-500" /> },
                       { l: "Risk Evolution Tracking", i: <Activity className="text-brand-lime" /> },
                       { l: "Enhanced Monitoring Triggers", i: <Zap className="text-orange-500" /> }
@@ -225,7 +227,7 @@ export default function BankingSolutionPage() {
                        <div className="text-zinc-500 leading-relaxed italic pr-8">Reason: High-intensity cross-border fund movement matching Terrorism Finance indicators.</div>
                     </div>
                     <div className="grid grid-cols-2 gap-6">
-                       <div className="p-4 bg-indigo-600 rounded-2xl flex items-center justify-between font-bold italic">
+                       <div className="p-4 bg-brand-lime text-neutral-900 rounded-2xl flex items-center justify-between font-bold italic">
                           <span>EDD Triggered</span>
                           <ArrowRight className="w-4 h-4" />
                        </div>
@@ -241,7 +243,7 @@ export default function BankingSolutionPage() {
 
         {/* 8-13. Screening, Case Mgmt, Reporting, Integration, Audit, Security */}
         <section className="py-32 px-8 bg-zinc-50 rounded-[64px] mx-4 border border-zinc-100 mb-24 text-center">
-           <h2 className="text-5xl font-bold font-manrope tracking-tight mb-20 uppercase italic underline decoration-indigo-200 decoration-8 underline-offset-16">End-to-End Banking Compliance</h2>
+           <h2 className="text-5xl font-bold font-manrope tracking-tight mb-20 uppercase italic underline decoration-brand-lime/30 decoration-8 underline-offset-16">End-to-End Banking Compliance</h2>
            <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 text-left">
               {[
                 { title: "Lifecycle Screening", desc: "Continuous Sanctions, PEP, and Terrorism checks throughout the account lifecycle.", icon: <Globe /> },
@@ -253,7 +255,7 @@ export default function BankingSolutionPage() {
               ].map((it, i) => (
                 <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 relative group overflow-hidden">
                    <div className="w-16 h-16 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform">
-                      {React.cloneElement(it.icon as React.ReactElement, { className: "w-8 h-8" })}
+                      {React.cloneElement(it.icon as any, { className: "w-8 h-8" })}
                    </div>
                    <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope">{it.title}</h4>
                    <p className="text-zinc-500 font-inter italic leading-relaxed text-sm italic">{it.desc}</p>
@@ -271,7 +273,7 @@ export default function BankingSolutionPage() {
                     <thead>
                        <tr className="bg-neutral-900 text-white font-manrope text-left">
                           <th className="p-8 font-black uppercase tracking-widest text-[10px] italic">Capability</th>
-                          <th className="p-8 font-black uppercase tracking-widest text-[10px] italic border-l border-white/10 text-center bg-indigo-600">Deep Sense</th>
+                           <th className="p-8 font-black uppercase tracking-widest text-[10px] italic border-l border-white/10 text-center bg-brand-lime text-neutral-900">Deep Sense</th>
                           <th className="p-8 font-black uppercase tracking-widest text-[10px] italic border-l border-white/10 text-center">Manual / Legacy Approaches</th>
                        </tr>
                     </thead>
@@ -302,7 +304,7 @@ export default function BankingSolutionPage() {
         {/* 15. Impact & 16. CTA Section */}
         <section className="pt-24 pb-48 px-8 flex flex-col items-center text-center">
            <div className="max-w-[1200px] mx-auto bg-neutral-900 rounded-[64px] p-24 relative overflow-hidden group shadow-3xl text-white">
-              <div className="absolute inset-0 bg-indigo-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+              <div className="absolute inset-0 bg-brand-lime/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
               <div className="relative z-10 flex flex-col items-center">
                  <h2 className="text-5xl md:text-7xl font-bold mb-10 tracking-tight leading-[1.1] uppercase italic font-manrope text-center">
                    Modernize AML Without <br />
@@ -334,44 +336,4 @@ export default function BankingSolutionPage() {
   );
 }
 
-function BellIcon({ className }: { className?: string }) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-    </svg>
-  );
-}
 
-function FileSearchIcon({ className }: { className?: string }) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v10" />
-      <polyline points="14 2 14 8 20 8" />
-      <circle cx="8" cy="18" r="3" />
-      <path d="m10.5 20.5 2.5 2.5" />
-    </svg>
-  );
-}

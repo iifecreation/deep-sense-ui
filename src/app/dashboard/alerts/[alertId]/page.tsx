@@ -31,7 +31,9 @@ import {
   Terminal,
   Calendar,
   CreditCard,
-  AlertCircle
+  AlertCircle,
+  Smartphone,
+  BadgeCheck
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";

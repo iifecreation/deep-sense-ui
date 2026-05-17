@@ -42,7 +42,7 @@ export default function Performance() {
                  {diff.icon}
                </div>
                <div className="flex flex-col gap-3">
-                 <h4 className="text-xl font-bold font-manrope tracking-tight leading-none text-neutral-900 group-hover:text-indigo-600 transition-colors">
+                 <h4 className="text-xl font-bold font-manrope tracking-tight leading-none text-neutral-900 group-hover:text-brand-lime transition-colors">
                    {diff.title}
                  </h4>
                  <p className="text-sm md:text-base text-zinc-500 font-inter leading-relaxed max-w-[280px] mx-auto">

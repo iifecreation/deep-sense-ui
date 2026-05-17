@@ -23,7 +23,9 @@ import {
   Server,
   Cloud,
   Layout,
-  Activity
+  Activity,
+  Network,
+  Search
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -128,7 +130,7 @@ export default function DeveloperHubPage() {
             ].map((card, i) => (
               <a key={i} href={card.h} className="group p-10 bg-[#0A0A0A] border border-white/5 rounded-[40px] hover:border-brand-lime hover:bg-neutral-900 transition-all">
                 <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mb-10 group-hover:bg-brand-lime group-hover:text-black transition-all shadow-xl">
-                    {React.cloneElement(card.i as React.ReactElement, { className: "w-6 h-6" })}
+                    {React.cloneElement(card.i as any, { className: "w-6 h-6" })}
                 </div>
                 <h3 className="text-2xl font-black uppercase italic italic mb-4 tracking-tighter font-manrope">{card.t}</h3>
                 <p className="text-zinc-500 text-sm italic font-inter italic leading-relaxed pr-6 group-hover:text-zinc-400 transition-colors">{card.d}</p>
@@ -158,7 +160,7 @@ export default function DeveloperHubPage() {
                    ].map((concept, i) => (
                      <div key={i} className="flex gap-8 group">
                         <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center shrink-0 group-hover:bg-white group-hover:text-black transition-all">
-                           {React.cloneElement(concept.i as React.ReactElement, { className: "w-6 h-6" })}
+                           {React.cloneElement(concept.i as any, { className: "w-6 h-6" })}
                         </div>
                         <div>
                            <h4 className="text-xl font-bold uppercase italic tracking-tighter mb-2 italic pr-6 leading-tight">{concept.t}</h4>
@@ -183,7 +185,7 @@ export default function DeveloperHubPage() {
                 ].map((api, i) => (
                   <div key={i} className="p-12 bg-[#0A0A0A] border border-white/5 rounded-[48px] hover:border-brand-lime transition-all overflow-hidden relative group">
                      <div className="absolute top-0 right-0 p-8 text-white/5 group-hover:text-brand-lime/10 transition-colors">
-                        {React.cloneElement(api.i as React.ReactElement, { className: "w-32 h-32" })}
+                        {React.cloneElement(api.i as any, { className: "w-32 h-32" })}
                      </div>
                      <div className="relative z-10">
                         <span className="text-[10px] font-black uppercase text-brand-lime tracking-widest mb-4 block italic font-manrope underline decoration-brand-lime/30 underline-offset-8">{api.v}</span>

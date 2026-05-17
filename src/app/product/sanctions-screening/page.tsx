@@ -126,7 +126,7 @@ export default function SanctionsScreeningPage() {
               ].map((item, i) => (
                 <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group">
                   <div className="w-14 h-14 bg-brand-lime text-neutral-900 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-lg shadow-brand-lime/10">
-                    {React.cloneElement(item.icon as React.ReactElement, { className: "w-7 h-7" })}
+                    {React.cloneElement(item.icon as any, { className: "w-7 h-7" })}
                   </div>
                   <h3 className="text-xl font-bold mb-4">{item.title}</h3>
                   <p className="text-zinc-500 text-sm leading-relaxed">{item.desc}</p>
@@ -155,7 +155,7 @@ export default function SanctionsScreeningPage() {
                 ].map((item, i) => (
                   <div key={i} className="flex flex-col items-center group">
                     <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center mb-8 group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all duration-500 shadow-xl group-hover:rotate-6">
-                       {React.cloneElement(item.icon as React.ReactElement, { className: "w-10 h-10" })}
+                       {React.cloneElement(item.icon as any, { className: "w-10 h-10" })}
                     </div>
                     <h4 className="text-xl font-bold mb-3">{item.label}</h4>
                     <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest text-center italic">{item.sub}</p>
@@ -224,7 +224,7 @@ export default function SanctionsScreeningPage() {
                     ].map((item, i) => (
                       <div key={i} className="flex gap-6">
                         <div className="w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center shrink-0 border border-zinc-100">
-                           {React.cloneElement(item.icon as React.ReactElement, { className: "w-6 h-6 text-indigo-600" })}
+                           {React.cloneElement(item.icon as any, { className: "w-6 h-6 text-indigo-600" })}
                         </div>
                         <div>
                            <h4 className="font-bold text-neutral-900 mb-2">{item.title}</h4>

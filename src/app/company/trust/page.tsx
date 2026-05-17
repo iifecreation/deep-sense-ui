@@ -88,7 +88,7 @@ export default function TrustCenterPage() {
                  ].map((it, i) => (
                    <div key={i} className="flex flex-col gap-6">
                       <div className="w-10 h-10 text-emerald-600">
-                        {React.cloneElement(it.i as React.ReactElement, { strokeWidth: 1.5, className: "w-8 h-8" })}
+                        {React.cloneElement(it.i as any, { strokeWidth: 1.5, className: "w-8 h-8" })}
                       </div>
                       <h4 className="text-lg font-black uppercase italic tracking-tighter leading-tight font-manrope italic">{it.t}</h4>
                       <p className="text-zinc-500 text-xs italic leading-relaxed pr-6">{it.d}</p>
@@ -111,7 +111,7 @@ export default function TrustCenterPage() {
                   ].map((it, i) => (
                     <div key={i} className="flex gap-8 group font-manrope italic mb-10 last:mb-0">
                        <div className="w-14 h-14 bg-zinc-50 border border-zinc-100 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-neutral-900 group-hover:text-brand-lime transition-all font-manrope">
-                          {React.cloneElement(it.i as React.ReactElement, { className: "w-6 h-6 font-manrope" })}
+                          {React.cloneElement(it.i as any, { className: "w-6 h-6 font-manrope" })}
                        </div>
                        <div>
                           <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter font-manrope italic">{it.t}</h4>

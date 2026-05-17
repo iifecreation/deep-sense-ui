@@ -267,7 +267,7 @@ export default function ScreeningCenterPage() {
                  <Button variant="outline" className="bg-white/5 border-white/10 text-white text-[9px] font-black uppercase italic h-8">Bulk Confirm</Button>
               </div>
             </div>
-          </section>
+          </CardHeader>
           <Tabs defaultValue="all" className="w-full">
             <TabsList className="bg-neutral-800 rounded-none border-b border-white/5 w-full justify-start px-8 h-12">
               {["All", "Sanctions", "PEP", "Watchlist", "Re-screening"].map(tab => (
@@ -494,7 +494,7 @@ export default function ScreeningCenterPage() {
                        <div key={i} className="flex gap-4 relative">
                           {i !== 4 && <div className="absolute left-[13px] top-8 bottom-[-32px] w-[2px] bg-border/50" />}
                           <div className="w-7 h-7 rounded-full bg-background border border-border/50 flex items-center justify-center shrink-0 z-10 shadow-sm transition-transform hover:scale-125">
-                             {React.cloneElement(change.icon as React.elements, { className: "w-3 h-3 " + (change.icon as React.elements).props.className })}
+                             {React.cloneElement(change.icon as any, { className: "w-3 h-3 " + (change.icon as any).props.className })}
                           </div>
                           <div className="space-y-1">
                              <div className="flex items-center gap-2">
@@ -616,7 +616,7 @@ export default function ScreeningCenterPage() {
            ].map((action, i) => (
              <button key={i} className={`flex items-center gap-3 p-4 rounded-2xl font-black text-[9px] uppercase tracking-widest italic hover:scale-105 active:scale-95 transition-all group ${action.color}`}>
                 <div className="w-6 h-6 rounded-lg bg-black/10 flex items-center justify-center shrink-0">
-                  {React.cloneElement(action.icon as React.elements, { className: "w-3 h-3" })}
+                  {React.cloneElement(action.icon as any, { className: "w-3 h-3" })}
                 </div>
                 {action.label}
              </button>

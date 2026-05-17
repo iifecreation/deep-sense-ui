@@ -44,7 +44,8 @@ import {
   Share2,
   Lock,
   MessageCircle,
-  Hash
+  Hash,
+  Network
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";

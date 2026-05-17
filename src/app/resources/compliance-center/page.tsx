@@ -114,7 +114,7 @@ export default function ComplianceCenterPage() {
                  ].map((cat, i) => (
                    <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all group text-left">
                       <div className="w-14 h-14 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                         {React.cloneElement(cat.i as React.ReactElement, { className: "w-6 h-6" })}
+                         {React.cloneElement(cat.i as any, { className: "w-6 h-6" })}
                       </div>
                       <h4 className="text-xl font-bold mb-6 italic uppercase tracking-tighter leading-tight font-manrope">{cat.t}</h4>
                       <ul className="space-y-3">

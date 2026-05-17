@@ -111,7 +111,7 @@ export default function CareersPage() {
                  ].map((it, i) => (
                    <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-3xl transition-all duration-700 hover:-translate-y-2 group overflow-hidden relative font-manrope italic pr-12 pr-6 group shadow-black/5">
                       <div className="w-14 h-14 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform shadow-lg shadow-black/10">
-                        {React.cloneElement(it.i as React.ReactElement, { className: "w-6 h-6 border-zinc-100" })}
+                        {React.cloneElement(it.i as any, { className: "w-6 h-6 border-zinc-100" })}
                       </div>
                       <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope italic">{it.t}</h4>
                       <p className="text-zinc-500 font-inter italic leading-relaxed text-sm mb-10 italic pr-8 italic pr-6 group-hover:text-neutral-900 transition-colors">{it.d}</p>
@@ -133,7 +133,7 @@ export default function CareersPage() {
                   ].map((it, i) => (
                     <div key={i} className="flex gap-8 group font-manrope italic mb-10 last:mb-0">
                        <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all font-manrope">
-                          {React.cloneElement(it.i as React.ReactElement, { className: "w-6 h-6 border-white/10 font-manrope" })}
+                          {React.cloneElement(it.i as any, { className: "w-6 h-6 border-white/10 font-manrope" })}
                        </div>
                        <div>
                           <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter font-manrope italic pr-6">{it.t}</h4>
@@ -168,7 +168,7 @@ export default function CareersPage() {
                   <div key={idx} className="p-8 bg-white border border-zinc-100 rounded-[32px] hover:border-brand-lime hover:shadow-2xl transition-all group flex flex-col md:flex-row justify-between items-center text-left font-manrope">
                     <div className="flex gap-6 items-center mb-6 md:mb-0">
                        <div className="w-12 h-12 bg-zinc-50 border border-zinc-100 rounded-xl flex items-center justify-center text-zinc-400 group-hover:bg-neutral-900 group-hover:text-brand-lime transition-all">
-                          {React.cloneElement(role.i as React.ReactElement, { className: "w-6 h-6" })}
+                          {React.cloneElement(role.i as any, { className: "w-6 h-6" })}
                        </div>
                        <div className="flex flex-col">
                           <span className="text-[9px] font-black uppercase text-brand-lime mb-1 tracking-widest">{role.cat}</span>

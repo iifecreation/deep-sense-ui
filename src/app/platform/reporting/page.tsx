@@ -71,7 +71,7 @@ export default function PlatformReportingPage() {
                ].map((step, i) => (
                  <div key={i} className="p-8 bg-white border border-zinc-200 rounded-[32px] flex flex-col items-center gap-4 group hover:bg-neutral-900 transition-all">
                     <div className="text-indigo-600 group-hover:text-brand-lime transition-colors">
-                       {React.cloneElement(step.i as React.ReactElement, { className: "w-8 h-8" })}
+                       {React.cloneElement(step.i as any, { className: "w-8 h-8" })}
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-white transition-colors">{step.l}</span>
                  </div>
@@ -191,7 +191,7 @@ export default function PlatformReportingPage() {
                   ].map((it, i) => (
                     <div key={i} className="flex gap-8 group">
                        <div className="w-14 h-14 bg-indigo-50 border border-indigo-100 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
-                          {React.cloneElement(it.icon as React.ReactElement, { className: "w-6 h-6 border-indigo-100" })}
+                          {React.cloneElement(it.icon as any, { className: "w-6 h-6 border-indigo-100" })}
                        </div>
                        <div>
                           <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter">{it.title}</h4>

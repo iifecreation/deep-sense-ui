@@ -28,8 +28,8 @@ export default function AuthLayout({
         {/* Animated Background Gradients */}
         <div className="absolute inset-0 z-0">
           <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#D1F701]/10 rounded-full blur-[140px] animate-pulse pointer-events-none" />
-          <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
-          <div className="absolute top-[30%] right-[-10%] w-[350px] h-[350px] bg-purple-600/10 rounded-full blur-[110px] pointer-events-none" />
+          <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-[#D1F701]/5 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute top-[30%] right-[-10%] w-[350px] h-[350px] bg-[#D1F701]/10 rounded-full blur-[110px] pointer-events-none" />
           
           {/* Subtle Grid Pattern */}
           <div className="absolute inset-0 opacity-[0.03]" style={{ 
@@ -71,8 +71,8 @@ export default function AuthLayout({
               </div>
 
               <div className="group flex items-start gap-6 transition-all duration-300">
-                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10 group-hover:border-blue-400/30 group-hover:bg-white/10 transition-all duration-300">
-                  <Lock className="w-7 h-7 text-blue-400" />
+                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10 group-hover:border-[#D1F701]/30 group-hover:bg-white/10 transition-all duration-300">
+                  <Lock className="w-7 h-7 text-[#D1F701]" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold mb-1.5">Zero-Trust Security</h3>
@@ -83,8 +83,8 @@ export default function AuthLayout({
               </div>
 
               <div className="group flex items-start gap-6 transition-all duration-300">
-                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10 group-hover:border-purple-400/30 group-hover:bg-white/10 transition-all duration-300">
-                  <Globe className="w-7 h-7 text-purple-400" />
+                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10 group-hover:border-[#D1F701]/30 group-hover:bg-white/10 transition-all duration-300">
+                  <Globe className="w-7 h-7 text-[#D1F701]" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold mb-1.5 font-heading">Adaptive Learning</h3>

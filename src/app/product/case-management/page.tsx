@@ -116,7 +116,7 @@ export default function CaseManagementPage() {
                 <div key={i} className="group p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 relative overflow-hidden">
                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-red-600/10 transition-colors" />
                    <div className="w-16 h-16 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform">
-                      {React.cloneElement(it.icon as React.ReactElement, { className: "w-8 h-8" })}
+                      {React.cloneElement(it.icon as any, { className: "w-8 h-8" })}
                    </div>
                    <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tight leading-tight">{it.title}</h4>
                    <p className="text-zinc-500 font-inter italic leading-relaxed text-sm">{it.desc}</p>
