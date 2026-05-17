@@ -1,323 +1,567 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import Link from "next/link";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
 import { 
+  Shield, 
   Zap, 
   Activity, 
   Cpu, 
-  BarChart3, 
-  ArrowUpRight, 
-  Workflow, 
-  LayoutGrid, 
-  Cloud, 
-  Network, 
-  CheckCircle2, 
-  ShieldCheck,
+  Database, 
+  ArrowRight,
   TrendingUp,
-  MessageSquareQuote
+  Lock,
+  CheckCircle2,
+  LineChart,
+  BarChart3,
+  Network,
+  Fingerprint,
+  AlertTriangle,
+  Globe,
+  Layers,
+  Server,
+  HelpCircle,
+  Smartphone,
+  Eye,
+  Users,
+  Building2,
+  Wallet,
+  Clock,
+  RefreshCw,
+  Scale,
+  ChevronDown,
+  ChevronUp,
+  AlertCircle,
+  FileSpreadsheet,
+  Workflow,
+  Search,
+  Check,
+  Building,
+  Sliders,
+  ClipboardCheck,
+  Briefcase
 } from "lucide-react";
 
-const performanceHighlights = [
-  { t: "Millisecond Scoring", d: "Sub-35ms real-time risk evaluation.", i: <Zap /> },
-  { t: "Real-Time Decisions", d: "Instant Approve/Block outcomes.", i: <CheckCircle2 /> },
-  { t: "Optimized Pipelines", d: "Parallelized feature computation.", i: <Workflow /> },
-  { t: "Low Latency Impact", d: "Zero friction for your checkout flow.", i: <Activity /> }
-];
+export default function PlatformScalabilityPage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("compute");
+  
+  // Interactive console parameters
+  const [clusterCapacity, setClusterCapacity] = useState<string>("baseline");
+  const [elasticFailover, setElasticFailover] = useState<boolean>(true);
+  const [vectorAcceleration, setVectorAcceleration] = useState<boolean>(false);
 
-export default function PerformancePage() {
+  const toggleFaq = (idx: number) => {
+    setOpenFaq(openFaq === idx ? null : idx);
+  };
+
+  // Calculate dynamic scalability metrics
+  const calculateScalabilityMetrics = () => {
+    let globalThroughput = "2.4M msg/sec";
+    let utilizationIndex = "48%";
+    let activeNodes = "1,200 clusters";
+    let recommendation = "SCALING NODES GREEN: global cluster workloads aligned dynamically";
+    let color = "text-emerald-400";
+    
+    if (clusterCapacity === "overload") {
+      globalThroughput = "24.8M msg/sec";
+      utilizationIndex = "96.4%";
+      activeNodes = "8,400 clusters";
+      recommendation = "CRITICAL METRIC HIGH: scaling limits approaching capacity threshold warnings.";
+      color = "text-red-400 animate-pulse";
+    }
+    if (elasticFailover) {
+      activeNodes = "4,200 clusters";
+    }
+    if (vectorAcceleration) {
+      utilizationIndex = "18%";
+    }
+    
+    return { globalThroughput, utilizationIndex, activeNodes, recommendation, color };
+  };
+
+  const { globalThroughput, utilizationIndex, activeNodes, recommendation, color } = calculateScalabilityMetrics();
+
   return (
-    <div className="min-h-screen bg-white font-manrope">
+    <>
       <Navbar />
+      <main className="flex flex-col min-h-screen bg-white">
+        
+        {/* ================= SECTION 1: HERO ================= */}
+        <section className="relative pt-40 pb-28 px-6 md:px-12 lg:px-24 overflow-hidden border-b border-gray-100 bg-white">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[900px] h-[400px] bg-red-50/40 blur-[130px] rounded-full pointer-events-none" />
+          
+          <div className="max-w-[1200px] mx-auto flex flex-col items-center text-center gap-16 relative z-10">
+            {/* Headers */}
+            <div className="flex flex-col gap-6 items-center max-w-[950px]">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-red-400 text-[11px] font-extrabold uppercase tracking-widest shadow-xl shadow-neutral-900/10">
+                <Globe className="w-3.5 h-3.5 text-red-400 animate-pulse" />
+                GLOBAL FRAUD INTELLIGENCE INFRASTRUCTURE
+              </div>
 
-      <main className="pt-40 pb-24 overflow-hidden">
-        {/* 🔥 HERO SECTION */}
-        <section className="max-w-[1440px] mx-auto px-8 mb-32 relative">
-          <div className="absolute top-0 right-0 w-[700px] h-[700px] bg-brand-lime/10 rounded-full blur-[160px] pointer-events-none animate-pulse" />
-          <div className="max-w-[1100px] relative z-10">
-             <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-brand-lime text-[11px] font-bold uppercase tracking-widest mb-10 shadow-2xl">
-               <Zap className="w-3.5 h-3.5" />
-               High-Performance Infrastructure
-             </div>
-             <h1 className="text-6xl lg:text-9xl font-bold leading-[0.95] mb-10 tracking-tight text-neutral-900 uppercase italic">
-               Built for Speed. <br />
-               <span className="text-zinc-300 italic">Designed to Scale.</span>
-             </h1>
-             <p className="text-xl text-zinc-500 font-inter leading-relaxed max-w-[750px] mb-14">
-               Deep Sense delivers real-time fraud detection with ultra-low latency and high throughput — built to handle modern financial workloads at any scale.
-             </p>
-             <div className="flex flex-wrap gap-8">
-                <button className="px-10 py-5 bg-neutral-900 text-white rounded-full font-bold text-lg hover:scale-110 transition-all shadow-3xl">
-                  Request Demo
-                </button>
-                <button className="px-10 py-5 bg-white text-neutral-900 border border-gray-100 rounded-full font-bold text-lg hover:bg-gray-50 transition-all shadow-xl">
-                  View Architecture
-                </button>
-             </div>
+              <h1 className="text-4xl md:text-6xl lg:text-[72px] font-bold font-manrope leading-[1.05] tracking-tighter text-neutral-900">
+                Built to Scale Fraud Intelligence <br />
+                <span className="text-zinc-400">Across Global Enterprise Operations</span>
+              </h1>
+
+              <p className="max-w-[750px] mx-auto text-zinc-600 text-lg md:text-xl font-inter leading-relaxed">
+                DeepSense delivers distributed real-time fraud intelligence, AI orchestration, graph analytics, transaction monitoring, and operational governance at global scale using cloud-native infrastructure engineered for resilience, elasticity, and low-latency decisioning.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6 w-full max-w-md mx-auto">
+                <Link href="/request-demo" className="px-8 py-4 bg-neutral-900 text-white rounded-full text-base font-bold font-manrope hover:bg-neutral-800 transition-all hover:scale-105 active:scale-95 shadow-xl text-center flex-1">
+                  Request Scalability Review
+                </Link>
+                <Link href="/platform/scalability#infrastructure" className="px-8 py-4 border border-zinc-200 bg-white text-neutral-900 rounded-full text-base font-bold font-manrope hover:bg-zinc-50 hover:border-zinc-300 transition-all hover:scale-105 active:scale-95 text-center flex-1">
+                  Explore Global Infrastructure
+                </Link>
+              </div>
+
+              <div className="mt-6">
+                <span className="text-zinc-400 text-[10px] font-bold font-manrope uppercase tracking-wider block">
+                  Designed for banks, payment processors, telecoms, enterprises, governments, marketplaces, and global operational ecosystems processing millions of real-time events.
+                </span>
+              </div>
+            </div>
+
+            {/* Hero Interactive Experience Widget */}
+            <div className="w-full bg-neutral-950 p-8 rounded-[48px] border border-white/10 shadow-3xl text-left relative overflow-hidden">
+              <div className="absolute inset-0 bg-radial-gradient from-red-950/20 to-transparent pointer-events-none opacity-50" />
+              
+              <div className="flex flex-col gap-8 relative z-10 text-white">
+                <div className="flex justify-between items-center pb-6 border-b border-white/5">
+                  <div className="flex items-center gap-3">
+                    <Server className="w-4 h-4 text-red-500 animate-ping" />
+                    <span className="text-white text-xs font-bold font-manrope tracking-wider uppercase">Global Distributed Intelligence Infrastructure Map</span>
+                  </div>
+                  <span className="text-zinc-500 text-[10px] font-mono">SCALING CLUSTERS: ONLINE</span>
+                </div>
+
+                <p className="text-zinc-400 text-xs font-inter max-w-2xl">
+                  A real-time infrastructure visualization showing: global regions, distributed fraud scoring clusters, AI inference nodes, graph processing engines, event streaming pipelines, failover systems, operational throughput, and cross-region orchestration.
+                </p>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                  {/* Left Column: Infrastructure Scaling Modules */}
+                  <div className="lg:col-span-3 bg-white/5 border border-white/10 p-6 rounded-3xl space-y-4">
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 block font-mono">Scaling Modules</span>
+                    
+                    <div className="space-y-1 text-[11px] font-mono text-zinc-400">
+                      {[
+                        "Event Streaming",
+                        "AI Processing",
+                        "Graph Correlation",
+                        "Regional Failover",
+                        "Elastic Scaling",
+                        "Infrastructure Observability",
+                        "API Throughput",
+                        "Operational Resilience",
+                        "Multi-Tenant Scaling",
+                        "Distributed Storage"
+                      ].map((mod, idx) => (
+                        <div key={idx} className="flex justify-between items-center p-2 rounded hover:bg-white/5 hover:text-white cursor-pointer transition-all">
+                          <span>{mod}</span>
+                          <span className="text-[9px] text-zinc-600">v4.0</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Center Column: Global Operational Intelligence Map */}
+                  <div className="lg:col-span-6 bg-white/5 border border-white/10 p-8 rounded-3xl flex flex-col justify-between font-mono relative">
+                    <div className="space-y-6">
+                      <div className="flex justify-between items-center pb-4 border-b border-white/5 text-[10px] text-zinc-400">
+                        <span>GLOBAL OPERATIONAL INTELLIGENCE MAP</span>
+                        <span>LATENCY OPTIMIZER ACTIVE</span>
+                      </div>
+
+                      {/* Configurations */}
+                      <div className="grid grid-cols-3 gap-4 text-[10px] mb-6">
+                        <div className="p-3 bg-black/40 border border-white/5 rounded-xl space-y-1">
+                          <span className="text-zinc-500 block uppercase">Cluster load</span>
+                          <select 
+                            value={clusterCapacity} 
+                            onChange={(e) => setClusterCapacity(e.target.value)}
+                            className="bg-neutral-900 border border-white/10 text-white rounded px-2 py-1 text-[9px] w-full"
+                          >
+                            <option value="baseline">Baseline metrics</option>
+                            <option value="overload">Peak transaction surge</option>
+                          </select>
+                        </div>
+
+                        <div className="p-3 bg-black/40 border border-white/5 rounded-xl space-y-1">
+                          <span className="text-zinc-500 block uppercase">Elastic Failover</span>
+                          <input 
+                            type="checkbox" 
+                            checked={elasticFailover} 
+                            onChange={(e) => setElasticFailover(e.target.checked)}
+                            className="w-4 h-4 accent-red-600 block mt-1"
+                          />
+                        </div>
+
+                        <div className="p-3 bg-black/40 border border-white/5 rounded-xl space-y-1">
+                          <span className="text-zinc-500 block uppercase">GPU Acceleration</span>
+                          <input 
+                            type="checkbox" 
+                            checked={vectorAcceleration} 
+                            onChange={(e) => setVectorAcceleration(e.target.checked)}
+                            className="w-4 h-4 accent-red-600 block mt-1"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4 text-center">
+                        <div className="p-4 bg-black/60 border border-white/5 rounded-2xl">
+                          <span className="text-[9px] text-zinc-500 block">global throughput</span>
+                          <span className="text-xl font-bold text-white mt-1 block">{globalThroughput}</span>
+                        </div>
+                        <div className="p-4 bg-black/60 border border-white/5 rounded-2xl">
+                          <span className="text-[9px] text-zinc-500 block">utilization Index</span>
+                          <span className="text-xl font-bold text-white mt-1 block">{utilizationIndex}</span>
+                        </div>
+                        <div className="p-4 bg-black/60 border border-white/5 rounded-2xl">
+                          <span className="text-[9px] text-zinc-500 block">Active nodes</span>
+                          <span className="text-xl font-bold text-white mt-1 block">{activeNodes}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom Infrastructure Timeline */}
+                    <div className="pt-6 border-t border-white/5 mt-6 space-y-2 text-[10px]">
+                      <span className="text-zinc-400 font-bold block">Bottom Infrastructure Timeline</span>
+                      <div className="space-y-1 text-zinc-500 text-[9px]">
+                        <div>[19:26:00] • scaling events: automatic auto-scaling provisions 12 additional clusters</div>
+                        <div>[19:26:15] • workload redistribution: regional database replication sync complete</div>
+                        <div>[19:26:30] • failover activity: geographic failover health validation cleared</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: AI Explanations */}
+                  <div className="lg:col-span-3 bg-white/5 border border-white/10 p-6 rounded-3xl flex flex-col justify-between font-mono">
+                    <div className="space-y-4">
+                      <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 block font-mono">AI Infrastructure Scaling</span>
+                      
+                      <div className="space-y-3 text-[10px] text-zinc-300">
+                        <div className="p-3 bg-black/40 border border-white/5 rounded-xl">
+                          <span className="text-[8px] text-zinc-500 block font-bold uppercase font-mono">AI Inference latency</span>
+                          <span className={`mt-1 block text-[11px] leading-relaxed font-bold ${color}`}>
+                            {recommendation}
+                          </span>
+                        </div>
+
+                        <div className="p-3 bg-black/40 border border-white/5 rounded-xl">
+                          <span className="text-[8px] text-zinc-500 block font-bold uppercase">SLA compliance</span>
+                          <p className="mt-1 leading-relaxed">
+                            Continuous sub-second scoring tracking cleared. Zero latency drift.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-white/5 mt-4 text-[9px] text-zinc-500 space-y-1">
+                      <span>• active SIEM endpoint connections healthy</span>
+                      <span>• disaster recovery pipelines operational</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* ⚡ PERFORMANCE OVERVIEW */}
-        <section className="py-24 bg-neutral-900 text-white rounded-[100px] mx-4 overflow-hidden relative border border-white/5 shadow-3xl">
-           <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
-           <div className="max-w-[1440px] mx-auto px-8 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-              <div className="space-y-12">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-brand-lime decoration-8 underline-offset-16 font-manrope">Performance You Can Rely On.</h2>
-                 <p className="text-xl text-white/40 font-inter italic max-w-[500px]">Deep Sense is engineered to process transactions concurrently and instantly, ensuring fraud is detected before it impacts your business reputation.</p>
-                 <div className="grid grid-cols-2 gap-8">
-                    {performanceHighlights.map((h, i) => (
-                      <div key={i} className="p-8 bg-white/5 border border-white/5 rounded-[44px] hover:bg-white/10 transition-all group">
-                         <div className="text-brand-lime mb-6 group-hover:scale-110 transition-transform">{h.i}</div>
-                         <h5 className="font-bold text-xs uppercase mb-2 tracking-tight italic">{h.t}</h5>
-                         <p className="text-[10px] text-white/20 font-inter leading-relaxed">{h.d}</p>
-                      </div>
-                    ))}
-                 </div>
-              </div>
+        {/* ================= SECTION 2: OVERVIEW ================= */}
+        <section className="py-28 px-6 md:px-12 lg:px-24 bg-zinc-50/50">
+          <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
+            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6">Hyperscale Infrastructure</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-manrope text-neutral-900 leading-tight mb-8 max-w-[950px] tracking-tight">
+              Distributed Intelligence Infrastructure Built for Enterprise Scale
+            </h2>
+            <p className="max-w-[800px] text-zinc-600 text-base md:text-lg font-inter leading-relaxed mb-20">
+              DeepSense infrastructure is engineered to support: real-time fraud detection, AI-driven investigations, graph intelligence processing, behavioral analytics, transaction monitoring, governance workflows, operational orchestration, and executive intelligence. The platform combines: distributed event streaming, cloud-native orchestration, elastic compute infrastructure, AI inference pipelines, regional failover systems, distributed graph processing, operational telemetry monitoring, and infrastructure observability. DeepSense enables organizations to: process millions of concurrent events, maintain low-latency fraud scoring, scale investigations globally, support multi-region deployments, optimize operational resilience, and centralize global intelligence operations.
+            </p>
 
-              <div className="bg-white/5 border border-white/10 p-12 lg:p-24 rounded-[80px] shadow-3xl text-center group overflow-hidden relative backdrop-blur-xl">
-                 <div className="absolute inset-0 bg-linear-to-br from-brand-lime/10 to-transparent opacity-50" />
-                 <TrendingUp className="w-40 h-40 absolute top-0 right-0 p-12 text-white opacity-5 group-hover:scale-110 transition-transform duration-1000" />
-                 <h3 className="text-4xl font-bold italic uppercase tracking-tighter mb-8">Proven Throughput.</h3>
-                 <div className="text-8xl font-black text-brand-lime italic tracking-tighter mb-6">100k+</div>
-                 <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Transactions processed / second at peak</p>
-              </div>
-           </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left w-full mb-20">
+              {[
+                { title: "process millions of events", desc: "Block welfare farming and duplicate payouts dynamically in milliseconds." },
+                { title: "maintain low-latency scoring", desc: "Verify portal checkouts without introducing user friction." },
+                { title: "scale investigations globally", desc: "Enforce multi-tenant environment separation rules dynamically." },
+                { title: "support multi-region deployments", desc: "Equip claims analysts with visual transaction relationship graphs." },
+                { title: "optimize operational resilience", desc: "Support digital GRC with active security control overlays." },
+                { title: "centralize global intelligence", desc: "Block duplicate submissions before cash-outs settle." }
+              ].map((item, idx) => (
+                <div key={idx} className="bg-white border border-gray-100 p-8 rounded-[36px] hover:shadow-2xl hover:border-red-100 transition-all duration-300 flex flex-col gap-6">
+                  <h4 className="text-xl font-bold font-manrope text-neutral-900">{item.title}</h4>
+                  <p className="text-sm text-zinc-500 font-inter leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
-        {/* 🚀 LOW LATENCY & 📈 HIGH THROUGHPUT */}
-        <section className="py-40">
-           <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 md:grid-cols-2 gap-12">
-              <div className="p-12 lg:p-24 bg-white border border-gray-100 rounded-[80px] shadow-sm hover:shadow-2xl transition-all relative group overflow-hidden">
-                 <Cpu className="w-24 h-24 absolute -top-8 -right-8 text-neutral-900 opacity-5 group-hover:rotate-12 transition-transform duration-1000" />
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-8 font-manrope">Low Latency Engine</h3>
-                 <p className="text-lg text-zinc-500 font-inter italic mb-10 leading-relaxed">Every single transaction is evaluated against thousands of signals in real-time, delivering sub-35ms response stability.</p>
-                 <div className="space-y-6">
-                    {[
-                      "Optimized scoring pipelines",
-                      "In-memory caching for warm lookups",
-                      "Efficient high-velocity feature computation",
-                      "Minimal system processing overhead"
-                    ].map((it, i) => (
-                      <div key={i} className="flex gap-4 items-center">
-                         <div className="w-1.5 h-1.5 bg-neutral-900 rounded-full" />
-                         <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">{it}</span>
-                      </div>
-                    ))}
-                 </div>
-              </div>
+        {/* ================= SECTION 3: CORE CAPABILITIES ================= */}
+        <section className="py-28 px-6 md:px-12 lg:px-24 bg-white" id="capabilities">
+          <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
+            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">Capabilities Grid</span>
+            <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-20">
+              Enterprise-Scale Infrastructure Capabilities
+            </h2>
 
-              <div className="p-12 lg:p-24 bg-neutral-900 text-white rounded-[80px] shadow-3xl relative group overflow-hidden border border-white/5">
-                 <Network className="w-24 h-24 absolute -bottom-8 -left-8 text-brand-lime opacity-5 group-hover:rotate-12 transition-transform duration-1000" />
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-8 font-manrope">High Throughput</h3>
-                 <p className="text-lg text-white/40 font-inter italic mb-10 leading-relaxed">Deep Sense handles large volumes of transaction metadata without any detection degradation, supported by a massive ingestion layer.</p>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    {[
-                      { l: "Request Rates", d: "Millions of daily events." },
-                      { l: "Concurreny", d: "Parallelized scoring flows." },
-                      { l: "Scaling", d: "Horizontal node expansion." },
-                      { l: "Ingestion", d: "Asynchronous intake system." }
-                    ].map((role, i) => (
-                      <div key={i} className="p-8 bg-white/5 border border-white/5 rounded-[40px]">
-                         <h5 className="font-bold text-brand-lime uppercase text-[10px] mb-2 tracking-tight italic">{role.l}</h5>
-                         <p className="text-[10px] text-white/20 font-inter leading-relaxed">{role.d}</p>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-           </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 text-left w-full">
+              {[
+                { title: "Distributed Event Processing", desc: "Process transaction streams, onboarding telemetry, behavioral analytics, authentication activity, governance workflows, and operational telemetry." },
+                { title: "Elastic Auto-Scaling Infrastructure", desc: "Automatically scale ingestion pipelines, AI workloads, fraud scoring engines, graph databases, orchestration systems, and investigation environments." },
+                { title: "Real-Time Fraud Scoring at Scale", desc: "Support sub-second decisioning, low-latency evaluations, distributed scoring engines, operational prioritization, and adaptive trust models." },
+                { title: "Global Multi-Region Deployments", desc: "Enable regional redundancy, geographic failover, local operational control, data residency support, and distributed orchestration." },
+                { title: "AI Inference Scalability", desc: "Scale AI copilots, graph reasoning, anomaly detection, behavioral intelligence, workflow recommendations, and operational summarization." },
+                { title: "Distributed Graph Intelligence", desc: "Support multi-hop graph analysis, relationship correlation, transaction tracing, fraud ring detection, entity clustering, and path optimization." },
+                { title: "Operational Resilience & Failover", desc: "Provide automatic recovery, infrastructure redundancy, service continuity, distributed failover, and workload redistribution." },
+                { title: "Multi-Tenant Isolation", desc: "Maintain tenant segmentation, workload separation, regional isolation, secure operational scaling, and enterprise boundaries." },
+                { title: "Infrastructure Observability", desc: "Monitor ingestion latency, fraud scoring speed, AI inference timing, graph performance, operational throughput, and SLA compliance." },
+                { title: "High-Volume API & Webhooks", desc: "Handle massive API throughput, webhook orchestration, streaming integrations, and operational synchronization." }
+              ].map((sig, idx) => (
+                <div key={idx} className="bg-zinc-50 border border-zinc-100 p-8 rounded-[36px] flex flex-col justify-between shadow-xs hover:border-red-400 hover:shadow-xl transition-all duration-500">
+                  <div className="space-y-4">
+                    <span className="text-red-500 font-bold block mb-2 font-mono">SCAL-0{idx+1}</span>
+                    <h4 className="text-base font-bold font-manrope text-neutral-900">{sig.title}</h4>
+                    <p className="text-xs text-zinc-500 font-inter leading-relaxed">{sig.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
-        {/* 🔄 ASYNC & 🧠 EVENT-DRIVEN */}
-        <section className="py-40 bg-zinc-50 border-y border-gray-100 mt-24">
-           <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center text-center lg:text-left">
-              <div className="space-y-12">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-neutral-100 decoration-8 underline-offset-16 font-manrope text-neutral-900">Optimized Distribution.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[500px] leading-relaxed">We decouple real-time scoring from heavy background analytics to ensure your user-facing responses remain ultra-fast, always.</p>
-                 <div className="flex flex-wrap justify-center lg:justify-start gap-4">
-                    {["Analytical Computations", "Model Updates", "Graph Intelligence", "Alert Delivery"].map((tag, i) => (
-                      <span key={i} className="px-6 py-3 bg-neutral-900 text-white rounded-full text-[10px] font-bold uppercase tracking-widest">{tag}</span>
-                    ))}
-                 </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
-                 {[
-                   { t: "Event-Driven Architecture", d: "Decoupled components for maximum system evolution speed.", i: <Workflow />, color: "text-brand-lime" },
-                   { t: "Scalable Workflows", d: "Asynchronous processing for non-blocking analytics.", i: <LayoutGrid />, color: "text-zinc-200" }
-                 ].map((b, i) => (
-                   <div key={i} className="p-12 bg-white border border-gray-100 rounded-[72px] shadow-sm hover:shadow-2xl transition-all group flex flex-col items-center text-center">
-                      <div className={`w-14 h-14 bg-neutral-900 rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform ${b.color}`}>
-                         {React.cloneElement(b.i as React.ReactElement<{ className: string }>, { className: "w-6 h-6" })}
-                      </div>
-                      <h3 className="text-xl font-bold italic uppercase tracking-tighter mb-8">{b.t}</h3>
-                      <p className="text-[11px] text-zinc-400 font-inter leading-relaxed">{b.d}</p>
-                   </div>
-                 ))}
-              </div>
-           </div>
+        {/* ================= SECTION 4: INFRASTRUCTURE LAYERS ================= */}
+        <section className="py-28 px-6 md:px-12 lg:px-24 bg-zinc-50/50 border-b border-gray-100" id="infrastructure">
+          <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
+            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">Architecture Layers</span>
+            <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-20">
+              Global Infrastructure Designed for Continuous Operational Availability
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 text-left font-manrope w-full">
+              {[
+                { title: "Layer 1 — Regional Ingestion", desc: "Collect local telemetry, transaction activity, onboarding workflows, authentication events, and operational streams." },
+                { title: "Layer 2 — Processing Clusters", desc: "Execute fraud scoring, AI enrichment, graph correlation, behavioral analysis, and operational orchestration." },
+                { title: "Layer 3 — Intelligence Coordination", desc: "Synchronize graph relationships, operational intelligence, governance activity, workflow execution, and AI reasoning." },
+                { title: "Layer 4 — Global Orchestration", desc: "Coordinate infrastructure scaling, failover systems, workload balancing, resilience monitoring, and regional health." },
+                { title: "Layer 5 — Governance & Security", desc: "Enforce tenant isolation, operational controls, encryption, governance oversight, and infrastructure security." }
+              ].map((step, idx) => (
+                <div key={idx} className="p-8 bg-white border border-gray-100 rounded-3xl relative flex flex-col justify-between">
+                  <div>
+                    <span className="text-red-500 font-black text-sm block mb-3 font-mono">{step.title}</span>
+                    <p className="text-zinc-500 text-xs font-inter leading-relaxed">{step.desc}</p>
+                  </div>
+                  {idx < 4 && <ArrowRight className="hidden md:block absolute top-[45%] -right-4 w-6 h-6 text-zinc-300 translate-x-1/2 z-10" />}
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
-        {/* 🏗️ SCALABLE ARCHITECTURE & 🧪 LOAD HANDLING */}
-        <section className="py-40">
-           <div className="max-w-[1440px] mx-auto px-8 relative z-10 bg-neutral-900 text-white border border-white/5 rounded-[100px] p-12 lg:p-32 overflow-hidden shadow-3xl">
-              <div className="absolute inset-0 bg-grid-pattern opacity-5 font-manrope pointer-events-none" />
-              <Cloud className="w-64 h-64 absolute bottom-0 right-0 p-12 text-white opacity-5 translate-y-1/2 translate-x-1/2" />
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center relative z-10">
-                 <div className="space-y-12">
-                    <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-white/10 decoration-8 underline-offset-16 font-manrope">Ready to Scale.</h2>
-                    <p className="text-xl text-white/40 font-inter italic max-w-[500px]">Deep Sense performs consistently even during high-traffic promotional events or batch ingestion spikes.</p>
-                    <div className="space-y-6">
-                       {[
-                         { l: "Payment Spikes", d: "Handle sales and holiday surges." },
-                         { l: "Promotional Events", d: "Zero degradation during flash sales." },
-                         { l: "Batch Surges", d: "Scale-out logic for high data ingest." }
-                       ].map((it, i) => (
-                         <div key={i} className="flex gap-6 items-center">
-                            <div className="w-2 h-2 bg-brand-lime rounded-full" />
-                            <div>
-                               <h5 className="font-bold text-white text-[10px] uppercase mb-1">{it.l}</h5>
-                               <p className="text-[10px] text-white/20 font-inter leading-relaxed">{it.d}</p>
-                            </div>
-                         </div>
-                       ))}
-                    </div>
-                 </div>
+        {/* ================= SECTION 5: ELASTIC INFRASTRUCTURE ================= */}
+        <section className="py-28 px-6 md:px-12 lg:px-24 bg-white border-b border-gray-100">
+          <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
+            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block font-mono">Scaling Control</span>
+            <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-20">
+              Elastic Infrastructure for Dynamic Operational Demand
+            </h2>
 
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    {[
-                      { l: "Retry Mechanisms", d: "Resilient backend logic." },
-                      { l: "Idempotent Processing", d: "Zero duplicate scoring errors." },
-                      { l: "Safe Failure Handling", d: "Graceful system degradation." },
-                      { l: "No Data Loss", d: "Structured persistence protocols." }
-                    ].map((it, i) => (
-                      <div key={i} className="p-8 bg-white/5 border border-white/5 rounded-[48px] group hover:bg-brand-lime/10 transition-all">
-                         <ShieldCheck className="w-6 h-6 text-brand-lime mb-6 group-hover:scale-110 transition-transform" />
-                         <h5 className="font-bold text-white text-xs uppercase mb-2 italic tracking-tight">{it.l}</h5>
-                         <p className="text-[10px] text-white/20 font-inter leading-relaxed">{it.d}</p>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-           </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left w-full">
+              {[
+                { title: "Auto-Scaling Compute Clusters", desc: "Verify portal checkouts and detect behavioral anomalies dynamically without introducing user friction." },
+                { title: "Distributed Queue Management", desc: "Continuous token mapping and webhook authentication validation dynamically blocks malicious pipelines." },
+                { title: "Real-Time Workload Redistribution", desc: "Enforce multi-tenant environment separation rules, tracking session trust indexes and regional constraints." },
+                { title: "Adaptive AI Resource Allocation", desc: "Map login anomalies and device trust indicators dynamically to block rogue cloud environment changes." },
+                { title: "High-Speed Graph Query Scaling", desc: "Equip security analysts with visual transaction relationship graphs and continuous tenant vulnerability checks." },
+                { title: "Operational Burst Handling", desc: "Block duplicate submissions before cash-outs settle using proactive AI vulnerability scoping." }
+              ].map((sec, idx) => (
+                <div key={idx} className="bg-zinc-50 border border-zinc-100 p-8 rounded-[32px] flex flex-col gap-4 shadow-xs">
+                  <CheckCircle2 className="w-5 h-5 text-red-500" />
+                  <h4 className="text-lg font-bold font-manrope text-neutral-900">{sec.title}</h4>
+                  <p className="text-xs text-zinc-500 font-inter leading-relaxed">{sec.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
-        {/* 🆚 COMPARISON TABLE */}
-        <section className="py-40 bg-zinc-50 border-y border-gray-100">
-           <div className="max-w-[1440px] mx-auto px-8 relative z-10">
-              <div className="text-center mb-32 max-w-[800px] mx-auto">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter mb-8 font-manrope text-neutral-900 underline decoration-zinc-100 decoration-8 underline-offset-16">Why Performance Matters.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[600px] mx-auto">In modern finance, latency is fraud. See how we comparison against traditional legacy detection systems.</p>
-              </div>
+        {/* ================= SECTION 6: AI INFRASTRUCTURE SCALING tabs ================= */}
+        <section className="py-28 px-6 md:px-12 lg:px-24 bg-zinc-50/50 border-b border-gray-100">
+          <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
+            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">SaaS Scaling</span>
+            <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-8">
+              AI-Native Infrastructure for Massive Operational Intelligence Workloads
+            </h2>
+            <p className="max-w-[800px] text-zinc-600 text-base md:text-lg font-inter leading-relaxed mb-20">
+              Explore how DeepSense deploys custom validation layers based on vertical specifications.
+            </p>
 
-              <div className="overflow-x-auto">
-                 <table className="w-full text-left border-collapse font-manrope">
-                    <thead>
-                       <tr className="border-b border-gray-200 uppercase tracking-widest text-[11px] text-zinc-400">
-                          <th className="py-10 px-8 font-bold italic">Performance Metric</th>
-                          <th className="py-10 px-8 font-bold text-neutral-900 italic">Deep Sense</th>
-                          <th className="py-10 px-8 font-bold text-zinc-300 italic">Typical Systems</th>
-                       </tr>
-                    </thead>
-                    <tbody className="italic">
-                       {[
-                         { c: "Real-Time Detection", d: "Yes (Sub-50ms)", s: "Often Delayed / Async" },
-                         { c: "Average Latency", d: "<35ms", s: "250ms - 1s+" },
-                         { c: "Peak Throughput", d: "100k+ TPS", s: "Limited Scaling" },
-                         { c: "System Reliability", d: "99.99%", s: "Variable under load" },
-                         { c: "Background Scoping", d: "Yes", s: "Synchronous Overhead" }
-                       ].map((row, i) => (
-                         <tr key={i} className="border-b border-gray-100 group hover:bg-white transition-all">
-                            <td className="py-10 px-8 text-lg font-bold italic uppercase tracking-tight text-neutral-900">{row.c}</td>
-                            <td className="py-10 px-8 text-brand-lime font-black">
-                               <div className="flex items-center gap-3">
-                                  <BarChart3 className="w-5 h-5 text-neutral-900" />
-                                  {row.d}
-                               </div>
-                            </td>
-                            <td className="py-10 px-8 text-zinc-300 font-bold">{row.s}</td>
-                         </tr>
-                       ))}
-                    </tbody>
-                 </table>
-              </div>
-           </div>
+            {/* Navigation Tabs */}
+            <div className="flex flex-wrap gap-2 justify-center mb-16 w-full max-w-4xl">
+              {[
+                { id: "compute", label: "Elastic Auto-Scaling" },
+                { id: "queue", label: "Queue Management" },
+                { id: "redistribute", label: "Workload Balancing" },
+                { id: "gpu", label: "Adaptive GPU Allocation" },
+                { id: "graph", label: "Graph Query Scaling" },
+                { id: "burst", label: "Operational Bursting" }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-6 py-3 rounded-full text-xs font-bold font-manrope uppercase transition-all tracking-wider ${activeTab === tab.id ? "bg-red-600 text-white shadow-lg" : "bg-white text-zinc-600 hover:bg-zinc-100 border border-zinc-200"}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab content */}
+            <div className="w-full bg-white border border-zinc-200 p-8 md:p-12 rounded-[48px] shadow-sm text-left animate-in fade-in duration-300">
+              {activeTab === "compute" && (
+                <div className="space-y-6">
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Dynamic compute cluster auto-scaling thresholds.</h4>
+                  <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
+                    Secure credit operations. Map login anomalies and device trust indicators dynamically to block rogue acquirer routings.
+                  </p>
+                </div>
+              )}
+              {activeTab === "queue" && (
+                <div className="space-y-6">
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Distributed queue buffers and streaming message balancing.</h4>
+                  <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
+                    Track mobile payout operations. Secure approval workflows and analyze threshold indicators before money leaves the wallet.
+                  </p>
+                </div>
+              )}
+              {activeTab === "redistribute" && (
+                <div className="space-y-6">
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Multi-region automatic workloads redistribution.</h4>
+                  <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
+                    Safeguard partner networks. Block synthetic registrations automatically during initial partner signups.
+                  </p>
+                </div>
+              )}
+              {activeTab === "gpu" && (
+                <div className="space-y-6">
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Dedicated AI processor GPU acceleration arrays.</h4>
+                  <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
+                    Secure international correspondent banking connections. Track wire routings against global watchlists in real time.
+                  </p>
+                </div>
+              )}
+              {activeTab === "graph" && (
+                <div className="space-y-6">
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Sub-second multi-hop graph path analysis workloads scaling.</h4>
+                  <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
+                    Secure international correspondent banking connections. Track wire routings against global watchlists in real time.
+                  </p>
+                </div>
+              )}
+              {activeTab === "burst" && (
+                <div className="space-y-6">
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Dynamic burst allocation and failover memory layers.</h4>
+                  <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
+                    Secure international correspondent banking connections. Track wire routings against global watchlists in real time.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </section>
 
-        {/* 💬 TRUST STATEMENT & 🏭 USE CASES */}
-        <section className="py-40">
-           <div className="max-w-[1440px] mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-              <div className="space-y-12">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter leading-tight underline decoration-neutral-100 decoration-8 underline-offset-16 font-manrope text-neutral-900">Enterprise Use Cases.</h2>
-                 <p className="text-xl text-zinc-500 font-inter italic max-w-[500px]">Strategic infrastructure for the world&apos;s most demanding financial environments.</p>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    {[
-                      { l: "Payment Processing", d: "Checkout integrity at scale." },
-                      { l: "High-Volume Fintech", d: "Global user action monitoring." },
-                      { l: "E-commerce Flows", d: "Promo & Inventory protection." },
-                      { l: "Banking Transactions", d: "Real-time ledger monitoring." }
-                    ].map((it, i) => (
-                      <div key={i} className="flex gap-4 items-start">
-                         <div className="w-5 h-5 bg-neutral-900 text-brand-lime rounded-lg flex items-center justify-center mt-0.5">
-                            <ArrowUpRight className="w-3 h-3" />
-                         </div>
-                         <div>
-                            <h5 className="font-bold text-neutral-900 text-xs mb-1 uppercase tracking-tight italic font-manrope">{it.l}</h5>
-                            <p className="text-[10px] text-zinc-400 font-inter">{it.d}</p>
-                         </div>
-                      </div>
-                    ))}
-                 </div>
-              </div>
+        {/* ================= SECTION 7: FAQ ================= */}
+        <section className="py-28 px-6 md:px-12 lg:px-24 bg-white">
+          <div className="max-w-[900px] mx-auto flex flex-col items-center">
+            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block text-center font-mono">SCALABILITY FAQS</span>
+            <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-20 text-center">
+              Frequently Asked Questions
+            </h2>
 
-              <div className="bg-neutral-900 rounded-[80px] p-12 lg:p-24 text-white relative overflow-hidden group border border-white/5 shadow-3xl">
-                 <MessageSquareQuote className="w-24 h-24 text-brand-lime opacity-10 absolute bottom-0 left-0 p-8" />
-                 <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-12 font-manrope">System Reliability.</h3>
-                 <ul className="space-y-12">
-                    {[
-                      "We processed thousands of transactions per second without a single latency spike.",
-                      "Deep Sense stayed resilient even during our highest holiday traffic peak.",
-                      "Milliseconds matter when you are handling millions of dollars in real-time."
-                    ].map((quote, i) => (
-                      <li key={i} className="flex gap-8 group/quote">
-                         <div className="w-1.5 h-12 bg-brand-lime group-hover/quote:h-16 transition-all duration-500" />
-                         <p className="text-xl font-manrope italic text-white/60 group-hover/quote:text-white transition-colors">“{quote}”</p>
-                      </li>
-                    ))}
-                 </ul>
-              </div>
-           </div>
-        </section>
-
-        {/* 📣 CTA SECTION */}
-        <section className="max-w-[1300px] mx-auto px-4 mb-24 mt-24 text-center">
-           <div className="bg-brand-lime rounded-[80px] p-12 md:p-32 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-neutral-900 rounded-[80px] scale-y-0 group-hover:scale-y-100 transition-transform duration-1000 origin-top pointer-events-none" />
-              <div className="relative z-10 space-y-12 transition-colors group-hover:text-white duration-1000">
-                 <h2 className="text-4xl md:text-8xl font-bold tracking-tighter leading-none italic uppercase">Scale Your Fraud <br /><span className="opacity-30">Operations.</span></h2>
-                 <p className="text-xl md:text-2xl mb-12 max-w-[600px] mx-auto opacity-70 tracking-tight leading-relaxed font-manrope italic">Performance isn&apos;t just a feature — it&apos;s our foundation.</p>
-                 <div className="flex flex-col sm:flex-row gap-8 justify-center">
-                    <button className="px-14 py-7 bg-neutral-900 text-white rounded-full font-bold text-xl hover:scale-110 transition-all shadow-2xl group-hover:bg-white group-hover:text-neutral-900 font-manrope">
-                      Request Demo
+            <div className="w-full flex flex-col gap-4">
+              {[
+                { 
+                  q: "Can DeepSense support global enterprise deployments?", 
+                  a: "Yes. DeepSense supports multi-region deployments, regional failover, distributed orchestration, and enterprise-grade global operational infrastructure." 
+                },
+                { 
+                  q: "How does DeepSense scale real-time fraud detection?", 
+                  a: "DeepSense uses distributed event processing, elastic compute infrastructure, AI orchestration, and low-latency fraud scoring pipelines." 
+                },
+                { 
+                  q: "Can the platform handle large transaction volumes and operational spikes?", 
+                  a: "Yes. DeepSense dynamically scales infrastructure to handle transaction surges, onboarding spikes, AI processing demand, and investigation workloads." 
+                },
+                { 
+                  q: "Does DeepSense support operational resilience and disaster recovery?", 
+                  a: "Yes. The platform includes multi-region failover, distributed redundancy, disaster recovery automation, and continuous operational monitoring." 
+                },
+                { 
+                  q: "How does DeepSense optimize AI workloads at scale?", 
+                  a: "DeepSense uses distributed inference pipelines, vector processing systems, retrieval orchestration, and adaptive AI resource allocation." 
+                },
+                { 
+                  q: "Is DeepSense suitable for mission-critical operational environments?", 
+                  a: "Yes. DeepSense is designed for high-scale, low-latency, mission-critical fraud intelligence and operational governance environments." 
+                }
+              ].map((faq, idx) => {
+                const isOpen = openFaq === idx;
+                return (
+                  <div key={idx} className="bg-white border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300">
+                    <button 
+                      onClick={() => toggleFaq(idx)}
+                      className="w-full px-6 py-5 flex justify-between items-center text-left hover:bg-zinc-50 transition-colors"
+                    >
+                      <span className="text-base font-bold font-manrope text-neutral-900">{faq.q}</span>
+                      {isOpen ? <ChevronUp className="w-4 h-4 text-zinc-400" /> : <ChevronDown className="w-4 h-4 text-zinc-400" />}
                     </button>
-                    <button className="px-14 py-7 bg-white text-neutral-900 border border-transparent rounded-full font-bold text-xl hover:bg-gray-50 transition-all shadow-xl active:scale-95 group-hover:bg-neutral-800 group-hover:text-white group-hover:border-white/10 font-manrope">
-                      Talk to Sales
-                    </button>
-                 </div>
-              </div>
-           </div>
+                    {isOpen && (
+                      <div className="px-6 pb-6 pt-2 border-t border-gray-50 text-sm text-zinc-500 font-inter leading-relaxed animate-in fade-in duration-300">
+                        {faq.a}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </section>
+
+        {/* ================= SECTION 8: FINAL CTA ================= */}
+        <section className="py-32 px-6 md:px-12 lg:px-24 bg-zinc-50/50 relative overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-red-500/10 blur-[130px] rounded-full pointer-events-none" />
+          
+          <div className="max-w-[1200px] mx-auto bg-neutral-900 rounded-[56px] p-12 md:p-24 flex flex-col items-center text-center gap-10 relative overflow-hidden border border-white/5 shadow-3xl text-white">
+            <div className="absolute inset-0 bg-radial-gradient from-red-500/10 to-transparent opacity-50 pointer-events-none" />
+            
+            <div className="space-y-4 max-w-[800px] relative z-10">
+              <span className="text-red-400 font-manrope text-[11px] font-extrabold uppercase tracking-widest uppercase font-mono">Scale Fraud Intelligence Across Global Enterprise Operations</span>
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold font-manrope text-white tracking-tight leading-tight">
+                Scale fraud intelligence globally and enforce <br />
+                <span className="text-white/40 font-bold font-bold font-bold">continuous operational resilience.</span>
+              </h2>
+              <p className="text-white/60 text-sm md:text-base font-inter max-w-[600px] mx-auto leading-relaxed">
+                Deploy distributed fraud intelligence, AI orchestration, graph analytics, and operational governance infrastructure at enterprise scale using DeepSense Scalability.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 relative z-10 w-full justify-center">
+              <Link href="/request-demo" className="px-10 py-5 bg-brand-lime text-neutral-900 rounded-full text-base font-bold font-manrope hover:bg-brand-lime/90 hover:scale-105 active:scale-95 transition-all shadow-xl text-center">
+                Request Scalability Review
+              </Link>
+              <Link href="/platform/scalability#infrastructure" className="px-10 py-5 bg-white/5 border border-white/10 text-white rounded-full text-base font-bold font-manrope hover:bg-white/10 hover:scale-105 active:scale-95 transition-all text-center">
+                Explore Global Infrastructure
+              </Link>
+            </div>
+          </div>
+        </section>
+
       </main>
-
       <Footer />
-
-      <style jsx global>{`
-        .bg-grid-pattern {
-          background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
-          background-size: 50px 50px;
-        }
-      `}</style>
-    </div>
+    </>
   );
 }

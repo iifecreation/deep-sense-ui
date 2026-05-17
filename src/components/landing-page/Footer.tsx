@@ -42,9 +42,9 @@ export default function Footer() {
       links: [
         { name: "Fraud Detection", href: "/product/fraud-detection" },
         { name: "AML Monitoring", href: "/product/aml-monitoring" },
-        { name: "Document Fraud", href: "/product/document-fraud-detection" },
-        { name: "ATO Prevention", href: "/product/behavioral" },
-        { name: "Behavioral Biometrics", href: "/product/behavioral" },
+        { name: "Document Fraud", href: "/product/document-fraud" },
+        { name: "ATO Prevention", href: "/product/behavioral-biometrics" },
+        { name: "Behavioral Biometrics", href: "/product/behavioral-biometrics" },
         { name: "NFC Fraud", href: "/product/nfc-contactless-fraud" },
         { name: "CNP Fraud", href: "/product/card-not-present-fraud" },
         { name: "APP Scam Detection", href: "/product/app-scam-detection" },
@@ -57,23 +57,23 @@ export default function Footer() {
         { name: "Risk Scoring", href: "/product/scoring-engine" },
         { name: "Graph Intelligence", href: "/product/graph-intelligence" },
         { name: "Rules Engine", href: "/product/rules-engine" },
-        { name: "Model Registry", href: "/platform/model-registry" },
-        { name: "Webhooks", href: "/platform/apis-webhooks" },
-        { name: "SIEM Integrations", href: "/platform/siem-integrations" },
-        { name: "Audit Logs", href: "/platform/audit-logs" },
-        { name: "On-Prem Deployment", href: "/platform/on-premise" }
+        { name: "Model Intelligence", href: "/platform/ai-intelligence" },
+        { name: "APIs & Webhooks", href: "/platform/webhooks" },
+        { name: "Integrations & SIEM", href: "/platform/integrations" },
+        { name: "Audit & Governance", href: "/platform/governance" },
+        { name: "Platform Architecture", href: "/platform/architecture" }
       ]
     },
     {
       title: "Enterprise Risk",
       links: [
-        { name: "GRC", href: "/product/grc-management" },
-        { name: "DLP", href: "/product/dlp-monitoring" },
-        { name: "Continuous Controls", href: "/product/continuous-controls-monitoring" },
-        { name: "Procurement Risk", href: "/product/procurement-vendor-risk" },
+        { name: "GRC", href: "/product/grc" },
+        { name: "DLP", href: "/product/dlp" },
+        { name: "Continuous Controls", href: "/product/continuous-controls" },
+        { name: "Procurement Risk", href: "/product/procurement-risk" },
         { name: "Third-Party Risk", href: "/product/third-party-risk" },
         { name: "Regulatory Reporting", href: "/product/regulatory-reporting" },
-        { name: "Compliance Reports", href: "/platform/enterprise-controls" }
+        { name: "Compliance Reports", href: "/platform/governance" }
       ]
     },
     {
@@ -82,9 +82,9 @@ export default function Footer() {
         { name: "Banking", href: "/solutions/banking" },
         { name: "Fintech", href: "/solutions/fintech" },
         { name: "Payments", href: "/solutions/payment-processors" },
-        { name: "E-commerce", href: "/solutions/ecommerce" },
-        { name: "Crypto", href: "/solutions/crypto" },
-        { name: "Telecom Wallets", href: "/solutions/telecom-wallets" },
+        { name: "E-commerce", href: "/solutions/ecommerce-marketplace" },
+        { name: "Crypto & Web3", href: "/solutions/crypto-web3" },
+        { name: "Telecom Wallets", href: "/solutions/telecom-mobile-money" },
         { name: "Gaming", href: "/solutions/gaming-betting" },
         { name: "Enterprise", href: "/solutions/enterprise-risk-teams" }
       ]
@@ -92,12 +92,12 @@ export default function Footer() {
     {
       title: "Developers",
       links: [
-        { name: "API Docs", href: "/resources/documentation" },
-        { name: "Authentication", href: "/developers/auth" },
-        { name: "SDKs", href: "/developers/sdks" },
-        { name: "Postman", href: "/developers/postman" },
+        { name: "API Reference", href: "/developers/api-overview" },
+        { name: "Authentication", href: "/developers/authentication" },
+        { name: "SDKs & Client Libraries", href: "/developers" },
+        { name: "Postman Collections", href: "/developers" },
         { name: "Webhooks", href: "/developers/webhooks" },
-        { name: "Sandbox", href: "/developers/sandbox" }
+        { name: "Developer Sandbox", href: "/developers" }
       ]
     },
     {
@@ -106,9 +106,9 @@ export default function Footer() {
         { name: "About", href: "/company/about" },
         { name: "Contact", href: "/company/contact" },
         { name: "Pricing", href: "/pricing" },
-        { name: "Security", href: "/platform/security-privacy" },
-        { name: "Privacy Policy", href: "/privacy" },
-        { name: "Terms", href: "/terms" }
+        { name: "Security", href: "/platform/security" },
+        { name: "Privacy Policy", href: "/platform/privacy" },
+        { name: "Trust Center", href: "/company/trust" }
       ]
     }
   ];

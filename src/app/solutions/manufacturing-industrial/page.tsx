@@ -40,50 +40,49 @@ import {
   Check,
   Building,
   Sliders,
-  ClipboardCheck,
-  Briefcase
+  ClipboardCheck
 } from "lucide-react";
 
-export default function MonitorVendorRiskPage() {
+export default function ManufacturingIndustrialPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("financial");
+  const [activeTab, setActiveTab] = useState<string>("manufacturing");
   
-  // Interactive Vendor risk parameters
-  const [vendorNetwork, setVendorNetwork] = useState<string>("normal");
-  const [onboardingValidation, setOnboardingValidation] = useState<boolean>(true);
-  const [invoiceThreshold, setInvoiceThreshold] = useState<boolean>(false);
+  // Interactive Industrial parameters
+  const [telemetryPattern, setTelemetryPattern] = useState<string>("normal");
+  const [supplierVerification, setSupplierVerification] = useState<boolean>(true);
+  const [invoiceSpike, setInvoiceSpike] = useState<boolean>(false);
 
   const toggleFaq = (idx: number) => {
     setOpenFaq(openFaq === idx ? null : idx);
   };
 
-  // Calculate dynamic vendor risk parameters
-  const calculateVendorRisk = () => {
-    let score = 9; // base risk score
+  // Calculate dynamic industrial risk parameters
+  const calculateIndustrialRisk = () => {
+    let score = 8; // base risk score
     
-    if (vendorNetwork === "shell") score += 45;
-    if (invoiceThreshold) score += 32;
-    if (!onboardingValidation) score += 14;
+    if (telemetryPattern === "spike") score += 42;
+    if (invoiceSpike) score += 34;
+    if (!supplierVerification) score += 14;
     
     score = Math.min(score, 99);
     
-    let status = "SECURE SUPPLIER COMPLIANCE";
+    let status = "SECURE FACTORY OPERATIONS";
     let color = "text-emerald-500";
     if (score >= 80) {
-      status = "COORDINATED SHELL RISK INTRUSION";
+      status = "COORDINATED INVENTORY FRAUD TARGET";
       color = "text-red-500";
     } else if (score >= 50) {
-      status = "UNTRUSTED THIRD-PARTY ONBOARDING";
+      status = "UNTRUSTED SUPPLIER ONBOARDING";
       color = "text-amber-500";
     } else if (score >= 30) {
-      status = "SUSPICIOUS AGGREGATE INVOICE DRIFT";
+      status = "HIGH VALUE PROCUREMENT DRIFT";
       color = "text-orange-400";
     }
     
     return { score, status, color };
   };
 
-  const { score, status, color } = calculateVendorRisk();
+  const { score, status, color } = calculateIndustrialRisk();
 
   return (
     <>
@@ -99,35 +98,35 @@ export default function MonitorVendorRiskPage() {
             <div className="flex flex-col gap-6 items-center max-w-[950px]">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-red-400 text-[11px] font-extrabold uppercase tracking-widest shadow-xl shadow-neutral-900/10">
                 <Smartphone className="w-3.5 h-3.5 text-red-400 animate-pulse" />
-                THIRD-PARTY & VENDOR RISK INTELLIGENCE
+                INDUSTRIAL FRAUD & OPERATIONAL INTELLIGENCE
               </div>
 
               <h1 className="text-4xl md:text-6xl lg:text-[72px] font-bold font-manrope leading-[1.05] tracking-tighter text-neutral-900">
-                Monitor Vendor Ecosystems and <br />
-                <span className="text-zinc-400">Detect Third-Party Risk in Real Time</span>
+                Protect Manufacturing and Industrial Operations <br />
+                <span className="text-zinc-400">From Fraud and Operational Abuse</span>
               </h1>
 
               <p className="max-w-[750px] mx-auto text-zinc-600 text-lg md:text-xl font-inter leading-relaxed">
-                DeepSense helps enterprises continuously monitor vendor ecosystems, detect procurement fraud, identify collusive supplier networks, and strengthen third-party governance using AI-driven intelligence and real-time risk analytics.
+                DeepSense helps manufacturers and industrial organizations detect fraud, secure procurement workflows, monitor operational risk, prevent insider abuse, and strengthen industrial governance using AI-driven analytics and real-time intelligence.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6 w-full max-w-md mx-auto">
                 <Link href="/request-demo" className="px-8 py-4 bg-neutral-900 text-white rounded-full text-base font-bold font-manrope hover:bg-neutral-800 transition-all hover:scale-105 active:scale-95 shadow-xl text-center flex-1">
                   Request Demo
                 </Link>
-                <Link href="/solutions/monitor-vendor-risk#use-cases" className="px-8 py-4 border border-zinc-200 bg-white text-neutral-900 rounded-full text-base font-bold font-manrope hover:bg-zinc-50 hover:border-zinc-300 transition-all hover:scale-105 active:scale-95 text-center flex-1">
-                  Explore Vendor Risk Use Cases
+                <Link href="/solutions/manufacturing-industrial#use-cases" className="px-8 py-4 border border-zinc-200 bg-white text-neutral-900 rounded-full text-base font-bold font-manrope hover:bg-zinc-50 hover:border-zinc-300 transition-all hover:scale-105 active:scale-95 text-center flex-1">
+                  Explore Industrial Use Cases
                 </Link>
               </div>
 
               <div className="mt-6">
                 <span className="text-zinc-400 text-[10px] font-bold font-manrope uppercase tracking-wider block">
-                  Built for procurement teams, enterprise risk operations, finance departments, industrial supply chains, regulated industries, and third-party governance programs.
+                  Built for manufacturers, industrial operators, energy providers, factory ecosystems, procurement operations, and enterprise industrial supply chains.
                 </span>
               </div>
             </div>
 
-            {/* Hero Illustration: Vendor Trust Intelligence Console */}
+            {/* Hero Illustration: Industrial Operations Intelligence Command Center */}
             <div className="w-full bg-neutral-950 p-8 rounded-[48px] border border-white/10 shadow-3xl text-left relative overflow-hidden">
               <div className="absolute inset-0 bg-radial-gradient from-red-950/20 to-transparent pointer-events-none opacity-50" />
               
@@ -135,49 +134,45 @@ export default function MonitorVendorRiskPage() {
                 <div className="flex justify-between items-center pb-6 border-b border-white/5">
                   <div className="flex items-center gap-3">
                     <Workflow className="w-4 h-4 text-red-500 animate-ping" />
-                    <span className="text-white text-xs font-bold font-manrope tracking-wider uppercase">Real-Time Vendor Trust Intelligence Console</span>
+                    <span className="text-white text-xs font-bold font-manrope tracking-wider uppercase">Supplier Integrity Dashboard</span>
                   </div>
-                  <span className="text-zinc-500 text-[10px] font-mono">THIRD-PARTY CORE PROCUREMENT ENGINE</span>
+                  <span className="text-zinc-500 text-[10px] font-mono">INDUSTRIAL CORE MONITORING ENGINE</span>
                 </div>
-
-                <p className="text-zinc-400 text-xs font-inter max-w-2xl">
-                  An interactive vendor intelligence dashboard showing live vendor trust scoring, supplier onboarding integrity, procurement anomaly detection, collusive vendor graph relationships, invoice manipulation alerts, sanctions and AML exposure, third-party behavioral anomalies, and vendor operational risk heatmaps.
-                </p>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
                   {/* Left Column: Interactive controls */}
                   <div className="lg:col-span-5 bg-white/5 border border-white/10 p-6 rounded-3xl space-y-6">
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 block font-mono">Configure Vendor Parameters</span>
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 block font-mono">Configure Industrial Parameters</span>
                     
                     <div className="space-y-4 text-xs font-mono">
                       <div className="flex justify-between items-center p-3 bg-black/40 border border-white/5 rounded-xl">
-                        <span className="text-zinc-400">Vendor network density</span>
+                        <span className="text-zinc-400">Telemetry Pattern</span>
                         <select 
-                          value={vendorNetwork} 
-                          onChange={(e) => setVendorNetwork(e.target.value)}
+                          value={telemetryPattern} 
+                          onChange={(e) => setTelemetryPattern(e.target.value)}
                           className="bg-neutral-900 border border-white/10 text-white rounded px-2 py-1 text-xs"
                         >
-                          <option value="normal">Normal supplier relations</option>
-                          <option value="shell">Coordinated shell ring</option>
+                          <option value="normal">Standard factory operations</option>
+                          <option value="spike">Coordinated sensor spoof spikes</option>
                         </select>
                       </div>
 
                       <div className="flex justify-between items-center p-3 bg-black/40 border border-white/5 rounded-xl">
-                        <span className="text-zinc-400">eID Onboarding verified</span>
+                        <span className="text-zinc-400">Supplier signature verified</span>
                         <input 
                           type="checkbox" 
-                          checked={onboardingValidation} 
-                          onChange={(e) => setOnboardingValidation(e.target.checked)}
+                          checked={supplierVerification} 
+                          onChange={(e) => setSupplierVerification(e.target.checked)}
                           className="w-4 h-4 accent-red-600"
                         />
                       </div>
 
                       <div className="flex justify-between items-center p-3 bg-black/40 border border-white/5 rounded-xl">
-                        <span className="text-zinc-400">High aggregate invoice spike</span>
+                        <span className="text-zinc-400">High value aggregate invoice</span>
                         <input 
                           type="checkbox" 
-                          checked={invoiceThreshold} 
-                          onChange={(e) => setInvoiceThreshold(e.target.checked)}
+                          checked={invoiceSpike} 
+                          onChange={(e) => setInvoiceSpike(e.target.checked)}
                           className="w-4 h-4 accent-red-600"
                         />
                       </div>
@@ -188,28 +183,28 @@ export default function MonitorVendorRiskPage() {
                   <div className="lg:col-span-7 bg-white/5 border border-white/10 p-8 rounded-3xl flex flex-col justify-between font-mono">
                     <div className="space-y-6">
                       <div className="flex justify-between items-center pb-4 border-b border-white/5 text-[10px] text-zinc-400">
-                        <span>DEEPSENSE THIRD-PARTY TELEMETRY</span>
+                        <span>DEEPSENSE INDUSTRIAL TELEMETRY</span>
                         <span>ANALYSIS COMPLETED</span>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="p-4 bg-black/40 border border-white/5 rounded-2xl">
-                          <span className="text-[9px] text-zinc-500 uppercase block">Procurement Risk Timeline</span>
+                          <span className="text-[9px] text-zinc-500 uppercase block">Procurement Fraud Monitor</span>
                           <span className="text-xs font-bold block text-zinc-300 mt-1 uppercase">
-                            {vendorNetwork === "shell" ? "Coordinated Shell Ring" : "Clear limit check"}
+                            {telemetryPattern === "spike" ? "Coordinated Diversion Vector" : "Clear limit check"}
                           </span>
                         </div>
                         <div className="p-4 bg-black/40 border border-white/5 rounded-2xl">
-                          <span className="text-[9px] text-zinc-500 uppercase block">Vendor Trust Scorecard</span>
+                          <span className="text-[9px] text-zinc-500 uppercase block">Industrial Risk Score</span>
                           <span className="text-xs font-bold block text-zinc-300 mt-1">
-                            {invoiceThreshold ? "Active Aggregations Alert" : "Standard invoice history"}
+                            {invoiceSpike ? "Active Ring Cluster Alert" : "Standard invoice history"}
                           </span>
                         </div>
                       </div>
 
                       <div className="flex justify-between items-center bg-black/60 border border-white/5 p-6 rounded-3xl">
                         <div>
-                          <span className="text-zinc-400 text-[10px] block">OVERALL TRUST SCORE</span>
+                          <span className="text-zinc-400 text-[10px] block">INDUSTRIAL RISK SCORE</span>
                           <span className="text-3xl font-black text-white">{score}/100</span>
                         </div>
                         <div className="text-right">
@@ -233,22 +228,22 @@ export default function MonitorVendorRiskPage() {
         {/* ================= SECTION 2: PROBLEMS / CHALLENGES ================= */}
         <section className="py-28 px-6 md:px-12 lg:px-24 bg-zinc-50/50">
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
-            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6">Vendor Risks</span>
+            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6">Industrial Risks</span>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-manrope text-neutral-900 leading-tight mb-8 max-w-[950px] tracking-tight">
-              Third-Party Ecosystems Create Expanding Enterprise Risk
+              Industrial Ecosystems Face Increasing Fraud and Operational Risk
             </h2>
             <p className="max-w-[800px] text-zinc-600 text-base md:text-lg font-inter leading-relaxed mb-20">
-              Modern enterprises depend heavily on suppliers, contractors, procurement ecosystems, outsourcing partners, logistics vendors, technology providers, consultants, and payment processors. Fraudsters increasingly exploit third-party ecosystems using fake vendors, procurement collusion, invoice fraud, shell companies, insider relationships, payment diversion, duplicate suppliers, sanctions evasion, and operational manipulation. Traditional vendor governance systems often struggle with fragmented supplier visibility, delayed onboarding reviews, disconnected procurement systems, manual investigations, limited behavioral intelligence, and lack of continuous monitoring. Without connected vendor intelligence, organizations face procurement leakage, compliance violations, operational disruption, financial fraud, insider collusion, reputational damage, and governance failures.
+              Modern manufacturing and industrial ecosystems manage procurement workflows, supplier ecosystems, factory operations, industrial payments, inventory systems, warehouse operations, OT and IoT telemetry, and contractor and workforce access. Fraudsters and malicious actors increasingly exploit industrial ecosystems using procurement collusion, invoice manipulation, fake suppliers, inventory theft, operational sabotage, insider abuse, unauthorized access, payment fraud, and coordinated vendor networks. Traditional industrial systems often struggle with fragmented operational visibility, disconnected procurement intelligence, delayed investigations, insider-risk visibility, operational complexity, and governance scalability. Without connected industrial intelligence, organizations face procurement losses, inventory leakage, operational disruption, insider threats, supplier risk exposure, compliance failures, and reputational damage.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left w-full mb-20">
               {[
-                { title: "Fake Suppliers", desc: "Fraudulent vendors infiltrate procurement ecosystems using manipulated onboarding data.", icon: <Shield /> },
-                { title: "Collusive Procurement Networks", desc: "Connected suppliers and insiders exploit procurement workflows.", icon: <Users /> },
-                { title: "Invoice Manipulation", desc: "Duplicate invoices and payout anomalies increase financial exposure.", icon: <Sliders /> },
-                { title: "Third-Party Compliance Risk", desc: "Vendors create AML, sanctions, and regulatory exposure.", icon: <Clock /> },
-                { title: "Insider Relationships", desc: "Internal procurement abuse creates hidden operational risk.", icon: <Building /> },
-                { title: "Vendor Monitoring Gaps", desc: "Periodic assessments fail to detect evolving third-party threats.", icon: <Sliders /> }
+                { title: "Procurement Fraud", desc: "Fake vendors and collusive procurement activity create financial exposure.", icon: <Shield /> },
+                { title: "Inventory & Asset Theft", desc: "Industrial assets and inventory remain vulnerable to manipulation and theft.", icon: <Users /> },
+                { title: "Insider Threats", desc: "Operational misuse and privileged access abuse create hidden risk.", icon: <Sliders /> },
+                { title: "Supplier & Contractor Risk", desc: "Third-party industrial ecosystems increase governance complexity.", icon: <Clock /> },
+                { title: "Invoice & Payment Manipulation", desc: "Fraudulent invoices and payout anomalies impact industrial operations.", icon: <Building /> },
+                { title: "OT & Operational Integrity", desc: "Industrial operations require continuous monitoring and operational trust.", icon: <Sliders /> }
               ].map((prob, idx) => (
                 <div key={idx} className="bg-white border border-gray-100 p-8 rounded-[36px] hover:shadow-2xl hover:border-red-100 transition-all duration-300 flex flex-col gap-6">
                   <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-500">
@@ -260,18 +255,18 @@ export default function MonitorVendorRiskPage() {
               ))}
             </div>
 
-            {/* Vendor Risk Lifecycle Flow Diagram */}
+            {/* Industrial Risk Lifecycle Flow Diagram */}
             <div className="w-full bg-white border border-zinc-200 p-8 rounded-[40px] shadow-sm text-left">
-              <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 block mb-8 text-center font-mono">VENDOR RISK LIFECYCLE FLOW</span>
+              <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 block mb-8 text-center font-mono">INDUSTRIAL RISK LIFECYCLE FLOW</span>
               
               <div className="grid grid-cols-1 md:grid-cols-6 gap-6 text-center font-manrope">
                 {[
-                  { title: "1. Onboarding", desc: "Patient onboarding verified dynamically using liveness checks." },
-                  { title: "2. Procurement", desc: "Claims details checked instantly against legacy historical templates." },
-                  { title: "3. Payment Verification", desc: "Score computed using behavioral inputs and metadata parameters." },
-                  { title: "4. Risk Scoring", desc: "Points redemptions evaluated for proxy listings and synthetic anomalies." },
-                  { title: "5. Investigations", desc: "Flagged transactions routed directly to dedicated Special Investigation Units." },
-                  { title: "6. Governance Workflows", desc: "Approved payouts executed securely with complete compliance reports." }
+                  { title: "1. Procurement intake", desc: "Patient onboarding verified dynamically using HIPAA-compliant liveness checks." },
+                  { title: "2. Supplier verification", desc: "Claims details checked instantly against legacy historical templates." },
+                  { title: "3. Operational telemetry", desc: "Score computed using behavioral inputs and metadata parameters." },
+                  { title: "4. Fraud Scoring", desc: "Points redemptions evaluated for proxy listings and synthetic anomalies." },
+                  { title: "5. Investigation", desc: "Flagged transactions routed directly to dedicated Special Investigation Units." },
+                  { title: "6. Governance", desc: "Approved payouts executed securely with complete compliance reports." }
                 ].map((step, idx) => (
                   <div key={idx} className="p-6 bg-zinc-50 border border-zinc-100 rounded-3xl relative flex flex-col items-center justify-between">
                     <div>
@@ -291,20 +286,20 @@ export default function MonitorVendorRiskPage() {
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
             <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6">Connected Defense</span>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-manrope text-neutral-900 leading-tight mb-8 max-w-[950px] tracking-tight">
-              Unified Vendor Intelligence and Third-Party Governance
+              Unified Industrial Fraud & Operational Intelligence
             </h2>
             <p className="max-w-[800px] text-zinc-600 text-base md:text-lg font-inter leading-relaxed mb-20">
-              DeepSense combines procurement monitoring, vendor intelligence, graph analytics, behavioral analytics, sanctions monitoring, invoice fraud detection, and governance automation into a unified third-party risk platform. The platform continuously evaluates supplier onboarding, procurement workflows, payment activity, behavioral anomalies, vendor relationships, insider exposure, compliance indicators, operational integrity, and third-party risk signals. DeepSense enables organizations to: continuously monitor vendors, detect procurement fraud, reduce supplier risk, improve due diligence, strengthen governance visibility, accelerate investigations, and improve operational resilience.
+              DeepSense combines fraud detection, behavioral analytics, procurement monitoring, insider-risk intelligence, operational telemetry analysis, graph intelligence, and governance automation into a unified industrial risk platform. The platform continuously evaluates procurement activity, supplier behavior, industrial workflows, operational telemetry, payment integrity, inventory movement, insider-risk indicators, graph relationships, and operational anomalies. DeepSense enables industrial organizations to: reduce fraud losses, strengthen procurement trust, secure operational workflows, reduce insider risk, improve industrial visibility, accelerate investigations, and strengthen operational resilience.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left w-full">
               {[
-                { title: "Continuously monitor vendors", desc: "Block welfare farming and duplicate payouts dynamically in milliseconds." },
-                { title: "Detect procurement fraud", desc: "Verify portal checkouts without introducing user friction." },
-                { title: "Reduce supplier risk", desc: "Enforce multi-tenant environment separation rules dynamically." },
-                { title: "Improve due diligence", desc: "Equip claims analysts with visual transaction relationship graphs." },
-                { title: "Strengthen governance visibility", desc: "Support SOX-aligned workflows with active security control overlays." },
-                { title: "Accelerate investigations", desc: "Block duplicate invoice payouts before settlements occur." }
+                { title: "Reduce fraud losses", desc: "Block welfare farming and duplicate payouts dynamically in milliseconds." },
+                { title: "Strengthen procurement trust", desc: "Verify portal checkouts without introducing user friction." },
+                { title: "Secure operational workflows", desc: "Enforce multi-tenant environment separation rules dynamically." },
+                { title: "Reduce insider risk", desc: "Equip claims analysts with visual transaction relationship graphs." },
+                { title: "Improve industrial visibility", desc: "Support HIPAA-aligned workflows with active security control overlays." },
+                { title: "Accelerate investigations", desc: "Block duplicate medical disbursements before payouts settle." }
               ].map((cap, idx) => (
                 <div key={idx} className="bg-zinc-50 border border-zinc-100 p-8 rounded-[32px] flex flex-col gap-4">
                   <h4 className="text-lg font-bold font-manrope text-neutral-900">{cap.title}</h4>
@@ -320,21 +315,21 @@ export default function MonitorVendorRiskPage() {
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
             <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">Capabilities Grid</span>
             <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-20">
-              Vendor & Procurement Intelligence Capabilities
+              Manufacturing & Industrial Intelligence Capabilities
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 text-left w-full">
               {[
-                { title: "Vendor Risk Scoring", desc: "Generate dynamic trust scores, onboarding integrity scores, operational consistency ratings, procurement exposure scores, and sanctions and AML indicators." },
-                { title: "Supplier Due Diligence", desc: "Verify business legitimacy, beneficial ownership, onboarding documentation, sanctions exposure, and operational integrity." },
-                { title: "Procurement Fraud Detection", desc: "Detect collusive bidding, suspicious procurement workflows, duplicate invoices, shell vendor activity, and payment manipulation." },
-                { title: "Vendor Behavioral Analytics", desc: "Analyze supplier behavior, operational patterns, procurement consistency, payment anomalies, and onboarding irregularities." },
-                { title: "Graph Intelligence", desc: "Visualize vendor relationships, insider connections, shared banking details, procurement ecosystems, and collusive networks." },
-                { title: "Continuous Compliance Monitoring", desc: "Monitor sanctions exposure, AML indicators, procurement violations, governance failures, and operational anomalies." },
-                { title: "Insider Threat Correlation", desc: "Identify employee-vendor relationships, suspicious approvals, procurement manipulation, privilege misuse, and operational abuse." },
-                { title: "Invoice & Payment Monitoring", desc: "Detect duplicate invoices, suspicious disbursements, abnormal settlement activity, payment redirection, and vendor payout anomalies." },
-                { title: "Case Management & Investigations", desc: "Coordinate procurement investigations, vendor reviews, escalation workflows, evidence management, and remediation tracking." },
-                { title: "Governance & Audit Readiness", desc: "Support audit workflows, third-party governance, compliance reporting, operational transparency, and remediation visibility." }
+                { title: "Procurement Fraud Detection", desc: "Detect fake suppliers, collusive bidding, duplicate invoices, suspicious procurement behavior, contract manipulation, and vendor abuse." },
+                { title: "Supplier & Contractor Risk Monitoring", desc: "Monitor onboarding integrity, operational trust, payment anomalies, suspicious relationships, governance exposure, and contractor access risk." },
+                { title: "Inventory & Asset Protection", desc: "Identify inventory manipulation, warehouse anomalies, unauthorized movement, asset theft indicators, and operational inconsistencies." },
+                { title: "Industrial Payment Intelligence", desc: "Analyze payout anomalies, procurement payment abuse, suspicious settlements, duplicate disbursements, and financial irregularities." },
+                { title: "Insider Threat Monitoring", desc: "Detect privilege misuse, operational abuse, unauthorized access, suspicious employee behavior, and governance violations." },
+                { title: "Behavioral Analytics", desc: "Analyze workforce behavior, procurement workflows, operational consistency, factory interactions, and trust indicators." },
+                { title: "OT & IoT Intelligence", desc: "Detect operational anomalies, suspicious telemetry, unauthorized industrial access, infrastructure inconsistencies, and industrial control risks." },
+                { title: "Graph Intelligence", desc: "Visualize linked suppliers, collusive vendor ecosystems, connected employees, operational relationships, and payment networks." },
+                { title: "Case Management & Investigations", desc: "Coordinate procurement investigations, operational reviews, insider-risk escalations, evidence workflows, and remediation tracking." },
+                { title: "Governance & Compliance Monitoring", desc: "Support industrial governance, audit readiness, procurement controls, operational compliance, and remediation workflows." }
               ].map((sig, idx) => (
                 <div key={idx} className="bg-white border border-gray-100 p-8 rounded-[36px] flex flex-col justify-between shadow-xs hover:border-red-400 hover:shadow-xl transition-all duration-500">
                   <div className="space-y-4">
@@ -353,16 +348,16 @@ export default function MonitorVendorRiskPage() {
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
             <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">Platform Steps</span>
             <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-20">
-              How DeepSense Monitors Vendor Risk
+              How DeepSense Protects Industrial Operations
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-5 gap-6 text-left font-manrope w-full">
               {[
-                { title: "Step 1 — Ingestion", desc: "DeepSense ingests onboarding records, procurement activity, invoices, payment telemetry, ERP workflows, supplier metadata, and operational signals." },
-                { title: "Step 2 — Enrichment", desc: "The platform enriches activity using graph intelligence, behavioral analytics, sanctions intelligence, operational telemetry, AML indicators, and insider-risk intelligence." },
-                { title: "Step 3 — Evaluation", desc: "DeepSense evaluates supplier legitimacy, payment integrity, procurement anomalies, compliance exposure, behavioral inconsistencies, and collusive relationships." },
-                { title: "Step 4 — Decisioning", desc: "The system generates vendor trust scores, procurement alerts, payment escalations, sanctions warnings, and governance indicators." },
-                { title: "Step 5 — Action", desc: "High-risk activity triggers vendor investigations, procurement reviews, remediation workflows, governance reporting, and audit escalation." }
+                { title: "Step 1 — Ingestion", desc: "DeepSense ingests procurement data, operational telemetry, inventory activity, supplier workflows, payment transactions, factory operations, and workforce signals." },
+                { title: "Step 2 — Enrichment", desc: "The platform enriches events using behavioral analytics, graph intelligence, operational telemetry, fraud indicators, supplier trust signals, and insider-risk intelligence." },
+                { title: "Step 3 — Evaluation", desc: "DeepSense evaluates procurement legitimacy, supplier integrity, operational trust, inventory exposure, insider-risk indicators, and fraud relationships." },
+                { title: "Step 4 — Decisioning", desc: "The system generates fraud scores, procurement alerts, operational escalations, insider-risk warnings, and payment interventions." },
+                { title: "Step 5 — Action", desc: "High-risk activity triggers investigations, procurement reviews, operational escalations, remediation workflows, and governance reporting." }
               ].map((step, idx) => (
                 <div key={idx} className="p-8 bg-zinc-50 border border-zinc-100 rounded-3xl relative flex flex-col justify-between">
                   <div>
@@ -381,7 +376,7 @@ export default function MonitorVendorRiskPage() {
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
             <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">Use Case Coverage</span>
             <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-8">
-              Built for Complex Enterprise Vendor Ecosystems
+              Built for Modern Industrial Ecosystems
             </h2>
             <p className="max-w-[800px] text-zinc-600 text-base md:text-lg font-inter leading-relaxed mb-20">
               Explore how DeepSense deploys custom validation layers based on vertical specifications.
@@ -390,11 +385,11 @@ export default function MonitorVendorRiskPage() {
             {/* Navigation Tabs */}
             <div className="flex flex-wrap gap-2 justify-center mb-16 w-full max-w-4xl">
               {[
-                { id: "financial", label: "Financial Services" },
-                { id: "manufacturing", label: "Manufacturing & Industrial" },
-                { id: "government", label: "Government & Public Sector" },
-                { id: "healthcare", label: "Healthcare" },
-                { id: "saas", label: "Enterprise SaaS & Tech" }
+                { id: "manufacturing", label: "Manufacturing Enterprises" },
+                { id: "factory", label: "Factory & Plant Operations" },
+                { id: "supply", label: "Industrial Supply Chains" },
+                { id: "energy", label: "Energy & Utilities" },
+                { id: "procurement", label: "Procurement & Finance" }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -408,41 +403,41 @@ export default function MonitorVendorRiskPage() {
 
             {/* Tab content */}
             <div className="w-full bg-white border border-zinc-200 p-8 md:p-12 rounded-[48px] shadow-sm text-left animate-in fade-in duration-300">
-              {activeTab === "financial" && (
+              {activeTab === "manufacturing" && (
                 <div className="space-y-6">
-                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Monitor high-risk vendors, AML exposure, outsourcing providers, and payment integrity.</h4>
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Protect procurement workflows, supplier ecosystems, operational integrity, and industrial payments.</h4>
                   <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
                     Secure credit operations. Map login anomalies and device trust indicators dynamically to block rogue acquirer routings.
                   </p>
                 </div>
               )}
-              {activeTab === "manufacturing" && (
+              {activeTab === "factory" && (
                 <div className="space-y-6">
-                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Protect supplier ecosystems, procurement workflows, inventory vendors, and operational resilience.</h4>
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Monitor operational anomalies, inventory movement, workforce behavior, and insider-risk indicators.</h4>
                   <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
                     Track mobile payout operations. Secure approval workflows and analyze threshold indicators before money leaves the wallet.
                   </p>
                 </div>
               )}
-              {activeTab === "government" && (
+              {activeTab === "supply" && (
                 <div className="space-y-6">
-                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Detect procurement corruption, collusive bidding, shell vendors, and operational abuse.</h4>
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Secure vendor onboarding, logistics workflows, payment integrity, and operational governance.</h4>
                   <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
                     Safeguard partner networks. Block synthetic registrations automatically during initial partner signups.
                   </p>
                 </div>
               )}
-              {activeTab === "healthcare" && (
+              {activeTab === "energy" && (
                 <div className="space-y-6">
-                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Monitor healthcare suppliers, billing vendors, procurement integrity, and operational exposure.</h4>
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Detect operational misuse, contractor abuse, suspicious telemetry, and governance violations.</h4>
                   <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
                     Secure international correspondent banking connections. Track wire routings against global watchlists in real time.
                   </p>
                 </div>
               )}
-              {activeTab === "saas" && (
+              {activeTab === "procurement" && (
                 <div className="space-y-6">
-                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Secure third-party integrations, contractor ecosystems, cloud vendors, and outsourcing operations.</h4>
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Prevent invoice fraud, procurement collusion, payout abuse, and financial manipulation.</h4>
                   <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
                     Secure international correspondent banking connections. Track wire routings against global watchlists in real time.
                   </p>
@@ -457,21 +452,21 @@ export default function MonitorVendorRiskPage() {
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
             <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">Platform Synergy</span>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-manrope text-neutral-900 leading-tight mb-8 max-w-[950px] tracking-tight">
-              Connected Across the Telecom Risk Ecosystem
+              Connected Across the Industrial Risk Ecosystem
             </h2>
             <p className="max-w-[800px] text-zinc-600 text-base md:text-lg font-inter leading-relaxed mb-20">
-              DeepSense links telecom fraud deciders with active GRC dashboards, GRC evidence matrices, device intelligence engines, and automated incident logs.
+              DeepSense links industrial fraud deciders with active GRC dashboards, GRC evidence matrices, device intelligence engines, and automated incident logs.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left w-full">
               {[
-                { title: "Behavioral Analytics", desc: "Subscriber anomaly detection and trust intelligence." },
-                { title: "Identity Intelligence", desc: "Subscriber verification and synthetic identity prevention." },
-                { title: "Device Fingerprinting", desc: "Session integrity and suspicious device monitoring." },
-                { title: "Payment Fraud Intelligence", desc: "Billing and telecom payment monitoring." },
-                { title: "Graph Intelligence", desc: "Connected abuse ecosystems and coordinated fraud visibility." },
-                { title: "UEBA & Insider Risk Monitoring", desc: "Behavioral anomaly detection across telecom operations." },
-                { title: "GRC & Controls Monitoring", desc: "Telecom governance and audit readiness intelligence." }
+                { title: "Behavioral Analytics", desc: "Operational anomaly detection and workforce intelligence." },
+                { title: "OT & IoT Monitoring", desc: "Industrial telemetry and operational trust analytics." },
+                { title: "Graph Intelligence", desc: "Connected supplier ecosystems and collusive network visibility." },
+                { title: "Payment Fraud Intelligence", desc: "Procurement and industrial payment monitoring." },
+                { title: "UEBA & Insider Risk Monitoring", desc: "Behavioral anomaly detection across industrial operations." },
+                { title: "GRC & Controls Monitoring", desc: "Industrial governance and audit readiness intelligence." },
+                { title: "Case Management", desc: "Operational investigations and evidence workflow orchestration." }
               ].map((int, idx) => (
                 <div key={idx} className="bg-zinc-50 border border-zinc-100 p-8 rounded-[36px] flex flex-col gap-4 shadow-xs">
                   <h4 className="text-lg font-bold font-manrope text-neutral-900">{int.title}</h4>
@@ -487,16 +482,16 @@ export default function MonitorVendorRiskPage() {
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
             <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">Operations Center</span>
             <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-20">
-              Real-Time Third-Party Risk Visibility
+              Real-Time Industrial Risk Visibility
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-left w-full">
               {[
-                { title: "Vendor Risk Operations Dashboard", desc: "Vendor alerts, onboarding anomalies, procurement fraud indicators, and operational risk visibility." },
-                { title: "Procurement Integrity Dashboard", desc: "Suspicious invoice monitoring, collusive vendor visibility, payout anomalies, and workflow abuse indicators." },
-                { title: "Vendor Trust Intelligence", desc: "Vendor trust scoring, onboarding analytics, behavioral indicators, and compliance exposure." },
-                { title: "Third-Party Graph Intelligence", desc: "Linked vendors, insider relationships, procurement ecosystems, and operational networks." },
-                { title: "Investigation Workspace", desc: "Vendor timelines, graph investigations, evidence management, and operational intelligence." }
+                { title: "Industrial Fraud Operations Dashboard", desc: "Procurement fraud alerts, operational abuse visibility, inventory analytics, and payment risk monitoring." },
+                { title: "Supplier Trust Intelligence", desc: "Supplier risk scoring, onboarding analytics, collusive relationship visibility, and operational trust indicators." },
+                { title: "Operational Integrity Dashboard", desc: "OT telemetry monitoring, workforce anomaly detection, infrastructure visibility, and operational risk analytics." },
+                { title: "Procurement & Payment Analytics", desc: "Invoice monitoring, payout anomalies, vendor risk visibility, and financial integrity indicators." },
+                { title: "Investigation Workspace", desc: "Linked entities, operational timelines, graph investigations, evidence management, and operational intelligence." }
               ].map((mod, idx) => (
                 <div key={idx} className="bg-white border border-gray-100 p-8 rounded-[36px] flex flex-col gap-4 shadow-xs">
                   <h4 className="text-lg font-bold font-manrope text-neutral-900">{mod.title}</h4>
@@ -512,16 +507,16 @@ export default function MonitorVendorRiskPage() {
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
             <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">Scale Coverage</span>
             <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-8">
-              Designed for Modern Connectivity Ecosystems
+              Designed for Enterprise Industrial Ecosystems
             </h2>
             <p className="max-w-[800px] text-zinc-600 text-base md:text-lg font-inter leading-relaxed mb-20">
-              Deploy continuous vendor models across diverse vertical operations globally.
+              Deploy continuous industrial models across diverse vertical operations globally.
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-6 text-left w-full">
               {[
-                "Financial Services", "Manufacturing & Industrial", "Government & Public Sector", "Healthcare", "Enterprise SaaS & Tech", "Energy & Utilities",
-                "Logistics & Supply Chain", "Retail & Consumer Platforms", "Hospitality & Travel", "Education & EdTech", "Nonprofits & NGOs", "Telecommunications"
+                "Manufacturing Enterprises", "Industrial Supply Chains", "Energy & Utilities", "Oil & Gas Operations", "Chemical Manufacturing", "Automotive Manufacturing",
+                "Electronics Manufacturing", "Heavy Industry", "Factory & Plant Operations", "Industrial Procurement Teams", "Warehouse & Inventory Operations", "Smart Manufacturing Ecosystems"
               ].map((ind, idx) => (
                 <div key={idx} className="bg-zinc-50 border border-zinc-100 p-5 rounded-2xl flex flex-col gap-2">
                   <Building2 className="w-4 h-4 text-red-500" />
@@ -539,20 +534,20 @@ export default function MonitorVendorRiskPage() {
             <div className="lg:col-span-5 flex flex-col gap-6">
               <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest">SaaS Governance</span>
               <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight">
-                Enterprise-Grade Vendor Governance and Security
+                Enterprise-Grade Security for Industrial Operations
               </h2>
               <p className="text-base text-zinc-600 font-inter leading-relaxed">
-                DeepSense maintains secure database separation, explainable risk calculations, and compliance-ready sovereign hosting options for every single vendor event.
+                DeepSense maintains secure database separation, explainable risk calculations, and HIPAA-compliant sovereign hosting options for every single industrial dispatch.
               </p>
             </div>
 
             {/* Right grid */}
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6 w-full text-left">
               {[
-                { title: "Explainable Vendor Risk Decisions", desc: "Every vendor risk decision includes reason codes, procurement evidence, behavioral indicators, graph relationships, and compliance exposure." },
-                { title: "Audit Logging", desc: "Track procurement reviews, onboarding approvals, payment escalations, investigations, and governance actions." },
-                { title: "Multi-Tenant Vendor Security", desc: "Secure operational separation across procurement teams, supplier ecosystems, enterprise environments, and governance workflows." },
-                { title: "Compliance-Ready Architecture", desc: "Support initiatives aligned with SOX, AML obligations, procurement governance, and third-party risk frameworks." },
+                { title: "Explainable Risk Decisions", desc: "Every fraud and operational decision includes reason codes, behavioral evidence, and industrial telemetry." },
+                { title: "Audit Logging", desc: "Track procurement investigations, operational escalations, payment reviews, and insider-risk workflows." },
+                { title: "Multi-Tenant Industrial Security", desc: "Secure operational separation across industrial environments, supplier ecosystems, and operational teams." },
+                { title: "Compliance-Ready Architecture", desc: "Support initiatives aligned with industrial governance, procurement controls, operational resilience, and compliance." },
                 { title: "Flexible Deployment Models", desc: "Available via SaaS, private cloud, hybrid, or on-premise infrastructure." }
               ].map((sec, idx) => (
                 <div key={idx} className="bg-white border border-gray-100 p-6 rounded-2xl flex flex-col gap-3 shadow-xs">
@@ -568,7 +563,7 @@ export default function MonitorVendorRiskPage() {
         {/* ================= SECTION 11: FAQ ================= */}
         <section className="py-28 px-6 md:px-12 lg:px-24 bg-white border-t border-gray-100">
           <div className="max-w-[900px] mx-auto flex flex-col items-center">
-            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block text-center">VENDOR RISK FAQS</span>
+            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block text-center">INDUSTRIAL FAQS</span>
             <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-20 text-center">
               Frequently Asked Questions
             </h2>
@@ -576,28 +571,28 @@ export default function MonitorVendorRiskPage() {
             <div className="w-full flex flex-col gap-4">
               {[
                 { 
-                  q: "Can DeepSense continuously monitor vendor risk?", 
-                  a: "Yes. DeepSense continuously evaluates vendor activity, procurement workflows, onboarding integrity, and operational anomalies in real time." 
+                  q: "Can DeepSense detect procurement fraud in real time?", 
+                  a: "Yes. DeepSense continuously evaluates procurement activity, supplier behavior, invoice integrity, and payment anomalies in real time." 
                 },
                 { 
-                  q: "Does DeepSense support procurement fraud detection?", 
-                  a: "Yes. The platform detects collusive bidding, fake vendors, suspicious invoices, payment manipulation, and operational abuse." 
+                  q: "Does DeepSense support supplier and contractor risk monitoring?", 
+                  a: "Yes. The platform monitors onboarding integrity, operational trust, suspicious relationships, and contractor access behavior." 
                 },
                 { 
-                  q: "Can DeepSense identify insider and vendor collusion?", 
-                  a: "Yes. DeepSense uses graph intelligence and behavioral analytics to identify suspicious insider-vendor relationships." 
+                  q: "Can DeepSense detect insider threats in industrial environments?", 
+                  a: "Yes. DeepSense identifies privilege misuse, operational abuse, suspicious employee activity, and governance violations." 
                 },
                 { 
-                  q: "Does DeepSense support sanctions and AML monitoring?", 
-                  a: "Yes. The platform continuously monitors sanctions exposure, AML indicators, and operational compliance risk." 
+                  q: "Does DeepSense support OT and industrial telemetry monitoring?", 
+                  a: "Yes. The platform analyzes industrial telemetry, operational anomalies, infrastructure inconsistencies, and workflow integrity." 
                 },
                 { 
-                  q: "Can DeepSense integrate with ERP and procurement systems?", 
-                  a: "Yes. DeepSense integrates with ERP, procurement, finance, and governance systems to provide unified third-party intelligence." 
+                  q: "Can DeepSense detect invoice and payment fraud?", 
+                  a: "Yes. DeepSense detects duplicate invoices, procurement payment abuse, suspicious settlements, and payout anomalies." 
                 },
                 { 
-                  q: "Is DeepSense suitable for enterprise-scale vendor governance?", 
-                  a: "Yes. DeepSense is designed for complex enterprise procurement ecosystems and large-scale third-party governance operations." 
+                  q: "Is DeepSense suitable for enterprise manufacturing ecosystems?", 
+                  a: "Yes. DeepSense is designed for large-scale manufacturing environments, industrial operations, and enterprise governance programs." 
                 }
               ].map((faq, idx) => {
                 const isOpen = openFaq === idx;
@@ -630,13 +625,13 @@ export default function MonitorVendorRiskPage() {
             <div className="absolute inset-0 bg-radial-gradient from-red-500/10 to-transparent opacity-50 pointer-events-none" />
             
             <div className="space-y-4 max-w-[800px] relative z-10">
-              <span className="text-red-400 font-manrope text-[11px] font-extrabold uppercase tracking-widest uppercase font-mono">Build Trusted Vendor Ecosystems With Real-Time Intelligence</span>
+              <span className="text-red-400 font-manrope text-[11px] font-extrabold uppercase tracking-widest uppercase font-mono">Strengthen Industrial Trust With Real-Time Operational Intelligence</span>
               <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold font-manrope text-white tracking-tight leading-tight">
-                Secure vendor profiles and prevent <br />
-                <span className="text-white/40 font-bold">payout anomalies dynamically.</span>
+                Secure industrial sensors and prevent <br />
+                <span className="text-white/40 font-bold">supplier collusion anomalies dynamically.</span>
               </h2>
               <p className="text-white/60 text-sm md:text-base font-inter max-w-[600px] mx-auto leading-relaxed">
-                Reduce procurement fraud, strengthen vendor governance, improve operational transparency, and secure third-party ecosystems using enterprise-grade vendor risk intelligence.
+                Protect industrial operations, prevent procurement abuse, secure supplier ecosystems, and modernize operational investigations using enterprise-grade industrial fraud intelligence.
               </p>
             </div>
 
@@ -644,8 +639,8 @@ export default function MonitorVendorRiskPage() {
               <Link href="/request-demo" className="px-10 py-5 bg-brand-lime text-neutral-900 rounded-full text-base font-bold font-manrope hover:bg-brand-lime/90 hover:scale-105 active:scale-95 transition-all shadow-xl text-center">
                 Request Demo
               </Link>
-              <Link href="/solutions/monitor-vendor-risk#use-cases" className="px-10 py-5 bg-white/5 border border-white/10 text-white rounded-full text-base font-bold font-manrope hover:bg-white/10 hover:scale-105 active:scale-95 transition-all text-center">
-                Explore Vendor Risk Use Cases
+              <Link href="/solutions/manufacturing-industrial#use-cases" className="px-10 py-5 bg-white/5 border border-white/10 text-white rounded-full text-base font-bold font-manrope hover:bg-white/10 hover:scale-105 active:scale-95 transition-all text-center">
+                Explore Industrial Use Cases
               </Link>
             </div>
           </div>

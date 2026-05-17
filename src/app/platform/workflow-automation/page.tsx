@@ -44,45 +44,45 @@ import {
   Briefcase
 } from "lucide-react";
 
-export default function PlatformIntegrationsPage() {
+export default function WorkflowAutomationPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("payments");
+  const [activeTab, setActiveTab] = useState<string>("financial");
   
   // Interactive console parameters
-  const [integrationScope, setIntegrationScope] = useState<string>("global");
-  const [webhookTracing, setWebhookTracing] = useState<boolean>(true);
-  const [apiThrottling, setApiThrottling] = useState<boolean>(false);
+  const [operationalState, setOperationalState] = useState<string>("active");
+  const [orchestrationFilter, setOrchestrationFilter] = useState<boolean>(true);
+  const [overrideControls, setOverrideControls] = useState<boolean>(false);
 
   const toggleFaq = (idx: number) => {
     setOpenFaq(openFaq === idx ? null : idx);
   };
 
-  // Calculate dynamic integration metrics
-  const calculateIntegrationMetrics = () => {
-    let apiLatency = "4.2 ms";
-    let ingestionThroughput = "1.8M msg/min";
-    let failedWebhooks = 0;
-    let recommendation = "INTEGRATION FABRIC GREEN: API endpoints synchronized perfectly globally";
+  // Calculate dynamic automation metrics
+  const calculateAutomationMetrics = () => {
+    let throughput = 1240;
+    let SLAEfficiency = 98;
+    let healthFactor = 99;
+    let recommendation = "SYSTEM HEALTH EXCELLENT: standard routing active";
     let color = "text-emerald-400";
     
-    if (integrationScope === "local") {
-      apiLatency = "142.8 ms";
-      ingestionThroughput = "240k msg/min";
-      failedWebhooks = 18;
-      recommendation = "CRITICAL METRIC EXPOSURE: unthrottled payment API spikes causing timeout errors.";
+    if (operationalState === "offline") {
+      throughput = 0;
+      SLAEfficiency = 14;
+      healthFactor = 22;
+      recommendation = "CRITICAL WARNING: offline baseline detected, manual routing overrides recommended";
       color = "text-red-400 animate-pulse";
     }
-    if (webhookTracing) {
-      apiLatency = "3.1 ms";
+    if (orchestrationFilter) {
+      SLAEfficiency = Math.max(SLAEfficiency - 2, 80);
     }
-    if (apiThrottling) {
-      failedWebhooks = Math.max(failedWebhooks - 12, 0);
+    if (overrideControls) {
+      healthFactor = Math.max(healthFactor - 12, 10);
     }
     
-    return { apiLatency, ingestionThroughput, failedWebhooks, recommendation, color };
+    return { throughput, SLAEfficiency, healthFactor, recommendation, color };
   };
 
-  const { apiLatency, ingestionThroughput, failedWebhooks, recommendation, color } = calculateIntegrationMetrics();
+  const { throughput, SLAEfficiency, healthFactor, recommendation, color } = calculateAutomationMetrics();
 
   return (
     <>
@@ -97,116 +97,116 @@ export default function PlatformIntegrationsPage() {
             {/* Headers */}
             <div className="flex flex-col gap-6 items-center max-w-[950px]">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-red-400 text-[11px] font-extrabold uppercase tracking-widest shadow-xl shadow-neutral-900/10">
-                <Network className="w-3.5 h-3.5 text-red-400 animate-pulse" />
-                ENTERPRISE CONNECTIVITY & OPERATIONAL INTEGRATIONS
+                <Smartphone className="w-3.5 h-3.5 text-red-400 animate-pulse" />
+                FRAUD OPERATIONS & WORKFLOW ORCHESTRATION
               </div>
 
               <h1 className="text-4xl md:text-6xl lg:text-[72px] font-bold font-manrope leading-[1.05] tracking-tighter text-neutral-900">
-                Connect Fraud Intelligence <br />
-                <span className="text-zinc-400">Across Your Entire Enterprise Ecosystem</span>
+                Automate Fraud Operations and Accelerate <br />
+                <span className="text-zinc-400">Enterprise Response Workflows</span>
               </h1>
 
               <p className="max-w-[750px] mx-auto text-zinc-600 text-lg md:text-xl font-inter leading-relaxed">
-                DeepSense Integrations unify payment systems, cloud infrastructure, fraud platforms, operational tooling, governance systems, and AI intelligence environments into one connected real-time fraud operations ecosystem.
+                DeepSense Workflow Automation helps enterprises orchestrate investigations, automate fraud response, trigger adaptive controls, streamline governance operations, and coordinate analyst workflows using AI-powered orchestration and real-time operational intelligence.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6 w-full max-w-md mx-auto">
                 <Link href="/request-demo" className="px-8 py-4 bg-neutral-900 text-white rounded-full text-base font-bold font-manrope hover:bg-neutral-800 transition-all hover:scale-105 active:scale-95 shadow-xl text-center flex-1">
-                  Explore Integrations
+                  Request Workflow Automation Demo
                 </Link>
-                <Link href="/platform/integrations#architecture" className="px-8 py-4 border border-zinc-200 bg-white text-neutral-900 rounded-full text-base font-bold font-manrope hover:bg-zinc-50 hover:border-zinc-300 transition-all hover:scale-105 active:scale-95 text-center flex-1">
-                  View Integration Architecture
+                <Link href="/platform/workflow-automation#workflows" className="px-8 py-4 border border-zinc-200 bg-white text-neutral-900 rounded-full text-base font-bold font-manrope hover:bg-zinc-50 hover:border-zinc-300 transition-all hover:scale-105 active:scale-95 text-center flex-1">
+                  Explore Automation Studio
                 </Link>
               </div>
 
               <div className="mt-6">
                 <span className="text-zinc-400 text-[10px] font-bold font-manrope uppercase tracking-wider block">
-                  Built for enterprise environments requiring secure, scalable, real-time connectivity across fraud operations, governance systems, AI infrastructure, and operational intelligence platforms.
+                  Built for fraud operations, AML teams, compliance organizations, payment risk teams, SOC analysts, governance teams, and enterprise operational environments.
                 </span>
               </div>
             </div>
 
-            {/* Hero Interactive Experience Widget */}
+            {/* Hero Illustration: Fraud Operations Automation Studio */}
             <div className="w-full bg-neutral-950 p-8 rounded-[48px] border border-white/10 shadow-3xl text-left relative overflow-hidden">
               <div className="absolute inset-0 bg-radial-gradient from-red-950/20 to-transparent pointer-events-none opacity-50" />
               
               <div className="flex flex-col gap-8 relative z-10 text-white">
                 <div className="flex justify-between items-center pb-6 border-b border-white/5">
                   <div className="flex items-center gap-3">
-                    <Sliders className="w-4 h-4 text-red-500 animate-ping" />
-                    <span className="text-white text-xs font-bold font-manrope tracking-wider uppercase">Unified Enterprise Integration Control Plane</span>
+                    <Workflow className="w-4 h-4 text-red-500 animate-ping" />
+                    <span className="text-white text-xs font-bold font-manrope tracking-wider uppercase">Fraud Operations Automation Studio</span>
                   </div>
-                  <span className="text-zinc-500 text-[10px] font-mono">CONNECTION BUS: NOMINAL</span>
+                  <span className="text-zinc-500 text-[10px] font-mono">AUTOMATION ENGINE CORE</span>
                 </div>
 
                 <p className="text-zinc-400 text-xs font-inter max-w-2xl">
-                  A real-time integration orchestration environment visualizing: API connectivity, event ingestion pipelines, webhook orchestration, fraud telemetry streams, cloud infrastructure synchronization, governance integrations, operational data exchange, and AI enrichment workflows.
+                  A fully interactive orchestration environment where teams can build fraud workflows, automate investigations, trigger adaptive controls, route escalations, orchestrate remediation, configure governance workflows, integrate AI decisioning, and monitor operational automation.
                 </p>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-                  {/* Left Column: Integration Categories */}
+                  {/* Left Sidebar: Workflow Modules */}
                   <div className="lg:col-span-3 bg-white/5 border border-white/10 p-6 rounded-3xl space-y-4">
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 block font-mono">Integration Categories</span>
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 block font-mono">Workflow Modules</span>
                     
                     <div className="space-y-1 text-[11px] font-mono text-zinc-400">
                       {[
-                        "Payment Integrations",
-                        "Identity Providers",
-                        "SIEM & Security",
-                        "Cloud Infrastructure",
-                        "Data Streaming",
-                        "Governance Systems",
-                        "CRM & ERP",
-                        "AI & Analytics",
-                        "Workflow Automation",
-                        "API & Webhooks"
-                      ].map((mod, idx) => (
+                        "Fraud Automation",
+                        "Investigation Routing",
+                        "AML Escalations",
+                        "Account Controls",
+                        "AI Workflow Builder",
+                        "Governance Automation",
+                        "Notification Engine",
+                        "Risk Prioritization",
+                        "Analyst Assignment",
+                        "Integration Connectors"
+                      ].map((tool, idx) => (
                         <div key={idx} className="flex justify-between items-center p-2 rounded hover:bg-white/5 hover:text-white cursor-pointer transition-all">
-                          <span>{mod}</span>
-                          <span className="text-[9px] text-zinc-600">v3.2</span>
+                          <span>{tool}</span>
+                          <span className="text-[9px] text-zinc-600">v1.4</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Center Column: Real-Time Connectivity Map */}
+                  {/* Center Canvas — Drag-and-Drop Workflow Builder */}
                   <div className="lg:col-span-6 bg-white/5 border border-white/10 p-8 rounded-3xl flex flex-col justify-between font-mono relative">
                     <div className="space-y-6">
                       <div className="flex justify-between items-center pb-4 border-b border-white/5 text-[10px] text-zinc-400">
-                        <span>REAL-TIME CONNECTIVITY MAP</span>
-                        <span>TELEMETRY CONNECTOR ACTIVE</span>
+                        <span>DRAG-AND-DROP CANVAS</span>
+                        <span>BUILDER SCREEN ACTIVE</span>
                       </div>
 
                       {/* Configurations */}
                       <div className="grid grid-cols-3 gap-4 text-[10px] mb-6">
                         <div className="p-3 bg-black/40 border border-white/5 rounded-xl space-y-1">
-                          <span className="text-zinc-500 block uppercase">Integration Scope</span>
+                          <span className="text-zinc-500 block uppercase">Operational State</span>
                           <select 
-                            value={integrationScope} 
-                            onChange={(e) => setIntegrationScope(e.target.value)}
+                            value={operationalState} 
+                            onChange={(e) => setOperationalState(e.target.value)}
                             className="bg-neutral-900 border border-white/10 text-white rounded px-2 py-1 text-[9px] w-full"
                           >
-                            <option value="global">Connected globally</option>
-                            <option value="local">Local sandbox isolation</option>
+                            <option value="active">Active automation stream</option>
+                            <option value="offline">Offline sandbox baseline</option>
                           </select>
                         </div>
 
                         <div className="p-3 bg-black/40 border border-white/5 rounded-xl space-y-1">
-                          <span className="text-zinc-500 block uppercase">Webhook tracing</span>
+                          <span className="text-zinc-500 block uppercase">Orchestration filter</span>
                           <input 
                             type="checkbox" 
-                            checked={webhookTracing} 
-                            onChange={(e) => setWebhookTracing(e.target.checked)}
+                            checked={orchestrationFilter} 
+                            onChange={(e) => setOrchestrationFilter(e.target.checked)}
                             className="w-4 h-4 accent-red-600 block mt-1"
                           />
                         </div>
 
                         <div className="p-3 bg-black/40 border border-white/5 rounded-xl space-y-1">
-                          <span className="text-zinc-500 block uppercase">Rate-limiting limits</span>
+                          <span className="text-zinc-500 block uppercase">Override controls</span>
                           <input 
                             type="checkbox" 
-                            checked={apiThrottling} 
-                            onChange={(e) => setApiThrottling(e.target.checked)}
+                            checked={overrideControls} 
+                            onChange={(e) => setOverrideControls(e.target.checked)}
                             className="w-4 h-4 accent-red-600 block mt-1"
                           />
                         </div>
@@ -214,58 +214,58 @@ export default function PlatformIntegrationsPage() {
 
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div className="p-4 bg-black/60 border border-white/5 rounded-2xl">
-                          <span className="text-[9px] text-zinc-500 block">Ingestion throughput</span>
-                          <span className="text-xl font-bold text-white mt-1 block">{ingestionThroughput}</span>
+                          <span className="text-[9px] text-zinc-500 block">Orchestrations / sec</span>
+                          <span className="text-xl font-bold text-white mt-1 block">{throughput} flow</span>
                         </div>
                         <div className="p-4 bg-black/60 border border-white/5 rounded-2xl">
-                          <span className="text-[9px] text-zinc-500 block">API Latency</span>
-                          <span className="text-xl font-bold text-white mt-1 block">{apiLatency}</span>
+                          <span className="text-[9px] text-zinc-500 block">SLA efficiency</span>
+                          <span className="text-xl font-bold text-white mt-1 block">{SLAEfficiency}%</span>
                         </div>
                         <div className="p-4 bg-black/60 border border-white/5 rounded-2xl">
-                          <span className="text-[9px] text-zinc-500 block">Failed webhooks</span>
-                          <span className={`text-xl font-bold mt-1 block ${failedWebhooks > 0 ? "text-red-400 animate-pulse font-extrabold" : "text-emerald-400"}`}>
-                            {failedWebhooks} items
+                          <span className="text-[9px] text-zinc-500 block">Workflow health</span>
+                          <span className={`text-xl font-bold mt-1 block ${healthFactor < 45 ? "text-red-400" : "text-emerald-400"}`}>
+                            {healthFactor}%
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Bottom Operational Timeline */}
+                    {/* Bottom Workflow Timeline */}
                     <div className="pt-6 border-t border-white/5 mt-6 space-y-2 text-[10px]">
-                      <span className="text-zinc-400 font-bold block">Bottom Operational Timeline</span>
+                      <span className="text-zinc-400 font-bold block">Bottom Timeline Console</span>
                       <div className="space-y-1 text-zinc-500 text-[9px]">
-                        <div>[19:26:00] • integration events: partner Stripe telemetry payload synchronized</div>
-                        <div>[19:26:15] • webhook execution: case updates pushed to regional GRC instances</div>
-                        <div>[19:26:30] • synchronization jobs: AWS cloud database keys rotated automatically</div>
+                        <div>[18:44:42] • trigger event: cross-channel velocity anomaly triggers risk override</div>
+                        <div>[18:45:02] • AI decision: routing case to high-priority sanctions queue</div>
+                        <div>[18:45:20] • remediation completion: ledger hold executed dynamically</div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Right Column: AI Explanations */}
+                  {/* Right Panel: Workflow Analytics */}
                   <div className="lg:col-span-3 bg-white/5 border border-white/10 p-6 rounded-3xl flex flex-col justify-between font-mono">
                     <div className="space-y-4">
-                      <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 block font-mono">AI Integration Insights</span>
+                      <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 block">Right Panel — AI Insights</span>
                       
                       <div className="space-y-3 text-[10px] text-zinc-300">
                         <div className="p-3 bg-black/40 border border-white/5 rounded-xl">
-                          <span className="text-[8px] text-zinc-500 block font-bold uppercase font-mono">AI-Generated Analysis</span>
-                          <span className={`mt-1 block text-[11px] leading-relaxed font-bold ${color}`}>
+                          <span className="text-[8px] text-zinc-500 block font-bold uppercase">AI recommendation status</span>
+                          <span className={`mt-1 block font-bold text-[11px] ${color}`}>
                             {recommendation}
                           </span>
                         </div>
 
                         <div className="p-3 bg-black/40 border border-white/5 rounded-xl">
-                          <span className="text-[8px] text-zinc-500 block font-bold uppercase font-mono">Dependency analytics</span>
+                          <span className="text-[8px] text-zinc-500 block font-bold uppercase">SLA Indicator Metrics</span>
                           <p className="mt-1 leading-relaxed">
-                            Continuous multi-region SaaS data sync complete. 100% endpoints operational.
+                            Computed average queue latency at 12 milliseconds. Bottlenecks resolved.
                           </p>
                         </div>
                       </div>
                     </div>
 
                     <div className="pt-4 border-t border-white/5 mt-4 text-[9px] text-zinc-500 space-y-1">
-                      <span>• active SIEM endpoint connections healthy</span>
-                      <span>• disaster recovery pipelines operational</span>
+                      <span>• active integration connectors validated</span>
+                      <span>• operational dependencies synchronized</span>
                     </div>
                   </div>
                 </div>
@@ -274,29 +274,29 @@ export default function PlatformIntegrationsPage() {
           </div>
         </section>
 
-        {/* ================= SECTION 2: INTEGRATIONS OVERVIEW ================= */}
+        {/* ================= SECTION 2: PROBLEMS / OVERVIEW ================= */}
         <section className="py-28 px-6 md:px-12 lg:px-24 bg-zinc-50/50">
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
-            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6">Connected Ecosystem</span>
+            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6">Orchestration Center</span>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-manrope text-neutral-900 leading-tight mb-8 max-w-[950px] tracking-tight">
-              One Connected Intelligence Ecosystem Across Fraud, Risk, and Operations
+              Intelligent Automation Across Fraud and Risk Operations
             </h2>
             <p className="max-w-[800px] text-zinc-600 text-base md:text-lg font-inter leading-relaxed mb-20">
-              DeepSense Integrations connect: fraud detection systems, payment infrastructure, onboarding platforms, SIEM environments, identity providers, governance tooling, cloud infrastructure, and enterprise operational systems. The platform enables organizations to: centralize operational telemetry, enrich fraud intelligence, automate cross-system workflows, synchronize investigations, reduce operational silos, accelerate deployment, and improve governance visibility. DeepSense supports: real-time APIs, event-driven architecture, streaming pipelines, webhook orchestration, secure authentication, and distributed integration infrastructure.
+              DeepSense Workflow Automation orchestrates: fraud response, AML investigations, onboarding escalations, transaction monitoring, remediation workflows, analyst operations, governance enforcement, and operational coordination. The platform connects: fraud alerts, graph intelligence, AI decisioning, behavioral analytics, transaction monitoring, device intelligence, investigation systems, and governance workflows. DeepSense enables organizations to: reduce manual investigations, accelerate fraud response, standardize operations, improve SLA performance, strengthen governance, automate operational decisions, and scale fraud operations efficiently.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left w-full mb-20">
               {[
-                { title: "centralize operational telemetry", desc: "Block welfare farming and duplicate payouts dynamically in milliseconds." },
-                { title: "enrich fraud intelligence", desc: "Verify portal checkouts without introducing user friction." },
-                { title: "automate cross-system workflows", desc: "Enforce multi-tenant environment separation rules dynamically." },
-                { title: "synchronize investigations", desc: "Equip claims analysts with visual transaction relationship graphs." },
-                { title: "reduce operational silos", desc: "Support digital GRC with active security control overlays." },
-                { title: "improve governance visibility", desc: "Block duplicate submissions before cash-outs settle." }
-              ].map((item, idx) => (
+                { title: "reduce manual investigations", desc: "Block welfare farming and duplicate payouts dynamically in milliseconds." },
+                { title: "accelerate fraud response", desc: "Verify portal checkouts without introducing user friction." },
+                { title: "standardize operations", desc: "Enforce multi-tenant environment separation rules dynamically." },
+                { title: "improve SLA performance", desc: "Equip claims analysts with visual transaction relationship graphs." },
+                { title: "strengthen governance", desc: "Support digital GRC with active security control overlays." },
+                { title: "scale operations efficiently", desc: "Block duplicate submissions before cash-outs settle." }
+              ].map((prob, idx) => (
                 <div key={idx} className="bg-white border border-gray-100 p-8 rounded-[36px] hover:shadow-2xl hover:border-red-100 transition-all duration-300 flex flex-col gap-6">
-                  <h4 className="text-xl font-bold font-manrope text-neutral-900">{item.title}</h4>
-                  <p className="text-sm text-zinc-500 font-inter leading-relaxed">{item.desc}</p>
+                  <h4 className="text-xl font-bold font-manrope text-neutral-900">{prob.title}</h4>
+                  <p className="text-sm text-zinc-500 font-inter leading-relaxed">{prob.desc}</p>
                 </div>
               ))}
             </div>
@@ -304,29 +304,29 @@ export default function PlatformIntegrationsPage() {
         </section>
 
         {/* ================= SECTION 3: CORE CAPABILITIES ================= */}
-        <section className="py-28 px-6 md:px-12 lg:px-24 bg-white" id="capabilities">
+        <section className="py-28 px-6 md:px-12 lg:px-24 bg-white" id="workflows">
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
             <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">Capabilities Grid</span>
             <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-20">
-              Enterprise Integration Capabilities
+              Enterprise Workflow Orchestration Capabilities
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 text-left w-full">
               {[
-                { title: "Real-Time API Infrastructure", desc: "Support REST APIs, GraphQL APIs, streaming APIs, low-latency ingestion, secure authentication, and operational telemetry exchange." },
-                { title: "Webhook Orchestration", desc: "Enable fraud event notifications, workflow triggers, operational escalations, investigation synchronization, governance updates, and real-time system coordination." },
-                { title: "Payment Infrastructure", desc: "Connect payment gateways, banking systems, card processors, wallet ecosystems, settlement infrastructure, and transaction intelligence platforms." },
-                { title: "Identity & Access", desc: "Integrate Okta, Azure AD, Auth0, SSO providers, MFA systems, and enterprise IAM infrastructure." },
-                { title: "SIEM & Security Connectivity", desc: "Support Splunk, Microsoft Sentinel, QRadar, CrowdStrike, Palo Alto, and enterprise security tooling." },
-                { title: "Cloud & Data Infrastructure", desc: "Integrate AWS, Azure, GCP, Snowflake, Databricks, Kafka, Kinesis, and Pub/Sub." },
-                { title: "CRM & Enterprise Operations", desc: "Connect Salesforce, SAP, Oracle, ServiceNow, and Workday." },
-                { title: "AI & Analytics Ecosystems", desc: "Enable AI enrichment, vector intelligence, analytics pipelines, ML orchestration, and operational intelligence processing." },
-                { title: "Governance & Compliance", desc: "Synchronize audit tooling, governance workflows, compliance reporting, remediation systems, and operational oversight platforms." },
-                { title: "Observability & Monitoring", desc: "Monitor API performance, webhook execution, ingestion health, synchronization latency, operational dependencies, and infrastructure resilience." }
+                { title: "Drag-and-Drop Workflow Builder", desc: "Build fraud workflows, AML processes, onboarding reviews, escalation chains, remediation orchestration, and governance approvals." },
+                { title: "AI-Powered Decisioning", desc: "Use AI to prioritize alerts, summarize cases, recommend escalations, classify suspicious activity, automate investigations, and optimize routing." },
+                { title: "Fraud Response Automation", desc: "Automate account freezes, payment holds, MFA enforcement, session revocation, onboarding restrictions, and transaction blocking." },
+                { title: "Investigation Routing", desc: "Automatically assign analysts, escalate high-risk alerts, balance workloads, prioritize cases, enforce SLAs, and coordinate reviews." },
+                { title: "AML & Compliance Automation", desc: "Orchestrate suspicious activity reviews, SAR generation, sanctions escalation, KYC workflows, governance approvals, and audit reporting." },
+                { title: "Remediation Orchestration", desc: "Trigger customer notifications, identity verification, password resets, risk reviews, access revocation, and governance tasks." },
+                { title: "Cross-System Integrations", desc: "Connect SIEM systems, payment gateways, identity platforms, case management tools, cloud infrastructure, and communication platforms." },
+                { title: "SLA & Escalation Management", desc: "Monitor response timelines, investigation SLAs, escalation delays, workflow bottlenecks, operational health, and analyst workload." },
+                { title: "Governance Workflow Enforcement", desc: "Enforce approval chains, segregation of duties, audit controls, remediation reviews, operational transparency, and policy compliance." },
+                { title: "Workflow Analytics & Reporting", desc: "Generate automation metrics, operational KPIs, SLA performance reports, remediation analytics, and workflow effectiveness insights." }
               ].map((sig, idx) => (
                 <div key={idx} className="bg-zinc-50 border border-zinc-100 p-8 rounded-[36px] flex flex-col justify-between shadow-xs hover:border-red-400 hover:shadow-xl transition-all duration-500">
                   <div className="space-y-4">
-                    <span className="text-red-500 font-bold block mb-2 font-mono">INT-0{idx+1}</span>
+                    <span className="text-red-500 font-bold block mb-2 font-mono">CAP-0{idx+1}</span>
                     <h4 className="text-base font-bold font-manrope text-neutral-900">{sig.title}</h4>
                     <p className="text-xs text-zinc-500 font-inter leading-relaxed">{sig.desc}</p>
                   </div>
@@ -336,21 +336,21 @@ export default function PlatformIntegrationsPage() {
           </div>
         </section>
 
-        {/* ================= SECTION 4: ARCHITECTURE LAYERS ================= */}
-        <section className="py-28 px-6 md:px-12 lg:px-24 bg-zinc-50/50 border-b border-gray-100" id="architecture">
+        {/* ================= SECTION 4: WORKFLOW LIFE CYCLE ================= */}
+        <section className="py-28 px-6 md:px-12 lg:px-24 bg-zinc-50/50 border-b border-gray-100">
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
-            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">Architecture Layers</span>
+            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">Platform Steps</span>
             <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-20">
-              Event-Driven Integration Architecture
+              How DeepSense Automates Fraud Operations
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-5 gap-6 text-left font-manrope w-full">
               {[
-                { title: "Layer 1 — API Gateway", desc: "Handles authentication, rate limiting, request validation, routing, API governance, and operational telemetry." },
-                { title: "Layer 2 — Event Streaming", desc: "Processes transaction streams, fraud events, onboarding telemetry, operational workflows, and governance notifications." },
-                { title: "Layer 3 — Orchestration", desc: "Coordinates webhook execution, workflow synchronization, event routing, operational enrichment, and AI correlation." },
-                { title: "Layer 4 — Enrichment", desc: "Enriches fraud signals, graph intelligence, behavioral analytics, transaction context, and operational metadata." },
-                { title: "Layer 5 — Observability", desc: "Provides integration observability, governance enforcement, operational auditing, SLA tracking, and resilience monitoring." }
+                { title: "Step 1 — Ingestion", desc: "DeepSense ingests fraud alerts, transaction anomalies, onboarding escalations, behavioral anomalies, AML triggers, device intelligence, and operational telemetry." },
+                { title: "Step 2 — Enrichment", desc: "The platform enriches workflows using graph intelligence, AI recommendations, risk scoring, behavioral analytics, entity correlation, and operational context." },
+                { title: "Step 3 — Execution", desc: "DeepSense executes automated escalations, analyst routing, remediation actions, fraud controls, governance approvals, and operational notifications." },
+                { title: "Step 4 — Action", desc: "Teams investigate alerts, review AI insights, coordinate escalations, approve actions, and complete remediation." },
+                { title: "Step 5 — Closure", desc: "The platform records workflow history, logs operational decisions, tracks SLA compliance, stores governance evidence, and generates audit reports." }
               ].map((step, idx) => (
                 <div key={idx} className="p-8 bg-white border border-gray-100 rounded-3xl relative flex flex-col justify-between">
                   <div>
@@ -364,12 +364,12 @@ export default function PlatformIntegrationsPage() {
           </div>
         </section>
 
-        {/* ================= SECTION 5: MARKETPLACE CATEGORIES ================= */}
-        <section className="py-28 px-6 md:px-12 lg:px-24 bg-white border-b border-gray-100" id="marketplace">
+        {/* ================= SECTION 5: USE CASES ================= */}
+        <section className="py-28 px-6 md:px-12 lg:px-24 bg-white border-b border-gray-100" id="use-cases">
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
-            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">Integration Hub</span>
+            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">Use Case Coverage</span>
             <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-8">
-              Enterprise Integration Marketplace
+              Built for Enterprise Operational Intelligence
             </h2>
             <p className="max-w-[800px] text-zinc-600 text-base md:text-lg font-inter leading-relaxed mb-20">
               Explore how DeepSense deploys custom validation layers based on vertical specifications.
@@ -378,12 +378,11 @@ export default function PlatformIntegrationsPage() {
             {/* Navigation Tabs */}
             <div className="flex flex-wrap gap-2 justify-center mb-16 w-full max-w-4xl">
               {[
-                { id: "payments", label: "Payment Providers" },
-                { id: "identity", label: "Identity Providers" },
-                { id: "security", label: "Security Platforms" },
-                { id: "cloud", label: "Cloud Infrastructure" },
-                { id: "operational", label: "Operational Systems" },
-                { id: "streaming", label: "Data Streaming" }
+                { id: "financial", label: "Financial Services" },
+                { id: "psp", label: "Fintech Platforms" },
+                { id: "processor", label: "Payment Processors" },
+                { id: "betting", label: "Gaming & Betting" },
+                { id: "enterprise", label: "Enterprise Risk Teams" }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -397,49 +396,41 @@ export default function PlatformIntegrationsPage() {
 
             {/* Tab content */}
             <div className="w-full bg-zinc-50 border border-zinc-200 p-8 md:p-12 rounded-[48px] shadow-sm text-left animate-in fade-in duration-300">
-              {activeTab === "payments" && (
+              {activeTab === "financial" && (
                 <div className="space-y-6">
-                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Stripe, Adyen, Flutterwave, Paystack, Visa, and Mastercard.</h4>
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Automate AML reviews, fraud escalations, payment controls, and onboarding governance.</h4>
                   <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
                     Secure credit operations. Map login anomalies and device trust indicators dynamically to block rogue acquirer routings.
                   </p>
                 </div>
               )}
-              {activeTab === "identity" && (
+              {activeTab === "psp" && (
                 <div className="space-y-6">
-                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Okta, Auth0, and Azure AD.</h4>
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Coordinate account takeover response, wallet investigations, onboarding reviews, and fraud remediation.</h4>
                   <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
                     Track mobile payout operations. Secure approval workflows and analyze threshold indicators before money leaves the wallet.
                   </p>
                 </div>
               )}
-              {activeTab === "security" && (
+              {activeTab === "processor" && (
                 <div className="space-y-6">
-                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Splunk, Sentinel, CrowdStrike, and Palo Alto.</h4>
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Orchestrate dispute workflows, merchant reviews, transaction monitoring, and compliance escalations.</h4>
                   <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
                     Safeguard partner networks. Block synthetic registrations automatically during initial partner signups.
                   </p>
                 </div>
               )}
-              {activeTab === "cloud" && (
+              {activeTab === "betting" && (
                 <div className="space-y-6">
-                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">AWS, Azure, GCP, Snowflake, and Databricks.</h4>
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Manage bonus abuse investigations, wagering fraud response, account restrictions, and AML operations.</h4>
                   <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
                     Secure international correspondent banking connections. Track wire routings against global watchlists in real time.
                   </p>
                 </div>
               )}
-              {activeTab === "operational" && (
+              {activeTab === "enterprise" && (
                 <div className="space-y-6">
-                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Salesforce, SAP, ServiceNow, and Workday.</h4>
-                  <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
-                    Secure international correspondent banking connections. Track wire routings against global watchlists in real time.
-                  </p>
-                </div>
-              )}
-              {activeTab === "streaming" && (
-                <div className="space-y-6">
-                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Kafka, Kinesis, RabbitMQ, and Pub/Sub.</h4>
+                  <h4 className="text-2xl font-bold font-manrope text-neutral-900">Enforce governance controls, insider-risk workflows, operational escalations, and compliance remediation.</h4>
                   <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
                     Secure international correspondent banking connections. Track wire routings against global watchlists in real time.
                   </p>
@@ -454,17 +445,17 @@ export default function PlatformIntegrationsPage() {
           <div className="max-w-[1440px] mx-auto text-center flex flex-col items-center">
             <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block">SaaS Governance</span>
             <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-20">
-              Enterprise-Grade Integration Security and Governance
+              Enterprise-Grade Operational Governance and Security
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-left w-full">
               {[
-                { title: "Secure API Authentication", desc: "OAuth, tokenization, key rotation, and RBAC enforcement." },
-                { title: "Encrypted Operational Traffic", desc: "Secure event and telemetry exchange." },
-                { title: "Integration Audit Logging", desc: "Immutable operational integration history." },
-                { title: "Governance Workflow Controls", desc: "Integrated compliance and approval enforcement." },
-                { title: "Multi-Tenant Integration Isolation", desc: "Secure enterprise operational boundaries." },
-                { title: "Infrastructure Resilience", desc: "Failover-aware integration orchestration." }
+                { title: "Immutable Workflow Logging", desc: "Tamper-resistant operational history." },
+                { title: "Role-Based Workflow Access", desc: "Granular permissions and workflow controls." },
+                { title: "Explainable AI Decisioning", desc: "Transparent orchestration reasoning." },
+                { title: "Multi-Tenant Operational Isolation", desc: "Secure enterprise workflow separation." },
+                { title: "Governance Workflow Integration", desc: "Integrated approval and audit processes." },
+                { title: "Flexible Deployment Models", desc: "SaaS, hybrid, private cloud, on-premise." }
               ].map((sec, idx) => (
                 <div key={idx} className="bg-white border border-gray-100 p-8 rounded-[32px] flex flex-col gap-4 shadow-xs">
                   <CheckCircle2 className="w-5 h-5 text-red-500" />
@@ -477,9 +468,9 @@ export default function PlatformIntegrationsPage() {
         </section>
 
         {/* ================= SECTION 7: FAQ ================= */}
-        <section className="py-28 px-6 md:px-12 lg:px-24 bg-white">
+        <section className="py-28 px-6 md:px-12 lg:px-24 bg-white border-t border-gray-100">
           <div className="max-w-[900px] mx-auto flex flex-col items-center">
-            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block text-center font-mono">INTEGRATION FAQS</span>
+            <span className="text-zinc-400 font-manrope text-xs font-extrabold uppercase tracking-widest mb-6 block text-center font-mono">AUTOMATION FAQS</span>
             <h2 className="text-4xl md:text-5xl font-bold font-manrope text-neutral-900 leading-tight mb-20 text-center">
               Frequently Asked Questions
             </h2>
@@ -487,28 +478,28 @@ export default function PlatformIntegrationsPage() {
             <div className="w-full flex flex-col gap-4">
               {[
                 { 
-                  q: "What systems can DeepSense integrate with?", 
-                  a: "DeepSense integrates with payment systems, cloud infrastructure, SIEM platforms, identity providers, governance tooling, AI ecosystems, and enterprise operational systems." 
+                  q: "What is DeepSense Workflow Automation?", 
+                  a: "DeepSense Workflow Automation is an enterprise orchestration engine that automates fraud operations, investigations, escalations, remediation workflows, and governance processes." 
                 },
                 { 
-                  q: "Does DeepSense support real-time APIs and webhooks?", 
-                  a: "Yes. DeepSense provides low-latency APIs, webhook orchestration, event streaming, and operational synchronization infrastructure." 
+                  q: "Can DeepSense automate fraud response actions?", 
+                  a: "Yes. The platform can automate account freezes, MFA enforcement, onboarding restrictions, payment holds, escalations, and remediation workflows." 
                 },
                 { 
-                  q: "Can DeepSense integrate into existing fraud and security environments?", 
-                  a: "Yes. DeepSense integrates with existing fraud tooling, SIEM systems, governance platforms, operational analytics infrastructure, and enterprise ecosystems." 
+                  q: "Does DeepSense support AI-assisted workflow orchestration?", 
+                  a: "Yes. AI copilots prioritize alerts, summarize investigations, optimize routing, recommend remediation, and automate operational decisioning." 
                 },
                 { 
-                  q: "Does DeepSense support event-driven architecture?", 
-                  a: "Yes. DeepSense uses distributed event-driven infrastructure for real-time intelligence synchronization and operational orchestration." 
+                  q: "Can organizations create custom fraud workflows?", 
+                  a: "Yes. Teams can build custom workflows using the drag-and-drop automation studio with configurable conditions, AI logic, and remediation actions." 
                 },
                 { 
-                  q: "Can organizations monitor integration performance and operational health?", 
-                  a: "Yes. DeepSense provides integration observability, webhook monitoring, SLA tracking, operational telemetry analytics, and infrastructure health monitoring." 
+                  q: "Does DeepSense support governance and approval workflows?", 
+                  a: "Yes. The platform supports approval chains, audit logging, segregation of duties, governance escalation, and compliance reporting." 
                 },
                 { 
-                  q: "Is DeepSense suitable for enterprise-scale integration environments?", 
-                  a: "Yes. DeepSense is designed for high-scale, multi-region enterprise connectivity with secure operational orchestration and resilient infrastructure." 
+                  q: "Is DeepSense Workflow Automation suitable for enterprise-scale operations?", 
+                  a: "Yes. DeepSense is designed for enterprise fraud operations, AML programs, compliance organizations, and large-scale operational orchestration." 
                 }
               ].map((faq, idx) => {
                 const isOpen = openFaq === idx;
@@ -541,22 +532,22 @@ export default function PlatformIntegrationsPage() {
             <div className="absolute inset-0 bg-radial-gradient from-red-500/10 to-transparent opacity-50 pointer-events-none" />
             
             <div className="space-y-4 max-w-[800px] relative z-10">
-              <span className="text-red-400 font-manrope text-[11px] font-extrabold uppercase tracking-widest uppercase font-mono">Unify Enterprise Fraud Intelligence Through Real-Time Connectivity</span>
+              <span className="text-red-400 font-manrope text-[11px] font-extrabold uppercase tracking-widest uppercase font-mono">Automate Fraud Operations and Accelerate Enterprise Response</span>
               <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold font-manrope text-white tracking-tight leading-tight">
-                Connect fraud systems, operational tooling, <br />
-                <span className="text-white/40 font-bold font-bold font-bold">and trace suspicious networks dynamically.</span>
+                Empower GRC analysts and trace <br />
+                <span className="text-white/40 font-bold font-bold font-bold">suspicious networks dynamically.</span>
               </h2>
               <p className="text-white/60 text-sm md:text-base font-inter max-w-[600px] mx-auto leading-relaxed">
-                Connect fraud systems, operational tooling, governance workflows, and AI intelligence into one unified enterprise ecosystem using DeepSense Integrations.
+                Streamline investigations, automate remediation workflows, enforce governance controls, and orchestrate enterprise fraud operations using DeepSense Workflow Automation.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 relative z-10 w-full justify-center">
               <Link href="/request-demo" className="px-10 py-5 bg-brand-lime text-neutral-900 rounded-full text-base font-bold font-manrope hover:bg-brand-lime/90 hover:scale-105 active:scale-95 transition-all shadow-xl text-center">
-                Explore Integrations
+                Request Workflow Automation Demo
               </Link>
-              <Link href="/platform/integrations#architecture" className="px-10 py-5 bg-white/5 border border-white/10 text-white rounded-full text-base font-bold font-manrope hover:bg-white/10 hover:scale-105 active:scale-95 transition-all text-center">
-                View Integration Architecture
+              <Link href="/platform/workflow-automation#workflows" className="px-10 py-5 bg-white/5 border border-white/10 text-white rounded-full text-base font-bold font-manrope hover:bg-white/10 hover:scale-105 active:scale-95 transition-all text-center">
+                Explore Automation Studio
               </Link>
             </div>
           </div>
