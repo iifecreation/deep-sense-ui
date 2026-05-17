@@ -20,7 +20,8 @@ import {
   Filter,
   Briefcase,
   History,
-  ShieldAlert
+  ShieldAlert,
+  Database
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";

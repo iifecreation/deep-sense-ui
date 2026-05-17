@@ -21,7 +21,9 @@ import {
   Briefcase,
   History,
   Building,
-  UserPlus
+  UserPlus,
+  Globe,
+  Bell
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
