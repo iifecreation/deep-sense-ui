@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Globe, Mail, Link as LinkIcon, Send } from "lucide-react";
+import { Globe, Mail, Link as LinkIcon, Send, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 
 export default function Footer() {
@@ -110,6 +110,29 @@ export default function Footer() {
         { name: "Privacy Policy", href: "/platform/privacy" },
         { name: "Trust Center", href: "/company/trust" }
       ]
+    },
+    {
+      title: "Legal & Trust",
+      links: [
+        { name: "Terms of Service", href: "/legal/terms" },
+        { name: "Privacy Policy", href: "/legal/privacy-policy" },
+        { name: "Cookie Policy", href: "/legal/cookies" },
+        { name: "Acceptable Use Policy", href: "/legal/acceptable-use" },
+        { name: "Data Processing Agreement (DPA)", href: "/legal/dpa" },
+        { name: "Security & Compliance", href: "/legal/security-compliance" },
+        { name: "AI & Responsible Use Policy", href: "/legal/ai-policy" },
+        { name: "Service Level Agreement (SLA)", href: "/legal/sla" },
+        { name: "Subprocessors", href: "/legal/subprocessors" },
+        { name: "Regulatory Compliance", href: "/legal/regulatory-compliance" },
+        { name: "Data Retention Policy", href: "/legal/data-retention" },
+        { name: "Law Enforcement Requests", href: "/legal/law-enforcement" },
+        { name: "Vulnerability Disclosure", href: "/legal/vulnerability-disclosure" },
+        { name: "Intellectual Property Policy", href: "/legal/intellectual-property" },
+        { name: "Vendor Terms", href: "/legal/vendor-terms" },
+        { name: "Trust Center", href: "/company/trust" },
+        { name: "Compliance Center", href: "/resources/compliance-center" },
+        { name: "Responsible AI Center", href: "/platform/privacy" }
+      ]
     }
   ];
 
@@ -152,8 +175,8 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom Section: 6 Columns sitemap links grid (placed below the branding row) */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+        {/* Bottom Section: 7 Columns sitemap links grid (placed below the branding row) */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-8">
           {columns.map((col, idx) => (
             <div key={idx} className="flex flex-col gap-4">
               <h4 className="text-neutral-900 text-[10px] font-extrabold font-manrope uppercase tracking-widest">{col.title}</h4>
@@ -170,6 +193,41 @@ export default function Footer() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Enterprise Legal & Regulatory Trust Center Directory */}
+        <div className="pt-16 border-t border-gray-100 flex flex-col gap-6">
+          <div className="flex items-center gap-2 text-neutral-900">
+            <ShieldCheck className="w-4 h-4 text-neutral-900" />
+            <h4 className="text-[10px] font-extrabold font-manrope uppercase tracking-widest">Enterprise Trust & Legal Center</h4>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-y-4 gap-x-8">
+            {[
+              { name: "Terms of Service", href: "/legal/terms" },
+              { name: "Privacy Policy", href: "/legal/privacy-policy" },
+              { name: "Cookie Policy", href: "/legal/cookies" },
+              { name: "Acceptable Use Policy", href: "/legal/acceptable-use" },
+              { name: "Data Processing (DPA)", href: "/legal/dpa" },
+              { name: "Security & Commitments", href: "/legal/security-compliance" },
+              { name: "AI & Responsible Use", href: "/legal/ai-policy" },
+              { name: "Service Level (SLA)", href: "/legal/sla" },
+              { name: "Subprocessors List", href: "/legal/subprocessors" },
+              { name: "Regulatory & Compliance", href: "/legal/regulatory-compliance" },
+              { name: "Data Retention & Deletion", href: "/legal/data-retention" },
+              { name: "Law Enforcement Requests", href: "/legal/law-enforcement" },
+              { name: "Vulnerability Disclosure", href: "/legal/vulnerability-disclosure" },
+              { name: "Copyright & IP Policy", href: "/legal/intellectual-property" },
+              { name: "Procurement & Vendor Terms", href: "/legal/vendor-terms" }
+            ].map((link, idx) => (
+              <Link 
+                key={idx} 
+                href={link.href} 
+                className="text-zinc-400 font-inter text-[11px] hover:text-brand-lime transition-all"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Bottom Strip */}

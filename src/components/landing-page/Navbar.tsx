@@ -75,6 +75,7 @@ const navConfig: NavMenu[] = [
       {
         title: "Fraud Decisioning",
         items: [
+          { label: "Product Overview", href: "/product/overview", icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
           { label: "Real-Time Fraud Detection", href: "/product/fraud-detection", icon: <Shield className="w-3.5 h-3.5" /> },
           { label: "Risk Scoring Engine", href: "/product/scoring-engine", icon: <BarChart2 className="w-3.5 h-3.5" /> },
           { label: "Rules Engine", href: "/product/rules-engine", icon: <Cpu className="w-3.5 h-3.5" /> },
@@ -244,8 +245,6 @@ const navConfig: NavMenu[] = [
       {
         title: "Developer Tools",
         items: [
-          { label: "Go & Node SDKs", href: "/developers", icon: <Code className="w-3.5 h-3.5" /> },
-          { label: "Postman Collection", href: "/developers", icon: <Terminal className="w-3.5 h-3.5" /> },
           { label: "Developer Sandbox", href: "/developers", icon: <Play className="w-3.5 h-3.5" /> }
         ]
       }
