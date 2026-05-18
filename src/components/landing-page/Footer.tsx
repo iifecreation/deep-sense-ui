@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Globe, Mail, Link as LinkIcon, Send } from "lucide-react";
+import { Globe, Mail, Link as LinkIcon, Send, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 
 export default function Footer() {
@@ -42,9 +42,9 @@ export default function Footer() {
       links: [
         { name: "Fraud Detection", href: "/product/fraud-detection" },
         { name: "AML Monitoring", href: "/product/aml-monitoring" },
-        { name: "Document Fraud", href: "/product/document-fraud-detection" },
-        { name: "ATO Prevention", href: "/product/behavioral" },
-        { name: "Behavioral Biometrics", href: "/product/behavioral" },
+        { name: "Document Fraud", href: "/product/document-fraud" },
+        { name: "ATO Prevention", href: "/product/behavioral-biometrics" },
+        { name: "Behavioral Biometrics", href: "/product/behavioral-biometrics" },
         { name: "NFC Fraud", href: "/product/nfc-contactless-fraud" },
         { name: "CNP Fraud", href: "/product/card-not-present-fraud" },
         { name: "APP Scam Detection", href: "/product/app-scam-detection" },
@@ -57,23 +57,23 @@ export default function Footer() {
         { name: "Risk Scoring", href: "/product/scoring-engine" },
         { name: "Graph Intelligence", href: "/product/graph-intelligence" },
         { name: "Rules Engine", href: "/product/rules-engine" },
-        { name: "Model Registry", href: "/platform/model-registry" },
-        { name: "Webhooks", href: "/platform/apis-webhooks" },
-        { name: "SIEM Integrations", href: "/platform/siem-integrations" },
-        { name: "Audit Logs", href: "/platform/audit-logs" },
-        { name: "On-Prem Deployment", href: "/platform/on-premise" }
+        { name: "Model Intelligence", href: "/platform/ai-intelligence" },
+        { name: "APIs & Webhooks", href: "/platform/webhooks" },
+        { name: "Integrations & SIEM", href: "/platform/integrations" },
+        { name: "Audit & Governance", href: "/platform/governance" },
+        { name: "Platform Architecture", href: "/platform/architecture" }
       ]
     },
     {
       title: "Enterprise Risk",
       links: [
-        { name: "GRC", href: "/product/grc-management" },
-        { name: "DLP", href: "/product/dlp-monitoring" },
-        { name: "Continuous Controls", href: "/product/continuous-controls-monitoring" },
-        { name: "Procurement Risk", href: "/product/procurement-vendor-risk" },
+        { name: "GRC", href: "/product/grc" },
+        { name: "DLP", href: "/product/dlp" },
+        { name: "Continuous Controls", href: "/product/continuous-controls" },
+        { name: "Procurement Risk", href: "/product/procurement-risk" },
         { name: "Third-Party Risk", href: "/product/third-party-risk" },
         { name: "Regulatory Reporting", href: "/product/regulatory-reporting" },
-        { name: "Compliance Reports", href: "/platform/enterprise-controls" }
+        { name: "Compliance Reports", href: "/platform/governance" }
       ]
     },
     {
@@ -82,9 +82,9 @@ export default function Footer() {
         { name: "Banking", href: "/solutions/banking" },
         { name: "Fintech", href: "/solutions/fintech" },
         { name: "Payments", href: "/solutions/payment-processors" },
-        { name: "E-commerce", href: "/solutions/ecommerce" },
-        { name: "Crypto", href: "/solutions/crypto" },
-        { name: "Telecom Wallets", href: "/solutions/telecom-wallets" },
+        { name: "E-commerce", href: "/solutions/ecommerce-marketplace" },
+        { name: "Crypto & Web3", href: "/solutions/crypto-web3" },
+        { name: "Telecom Wallets", href: "/solutions/telecom-mobile-money" },
         { name: "Gaming", href: "/solutions/gaming-betting" },
         { name: "Enterprise", href: "/solutions/enterprise-risk-teams" }
       ]
@@ -92,12 +92,12 @@ export default function Footer() {
     {
       title: "Developers",
       links: [
-        { name: "API Docs", href: "/resources/documentation" },
-        { name: "Authentication", href: "/developers/auth" },
-        { name: "SDKs", href: "/developers/sdks" },
-        { name: "Postman", href: "/developers/postman" },
+        { name: "API Reference", href: "/developers/api-overview" },
+        { name: "Authentication", href: "/developers/authentication" },
+        { name: "SDKs & Client Libraries", href: "/developers" },
+        { name: "Postman Collections", href: "/developers" },
         { name: "Webhooks", href: "/developers/webhooks" },
-        { name: "Sandbox", href: "/developers/sandbox" }
+        { name: "Developer Sandbox", href: "/developers" }
       ]
     },
     {
@@ -106,9 +106,32 @@ export default function Footer() {
         { name: "About", href: "/company/about" },
         { name: "Contact", href: "/company/contact" },
         { name: "Pricing", href: "/pricing" },
-        { name: "Security", href: "/platform/security-privacy" },
-        { name: "Privacy Policy", href: "/privacy" },
-        { name: "Terms", href: "/terms" }
+        { name: "Security", href: "/platform/security" },
+        { name: "Privacy Policy", href: "/platform/privacy" },
+        { name: "Trust Center", href: "/company/trust" }
+      ]
+    },
+    {
+      title: "Legal & Trust",
+      links: [
+        { name: "Terms of Service", href: "/legal/terms" },
+        { name: "Privacy Policy", href: "/legal/privacy-policy" },
+        { name: "Cookie Policy", href: "/legal/cookies" },
+        { name: "Acceptable Use Policy", href: "/legal/acceptable-use" },
+        { name: "Data Processing Agreement (DPA)", href: "/legal/dpa" },
+        { name: "Security & Compliance", href: "/legal/security-compliance" },
+        { name: "AI & Responsible Use Policy", href: "/legal/ai-policy" },
+        { name: "Service Level Agreement (SLA)", href: "/legal/sla" },
+        { name: "Subprocessors", href: "/legal/subprocessors" },
+        { name: "Regulatory Compliance", href: "/legal/regulatory-compliance" },
+        { name: "Data Retention Policy", href: "/legal/data-retention" },
+        { name: "Law Enforcement Requests", href: "/legal/law-enforcement" },
+        { name: "Vulnerability Disclosure", href: "/legal/vulnerability-disclosure" },
+        { name: "Intellectual Property Policy", href: "/legal/intellectual-property" },
+        { name: "Vendor Terms", href: "/legal/vendor-terms" },
+        { name: "Trust Center", href: "/company/trust" },
+        { name: "Compliance Center", href: "/resources/compliance-center" },
+        { name: "Responsible AI Center", href: "/platform/privacy" }
       ]
     }
   ];
@@ -152,8 +175,8 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom Section: 6 Columns sitemap links grid (placed below the branding row) */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+        {/* Bottom Section: 7 Columns sitemap links grid (placed below the branding row) */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-8">
           {columns.map((col, idx) => (
             <div key={idx} className="flex flex-col gap-4">
               <h4 className="text-neutral-900 text-[10px] font-extrabold font-manrope uppercase tracking-widest">{col.title}</h4>
@@ -170,6 +193,41 @@ export default function Footer() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Enterprise Legal & Regulatory Trust Center Directory */}
+        <div className="pt-16 border-t border-gray-100 flex flex-col gap-6">
+          <div className="flex items-center gap-2 text-neutral-900">
+            <ShieldCheck className="w-4 h-4 text-neutral-900" />
+            <h4 className="text-[10px] font-extrabold font-manrope uppercase tracking-widest">Enterprise Trust & Legal Center</h4>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-y-4 gap-x-8">
+            {[
+              { name: "Terms of Service", href: "/legal/terms" },
+              { name: "Privacy Policy", href: "/legal/privacy-policy" },
+              { name: "Cookie Policy", href: "/legal/cookies" },
+              { name: "Acceptable Use Policy", href: "/legal/acceptable-use" },
+              { name: "Data Processing (DPA)", href: "/legal/dpa" },
+              { name: "Security & Commitments", href: "/legal/security-compliance" },
+              { name: "AI & Responsible Use", href: "/legal/ai-policy" },
+              { name: "Service Level (SLA)", href: "/legal/sla" },
+              { name: "Subprocessors List", href: "/legal/subprocessors" },
+              { name: "Regulatory & Compliance", href: "/legal/regulatory-compliance" },
+              { name: "Data Retention & Deletion", href: "/legal/data-retention" },
+              { name: "Law Enforcement Requests", href: "/legal/law-enforcement" },
+              { name: "Vulnerability Disclosure", href: "/legal/vulnerability-disclosure" },
+              { name: "Copyright & IP Policy", href: "/legal/intellectual-property" },
+              { name: "Procurement & Vendor Terms", href: "/legal/vendor-terms" }
+            ].map((link, idx) => (
+              <Link 
+                key={idx} 
+                href={link.href} 
+                className="text-zinc-400 font-inter text-[11px] hover:text-brand-lime transition-all"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Bottom Strip */}

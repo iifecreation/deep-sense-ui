@@ -453,7 +453,7 @@ export default function Home() {
             </div>
 
             <div className="flex justify-center">
-              <Link href="/product/document-fraud-detection" className="px-10 py-5 bg-neutral-900 text-white rounded-full font-bold text-base font-manrope hover:bg-neutral-800 transition-all hover:scale-105 active:scale-95 shadow-xl inline-flex items-center gap-3">
+              <Link href="/product/document-fraud" className="px-10 py-5 bg-neutral-900 text-white rounded-full font-bold text-base font-manrope hover:bg-neutral-800 transition-all hover:scale-105 active:scale-95 shadow-xl inline-flex items-center gap-3">
                 Explore Document Fraud Detection
                 <ArrowRight className="w-4 h-4 text-brand-lime" />
               </Link>

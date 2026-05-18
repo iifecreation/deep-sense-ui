@@ -42,7 +42,10 @@ import {
   Clock,
   TrendingDown,
   Bell,
-  FileCheck
+  FileCheck,
+  Network,
+  Workflow,
+  Scale
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 
@@ -72,7 +75,8 @@ const navConfig: NavMenu[] = [
       {
         title: "Fraud Decisioning",
         items: [
-          { label: "Real-Time Fraud Detection", href: "/product/real-time-detection", icon: <Shield className="w-3.5 h-3.5" /> },
+          { label: "Product Overview", href: "/product/overview", icon: <LayoutDashboard className="w-3.5 h-3.5" /> },
+          { label: "Real-Time Fraud Detection", href: "/product/fraud-detection", icon: <Shield className="w-3.5 h-3.5" /> },
           { label: "Risk Scoring Engine", href: "/product/scoring-engine", icon: <BarChart2 className="w-3.5 h-3.5" /> },
           { label: "Rules Engine", href: "/product/rules-engine", icon: <Cpu className="w-3.5 h-3.5" /> },
           { label: "Graph Intelligence", href: "/product/graph-intelligence", icon: <Database className="w-3.5 h-3.5" /> },
@@ -82,14 +86,14 @@ const navConfig: NavMenu[] = [
       {
         title: "Identity & Document Intelligence",
         items: [
-          { label: "Document Fraud Detection", href: "/product/document-fraud-detection", icon: <BadgeCheck className="w-3.5 h-3.5" /> },
+          { label: "Document Fraud Detection", href: "/product/document-fraud", icon: <BadgeCheck className="w-3.5 h-3.5" /> },
           { label: "KYC Verification", href: "/product/kyc-verification", icon: <UserCheck className="w-3.5 h-3.5" /> },
           { label: "OCR & MRZ Validation", href: "/product/ocr-mrz-validation", icon: <Terminal className="w-3.5 h-3.5" /> },
           { label: "Face Match & Liveness", href: "/product/face-match-liveness", icon: <UserCheck className="w-3.5 h-3.5" /> },
           { label: "Deepfake Detection", href: "/product/deepfake-detection", icon: <Eye className="w-3.5 h-3.5" /> },
-          { label: "Synthetic Identity Detection", href: "/product/synthetic-identity-detection", icon: <UserCheck className="w-3.5 h-3.5" /> },
+          { label: "Synthetic Identity Detection", href: "/product/synthetic-identity", icon: <UserCheck className="w-3.5 h-3.5" /> },
           { label: "Device Fingerprinting", href: "/product/device-fingerprinting", icon: <Smartphone className="w-3.5 h-3.5" /> },
-          { label: "Behavioral Biometrics", href: "/product/behavioral", icon: <Fingerprint className="w-3.5 h-3.5" /> }
+          { label: "Behavioral Biometrics", href: "/product/behavioral-biometrics", icon: <Fingerprint className="w-3.5 h-3.5" /> }
         ]
       },
       {
@@ -98,8 +102,8 @@ const navConfig: NavMenu[] = [
           { label: "APP Scam Detection", href: "/product/app-scam-detection", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
           { label: "Card-Not-Present Fraud", href: "/product/card-not-present-fraud", icon: <CreditCard className="w-3.5 h-3.5" /> },
           { label: "NFC / Contactless Fraud", href: "/product/nfc-contactless-fraud", icon: <Smartphone className="w-3.5 h-3.5" /> },
-          { label: "Bonus & Promo Abuse", href: "/product/bonus-promo-abuse", icon: <TrendingDown className="w-3.5 h-3.5" /> },
-          { label: "Friendly Fraud / Chargebacks", href: "/product/friendly-fraud-chargebacks", icon: <Shield className="w-3.5 h-3.5" /> }
+          { label: "Bonus & Promo Abuse", href: "/product/bonus-abuse", icon: <TrendingDown className="w-3.5 h-3.5" /> },
+          { label: "Friendly Fraud / Chargebacks", href: "/product/friendly-fraud", icon: <Shield className="w-3.5 h-3.5" /> }
         ]
       },
       {
@@ -108,7 +112,7 @@ const navConfig: NavMenu[] = [
           { label: "AML Transaction Monitoring", href: "/product/aml-monitoring", icon: <Activity className="w-3.5 h-3.5" /> },
           { label: "Sanctions Screening", href: "/product/sanctions-screening", icon: <Globe className="w-3.5 h-3.5" /> },
           { label: "PEP Screening", href: "/product/pep-screening", icon: <Users className="w-3.5 h-3.5" /> },
-          { label: "Adverse Media Screening", href: "/product/adverse-media-screening", icon: <BookOpen className="w-3.5 h-3.5" /> },
+          { label: "Adverse Media Screening", href: "/product/adverse-media", icon: <BookOpen className="w-3.5 h-3.5" /> },
           { label: "Customer Risk Profiling", href: "/product/risk-profiling", icon: <UserCheck className="w-3.5 h-3.5" /> },
           { label: "Regulatory Reporting", href: "/product/regulatory-reporting", icon: <FileSpreadsheet className="w-3.5 h-3.5" /> }
         ]
@@ -116,10 +120,10 @@ const navConfig: NavMenu[] = [
       {
         title: "Enterprise Risk",
         items: [
-          { label: "Continuous Controls Monitoring", href: "/product/continuous-controls-monitoring", icon: <Clock className="w-3.5 h-3.5" /> },
-          { label: "GRC Management", href: "/product/grc-management", icon: <Settings className="w-3.5 h-3.5" /> },
-          { label: "DLP Monitoring", href: "/product/dlp-monitoring", icon: <Eye className="w-3.5 h-3.5" /> },
-          { label: "Procurement & Vendor Risk", href: "/product/procurement-vendor-risk", icon: <Briefcase className="w-3.5 h-3.5" /> },
+          { label: "Continuous Controls Monitoring", href: "/product/continuous-controls", icon: <Clock className="w-3.5 h-3.5" /> },
+          { label: "GRC Management", href: "/product/grc", icon: <Settings className="w-3.5 h-3.5" /> },
+          { label: "DLP Monitoring", href: "/product/dlp", icon: <Eye className="w-3.5 h-3.5" /> },
+          { label: "Procurement & Vendor Risk", href: "/product/procurement-risk", icon: <Briefcase className="w-3.5 h-3.5" /> },
           { label: "Third-Party Risk", href: "/product/third-party-risk", icon: <Users className="w-3.5 h-3.5" /> },
           { label: "UEBA", href: "/product/ueba", icon: <Cpu className="w-3.5 h-3.5" /> }
         ]
@@ -135,28 +139,47 @@ const navConfig: NavMenu[] = [
           { label: "Banks", href: "/solutions/banking", icon: <Building2 className="w-3.5 h-3.5" /> },
           { label: "Fintechs", href: "/solutions/fintech", icon: <Coins className="w-3.5 h-3.5" /> },
           { label: "Payment Processors", href: "/solutions/payment-processors", icon: <Wallet className="w-3.5 h-3.5" /> },
-          { label: "Crypto & Web3", href: "/solutions/crypto", icon: <Globe className="w-3.5 h-3.5" /> },
-          { label: "E-commerce", href: "/solutions/ecommerce", icon: <ShoppingBag className="w-3.5 h-3.5" /> },
-          { label: "Telecom Wallets", href: "/solutions/telecom-wallets", icon: <Smartphone className="w-3.5 h-3.5" /> },
+          { label: "Crypto & Web3", href: "/solutions/crypto-web3", icon: <Globe className="w-3.5 h-3.5" /> },
+          { label: "E-commerce", href: "/solutions/ecommerce-marketplace", icon: <ShoppingBag className="w-3.5 h-3.5" /> },
+          { label: "Telecom Wallets", href: "/solutions/telecom-mobile-money", icon: <Smartphone className="w-3.5 h-3.5" /> },
           { label: "Gaming & Betting", href: "/solutions/gaming-betting", icon: <Activity className="w-3.5 h-3.5" /> },
           { label: "Insurance", href: "/solutions/insurance", icon: <Shield className="w-3.5 h-3.5" /> },
           { label: "Enterprise Risk Teams", href: "/solutions/enterprise-risk-teams", icon: <Settings className="w-3.5 h-3.5" /> }
         ]
       },
       {
-        title: "By Use Case",
+        title: "Specialty Sectors",
+        items: [
+          { label: "Enterprise SaaS", href: "/solutions/enterprise-saas-platforms", icon: <Layers className="w-3.5 h-3.5" /> },
+          { label: "Retail & Consumer", href: "/solutions/retail-consumer-platforms", icon: <ShoppingBag className="w-3.5 h-3.5" /> },
+          { label: "Hospitality & Travel", href: "/solutions/hospitality-travel-booking", icon: <Globe className="w-3.5 h-3.5" /> },
+          { label: "Education & EdTech", href: "/solutions/education-edtech", icon: <BookOpen className="w-3.5 h-3.5" /> },
+          { label: "Logistics & Chain", href: "/solutions/logistics-supply-chain", icon: <Clock className="w-3.5 h-3.5" /> },
+          { label: "Industrial & Factory", href: "/solutions/manufacturing-industrial", icon: <Building2 className="w-3.5 h-3.5" /> },
+          { label: "Energy & Utilities", href: "/solutions/energy-utilities", icon: <Zap className="w-3.5 h-3.5" /> },
+          { label: "Gaming & Entertainment", href: "/solutions/gaming-digital-entertainment", icon: <Activity className="w-3.5 h-3.5" /> },
+          { label: "Nonprofits & NGOs", href: "/solutions/nonprofits-ngos", icon: <Users className="w-3.5 h-3.5" /> },
+          { label: "Telecommunications", href: "/solutions/telecommunications", icon: <Smartphone className="w-3.5 h-3.5" /> },
+          { label: "Public Sector", href: "/solutions/government-public-sector", icon: <Building2 className="w-3.5 h-3.5" /> },
+          { label: "Healthcare", href: "/solutions/healthcare", icon: <Activity className="w-3.5 h-3.5" /> }
+        ]
+      },
+      {
+        title: "Use Case & Compliance",
         items: [
           { label: "Stop Transaction Fraud", href: "/solutions/transaction-fraud", icon: <Shield className="w-3.5 h-3.5" /> },
           { label: "Prevent Account Takeover", href: "/solutions/account-takeover", icon: <Lock className="w-3.5 h-3.5" /> },
           { label: "Detect APP Scams", href: "/solutions/detect-app-scams", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
           { label: "Detect Document Fraud", href: "/solutions/detect-document-fraud", icon: <BadgeCheck className="w-3.5 h-3.5" /> },
-          { label: "Verify Customer Identity", href: "/solutions/verify-customer-identity", icon: <UserCheck className="w-3.5 h-3.5" /> },
-          { label: "Stop Synthetic Identity Fraud", href: "/solutions/stop-synthetic-identity-fraud", icon: <UserCheck className="w-3.5 h-3.5" /> },
+          { label: "Verify Identity", href: "/solutions/verify-customer-identity", icon: <UserCheck className="w-3.5 h-3.5" /> },
+          { label: "Stop Synthetic Identity", href: "/solutions/stop-synthetic-identity-fraud", icon: <UserCheck className="w-3.5 h-3.5" /> },
           { label: "Monitor AML Risk", href: "/solutions/aml", icon: <Activity className="w-3.5 h-3.5" /> },
-          { label: "Reduce Chargebacks", href: "/solutions/reduce-chargebacks", icon: <TrendingDown className="w-3.5 h-3.5" /> },
-          { label: "Prevent Bonus Abuse", href: "/solutions/prevent-bonus-abuse", icon: <Zap className="w-3.5 h-3.5" /> },
+          { label: "Sanctions Screening", href: "/solutions/sanctions-screening", icon: <Globe className="w-3.5 h-3.5" /> },
+          { label: "STR Reporting", href: "/solutions/str-reporting", icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
+          { label: "CBN Compliance", href: "/solutions/cbn-compliance", icon: <FileCheck className="w-3.5 h-3.5" /> },
+          { label: "PEP Monitoring", href: "/solutions/pep-monitoring", icon: <Users className="w-3.5 h-3.5" /> },
           { label: "Monitor Vendor Risk", href: "/solutions/monitor-vendor-risk", icon: <Briefcase className="w-3.5 h-3.5" /> },
-          { label: "Automate Compliance Controls", href: "/solutions/automate-compliance-controls", icon: <Settings className="w-3.5 h-3.5" /> }
+          { label: "Automate Controls", href: "/solutions/automate-compliance-controls", icon: <Settings className="w-3.5 h-3.5" /> }
         ]
       }
     ]
@@ -165,23 +188,43 @@ const navConfig: NavMenu[] = [
     title: "Platform",
     groups: [
       {
-        title: "Core Architecture",
+        title: "Core & AI Engine",
         items: [
-          { label: "Security & Privacy", href: "/platform/security-privacy", icon: <Shield className="w-3.5 h-3.5" /> },
-          { label: "Multi-Tenant SaaS", href: "/platform/saas", icon: <Layers className="w-3.5 h-3.5" /> },
-          { label: "On-Premise Deployment", href: "/platform/on-premise", icon: <Database className="w-3.5 h-3.5" /> },
-          { label: "Private Cloud Deployment", href: "/platform/private-cloud", icon: <Globe className="w-3.5 h-3.5" /> },
-          { label: "APIs & Webhooks", href: "/platform/apis-webhooks", icon: <Code className="w-3.5 h-3.5" /> }
+          { label: "Platform Capabilities", href: "/platform/capabilities", icon: <Layers className="w-3.5 h-3.5" /> },
+          { label: "AI Copilot Platform", href: "/platform/ai-copilot", icon: <Cpu className="w-3.5 h-3.5" /> },
+          { label: "AI Intelligence Core", href: "/platform/ai-intelligence", icon: <Cpu className="w-3.5 h-3.5" /> },
+          { label: "Graph Intelligence", href: "/platform/graph-intelligence", icon: <Network className="w-3.5 h-3.5" /> },
+          { label: "Behavioral Analytics", href: "/platform/behavioral-analytics", icon: <Fingerprint className="w-3.5 h-3.5" /> }
         ]
       },
       {
-        title: "Enterprise Capabilities",
+        title: "Infrastructure & Scale",
         items: [
-          { label: "SIEM Integrations", href: "/platform/siem-integrations", icon: <Activity className="w-3.5 h-3.5" /> },
-          { label: "Risk Graph", href: "/platform/risk-graph", icon: <Cpu className="w-3.5 h-3.5" /> },
-          { label: "Model Registry", href: "/platform/model-registry", icon: <Layers className="w-3.5 h-3.5" /> },
-          { label: "Audit Logs", href: "/platform/audit-logs", icon: <History className="w-3.5 h-3.5" /> },
-          { label: "Enterprise Controls", href: "/platform/enterprise-controls", icon: <Settings className="w-3.5 h-3.5" /> }
+          { label: "Platform Architecture", href: "/platform/architecture", icon: <Layers className="w-3.5 h-3.5" /> },
+          { label: "Global Scalability", href: "/platform/scalability", icon: <Globe className="w-3.5 h-3.5" /> },
+          { label: "APIs & Webhooks", href: "/platform/webhooks", icon: <Workflow className="w-3.5 h-3.5" /> },
+          { label: "Platform Integrations", href: "/platform/integrations", icon: <Network className="w-3.5 h-3.5" /> },
+          { label: "Device Intelligence", href: "/platform/device-intelligence", icon: <Smartphone className="w-3.5 h-3.5" /> }
+        ]
+      },
+      {
+        title: "Real-Time Operations",
+        items: [
+          { label: "Transaction Monitoring", href: "/platform/transaction-monitoring", icon: <Activity className="w-3.5 h-3.5" /> },
+          { label: "Identity Intelligence", href: "/platform/identity-intelligence", icon: <UserCheck className="w-3.5 h-3.5" /> },
+          { label: "Workflow Automation", href: "/platform/workflow-automation", icon: <Workflow className="w-3.5 h-3.5" /> },
+          { label: "Case Management", href: "/platform/case-management", icon: <Briefcase className="w-3.5 h-3.5" /> },
+          { label: "Admin Console & Org", href: "/platform/admin-console", icon: <Settings className="w-3.5 h-3.5" /> }
+        ]
+      },
+      {
+        title: "Governance & Security",
+        items: [
+          { label: "Security Operations", href: "/platform/security", icon: <Shield className="w-3.5 h-3.5" /> },
+          { label: "Privacy & Data Ethics", href: "/platform/privacy", icon: <Lock className="w-3.5 h-3.5" /> },
+          { label: "Enterprise Governance", href: "/platform/governance", icon: <Scale className="w-3.5 h-3.5" /> },
+          { label: "Governance & Compliance", href: "/platform/governance-compliance", icon: <Scale className="w-3.5 h-3.5" /> },
+          { label: "Regulatory Reporting", href: "/platform/reporting", icon: <FileSpreadsheet className="w-3.5 h-3.5" /> }
         ]
       }
     ]
@@ -192,20 +235,17 @@ const navConfig: NavMenu[] = [
       {
         title: "API Overview",
         items: [
-          { label: "Authentication", href: "/developers/auth", icon: <Lock className="w-3.5 h-3.5" /> },
-          { label: "Transaction Scoring API", href: "/developers/transaction-scoring", icon: <Zap className="w-3.5 h-3.5" /> },
-          { label: "Screening API", href: "/developers/screening", icon: <Shield className="w-3.5 h-3.5" /> },
-          { label: "Document Verification API", href: "/developers/document-verification", icon: <BadgeCheck className="w-3.5 h-3.5" /> },
+          { label: "Developer Hub Home", href: "/developers", icon: <Terminal className="w-3.5 h-3.5" /> },
+          { label: "API Reference", href: "/developers/api-overview", icon: <BookOpen className="w-3.5 h-3.5" /> },
+          { label: "Authentication", href: "/developers/authentication", icon: <Lock className="w-3.5 h-3.5" /> },
+          { label: "Quickstart Guide", href: "/developers/quickstart", icon: <Zap className="w-3.5 h-3.5" /> },
           { label: "Webhook Events", href: "/developers/webhooks", icon: <Bell className="w-3.5 h-3.5" /> }
         ]
       },
       {
         title: "Developer Tools",
         items: [
-          { label: "SDKs", href: "/developers/sdks", icon: <Code className="w-3.5 h-3.5" /> },
-          { label: "Postman Collection", href: "/developers/postman", icon: <Terminal className="w-3.5 h-3.5" /> },
-          { label: "Sandbox", href: "/developers/sandbox", icon: <Play className="w-3.5 h-3.5" /> },
-          { label: "API Status", href: "/developers/status", icon: <Activity className="w-3.5 h-3.5" /> }
+          { label: "Developer Sandbox", href: "/developers", icon: <Play className="w-3.5 h-3.5" /> }
         ]
       }
     ]
@@ -220,16 +260,17 @@ const navConfig: NavMenu[] = [
           { label: "Guides", href: "/resources/guides", icon: <FileText className="w-3.5 h-3.5" /> },
           { label: "Whitepapers", href: "/resources/whitepapers", icon: <FileText className="w-3.5 h-3.5" /> },
           { label: "Compliance Center", href: "/resources/compliance-center", icon: <BadgeCheck className="w-3.5 h-3.5" /> },
-          { label: "Fraud Typology Library", href: "/resources/fraud-typology-library", icon: <Shield className="w-3.5 h-3.5" /> }
+          { label: "CBN Compliance Guide", href: "/resources/cbn-guide", icon: <Shield className="w-3.5 h-3.5" /> }
         ]
       },
       {
         title: "Guides & Reference",
         items: [
-          { label: "AML Readiness Guide", href: "/resources/aml-readiness-guide", icon: <FileCheck className="w-3.5 h-3.5" /> },
-          { label: "Regulatory Reporting Guide", href: "/resources/regulatory-reporting-guide", icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
+          { label: "How It Works", href: "/resources/how-it-works", icon: <Activity className="w-3.5 h-3.5" /> },
+          { label: "AML Readiness Checklist", href: "/resources/aml-checklist", icon: <FileCheck className="w-3.5 h-3.5" /> },
+          { label: "Regulatory Reporting Guide", href: "/resources/reporting-guide", icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
           { label: "Documentation", href: "/resources/documentation", icon: <BookOpen className="w-3.5 h-3.5" /> },
-          { label: "Support", href: "/resources/support", icon: <HelpCircle className="w-3.5 h-3.5" /> }
+          { label: "Contact Support Office", href: "/company/contact", icon: <HelpCircle className="w-3.5 h-3.5" /> }
         ]
       }
     ]
@@ -250,10 +291,11 @@ const navConfig: NavMenu[] = [
         ]
       },
       {
-        title: "Growth",
+        title: "Growth & Trust",
         items: [
           { label: "Careers", href: "/company/careers", badge: "Soon", icon: <Activity className="w-3.5 h-3.5" /> },
-          { label: "Partners", href: "/company/partners", icon: <Layers className="w-3.5 h-3.5" /> }
+          { label: "Partners", href: "/company/partners", icon: <Layers className="w-3.5 h-3.5" /> },
+          { label: "Trust Center", href: "/company/trust", icon: <Shield className="w-3.5 h-3.5" /> }
         ]
       }
     ]
@@ -281,9 +323,9 @@ export default function Navbar() {
       case "Product":
         return "grid-cols-5 gap-x-6 w-full";
       case "Solutions":
-        return "grid-cols-2 gap-x-16 max-w-[900px] mx-auto";
+        return "grid-cols-3 gap-x-12 w-full max-w-[1200px] mx-auto";
       case "Platform":
-        return "grid-cols-2 gap-x-16 max-w-[900px] mx-auto";
+        return "grid-cols-4 gap-x-8 w-full max-w-[1200px] mx-auto";
       case "Developers":
         return "grid-cols-2 gap-x-16 max-w-[900px] mx-auto";
       case "Resources":
