@@ -42,7 +42,15 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
     pathname === "/legal/acceptable-use" ||
     pathname === "/legal/dpa" ||
     pathname === "/legal/security-compliance" ||
-    pathname === "/legal/ai-policy"
+    pathname === "/legal/ai-policy" ||
+    pathname === "/legal/sla" ||
+    pathname === "/legal/subprocessors" ||
+    pathname === "/legal/regulatory-compliance" ||
+    pathname === "/legal/data-retention" ||
+    pathname === "/legal/law-enforcement" ||
+    pathname === "/legal/vulnerability-disclosure" ||
+    pathname === "/legal/intellectual-property" ||
+    pathname === "/legal/vendor-terms"
   ) {
     return (
       <div className="min-h-screen bg-zinc-50 text-neutral-900 font-manrope">
