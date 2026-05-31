@@ -4,36 +4,50 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Code as Github, Mail, ArrowRight, LoaderCircle as Loader2 } from "lucide-react";
+import { Code as Github, Mail, ArrowRight, LoaderCircle as Loader2, AlertCircle } from "lucide-react";
 import { useState } from "react";
-
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid work email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { loginSchema, type LoginInput } from "@/schemas";
+import { authService } from "@/services/auth.service";
+import { ApiError } from "@/lib/api/client";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormValues>({
+  } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
   });
 
-  async function onSubmit(data: LoginFormValues) {
+  async function onSubmit(data: LoginInput) {
     setIsLoading(true);
-    // Simulate API call
-    console.log("Login attempt:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
+    setError(null);
+
+    try {
+      await authService.login(data);
+      
+      // Redirect to intended destination or dashboard
+      if (redirect) {
+        router.push(decodeURIComponent(redirect));
+      } else {
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.message || 'Login failed. Please check your credentials and try again.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -44,6 +58,13 @@ export default function LoginPage() {
           Log in with your enterprise credentials to manage your fraud prevention infrastructure.
         </p>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+          <p className="text-sm text-red-800">{error}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid gap-2">
