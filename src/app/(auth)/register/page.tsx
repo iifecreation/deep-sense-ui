@@ -4,16 +4,23 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Shield, Code as Github, Mail, ArrowRight, LoaderCircle as Loader2, BadgeInfo as Info } from "lucide-react";
+import { Shield, Code as Github, Mail, ArrowRight, LoaderCircle as Loader2, BadgeInfo as Info, AlertCircle } from "lucide-react";
 import { useState } from "react";
+import { signupSchema, type SignupInput } from "@/schemas";
+import { authService } from "@/services/auth.service";
+import { ApiError } from "@/lib/api/client";
 
 const registerSchema = z.object({
   fullName: z.string().min(2, "Full name is required"),
   companyName: z.string().min(2, "Company name is required"),
+  companySlug: z.string().min(3, "Company slug must be at least 3 characters").regex(/^[a-z0-9-]+$/, "Slug can only contain lowercase letters, numbers, and hyphens"),
+  country: z.string().min(2, "Country is required"),
+  services: z.array(z.string()).min(1, "At least one service must be selected"),
   email: z.string().email("Please enter a valid work email"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   agree: z.literal(true, {
@@ -25,6 +32,8 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const {
     register,
@@ -34,16 +43,35 @@ export default function RegisterPage() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      agree: false as unknown as true, // Type hack for literal(true) with default false
+      agree: false as unknown as true,
+      services: [],
+      country: 'US',
     }
   });
 
   async function onSubmit(data: RegisterFormValues) {
     setIsLoading(true);
-    // Simulate API call
-    console.log("Registration attempt:", data);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsLoading(false);
+    setError(null);
+
+    try {
+      const signupData: SignupInput = {
+        organization_name: data.companyName,
+        organization_slug: data.companySlug,
+        country: data.country,
+        services: data.services,
+        email: data.email,
+        password: data.password,
+        full_name: data.fullName,
+      };
+
+      await authService.signup(signupData);
+      router.push('/dashboard');
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.message || 'Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -54,6 +82,13 @@ export default function RegisterPage() {
           Initialize your enterprise security suite. Start your 14-day comprehensive trial today.
         </p>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+          <p className="text-sm text-red-800">{error}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -91,6 +126,74 @@ export default function RegisterPage() {
               </p>
             )}
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="companySlug" className="text-zinc-600 dark:text-zinc-400 font-semibold ml-0.5">
+              Organization Slug
+            </Label>
+            <Input
+              id="companySlug"
+              placeholder="deepmind"
+              autoComplete="organization-slug"
+              className="h-11 px-4 rounded-xl border-border bg-muted/30 focus:bg-background focus:ring-2 focus:ring-[#D1F701]/20 transition-all duration-300 placeholder:text-muted-foreground/40"
+              {...register("companySlug")}
+            />
+            {errors.companySlug && (
+              <p className="text-xs text-destructive mt-1 ml-0.5 font-medium">
+                {errors.companySlug.message}
+              </p>
+            )}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="country" className="text-zinc-600 dark:text-zinc-400 font-semibold ml-0.5">
+              Country
+            </Label>
+            <select
+              id="country"
+              {...register("country")}
+              className="h-11 px-4 rounded-xl border-border bg-muted/30 focus:bg-background focus:ring-2 focus:ring-[#D1F701]/20 transition-all duration-300 text-sm"
+            >
+              <option value="US">United States</option>
+              <option value="GB">United Kingdom</option>
+              <option value="CA">Canada</option>
+              <option value="DE">Germany</option>
+              <option value="FR">France</option>
+              <option value="AU">Australia</option>
+              <option value="SG">Singapore</option>
+              <option value="JP">Japan</option>
+            </select>
+            {errors.country && (
+              <p className="text-xs text-destructive mt-1 ml-0.5 font-medium">
+                {errors.country.message}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="grid gap-2">
+          <Label className="text-zinc-600 dark:text-zinc-400 font-semibold ml-0.5">
+            Services (select at least one)
+          </Label>
+          <div className="grid grid-cols-2 gap-3">
+            {['fraud_detection', 'aml', 'screening', 'risk_assessment'].map((service) => (
+              <label key={service} className="flex items-center gap-2 p-3 rounded-lg border border-border bg-muted/30 hover:bg-muted/50 cursor-pointer transition-colors">
+                <input
+                  type="checkbox"
+                  value={service}
+                  {...register("services")}
+                  className="w-4 h-4 rounded border-border"
+                />
+                <span className="text-sm font-medium capitalize">{service.replace('_', ' ')}</span>
+              </label>
+            ))}
+          </div>
+          {errors.services && (
+            <p className="text-xs text-destructive mt-1 ml-0.5 font-medium">
+              {errors.services.message}
+            </p>
+          )}
         </div>
 
         <div className="grid gap-2">
