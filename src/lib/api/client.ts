@@ -2,8 +2,9 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 // Environment configuration
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://api.deepsense.ai' : 'http://localhost:8000');
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === 'production' ? 'https://app.deepsense.ai' : 'http://localhost:3000');
+
 
 // API Error types
 export class ApiError extends Error {
@@ -61,6 +62,12 @@ const createApiClient = (): AxiosInstance => {
   // Request interceptor - add auth token
   client.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
+      if (!process.env.NEXT_PUBLIC_API_URL && process.env.NODE_ENV === 'production') {
+        throw new Error('NEXT_PUBLIC_API_URL environment variable is required in production');
+      }
+      if (!process.env.NEXT_PUBLIC_APP_URL && process.env.NODE_ENV === 'production') {
+        throw new Error('NEXT_PUBLIC_APP_URL environment variable is required in production');
+      }
       const token = getToken();
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
