@@ -11,18 +11,41 @@ import {
   AvailableService,
   AvailableCountry,
 } from '@/types';
-import { post, get, setToken, setRefreshToken, clearTokens } from '@/lib/api/client';
+import { post, get, setToken, setRefreshToken, clearTokens, apiClient } from '@/lib/api/client';
 
 export const authService = {
   /**
    * Login with email and password
    */
-  async login(data: LoginRequest): Promise<TokenResponse> {
-    const response = await post<TokenResponse>('/auth/login', data);
+  async login(data: LoginRequest): Promise<TokenResponse & { challenge?: string }> {
+    const response = await apiClient.post<TokenResponse>('/auth/login', data);
+    
+    // Store tokens only if 2FA is not required
+    if (!response.data.requires_2fa) {
+      setToken(response.data.access_token);
+      setRefreshToken(response.data.refresh_token);
+    }
+    
+    return {
+      ...response.data,
+      challenge: response.headers['x-2fa-challenge']
+    };
+  },
+
+  /**
+   * Verify 2FA code
+   */
+  async verify2fa(code: string, challenge?: string): Promise<TokenResponse> {
+    const headers = challenge ? { 'X-2FA-Challenge': challenge } : {};
+    const response = await post<TokenResponse>('/auth/verify-2fa', { code }, { headers });
     
     // Store tokens
-    setToken(response.access_token);
-    setRefreshToken(response.refresh_token);
+    if (response.access_token) {
+      setToken(response.access_token);
+      if (response.refresh_token) {
+        setRefreshToken(response.refresh_token);
+      }
+    }
     
     return response;
   },

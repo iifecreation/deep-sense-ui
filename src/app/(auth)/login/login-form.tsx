@@ -31,8 +31,16 @@ function LoginFormContent({ redirect }: { redirect: string | null }) {
     setError(null);
 
     try {
-      await authService.login(data);
+      const response = await authService.login(data);
       
+      if (response.requires_2fa) {
+        if (response.challenge && typeof window !== 'undefined') {
+          localStorage.setItem('deep_sense_2fa_challenge', response.challenge);
+        }
+        router.push('/verify-mfa');
+        return;
+      }
+
       // Redirect to intended destination or dashboard
       if (redirect) {
         router.push(decodeURIComponent(redirect));
