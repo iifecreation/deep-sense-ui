@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { 
   ShieldCheck, 
   Search, 
@@ -30,7 +30,8 @@ import {
   Activity,
   Archive,
   Lock,
-  Plus
+  Plus,
+  RefreshCw
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -54,8 +55,93 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { useScreeningMatches, useWatchlists } from "@/hooks/use-screening";
 
 export default function ScreeningCenterPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const { data: matches, isLoading, isError, error, refetch } = useScreeningMatches({ 
+    query: { page: 1, page_size: 50 },
+    filters: statusFilter ? { status: statusFilter } : {}
+  });
+  const { data: watchlists } = useWatchlists();
+
+  const getMatchTypeColor = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'sanctions': return 'text-rose-500';
+      case 'pep': return 'text-amber-500';
+      case 'watchlist': return 'text-indigo-500';
+      default: return 'text-slate-500';
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'confirmed': return 'text-rose-500';
+      case 'cleared': return 'text-emerald-500';
+      case 'under_review': return 'text-amber-500';
+      case 'pending': return 'text-orange-500';
+      default: return 'text-slate-400';
+    }
+  };
+
+  const filteredMatches = matches?.filter((m: any) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      m.id?.toLowerCase().includes(query) ||
+      m.customer_name?.toLowerCase().includes(query) ||
+      m.match_type?.toLowerCase().includes(query)
+    );
+  }) || [];
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-10 pb-20">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-black italic tracking-tighter uppercase text-neutral-900 dark:text-white">
+            Screening Center<span className="text-indigo-500">.</span>
+          </h1>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i} className="rounded-3xl border border-border/50">
+              <CardContent className="p-5">
+                <div className="h-20 bg-slate-100 animate-pulse rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col gap-10 pb-20">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-black italic tracking-tighter uppercase text-neutral-900 dark:text-white">
+            Screening Center<span className="text-indigo-500">.</span>
+          </h1>
+        </div>
+        <Card className="rounded-3xl border border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="text-red-600 h-5 w-5" />
+              <div>
+                <p className="font-semibold text-red-900">Failed to load screening matches</p>
+                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
+              </div>
+            </div>
+            <Button onClick={() => refetch()} className="mt-4" variant="outline">
+              <RefreshCw className="w-4 h-4 mr-2" /> Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-10 pb-20">
       {/* 1. PAGE HEADER */}
@@ -74,7 +160,7 @@ export default function ScreeningCenterPage() {
               <Upload className="w-3.5 h-3.5 mr-2" />
               Upload Watchlist
             </Button>
-            <Button variant="outline" className="h-10 px-4 text-xs font-bold uppercase tracking-widest italic group">
+            <Button variant="outline" className="h-10 px-4 text-xs font-bold uppercase tracking-widest italic">
               <PlayCircle className="w-3.5 h-3.5 mr-2" />
               Run Re-screening
             </Button>
@@ -82,7 +168,7 @@ export default function ScreeningCenterPage() {
               <Download className="w-3.5 h-3.5 mr-2" />
               Export Matches
             </Button>
-            <Button className="h-10 px-6 bg-indigo-600 text-white hover:bg-indigo-700 font-bold text-xs uppercase tracking-widest italic shadow-lg shadow-indigo-600/20">
+            <Button className="h-10 px-6 bg-indigo-600 text-white hover:bg-indigo-700 font-bold text-xs uppercase tracking-widest italic shadow-lg shadow-indigo-600/20" onClick={() => refetch()}>
               <RefreshCcw className="w-3.5 h-3.5 mr-2" />
               Refresh
             </Button>
@@ -96,23 +182,27 @@ export default function ScreeningCenterPage() {
             <Input 
               placeholder="Search by entity, ID, passport..." 
               className="h-8 w-48 text-[10px] font-bold uppercase tracking-widest border-none shadow-none focus-visible:ring-0"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           
-          {[
-            { label: "Match Type", value: "All Lists" },
-            { label: "Confidence", value: "80%+" },
-            { label: "Risk Level", value: "Critical" },
-            { label: "Status", value: "Pending" },
-            { label: "Analyst", value: "Me" },
-          ].map((filter, i) => (
-            <div key={i} className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group">
-              <span className="text-[10px] font-black uppercase tracking-widest italic text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
-                {filter.label}: {filter.value}
-              </span>
-              <ChevronRight className="w-2.5 h-2.5 text-muted-foreground/50 rotate-90" />
-            </div>
-          ))}
+          <Button 
+            variant={statusFilter === 'pending' ? 'default' : 'outline'} 
+            size="sm" 
+            className="h-8 px-3 text-[10px] font-bold uppercase italic tracking-widest"
+            onClick={() => setStatusFilter(statusFilter === 'pending' ? null : 'pending')}
+          >
+            Pending
+          </Button>
+          <Button 
+            variant={statusFilter === 'confirmed' ? 'default' : 'outline'} 
+            size="sm" 
+            className="h-8 px-3 text-[10px] font-bold uppercase italic tracking-widest"
+            onClick={() => setStatusFilter(statusFilter === 'confirmed' ? null : 'confirmed')}
+          >
+            Confirmed
+          </Button>
           
           <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg ml-auto mr-2">
             <Filter className="w-3.5 h-3.5" />
@@ -123,12 +213,12 @@ export default function ScreeningCenterPage() {
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {[
-          { label: "Pending Matches", value: "28", delta: "+4", trend: "up", icon: <Clock className="text-orange-500" /> },
-          { label: "High-Risk Matches", value: "12", delta: "+2", trend: "up", icon: <AlertTriangle className="text-rose-500 animate-pulse" /> },
-          { label: "Confirmed Matches", value: "05", delta: "0", trend: "neutral", icon: <ShieldCheck className="text-indigo-500" /> },
-          { label: "False Positives", value: "142", delta: "+22", trend: "up", icon: <CheckCircle2 className="text-emerald-500" /> },
-          { label: "PEP Matches", value: "08", delta: "+1", trend: "up", icon: <Users className="text-amber-500" /> },
-          { label: "Sanctions Matches", value: "04", delta: "-1", trend: "down", icon: <Flag className="text-rose-600" /> },
+          { label: "Pending Matches", value: matches?.filter((m: any) => m.status === 'pending').length || 0, delta: "", trend: "neutral", icon: <Clock className="text-orange-500" /> },
+          { label: "High-Risk Matches", value: matches?.filter((m: any) => m.risk_level === 'critical').length || 0, delta: "", trend: "neutral", icon: <AlertTriangle className="text-rose-500" /> },
+          { label: "Confirmed Matches", value: matches?.filter((m: any) => m.status === 'confirmed').length || 0, delta: "", trend: "neutral", icon: <ShieldCheck className="text-indigo-500" /> },
+          { label: "False Positives", value: matches?.filter((m: any) => m.status === 'dismissed').length || 0, delta: "", trend: "neutral", icon: <CheckCircle2 className="text-emerald-500" /> },
+          { label: "PEP Matches", value: matches?.filter((m: any) => m.match_type === 'pep').length || 0, delta: "", trend: "neutral", icon: <Users className="text-amber-500" /> },
+          { label: "Sanctions Matches", value: matches?.filter((m: any) => m.match_type === 'sanctions').length || 0, delta: "", trend: "neutral", icon: <Flag className="text-rose-600" /> },
         ].map((kpi, i) => (
           <Link 
             key={i} 
@@ -139,11 +229,6 @@ export default function ScreeningCenterPage() {
               <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                 {kpi.icon}
               </div>
-              <Badge variant="outline" className={`text-[9px] font-black italic tracking-widest uppercase border-none px-0 ${
-                kpi.trend === 'up' ? (kpi.label.includes('False') ? 'text-emerald-500' : 'text-rose-500') : kpi.trend === 'down' ? 'text-emerald-500' : 'text-muted-foreground'
-              }`}>
-                {kpi.delta}
-              </Badge>
             </div>
             <div>
               <div className="text-2xl font-black italic tracking-tighter text-neutral-900 dark:text-white leading-none">
@@ -187,44 +272,43 @@ export default function ScreeningCenterPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[
-                  { id: "M-4401", name: "Vladimir Y. Potanin", type: "Sanctions", source: "OFAC SDN", confidence: 98, risk: "Critical", status: "Pending" },
-                  { id: "M-1102", name: "Atlassian Energy Ltd", type: "Watchlist", source: "EU Freeze", confidence: 84, risk: "High", status: "Pending" },
-                  { id: "M-8812", name: "Chen Wei", type: "PEP", source: "Global PEP Tier 1", confidence: 42, risk: "Medium", status: "Pending" },
-                  { id: "M-5521", name: "Dmitry Volkov", type: "Sanctions", source: "UK HMT", confidence: 91, risk: "Critical", status: "Pending" },
-                ].map((row, i) => (
+                {filteredMatches.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8">
+                      <p className="text-sm text-slate-500">No matches found</p>
+                    </TableCell>
+                  </TableRow>
+                ) : filteredMatches.slice(0, 4).map((row: any, i: number) => (
                   <TableRow key={i} className="group hover:bg-orange-50/30 dark:hover:bg-orange-950/20 transition-colors border-b border-border/50 cursor-pointer">
                     <TableCell className="px-8 py-5">
                       <Link href={`/dashboard/screening/matches/${row.id}`} className="flex flex-col">
-                        <span className="text-xs font-black italic tracking-tight">{row.name}</span>
+                        <span className="text-xs font-black italic tracking-tight">{row.customer_name || 'Unknown'}</span>
                         <span className="text-[8px] font-black text-neutral-400 uppercase italic mt-1">{row.id}</span>
                       </Link>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={`text-[9px] font-black italic tracking-widest uppercase border-none px-0 ${
-                        row.type === 'Sanctions' ? 'text-rose-500' : row.type === 'PEP' ? 'text-amber-500' : 'text-indigo-500'
-                      }`}>
-                        {row.type}
+                      <Badge variant="outline" className={`text-[9px] font-black italic tracking-widest uppercase border-none px-0 ${getMatchTypeColor(row.match_type || 'unknown')}`}>
+                        {row.match_type || 'Unknown'}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <span className="text-[10px] font-medium text-muted-foreground italic">{row.source}</span>
+                      <span className="text-[10px] font-medium text-muted-foreground italic">{row.source_list || 'Unknown'}</span>
                     </TableCell>
                     <TableCell className="text-center">
                        <div className="flex flex-col items-center gap-1">
-                          <span className={`text-sm font-black italic ${row.confidence > 80 ? 'text-rose-500' : 'text-neutral-900 dark:text-white'}`}>
-                            {row.confidence}%
+                          <span className={`text-sm font-black italic ${row.confidence_score > 80 ? 'text-rose-500' : 'text-neutral-900 dark:text-white'}`}>
+                            {row.confidence_score || 0}%
                           </span>
                           <div className="w-12 h-1 bg-muted rounded-full overflow-hidden">
-                             <div className={`h-full ${row.confidence > 80 ? 'bg-rose-500' : 'bg-brand-lime'}`} style={{ width: `${row.confidence}%` }} />
+                             <div className={`h-full ${row.confidence_score > 80 ? 'bg-rose-500' : 'bg-brand-lime'}`} style={{ width: `${row.confidence_score || 0}%` }} />
                           </div>
                        </div>
                     </TableCell>
                     <TableCell className="text-center px-8">
                        <Badge className={`text-[9px] font-black italic tracking-widest uppercase ${
-                         row.risk === 'Critical' ? 'bg-rose-600' : 'bg-orange-500'
+                         row.risk_level === 'critical' ? 'bg-rose-600' : row.risk_level === 'high' ? 'bg-orange-500' : 'bg-slate-500'
                        }`}>
-                         {row.risk}
+                         {row.risk_level || 'Unknown'}
                        </Badge>
                     </TableCell>
                     <TableCell className="px-8 text-right">
@@ -293,26 +377,24 @@ export default function ScreeningCenterPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {[
-                    { id: "M-9921", customer: "Alex Reed", source: "Interpol Red Notice", score: 94, status: "Confirmed", date: "2m ago" },
-                    { id: "M-1104", customer: "Sarah Jenkins", source: "World-Check PEP", score: 62, status: "Cleared", date: "1h ago" },
-                    { id: "M-4521", customer: "Global Assets BVI", source: "OFAC SDN", score: 88, status: "Under Review", date: "3h ago" },
-                    { id: "M-7712", customer: "Jordan B. Peterson", source: "UK SI Watchlist", score: 14, status: "False Positive", date: "1d ago" },
-                    { id: "M-2201", customer: "Atlas Trading", source: "EU Freeze List", score: 99, status: "Confirmed", date: "2d ago" },
-                  ].map((row, i) => (
+                  {filteredMatches.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8">
+                        <p className="text-sm text-slate-500">No matches found</p>
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredMatches.map((row: any, i: number) => (
                     <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-4 font-black italic text-[11px] text-muted-foreground">{row.id}</TableCell>
-                      <TableCell className="text-[11px] font-black italic">{row.customer}</TableCell>
-                      <TableCell className="text-[10px] font-medium text-muted-foreground italic">{row.source}</TableCell>
-                      <TableCell className="text-center font-black italic text-[13px]">{row.score}%</TableCell>
+                      <TableCell className="text-[11px] font-black italic">{row.customer_name || 'Unknown'}</TableCell>
+                      <TableCell className="text-[10px] font-medium text-muted-foreground italic">{row.source_list || 'Unknown'}</TableCell>
+                      <TableCell className="text-center font-black italic text-[13px]">{row.confidence_score || 0}%</TableCell>
                       <TableCell className="text-center">
-                        <Badge variant="outline" className={`text-[8px] font-black uppercase italic tracking-widest border-none px-0 ${
-                          row.status === 'Confirmed' ? 'text-rose-500' : row.status === 'Cleared' ? 'text-emerald-500' : 'text-neutral-400'
-                        }`}>
-                          {row.status}
+                        <Badge variant="outline" className={`text-[8px] font-black uppercase italic tracking-widest border-none px-0 ${getStatusColor(row.status || 'unknown')}`}>
+                          {row.status || 'Unknown'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="px-8 text-right text-[10px] font-bold text-muted-foreground uppercase">{row.date}</TableCell>
+                      <TableCell className="px-8 text-right text-[10px] font-bold text-muted-foreground uppercase">{row.created_at ? new Date(row.created_at).toLocaleDateString() : 'N/A'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

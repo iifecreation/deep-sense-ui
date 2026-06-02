@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { 
   FileText, 
   Search, 
@@ -31,7 +31,8 @@ import {
   Calendar,
   Users,
   ShieldCheck,
-  Zap
+  Zap,
+  RefreshCw
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -55,8 +56,81 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { useReports } from "@/hooks";
 
 export default function RegulatoryReportsPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data: reports, isLoading, isError, error, refetch } = useReports({ 
+    query: { page: 1, page_size: 50 }
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'draft': return 'bg-slate-500 text-white';
+      case 'submitted': return 'bg-blue-500 text-white';
+      case 'under_review': return 'bg-amber-500 text-white';
+      case 'approved': return 'bg-emerald-500 text-white';
+      case 'rejected': return 'bg-red-500 text-white';
+      default: return 'bg-slate-400 text-white';
+    }
+  };
+
+  const filteredReports = reports?.filter((r: any) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      r.id?.toLowerCase().includes(query) ||
+      r.report_type?.toLowerCase().includes(query) ||
+      r.case_id?.toLowerCase().includes(query)
+    );
+  }) || [];
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-10 pb-20">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-black italic tracking-tighter uppercase text-neutral-900 dark:text-white">
+            Regulatory Reports<span className="text-brand-lime">.</span>
+          </h1>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="rounded-2xl border">
+              <CardContent className="p-6">
+                <div className="h-24 bg-slate-100 animate-pulse rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col gap-10 pb-20">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-black italic tracking-tighter uppercase text-neutral-900 dark:text-white">
+            Regulatory Reports<span className="text-brand-lime">.</span>
+          </h1>
+        </div>
+        <Card className="rounded-3xl border border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="text-red-600 h-5 w-5" />
+              <div>
+                <p className="font-semibold text-red-900">Failed to load reports</p>
+                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
+              </div>
+            </div>
+            <Button onClick={() => refetch()} className="mt-4" variant="outline">
+              <RefreshCw className="w-4 h-4 mr-2" /> Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-10 pb-20">
       {/* 1. PAGE HEADER */}
