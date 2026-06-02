@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from "react";
 import { 
   Zap, 
   Search, 
@@ -12,7 +15,9 @@ import {
   Filter,
   Plus,
   RefreshCcw,
-  PlayCircle
+  PlayCircle,
+  AlertTriangle,
+  RefreshCw
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,14 +25,79 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { useFraudRules, useFraudRuleMetrics } from "@/hooks/use-fraud-rules";
 
 export default function RulesManagement() {
-  const rules = [
-    { id: "rl_9912", n: "High Velocity Check", s: "Active", l: "L2", p: "Engine Core" },
-    { id: "rl_4421", n: "IP Geofence (EU/US)", s: "Testing", l: "L3", p: "Network Edge" },
-    { id: "rl_1102", n: "Device Fingerprint Match", s: "Active", l: "L1", p: "Entity Profile" },
-    { id: "rl_5528", n: "BIN Country Mismatch", s: "Disabled", l: "L2", p: "Payment Intel" }
-  ];
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const { data: rules, isLoading, isError, error, refetch } = useFraudRules({ 
+    query: { page: 1, page_size: 50, ...(statusFilter ? { status: statusFilter } : {}) },
+    filters: {}
+  });
+  const { data: metrics } = useFraudRuleMetrics(30);
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'active': return 'bg-emerald-500 text-white';
+      case 'testing': return 'bg-blue-500 text-white';
+      case 'disabled': return 'bg-slate-400 text-white';
+      case 'archived': return 'bg-slate-600 text-white';
+      default: return 'bg-slate-400 text-white';
+    }
+  };
+
+  const filteredRules = rules?.filter((r: any) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      r.id?.toLowerCase().includes(query) ||
+      r.name?.toLowerCase().includes(query) ||
+      r.description?.toLowerCase().includes(query)
+    );
+  }) || [];
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Rules Engine</h1>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="rounded-xl shadow-sm border">
+              <CardContent className="p-4">
+                <div className="h-20 bg-slate-100 animate-pulse rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Rules Engine</h1>
+        </div>
+        <Card className="rounded-xl shadow-sm border border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="text-red-600 h-5 w-5" />
+              <div>
+                <p className="font-semibold text-red-900">Failed to load fraud rules</p>
+                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
+              </div>
+            </div>
+            <Button onClick={() => refetch()} className="mt-4" variant="outline">
+              <RefreshCw className="w-4 h-4 mr-2" /> Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -49,24 +119,44 @@ export default function RulesManagement() {
 
       {/* KPI Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { label: "Active Rules", value: "24", subtext: "Live in production", icon: <ShieldCheck className="text-emerald-500" />, color: "border-emerald-100 bg-emerald-50/20" },
-          { label: "Rules in Testing", value: "12", subtext: "Shadow mode simulation", icon: <Zap className="text-blue-500" />, color: "border-blue-100 bg-blue-50/20" },
-          { label: "Logic AlertsToday", value: "156", subtext: "Heuristic trigger volume", icon: <Cpu className="text-amber-500" />, color: "border-amber-100 bg-amber-50/20" },
-        ].map((kpi, i) => (
-          <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
-                {kpi.icon}
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{kpi.label}</p>
-                <div className="text-xl font-bold text-slate-900">{kpi.value}</div>
-                <p className="text-[10px] text-slate-400 font-medium">{kpi.subtext}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        <Card className="rounded-xl shadow-sm border border-emerald-100 bg-emerald-50/20">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
+              <ShieldCheck className="text-emerald-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Active Rules</p>
+              <div className="text-xl font-bold text-slate-900">{rules?.filter((r: any) => r.status === 'active').length || 0}</div>
+              <p className="text-[10px] text-slate-400 font-medium">Live in production</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-xl shadow-sm border border-blue-100 bg-blue-50/20">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
+              <Zap className="text-blue-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Rules in Testing</p>
+              <div className="text-xl font-bold text-slate-900">{rules?.filter((r: any) => r.status === 'testing').length || 0}</div>
+              <p className="text-[10px] text-slate-400 font-medium">Shadow mode simulation</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-xl shadow-sm border border-amber-100 bg-amber-50/20">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
+              <Cpu className="text-amber-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total Triggers</p>
+              <div className="text-xl font-bold text-slate-900">{metrics?.total_triggers || 0}</div>
+              <p className="text-[10px] text-slate-400 font-medium">Heuristic trigger volume</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -75,14 +165,32 @@ export default function RulesManagement() {
           <div className="p-4 border-b border-slate-100 bg-slate-50/30 flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="relative w-full md:w-80">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <Input placeholder="Search Rule ID, Name, Logic..." className="pl-9 bg-white text-sm" />
+              <Input 
+                placeholder="Search Rule ID, Name, Logic..." 
+                className="pl-9 bg-white text-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
             <div className="flex items-center gap-2 w-full md:w-auto">
-              <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold">
-                <Filter className="w-4 h-4 mr-2" /> All Clusters
+              <Button 
+                variant={statusFilter === 'active' ? 'default' : 'outline'} 
+                size="sm" 
+                className="h-9 px-3 text-xs font-semibold"
+                onClick={() => setStatusFilter(statusFilter === 'active' ? null : 'active')}
+              >
+                Active
+              </Button>
+              <Button 
+                variant={statusFilter === 'testing' ? 'default' : 'outline'} 
+                size="sm" 
+                className="h-9 px-3 text-xs font-semibold"
+                onClick={() => setStatusFilter(statusFilter === 'testing' ? null : 'testing')}
+              >
+                Testing
               </Button>
               <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold">
-                 <RefreshCcw className="w-4 h-4 mr-2" /> Refresh
+                 <RefreshCcw className="w-4 h-4 mr-2" onClick={() => refetch()} /> Refresh
               </Button>
             </div>
           </div>
@@ -96,26 +204,28 @@ export default function RulesManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rules.map((rule, i) => (
+              {filteredRules.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-8">
+                    <p className="text-sm text-slate-500">No rules found</p>
+                  </TableCell>
+                </TableRow>
+              ) : filteredRules.map((rule: any, i: number) => (
                 <TableRow key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer">
                   <TableCell className="pl-6 py-4">
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-900">{rule.n}</span>
+                      <span className="text-sm font-bold text-slate-900">{rule.name || 'Unnamed Rule'}</span>
                       <span className="text-[10px] font-medium text-slate-400 uppercase">{rule.id}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="rounded-full px-2 py-0 text-[10px] font-bold bg-slate-50 border-slate-200 text-slate-500 uppercase">
-                      {rule.p}
+                      {rule.cluster || 'Unknown'}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-center">
-                    <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold border-none uppercase ${
-                      rule.s === 'Active' ? 'bg-emerald-500 text-white' : 
-                      rule.s === 'Testing' ? 'bg-blue-500 text-white' : 
-                      'bg-slate-400 text-white'
-                    }`}>
-                      {rule.s}
+                    <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold border-none uppercase ${getStatusColor(rule.status || 'unknown')}`}>
+                      {rule.status || 'Unknown'}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right pr-6">

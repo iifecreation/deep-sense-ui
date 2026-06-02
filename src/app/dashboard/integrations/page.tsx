@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { 
   Plug, 
   Search, 
@@ -33,7 +33,8 @@ import {
   LayoutGrid,
   ChevronDown,
   ArrowUpRight,
-  ExternalLink
+  ExternalLink,
+  RefreshCw
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -57,8 +58,82 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import { useIntegrations, useWebhooks } from "@/hooks";
 
 export default function IntegrationsPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data: integrations, isLoading, isError, error, refetch } = useIntegrations({ 
+    query: { page: 1, page_size: 50 }
+  });
+  const { data: webhooks } = useWebhooks({ 
+    query: { page: 1, page_size: 50 }
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'healthy': return 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
+      case 'degraded': return 'bg-orange-500/10 text-orange-500 border border-orange-500/20';
+      case 'disabled': return 'bg-muted text-muted-foreground border border-border';
+      default: return 'bg-muted text-muted-foreground border border-border';
+    }
+  };
+
+  const filteredIntegrations = integrations?.filter((i: any) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      i.id?.toLowerCase().includes(query) ||
+      i.name?.toLowerCase().includes(query) ||
+      i.type?.toLowerCase().includes(query)
+    );
+  }) || [];
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-10 pb-20">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-black italic tracking-tighter uppercase font-black">
+            Integrations<span className="text-brand-lime">.</span>
+          </h1>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i} className="rounded-[32px] border border-border/50">
+              <CardContent className="p-5">
+                <div className="h-20 bg-slate-100 animate-pulse rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col gap-10 pb-20">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-black italic tracking-tighter uppercase font-black">
+            Integrations<span className="text-brand-lime">.</span>
+          </h1>
+        </div>
+        <Card className="rounded-3xl border border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="text-red-600 h-5 w-5" />
+              <div>
+                <p className="font-semibold text-red-900">Failed to load integrations</p>
+                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
+              </div>
+            </div>
+            <Button onClick={() => refetch()} className="mt-4" variant="outline">
+              <RefreshCw className="w-4 h-4 mr-2" /> Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-10 pb-20">
       {/* 1. PAGE HEADER */}

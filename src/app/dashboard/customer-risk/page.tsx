@@ -1,3 +1,5 @@
+'use client';
+
 import { 
   ShieldAlert, 
   Search, 
@@ -14,7 +16,8 @@ import {
   PieChart,
   ArrowRight,
   ChevronRight,
-  AlertCircle
+  AlertCircle,
+  RefreshCw
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,8 +25,80 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { useCustomers } from "@/hooks/use-customers";
+import { useState } from "react";
 
 export default function CustomerRiskRegistry() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [riskTierFilter, setRiskTierFilter] = useState<string | null>(null);
+  const { data: customers, isLoading, isError, error, refetch } = useCustomers({ 
+    query: { page: 1, page_size: 50 },
+    filters: riskTierFilter ? { risk_tier: riskTierFilter } : {}
+  });
+
+  const getRiskTierColor = (tier: string) => {
+    switch (tier.toLowerCase()) {
+      case 'critical': return 'bg-red-900 text-white';
+      case 'high': return 'bg-red-500 text-white';
+      case 'medium': return 'bg-amber-500 text-white';
+      case 'low': return 'bg-emerald-500 text-white';
+      default: return 'bg-slate-500 text-white';
+    }
+  };
+
+  const filteredCustomers = customers?.filter((c: any) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      c.id?.toLowerCase().includes(query) ||
+      c.name?.toLowerCase().includes(query) ||
+      c.type?.toLowerCase().includes(query)
+    );
+  }) || [];
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Customer Risk Registry</h1>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="rounded-xl shadow-sm border">
+              <CardContent className="p-4">
+                <div className="h-20 bg-slate-100 animate-pulse rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Customer Risk Registry</h1>
+        </div>
+        <Card className="rounded-xl shadow-sm border border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="text-red-600 h-5 w-5" />
+              <div>
+                <p className="font-semibold text-red-900">Failed to load customers</p>
+                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
+              </div>
+            </div>
+            <Button onClick={() => refetch()} className="mt-4" variant="outline">
+              <RefreshCw className="w-4 h-4 mr-2" /> Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -44,24 +119,48 @@ export default function CustomerRiskRegistry() {
 
       {/* KPI Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { label: "High-Risk Portfolio", value: "1,240", subtext: "+4.2% increased exposure", icon: <ShieldAlert className="text-red-500" />, color: "border-red-100 bg-red-50/20" },
-          { label: "New Escalations", value: "42", subtext: "Within 24h review SLA", icon: <TrendingUp className="text-blue-500" />, color: "border-blue-100 bg-blue-50/20" },
-          { label: "Screening Matches", value: "156", subtext: "Pending PEP/Sanctions review", icon: <Users className="text-amber-500" />, color: "border-amber-100 bg-amber-50/20" },
-        ].map((kpi, i) => (
-          <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
-                {kpi.icon}
+        <Card className="rounded-xl shadow-sm border border-red-100 bg-red-50/20">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
+              <ShieldAlert className="text-red-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">High-Risk Portfolio</p>
+              <div className="text-xl font-bold text-slate-900">
+                {customers?.filter((c: any) => c.risk_tier === 'high' || c.risk_tier === 'critical').length || 0}
               </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{kpi.label}</p>
-                <div className="text-xl font-bold text-slate-900">{kpi.value}</div>
-                <p className="text-[10px] text-slate-400 font-medium">{kpi.subtext}</p>
+              <p className="text-[10px] text-slate-400 font-medium">Total customers</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-xl shadow-sm border border-blue-100 bg-blue-50/20">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
+              <TrendingUp className="text-blue-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Critical Risk</p>
+              <div className="text-xl font-bold text-slate-900">
+                {customers?.filter((c: any) => c.risk_tier === 'critical').length || 0}
               </div>
-            </CardContent>
-          </Card>
-        ))}
+              <p className="text-[10px] text-slate-400 font-medium">Immediate attention</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-xl shadow-sm border border-amber-100 bg-amber-50/20">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
+              <Users className="text-amber-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total Customers</p>
+              <div className="text-xl font-bold text-slate-900">{customers?.length || 0}</div>
+              <p className="text-[10px] text-slate-400 font-medium">All tiers</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Main Registry Table */}
@@ -69,14 +168,32 @@ export default function CustomerRiskRegistry() {
         <div className="p-4 border-b border-slate-100 bg-slate-50/30 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative w-full md:w-80">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <Input placeholder="Search customers, entities..." className="pl-9 bg-white text-sm" />
+            <Input 
+              placeholder="Search customers, entities..." 
+              className="pl-9 bg-white text-sm"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold">
-              <Filter className="w-4 h-4 mr-2" /> All Risk Tiers
+            <Button 
+              variant={riskTierFilter === 'critical' ? 'default' : 'outline'} 
+              size="sm" 
+              className="h-9 px-3 text-xs font-semibold"
+              onClick={() => setRiskTierFilter(riskTierFilter === 'critical' ? null : 'critical')}
+            >
+              <Filter className="w-4 h-4 mr-2" /> Critical
+            </Button>
+            <Button 
+              variant={riskTierFilter === 'high' ? 'default' : 'outline'} 
+              size="sm" 
+              className="h-9 px-3 text-xs font-semibold"
+              onClick={() => setRiskTierFilter(riskTierFilter === 'high' ? null : 'high')}
+            >
+              <Filter className="w-4 h-4 mr-2" /> High
             </Button>
             <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold">
-               <RefreshCcw className="w-4 h-4 mr-2" /> Refresh
+               <RefreshCcw className="w-4 h-4 mr-2" onClick={() => refetch()} /> Refresh
             </Button>
           </div>
         </div>
@@ -86,54 +203,34 @@ export default function CustomerRiskRegistry() {
               <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-6">Customer / Entity</TableHead>
               <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Risk Tier</TableHead>
               <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Score</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Trend</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Flags</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Type</TableHead>
               <TableHead className="text-right pr-6"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {[
-              { id: "C-9921", name: "Ouroboros Trading", type: "Corporate", tier: "Critical", score: 94, trend: "+12", flags: ["Sanctions", "PEP"] },
-              { id: "C-4402", name: "Sarah Jenkins", type: "Retail", tier: "High", score: 82, trend: "+5", flags: ["PEP"] },
-              { id: "C-8812", name: "Atlas Global Ltd", type: "Merchant", tier: "Low", score: 25, trend: "-2", flags: ["Watchlist"] },
-              { id: "C-1049", name: "Dmitry Volkov", type: "Retail", tier: "High", score: 91, trend: "+18", flags: ["Sanctions"] },
-              { id: "C-5521", name: "Nexus Assets", type: "Financial", tier: "Medium", score: 79, trend: "0", flags: [] },
-            ].map((customer, i) => (
+            {filteredCustomers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8">
+                  <p className="text-sm text-slate-500">No customers found</p>
+                </TableCell>
+              </TableRow>
+            ) : filteredCustomers.map((customer: any, i: number) => (
               <TableRow key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer">
                 <TableCell className="pl-6">
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-slate-900">{customer.name}</span>
+                    <span className="text-xs font-bold text-slate-900">{customer.name || 'Unknown'}</span>
                     <div className="flex gap-2 text-[10px] font-medium text-slate-400 uppercase">
                       <span>{customer.id}</span>
-                      <span>•</span>
-                      <span>{customer.type}</span>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide border-none ${
-                    customer.tier === 'Critical' ? 'bg-red-900 text-white' : 
-                    customer.tier === 'High' ? 'bg-red-500 text-white' : 
-                    customer.tier === 'Medium' ? 'bg-amber-500 text-white' : 
-                    'bg-emerald-500 text-white'
-                  }`}>
-                    {customer.tier}
+                  <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide border-none ${getRiskTierColor(customer.risk_tier || 'unknown')}`}>
+                    {customer.risk_tier || 'Unknown'}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-sm font-bold text-slate-900">{customer.score}</TableCell>
-                <TableCell>
-                  <span className={`text-[10px] font-bold ${customer.trend.startsWith('+') ? 'text-red-500' : customer.trend === '0' ? 'text-slate-400' : 'text-emerald-500'}`}>
-                    {customer.trend}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    {customer.flags.map(f => (
-                      <Badge key={f} variant="outline" className="text-[8px] font-bold uppercase border-slate-200 text-slate-500">{f}</Badge>
-                    ))}
-                    {customer.flags.length === 0 && <span className="text-[10px] text-slate-300 italic">None</span>}
-                  </div>
-                </TableCell>
+                <TableCell className="text-sm font-bold text-slate-900">{customer.risk_score || 0}</TableCell>
+                <TableCell className="text-[11px] font-semibold text-slate-500">{customer.type || 'Unknown'}</TableCell>
                 <TableCell className="text-right pr-6">
                   <Link href={`/dashboard/customer-risk/${customer.id}`}>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 group-hover:text-blue-600">
@@ -157,60 +254,47 @@ export default function CustomerRiskRegistry() {
             </div>
             <PieChart className="w-5 h-5 text-slate-200" />
           </div>
-          <div className="grid grid-cols-2 gap-8 items-center">
-            <div className="space-y-3">
-              {[
-                { label: "Critical Risk", value: "12%", color: "bg-red-800" },
-                { label: "High Risk", value: "28%", color: "bg-red-500" },
-                { label: "Medium Risk", value: "40%", color: "bg-amber-500" },
-                { label: "Low Risk", value: "20%", color: "bg-emerald-500" },
-              ].map((segment, i) => (
+          <div className="space-y-3">
+            {[
+              { label: "Critical Risk", value: customers?.filter((c: any) => c.risk_tier === 'critical').length || 0, color: "bg-red-800" },
+              { label: "High Risk", value: customers?.filter((c: any) => c.risk_tier === 'high').length || 0, color: "bg-red-500" },
+              { label: "Medium Risk", value: customers?.filter((c: any) => c.risk_tier === 'medium').length || 0, color: "bg-amber-500" },
+              { label: "Low Risk", value: customers?.filter((c: any) => c.risk_tier === 'low').length || 0, color: "bg-emerald-500" },
+            ].map((segment, i) => {
+              const total = customers?.length || 1;
+              const percentage = ((segment.value / total) * 100).toFixed(0);
+              return (
                 <div key={i} className="flex justify-between items-center text-[11px] font-medium">
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${segment.color}`} />
                     <span className="text-slate-500">{segment.label}</span>
                   </div>
-                  <span className="text-slate-900 font-bold">{segment.value}</span>
+                  <span className="text-slate-900 font-bold">{segment.value} ({percentage}%)</span>
                 </div>
-              ))}
-            </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-slate-50 rounded-full aspect-square border-4 border-white shadow-inner">
-              <span className="text-2xl font-bold text-slate-900">1,240</span>
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">High Risk</span>
-            </div>
+              );
+            })}
           </div>
         </Card>
 
         <Card className="rounded-xl shadow-sm border bg-white p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <CardTitle className="text-base font-bold text-slate-900">Recent Risk Evolution</CardTitle>
-              <CardDescription className="text-xs">Timeline of high-velocity profile changes.</CardDescription>
+              <CardTitle className="text-base font-bold text-slate-900">Quick Actions</CardTitle>
+              <CardDescription className="text-xs">Common customer management tasks.</CardDescription>
             </div>
             <TrendingUp className="w-5 h-5 text-slate-200" />
           </div>
-          <div className="space-y-4">
-            {[
-              { type: "Critical", name: "Ouroboros Trading", reason: "Sudden velocity shift", time: "5m ago" },
-              { type: "High", name: "Chen Wei", reason: "PEP status confirmed", time: "1h ago" },
-              { type: "High", name: "Global Trade Solutions", reason: "New high-risk device link", time: "3h ago" },
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-4 p-3 rounded-lg bg-slate-50/50 hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100 group">
-                <div className={`mt-1 h-2 w-2 rounded-full ${item.type === 'Critical' ? 'bg-red-800' : 'bg-red-500'}`} />
-                <div className="flex-1 space-y-0.5">
-                  <div className="flex justify-between">
-                    <span className="text-xs font-bold text-slate-900">{item.name}</span>
-                    <span className="text-[10px] text-slate-400 font-medium">{item.time}</span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 line-clamp-1">{item.reason}</p>
-                </div>
-                <ArrowRight className="w-3 h-3 text-slate-200 group-hover:text-blue-600 transition-colors" />
-              </div>
-            ))}
+          <div className="space-y-2">
+            <Button variant="outline" className="w-full text-xs font-bold border-slate-200 justify-start">
+              <Filter className="w-4 h-4 mr-2" /> Bulk Risk Assessment
+            </Button>
+            <Button variant="outline" className="w-full text-xs font-bold border-slate-200 justify-start">
+              <Download className="w-4 h-4 mr-2" /> Export Customer List
+            </Button>
+            <Button variant="outline" className="w-full text-xs font-bold border-slate-200 justify-start">
+              <RefreshCcw className="w-4 h-4 mr-2" /> Refresh Screening Data
+            </Button>
           </div>
-          <Button variant="ghost" className="w-full mt-4 text-[11px] font-bold text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-            View Risk Audit Trail
-          </Button>
         </Card>
       </div>
     </div>

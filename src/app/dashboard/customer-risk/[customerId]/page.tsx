@@ -38,7 +38,8 @@ import {
   Users,
   MapPin,
   Laptop,
-  AlertCircle
+  AlertCircle,
+  RefreshCw
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -63,38 +64,64 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { useCustomer, useCustomerRisk } from "@/hooks/use-customers";
 
 export default function CustomerRiskProfile() {
   const params = useParams();
   const customerId = params.customerId as string;
+  const { data: customer, isLoading, isError, error, refetch } = useCustomer(customerId);
+  const { data: riskData, isLoading: riskLoading } = useCustomerRisk(customerId);
 
-  // Mock data for the customer
-  const customer = {
-    id: customerId,
-    name: "Elena Volkov",
-    riskScore: 78,
-    riskTier: "High",
-    status: "Under Review",
-    analyst: "Marcus Aurelius",
-    joined: "Jan 12, 2024",
-    email: "elena.volkov@globalsecure.io",
-    location: "Larnaca, Cyprus",
-    type: "Institutional Admin",
-    drivers: [
-      { label: "Jurisdiction Opacity", value: 84, color: "bg-red-500" },
-      { label: "Transaction Velocity", value: 72, color: "bg-amber-500" },
-      { label: "Entity Linkage Depth", value: 45, color: "bg-blue-500" },
-      { label: "Behavioral Deviation", value: 88, color: "bg-red-600" }
-    ],
-    screening: {
-      sanctions: "Clear",
-      pep: "Match Detected (L1)",
-      watchlist: "Clear"
-    },
-    stats: {
-      alerts: 3,
-      cases: 1,
-      trending: "+12%"
+  if (isLoading || riskLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Loading customer...</h1>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="rounded-xl shadow-sm border">
+              <CardContent className="p-4">
+                <div className="h-20 bg-slate-100 animate-pulse rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Customer Risk Profile</h1>
+        </div>
+        <Card className="rounded-xl shadow-sm border border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="text-red-600 h-5 w-5" />
+              <div>
+                <p className="font-semibold text-red-900">Failed to load customer</p>
+                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
+              </div>
+            </div>
+            <Button onClick={() => refetch()} className="mt-4" variant="outline">
+              <RefreshCw className="w-4 h-4 mr-2" /> Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const getRiskTierColor = (tier: string) => {
+    switch (tier.toLowerCase()) {
+      case 'critical': return 'bg-red-100 text-red-700';
+      case 'high': return 'bg-red-100 text-red-700';
+      case 'medium': return 'bg-amber-100 text-amber-700';
+      case 'low': return 'bg-emerald-100 text-emerald-700';
+      default: return 'bg-slate-100 text-slate-700';
     }
   };
 
@@ -107,17 +134,15 @@ export default function CustomerRiskProfile() {
             <ArrowLeft className="w-3 h-3" /> Back to Registry
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{customer.name}</h1>
-            <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide border-none ${
-              customer.riskTier === 'High' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
-            }`}>
-              {customer.riskTier} Risk
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{customer?.name || 'Unknown Customer'}</h1>
+            <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide border-none ${getRiskTierColor(customer?.risk_tier || 'unknown')}`}>
+              {(customer?.risk_tier || 'Unknown')} Risk
             </Badge>
             <Badge variant="outline" className="rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide bg-blue-50 text-blue-700 border-none">
-              {customer.status}
+              {customer?.status || 'Unknown'}
             </Badge>
           </div>
-          <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">{customer.id} • {customer.type}</p>
+          <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">{customerId} • {customer?.type || 'Unknown'}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="font-semibold">
@@ -140,24 +165,46 @@ export default function CustomerRiskProfile() {
 
       {/* KPI Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { label: "Entity Risk Index", value: customer.riskScore, subtext: "Historical high: 82", icon: <Zap className="text-red-500" />, color: "border-red-100 bg-red-50/20" },
-          { label: "Active Alerts", value: customer.stats.alerts, subtext: "1 critical signal", icon: <AlertCircle className="text-amber-500" />, color: "border-amber-100 bg-amber-50/20" },
-          { label: "Screening Status", value: "Flagged", subtext: "PEP Match Detected", icon: <ShieldAlert className="text-blue-500" />, color: "border-blue-100 bg-blue-50/20" },
-        ].map((kpi, i) => (
-          <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
-            <CardContent className="p-4 flex gap-4 items-center">
-              <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
-                {kpi.icon}
+        <Card className="rounded-xl shadow-sm border border-red-100 bg-red-50/20">
+          <CardContent className="p-4 flex gap-4 items-center">
+            <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
+              <Zap className="text-red-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Entity Risk Index</p>
+              <div className="text-xl font-bold text-slate-900">{customer?.risk_score || 0}</div>
+              <p className="text-[10px] text-slate-400 font-medium">Current score</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-xl shadow-sm border border-amber-100 bg-amber-50/20">
+          <CardContent className="p-4 flex gap-4 items-center">
+            <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
+              <AlertCircle className="text-amber-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Active Alerts</p>
+              <div className="text-xl font-bold text-slate-900">{customer?.alert_count || 0}</div>
+              <p className="text-[10px] text-slate-400 font-medium">Total alerts</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-xl shadow-sm border border-blue-100 bg-blue-50/20">
+          <CardContent className="p-4 flex gap-4 items-center">
+            <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
+              <ShieldAlert className="text-blue-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Screening Status</p>
+              <div className="text-xl font-bold text-slate-900">
+                {riskData?.screening_status || 'Unknown'}
               </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{kpi.label}</p>
-                <div className="text-xl font-bold text-slate-900">{kpi.value}</div>
-                <p className="text-[10px] text-slate-400 font-medium">{kpi.subtext}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              <p className="text-[10px] text-slate-400 font-medium">AML check</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Main Content Workspace */}
@@ -185,20 +232,20 @@ export default function CustomerRiskProfile() {
                     </div>
                   </div>
                   <p className="text-sm font-medium leading-relaxed text-blue-50">
-                    Calculated score of {customer.riskScore} is primarily driven by <span className="font-bold underline decoration-blue-300">Jurisdiction Opacity</span> (Cyprus) 
-                    and highly anomalous transaction velocity. ML models have identified structural 
-                    similarities to known high-risk institutional nodes in the last 24 hours.
+                    Calculated score of {customer?.risk_score || 0} is primarily driven by risk factors 
+                    identified in the risk assessment. ML models have evaluated the customer profile 
+                    against known risk patterns.
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                    {customer.drivers.map((driver, i) => (
+                    {riskData?.risk_factors?.map((driver: any, i: number) => (
                       <div key={i} className="space-y-1.5">
                         <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-blue-100">
-                          <span>{driver.label}</span>
-                          <span>{driver.value}</span>
+                          <span>{driver.label || 'Factor'}</span>
+                          <span>{driver.value || 0}</span>
                         </div>
-                        <Progress value={driver.value} className="h-1 bg-white/10" />
+                        <Progress value={driver.value || 0} className="h-1 bg-white/10" />
                       </div>
-                    ))}
+                    )) || <p className="text-blue-200 text-sm">No risk factors available</p>}
                   </div>
                 </div>
               </Card>
@@ -209,10 +256,10 @@ export default function CustomerRiskProfile() {
                   <h4 className="text-sm font-bold text-slate-900 mb-4">Core Metadata</h4>
                   <div className="space-y-4">
                     {[
-                      { label: "Entity Name", value: customer.name, icon: <User className="w-4 h-4" /> },
-                      { label: "Email Address", value: customer.email, icon: <Globe className="w-4 h-4" /> },
-                      { label: "Location", value: customer.location, icon: <MapPin className="w-4 h-4" /> },
-                      { label: "Joined", value: customer.joined, icon: <Calendar className="w-4 h-4" /> },
+                      { label: "Entity Name", value: customer?.name || 'Unknown', icon: <User className="w-4 h-4" /> },
+                      { label: "Email Address", value: customer?.email || 'N/A', icon: <Globe className="w-4 h-4" /> },
+                      { label: "Location", value: customer?.country || 'N/A', icon: <MapPin className="w-4 h-4" /> },
+                      { label: "Joined", value: customer?.created_at ? new Date(customer.created_at).toLocaleDateString() : 'N/A', icon: <Calendar className="w-4 h-4" /> },
                     ].map((item, i) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                         <span className="text-[11px] font-medium text-slate-400 flex items-center gap-2">{item.icon} {item.label}</span>
@@ -223,24 +270,20 @@ export default function CustomerRiskProfile() {
                 </Card>
 
                 <Card className="rounded-xl shadow-sm border bg-white p-6">
-                  <h4 className="text-sm font-bold text-slate-900 mb-4">Device Profile</h4>
+                  <h4 className="text-sm font-bold text-slate-900 mb-4">Customer Type</h4>
                   <div className="bg-slate-50 rounded-lg p-4 flex items-center gap-4 border border-slate-100 mb-4">
                     <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center">
-                      <Laptop className="w-5 h-5 text-slate-400" />
+                      <User className="w-5 h-5 text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900">MacBook Pro (M3 Max)</p>
-                      <p className="text-[10px] font-medium text-slate-400 uppercase">IP: 185.112.42.9 • Verified</p>
+                      <p className="text-xs font-bold text-slate-900">{customer?.type || 'Unknown'}</p>
+                      <p className="text-[10px] font-medium text-slate-400 uppercase">Customer classification</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                      <span>Trust Signals</span>
-                      <span className="text-slate-900">3/4 Nodes Verified</span>
-                    </div>
-                    <div className="flex gap-1.5">
-                      {[1,2,3].map(i => <div key={i} className="flex-1 h-1 bg-blue-500 rounded-full" />)}
-                      <div className="flex-1 h-1 bg-slate-200 rounded-full" />
+                      <span>Status</span>
+                      <span className="text-slate-900">{customer?.status || 'Unknown'}</span>
                     </div>
                   </div>
                 </Card>
@@ -255,9 +298,9 @@ export default function CustomerRiskProfile() {
             <h4 className="text-sm font-bold text-slate-900">AML Screening Perimeter</h4>
             <div className="space-y-2">
               {[
-                { label: "Sanctions", status: "Clear", icon: <ShieldCheck className="text-emerald-500" /> },
-                { label: "PEP List", status: "Match (L1)", icon: <ShieldAlert className="text-amber-500" /> },
-                { label: "Watchlist", status: "Clear", icon: <Globe className="text-emerald-500" /> },
+                { label: "Sanctions", status: riskData?.sanctions_status || 'Unknown', icon: <ShieldCheck className="text-emerald-500" /> },
+                { label: "PEP List", status: riskData?.pep_status || 'Unknown', icon: <ShieldAlert className="text-amber-500" /> },
+                { label: "Watchlist", status: riskData?.watchlist_status || 'Unknown', icon: <Globe className="text-emerald-500" /> },
               ].map((check, i) => (
                 <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 bg-slate-50/50">
                   <div className="flex items-center gap-3">

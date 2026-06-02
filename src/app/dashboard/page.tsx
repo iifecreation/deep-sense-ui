@@ -1,27 +1,118 @@
+'use client';
+
 import { 
   AlertCircle, 
   CheckCircle2, 
   Users, 
   ArrowUpRight, 
   ArrowRight,
-  Plus
+  Plus,
+  RefreshCw,
+  AlertTriangle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Link from "next/link";
+import { useDashboardMetrics } from "@/hooks/use-analytics";
+import { useAlerts } from "@/hooks/use-alerts";
+import { useEffect, useState } from "react";
 
 export default function DashboardOverview() {
+  const { data: metrics, isLoading: metricsLoading, isError: metricsError, refetch: refetchMetrics } = useDashboardMetrics();
+  const { data: alerts, isLoading: alertsLoading, isError: alertsError, refetch: refetchAlerts } = useAlerts({ query: { page: 1, page_size: 5 }, filters: { severity: 'high' } });
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const handleRefresh = () => {
+    refetchMetrics();
+    refetchAlerts();
+    setLastUpdated(new Date());
+  };
+
+  useEffect(() => {
+    setLastUpdated(new Date());
+  }, [metrics, alerts]);
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
+  };
+
+  const getRiskColor = (risk: string) => {
+    switch (risk.toLowerCase()) {
+      case 'critical': return 'bg-red-900 text-white';
+      case 'high': return 'bg-red-500 text-white';
+      case 'medium': return 'bg-amber-500 text-white';
+      case 'low': return 'bg-green-500 text-white';
+      default: return 'bg-slate-500 text-white';
+    }
+  };
+
+  if (metricsLoading && alertsLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Dashboard Overview</h1>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="rounded-xl shadow-sm border">
+              <CardContent className="p-6">
+                <div className="h-20 bg-slate-100 animate-pulse rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (metricsError || alertsError) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Dashboard Overview</h1>
+        </div>
+        <Card className="rounded-xl shadow-sm border border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="text-red-600 h-5 w-5" />
+              <div>
+                <p className="font-semibold text-red-900">Failed to load dashboard data</p>
+                <p className="text-sm text-red-700">Please check your connection and try again.</p>
+              </div>
+            </div>
+            <Button onClick={handleRefresh} className="mt-4" variant="outline">
+              <RefreshCw className="w-4 h-4 mr-2" /> Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Dashboard Overview</h1>
-          <p className="text-sm text-slate-500 mt-1">Real-time risk monitoring and operational control.</p>
+          <p className="text-sm text-slate-500 mt-1">
+            Real-time risk monitoring and operational control.
+            {lastUpdated && <span className="ml-2">Last updated: {lastUpdated.toLocaleTimeString()}</span>}
+          </p>
         </div>
         <div className="flex gap-3">
+          <Button variant="outline" className="text-sm font-semibold" onClick={handleRefresh}>
+            <RefreshCw className="w-4 h-4 mr-2" /> Refresh
+          </Button>
           <Button variant="outline" className="text-sm font-semibold">Generate Report</Button>
           <Button className="bg-blue-600 hover:bg-blue-700 text-sm font-semibold">
             <Plus className="w-4 h-4 mr-2" /> Create Case
@@ -31,22 +122,38 @@ export default function DashboardOverview() {
 
       {/* KPI Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { title: "Open Alerts", value: "142", subtext: "Requires immediate review", icon: <AlertCircle className="text-red-500" />, color: "border-red-100 bg-red-50/30" },
-          { title: "Pending Reviews", value: "28", subtext: "Within 24h SLA", icon: <CheckCircle2 className="text-blue-500" />, color: "border-blue-100 bg-blue-50/30" },
-          { title: "High-Risk Customers", value: "842", subtext: "+5 since last sync", icon: <Users className="text-amber-500" />, color: "border-amber-100 bg-amber-50/30" },
-        ].map((kpi, i) => (
-          <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">{kpi.title}</CardTitle>
-              {kpi.icon}
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{kpi.value}</div>
-              <p className="text-xs text-slate-500 mt-1">{kpi.subtext}</p>
-            </CardContent>
-          </Card>
-        ))}
+        <Card className="rounded-xl shadow-sm border border-red-100 bg-red-50/30">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">Open Alerts</CardTitle>
+            <AlertCircle className="text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-slate-900">{(metrics as any)?.total_alerts || 0}</div>
+            <p className="text-xs text-slate-500 mt-1">Requires immediate review</p>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-xl shadow-sm border border-blue-100 bg-blue-50/30">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">Active Cases</CardTitle>
+            <CheckCircle2 className="text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-slate-900">{(metrics as any)?.active_cases || 0}</div>
+            <p className="text-xs text-slate-500 mt-1">{(metrics as any)?.unresolved_cases || 0} unresolved</p>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-xl shadow-sm border border-amber-100 bg-amber-50/30">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">High-Risk Alerts</CardTitle>
+            <Users className="text-amber-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-slate-900">{(metrics as any)?.high_risk_alerts || 0}</div>
+            <p className="text-xs text-slate-500 mt-1">Critical attention needed</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Main Content Area */}
@@ -66,38 +173,49 @@ export default function DashboardOverview() {
             <TableHeader className="bg-slate-50/50">
               <TableRow>
                 <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-6">Alert ID</TableHead>
-                <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Customer</TableHead>
+                <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Description</TableHead>
                 <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Risk Level</TableHead>
                 <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Time</TableHead>
                 <TableHead className="text-right pr-6"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {[
-                { id: "AL-8821", name: "Global Trade Solutions", risk: "Critical", time: "2m ago" },
-                { id: "AL-8822", name: "Elena Volkov", risk: "High", time: "14m ago" },
-                { id: "AL-8823", name: "Nexus Crypto OTC", risk: "Medium", time: "1h ago" },
-                { id: "AL-8824", name: "Sarah O'Connell", risk: "High", time: "3h ago" },
-                { id: "AL-8825", name: "Silk Road Logistics", risk: "Medium", time: "5h ago" },
-              ].map((alert, i) => (
-                <TableRow key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer">
-                  <TableCell className="text-xs font-semibold text-slate-400 pl-6">{alert.id}</TableCell>
-                  <TableCell className="text-xs font-bold text-slate-900">{alert.name}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide border-none ${
-                      alert.risk === 'Critical' ? 'bg-red-900 text-white' : alert.risk === 'High' ? 'bg-red-500 text-white' : 'bg-amber-500 text-white'
-                    }`}>
-                      {alert.risk}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-xs text-slate-500 font-medium">{alert.time}</TableCell>
-                  <TableCell className="text-right pr-6">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 group-hover:text-blue-600">
-                      <ArrowUpRight className="w-4 h-4" />
-                    </Button>
+              {alertsLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8">
+                    <div className="flex items-center justify-center">
+                      <RefreshCw className="w-4 h-4 animate-spin mr-2" />
+                      Loading alerts...
+                    </div>
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : alerts && alerts.length > 0 ? (
+                alerts.map((alert: any) => (
+                  <TableRow key={alert.id} className="group hover:bg-slate-50 transition-colors cursor-pointer">
+                    <TableCell className="text-xs font-semibold text-slate-400 pl-6">{alert.id}</TableCell>
+                    <TableCell className="text-xs font-bold text-slate-900 max-w-[200px] truncate">{alert.description || 'No description'}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide border-none ${getRiskColor(alert.severity || 'low')}`}>
+                        {alert.severity || 'low'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-xs text-slate-500 font-medium">{alert.created_at ? formatTimeAgo(alert.created_at) : 'N/A'}</TableCell>
+                    <TableCell className="text-right pr-6">
+                      <Link href={`/dashboard/alerts/${alert.id}`}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 group-hover:text-blue-600">
+                          <ArrowUpRight className="w-4 h-4" />
+                        </Button>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8">
+                    <p className="text-sm text-slate-500">No high-priority alerts found</p>
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </Card>
@@ -109,31 +227,16 @@ export default function DashboardOverview() {
             <CardDescription className="text-xs">Operational ledger and audit stream.</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 p-6 space-y-6 overflow-y-auto max-h-[400px]">
-            {[
-              { event: "Case Escalated", time: "12m ago", detail: "Alert AL-8821 assigned to senior analyst.", icon: <ArrowUpRight className="text-blue-500" /> },
-              { event: "Screening Match", time: "44m ago", detail: "Customer 'Elena Volkov' flagged for PEP match.", icon: <Users className="text-amber-500" /> },
-              { event: "Report Filed", time: "1h ago", detail: "SAR #449 submitted for CTR compliance.", icon: <CheckCircle2 className="text-emerald-500" /> },
-              { event: "New Customer", time: "3h ago", detail: "Atlas Logistics onboarding initiated.", icon: <Plus className="text-slate-400" /> },
-            ].map((activity, i) => (
-              <div key={i} className="flex gap-4 relative">
-                {i !== 3 && <div className="absolute left-[13px] top-8 bottom-[-24px] w-[1px] bg-slate-100" />}
-                <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 z-10">
-                  {activity.icon}
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-slate-900">{activity.event}</span>
-                    <span className="text-[10px] font-medium text-slate-400">{activity.time}</span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 leading-relaxed font-medium">{activity.detail}</p>
-                </div>
-              </div>
-            ))}
+            <div className="text-sm text-slate-500 text-center py-8">
+              Activity feed coming soon
+            </div>
           </CardContent>
           <div className="p-4 border-t border-slate-100 mt-auto">
-            <Button variant="outline" className="w-full text-xs font-bold h-9 bg-slate-50 hover:bg-slate-100 border-slate-200">
-              Full System Trace
-            </Button>
+            <Link href="/dashboard/audit">
+              <Button variant="outline" className="w-full text-xs font-bold h-9 bg-slate-50 hover:bg-slate-100 border-slate-200">
+                Full System Trace
+              </Button>
+            </Link>
           </div>
         </Card>
       </div>
