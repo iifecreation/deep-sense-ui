@@ -4,49 +4,23 @@ import {
   ArrowLeft, 
   ShieldCheck, 
   ShieldAlert, 
-  AlertTriangle, 
-  Clock, 
   User, 
   Zap, 
-  MoreHorizontal, 
   ChevronRight, 
-  Download, 
-  Briefcase, 
   MessageSquare,
-  FileText,
-  Activity,
-  Plus,
-  ArrowUpRight,
-  CheckCircle2,
-  Eye,
   Info,
-  History,
-  TrendingUp,
-  Link as LinkIcon,
-  Fingerprint,
   Globe,
-  MoreVertical,
-  CheckSquare,
-  Flag,
   Calendar,
-  Layers,
-  Archive,
-  Star,
   Lock,
-  MessageCircle,
-  Network,
-  Users,
   MapPin,
-  Laptop,
   AlertCircle,
   RefreshCw
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
@@ -55,22 +29,20 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
 import { useCustomer, useCustomerRisk } from "@/hooks/use-customers";
+
+type RiskFactor = {
+  label?: string;
+  value?: number;
+};
 
 export default function CustomerRiskProfile() {
   const params = useParams();
   const customerId = params.customerId as string;
   const { data: customer, isLoading, isError, error, refetch } = useCustomer(customerId);
   const { data: riskData, isLoading: riskLoading } = useCustomerRisk(customerId);
+  const customerDisplayName = customer?.full_name || 'Unknown Customer';
+  const customerClassification = customer?.kyc_status || customer?.screening_status || 'Unknown';
 
   if (isLoading || riskLoading) {
     return (
@@ -134,7 +106,7 @@ export default function CustomerRiskProfile() {
             <ArrowLeft className="w-3 h-3" /> Back to Registry
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{customer?.name || 'Unknown Customer'}</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{customerDisplayName}</h1>
             <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide border-none ${getRiskTierColor(customer?.risk_tier || 'unknown')}`}>
               {(customer?.risk_tier || 'Unknown')} Risk
             </Badge>
@@ -142,7 +114,7 @@ export default function CustomerRiskProfile() {
               {customer?.status || 'Unknown'}
             </Badge>
           </div>
-          <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">{customerId} • {customer?.type || 'Unknown'}</p>
+          <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">{customer?.customer_id || customerId} • {customerClassification}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="font-semibold">
@@ -185,7 +157,7 @@ export default function CustomerRiskProfile() {
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Active Alerts</p>
-              <div className="text-xl font-bold text-slate-900">{customer?.alert_count || 0}</div>
+              <div className="text-xl font-bold text-slate-900">{customer?.linked_alerts_count || 0}</div>
               <p className="text-[10px] text-slate-400 font-medium">Total alerts</p>
             </div>
           </CardContent>
@@ -237,7 +209,7 @@ export default function CustomerRiskProfile() {
                     against known risk patterns.
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                    {riskData?.risk_factors?.map((driver: any, i: number) => (
+                    {riskData?.risk_factors?.map((driver: RiskFactor, i: number) => (
                       <div key={i} className="space-y-1.5">
                         <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-blue-100">
                           <span>{driver.label || 'Factor'}</span>
@@ -256,9 +228,9 @@ export default function CustomerRiskProfile() {
                   <h4 className="text-sm font-bold text-slate-900 mb-4">Core Metadata</h4>
                   <div className="space-y-4">
                     {[
-                      { label: "Entity Name", value: customer?.name || 'Unknown', icon: <User className="w-4 h-4" /> },
+                      { label: "Entity Name", value: customerDisplayName, icon: <User className="w-4 h-4" /> },
                       { label: "Email Address", value: customer?.email || 'N/A', icon: <Globe className="w-4 h-4" /> },
-                      { label: "Location", value: customer?.country || 'N/A', icon: <MapPin className="w-4 h-4" /> },
+                      { label: "Location", value: customer?.nationality || 'N/A', icon: <MapPin className="w-4 h-4" /> },
                       { label: "Joined", value: customer?.created_at ? new Date(customer.created_at).toLocaleDateString() : 'N/A', icon: <Calendar className="w-4 h-4" /> },
                     ].map((item, i) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
@@ -276,7 +248,7 @@ export default function CustomerRiskProfile() {
                       <User className="w-5 h-5 text-slate-400" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900">{customer?.type || 'Unknown'}</p>
+                      <p className="text-xs font-bold text-slate-900">{customerClassification}</p>
                       <p className="text-[10px] font-medium text-slate-400 uppercase">Customer classification</p>
                     </div>
                   </div>

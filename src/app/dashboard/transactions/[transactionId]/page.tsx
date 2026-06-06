@@ -64,68 +64,80 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { useTransaction } from "@/hooks/use-transactions";
 
 export default function TransactionDetailPage() {
   const params = useParams();
   const transactionId = params.transactionId as string;
 
-  // Full detail mock data
+  const { data, isLoading, isError, refetch } = useTransaction(transactionId);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-lime"></div>
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="p-6 bg-red-50 text-red-700 rounded-lg flex flex-col items-center">
+        <AlertTriangle className="w-8 h-8 mb-2" />
+        <h2 className="font-bold">Failed to load transaction</h2>
+        <Button onClick={refetch} className="mt-4" variant="outline">Retry</Button>
+      </div>
+    );
+  }
+
+  const txnData = data;
+  
+  // Safe mapping of transaction data
   const txn = {
-    id: transactionId,
-    decision: "REVIEW",
-    status: "Flagged",
-    riskScore: 84,
-    amount: "4,250.00",
-    currency: "USD",
-    timestamp: "Oct 15, 2026 • 19:32:11",
+    id: txnData.id,
+    decision: txnData.decision || "PENDING",
+    status: txnData.status || "Unknown",
+    riskScore: txnData.final_score || 0,
+    amount: txnData.amount,
+    currency: txnData.currency,
+    timestamp: new Date(txnData.occurred_at || txnData.created_at).toLocaleString(),
     customer: {
-      name: "Elena Volkov",
-      id: "CUST-9921",
-      risk: "Medium",
-      joined: "Jan 2024"
+      name: txnData.customer_name || "Unknown",
+      id: txnData.customer_id || txnData.account_id || "Unknown",
+      risk: txnData.risk_level || "Unknown",
+      joined: "N/A"
     },
     merchant: {
-      name: "Z-Crypt Solutions Hub",
-      id: "MERCH-4421",
-      location: "Larnaca, Cyprus"
+      name: txnData.merchant_id || "Unknown",
+      id: txnData.merchant_id || "Unknown",
+      location: "Unknown"
     },
     network: {
-      ip: "185.112.42.9",
-      isp: "MTN Cyprus",
+      ip: "N/A",
+      isp: "N/A",
       proxy: false,
-      vpn: true,
+      vpn: false,
       tor: false
     },
     device: {
-      name: "MacBook Pro (macOS 14.2)",
-      id: "DEV-7721-BC",
-      integrity: "Trusted",
-      browser: "Chrome 122.0.0"
+      name: "N/A",
+      id: "N/A",
+      integrity: "N/A",
+      browser: "N/A"
     },
     scores: {
-      ml: 78,
-      rules: 92,
-      anomaly: 81,
-      device: 44,
-      graph: 65,
-      behavioral: 88,
-      final: 84
+      ml: txnData.final_score || 0,
+      rules: 0,
+      anomaly: 0,
+      device: 0,
+      graph: 0,
+      behavioral: 0,
+      final: txnData.final_score || 0
     },
-    rules: [
-      { name: "High-Opacity Jurisdiction", type: "Geography", match: "Origin in CY (Tier 3)", severity: "Critical", weight: "+42" },
-      { name: "Velocity Breach (1h)", type: "Behavior", match: "3 txns > $1k in 60m", severity: "High", weight: "+28" },
-      { name: "VPN Ingress Detected", type: "Network", match: "IP flags active VPN", severity: "Medium", weight: "+12" },
-      { name: "Unusual Merchant Category", type: "Model", match: "Cross-border crypto", severity: "Medium", weight: "+15" }
-    ],
-    alerts: [
-      { id: "ALT-9921", type: "Velocity Breach", status: "Active", severity: "High" }
-    ],
+    rules: [],
+    alerts: [],
     timeline: [
-      { event: "Transaction Received", time: "19:32:11", detail: "Payload validated via REST API" },
-      { event: "Risk Scoring Initialized", time: "19:32:11", detail: "Orchestrator v4.2 engaged" },
-      { event: "Rule Threshold Breach", time: "19:32:12", detail: "Score exceeded review threshold (75+)" },
-      { event: "Alert [ALT-9921] Created", time: "19:32:14", detail: "Assigned to auto-queue" },
-      { event: "Analyst Assigned", time: "19:44:02", detail: "Reviewer: Marcus Aurelius" }
+      { event: "Transaction Received", time: new Date(txnData.created_at).toLocaleTimeString(), detail: "Logged in system" }
     ]
   };
 
@@ -223,13 +235,8 @@ export default function TransactionDetailPage() {
                         <div className="space-y-2">
                            <h3 className="text-xl font-black italic uppercase tracking-tighter">Decision Logic Resolution</h3>
                            <p className="text-[13px] text-white/80 leading-relaxed font-medium italic italic">
-                              This transaction scored <span className="text-white font-black underline underline-offset-4 decoration-white/30">{txn.scores.final}</span> due to a high-opacity jurisdiction hit combined with a behavior velocity breach. 
-                              The ML pattern matches a known cash-out vector observed in similar institutional gateways where magnitude exceeds the 30-day baseline by 4x.
+                              This transaction scored <span className="text-white font-black underline underline-offset-4 decoration-white/30">{txn.scores.final}</span>.
                            </p>
-                           <div className="flex gap-4 pt-2">
-                              <Badge className="bg-white/10 text-white border-white/10 text-[8px] font-black uppercase italic h-6 px-3">VPN INGRESS DETECTED</Badge>
-                              <Badge className="bg-white/10 text-white border-white/10 text-[8px] font-black uppercase italic h-6 px-3">TIER 3 ORIGIN</Badge>
-                           </div>
                         </div>
                      </div>
                   </div>
@@ -297,41 +304,12 @@ export default function TransactionDetailPage() {
 
                   {/* TRIGGERED RULES TABLE */}
                   <Card className="rounded-[40px] border-border/50 shadow-md overflow-hidden bg-white">
-                     <CardHeader className="p-10 border-b border-border/50">
+                     <CardHeader className="p-10 border-b border-border/50 flex flex-row items-center justify-between">
                         <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Triggered Logic Nodes</CardTitle>
+                        <Badge className="bg-muted text-muted-foreground border-none text-[8px] font-black italic">{txn.rules.length}</Badge>
                      </CardHeader>
-                     <CardContent className="p-0">
-                        <Table>
-                           <TableHeader className="bg-muted px-10">
-                              <TableRow className="hover:bg-transparent border-none">
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 px-10 text-neutral-400">Rule Identification</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-neutral-400">Match Detail</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-center text-neutral-400">Impulse</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-right px-10 text-neutral-400">Severity</TableHead>
-                              </TableRow>
-                           </TableHeader>
-                           <TableBody>
-                              {txn.rules.map((rule, i) => (
-                                <TableRow key={i} className="group hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0 cursor-pointer h-20">
-                                   <TableCell className="px-10 py-5">
-                                      <div className="flex flex-col">
-                                         <span className="text-[13px] font-black italic tracking-tighter uppercase text-neutral-900">{rule.name}</span>
-                                         <span className="text-[9px] font-black uppercase text-muted-foreground italic mt-1">{rule.type}</span>
-                                      </div>
-                                   </TableCell>
-                                   <TableCell className="text-[11px] font-black italic text-neutral-400 uppercase">{rule.match}</TableCell>
-                                   <TableCell className="text-center font-black italic text-rose-500">{rule.weight}</TableCell>
-                                   <TableCell className="px-10 text-right">
-                                      <Badge variant="outline" className={`text-[8px] font-black uppercase italic tracking-widest border-none ${
-                                        rule.severity === 'Critical' ? 'text-rose-500' : 'text-orange-500'
-                                      }`}>
-                                         {rule.severity} Result
-                                      </Badge>
-                                   </TableCell>
-                                </TableRow>
-                              ))}
-                           </TableBody>
-                        </Table>
+                     <CardContent className="p-10 text-center text-muted-foreground italic text-sm font-bold">
+                        No rules triggered.
                      </CardContent>
                   </Card>
                </TabsContent>
@@ -420,23 +398,10 @@ export default function TransactionDetailPage() {
             <Card className="rounded-[40px] border-border/50 shadow-md p-10 bg-white">
                <CardHeader className="p-0 mb-8 flex flex-row items-center justify-between">
                   <CardTitle className="text-xl font-black italic uppercase tracking-tighter">Linked Objects</CardTitle>
-                  <Badge className="bg-muted text-muted-foreground border-none text-[8px] font-black uppercase italic">01 Total</Badge>
+                  <Badge className="bg-muted text-muted-foreground border-none text-[8px] font-black uppercase italic">{txn.alerts.length} Total</Badge>
                </CardHeader>
-               <CardContent className="p-0 space-y-4">
-                  {txn.alerts.map((alert, i) => (
-                    <Link key={i} href={`/dashboard/alerts/${alert.id}`} className="block p-5 bg-muted/20 border border-border rounded-[28px] group hover:bg-muted transition-all">
-                       <div className="flex items-center justify-between mb-2">
-                          <span className="text-[10px] font-black italic text-neutral-900">{alert.id}</span>
-                          <Badge className="bg-rose-500 text-white border-none text-[7px] font-black uppercase italic">{alert.severity}</Badge>
-                       </div>
-                       <div className="text-[11px] font-black uppercase tracking-widest text-muted-foreground italic h-4 overflow-hidden mb-3">{alert.type}</div>
-                       <div className="flex justify-between items-center pt-2 border-t border-border/50">
-                          <span className="text-[9px] font-black uppercase italic text-muted-foreground">{alert.status}</span>
-                          <ChevronRight className="w-3 h-3 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-                       </div>
-                    </Link>
-                  ))}
-                  <Button variant="ghost" className="w-full text-[9px] font-black uppercase italic tracking-widest text-muted-foreground hover:text-neutral-900 border-none">Search Related Nodes</Button>
+               <CardContent className="p-4 text-center text-muted-foreground italic text-sm font-bold">
+                  No linked alerts.
                </CardContent>
             </Card>
          </div>

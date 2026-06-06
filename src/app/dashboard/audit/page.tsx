@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { 
   History, 
   Search, 
@@ -30,7 +30,8 @@ import {
   Zap,
   MoreHorizontal,
   ChevronDown,
-  LayoutGrid
+  LayoutGrid,
+  AlertCircle
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -54,8 +55,59 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { useAuditEvents, useAuditSummary } from "@/hooks";
 
 export default function AuditTrailsPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data: auditData, isLoading, isError, refetch } = useAuditEvents({ search: searchQuery });
+  const { data: summaryData, isLoading: isSummaryLoading } = useAuditSummary();
+
+  if (isLoading || isSummaryLoading) {
+    return (
+      <div className="flex flex-col gap-10 pb-20">
+        <section className="sticky top-0 z-40 -mx-6 px-6 py-6 bg-background/80 backdrop-blur-md border-b border-border/50 transition-all">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <h1 className="text-3xl font-black italic tracking-tighter uppercase">Audit Trails<span className="text-brand-lime">.</span></h1>
+          </div>
+        </section>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="rounded-xl shadow-sm border bg-white h-24 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col gap-10 pb-20">
+        <section className="sticky top-0 z-40 -mx-6 px-6 py-6 bg-background/80 backdrop-blur-md border-b border-border/50 transition-all">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <h1 className="text-3xl font-black italic tracking-tighter uppercase">Audit Trails<span className="text-brand-lime">.</span></h1>
+          </div>
+        </section>
+        <Card className="rounded-3xl border border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="text-red-600 h-5 w-5" />
+              <div>
+                <p className="font-semibold text-red-900">Failed to load audit trails</p>
+                <p className="text-sm text-red-700">Please check your connection and try again.</p>
+              </div>
+            </div>
+            <Button onClick={refetch} className="mt-4" variant="outline">
+              <RefreshCcw className="w-4 h-4 mr-2" /> Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const items = auditData?.items || [];
+  const summary = summaryData || {};
+
   return (
     <div className="flex flex-col gap-10 pb-20">
       {/* 1. PAGE HEADER */}
@@ -78,7 +130,7 @@ export default function AuditTrailsPage() {
                <Database className="w-3.5 h-3.5 mr-2" />
                Export Logs
             </Button>
-            <Button size="icon" variant="ghost" className="h-10 w-10">
+            <Button size="icon" variant="ghost" className="h-10 w-10" onClick={refetch}>
                <RefreshCcw className="w-3.5 h-3.5" />
             </Button>
           </div>
@@ -90,6 +142,8 @@ export default function AuditTrailsPage() {
             <Search className="w-3.5 h-3.5 text-muted-foreground" />
             <Input 
               placeholder="Filter by ID, User, Action..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="h-8 w-64 text-[11px] font-bold border-none shadow-none focus-visible:ring-0 italic"
             />
           </div>
@@ -117,12 +171,12 @@ export default function AuditTrailsPage() {
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {[
-          { label: "Total Events", value: "48,291", delta: "+1.2k", icon: <Database className="text-neutral-400 font-bold" /> },
-          { label: "User Actions", value: "842", delta: "+12", icon: <Users className="text-brand-lime" /> },
-          { label: "Critical Events", value: "14", delta: "+2", icon: <AlertTriangle className="text-rose-500 animate-pulse" /> },
-          { label: "Config Changes", value: "08", delta: "+1", icon: <Settings className="text-orange-500 font-bold" /> },
-          { label: "Report Actions", value: "112", delta: "-5", icon: <FileText className="text-indigo-500 font-bold" /> },
-          { label: "Security Events", value: "42", delta: "+4", icon: <ShieldAlert className="text-rose-600 font-bold" /> },
+          { label: "Total Events", value: summary.total_events || auditData?.total || 0, delta: "+1.2k", icon: <Database className="text-neutral-400 font-bold" /> },
+          { label: "User Actions", value: summary.events_by_type?.USER_ACTION || 0, delta: "+12", icon: <Users className="text-brand-lime" /> },
+          { label: "Critical Events", value: summary.critical_events || 0, delta: "+2", icon: <AlertTriangle className="text-rose-500 animate-pulse" /> },
+          { label: "Config Changes", value: summary.events_by_type?.SYSTEM || 0, delta: "+1", icon: <Settings className="text-orange-500 font-bold" /> },
+          { label: "Report Actions", value: summary.events_by_type?.COMPLIANCE || 0, delta: "-5", icon: <FileText className="text-indigo-500 font-bold" /> },
+          { label: "Security Events", value: summary.events_by_type?.SECURITY || 0, delta: "+4", icon: <ShieldAlert className="text-rose-600 font-bold" /> },
         ].map((kpi, i) => (
           <div 
             key={i} 
@@ -175,24 +229,26 @@ export default function AuditTrailsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[
-                  { id: "EVT-CC-091", entity: "Rule Logic: HIGH_VELOCITY_BVI", action: "Deleted", user: "John Carter (Admin)", time: "12m ago" },
-                  { id: "EVT-SE-112", entity: "API Secret Key: #4491", action: "Revoked", user: "Security Engine", time: "44m ago" },
-                  { id: "EVT-RE-004", entity: "STR-4491 (Rejected)", action: "Force Submit", user: "Vlad Orlov", time: "1h ago" },
-                  { id: "EVT-UA-882", entity: "Root Permissions", action: "Grant Upgrade", user: "Michael Chen", time: "2h ago" },
-                ].map((row, i) => (
-                  <TableRow key={i} className="group hover:bg-rose-500/10 border-b border-rose-500/10 transition-colors cursor-pointer">
-                    <TableCell className="px-8 py-5 font-black italic text-xs text-rose-500">{row.id}</TableCell>
-                    <TableCell className="text-[11px] font-black italic">{row.entity}</TableCell>
+                {items.filter((i: any) => i.severity === 'CRITICAL' || i.severity === 'HIGH').slice(0, 4).map((row: any, i: number) => (
+                  <TableRow key={row.id} className="group hover:bg-rose-500/10 border-b border-rose-500/10 transition-colors cursor-pointer">
+                    <TableCell className="px-8 py-5 font-black italic text-xs text-rose-500">{row.id.split('-')[0]}</TableCell>
+                    <TableCell className="text-[11px] font-black italic">{row.entity_type} {row.entity_id}</TableCell>
                     <TableCell>
                        <Badge className="bg-rose-500 text-white text-[9px] font-black uppercase italic tracking-widest">
                          {row.action}
                        </Badge>
                     </TableCell>
-                    <TableCell className="text-[10px] font-bold text-muted-foreground italic uppercase">{row.user}</TableCell>
-                    <TableCell className="px-8 text-right text-[10px] font-black text-rose-500 italic">{row.time}</TableCell>
+                    <TableCell className="text-[10px] font-bold text-muted-foreground italic uppercase">{row.actor_id}</TableCell>
+                    <TableCell className="px-8 text-right text-[10px] font-black text-rose-500 italic">{new Date(row.created_at).toLocaleString()}</TableCell>
                   </TableRow>
                 ))}
+                {items.filter((i: any) => i.severity === 'CRITICAL' || i.severity === 'HIGH').length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-10 text-rose-500/50">
+                      No critical events found.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </CardContent>
@@ -235,48 +291,49 @@ export default function AuditTrailsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {[
-                    { time: "2026-04-15 11:22:01", actor: "jwilson_adm", action: "Submit Report", entity: "STR-44021", ip: "192.168.1.12", loc: "London, UK", integrity: "Verified" },
-                    { time: "2026-04-15 11:15:33", actor: "smiller_cpl", action: "Approve Case", entity: "CASE-9912", ip: "192.168.1.44", loc: "London, UK", integrity: "Verified" },
-                    { time: "2026-04-15 10:44:12", actor: "System_Core", action: "Run Screening", entity: "Batch_Q3", ip: "Internal", loc: "Cloud-US-East", integrity: "Verified" },
-                    { time: "2026-04-15 10:12:00", actor: "root_adm", action: "Update Model", entity: "ML-Graph-v2", ip: "Auth-Proxy", loc: "Remote", integrity: "Verified" },
-                    { time: "2026-04-15 09:55:21", actor: "jwilson_adm", action: "Export Data", entity: "Compliance_Feed", ip: "192.168.1.12", loc: "London, UK", integrity: "Verified" },
-                  ].map((row, i) => (
-                    <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors cursor-pointer">
+                  {items.map((row: any) => (
+                    <TableRow key={row.id} className="group hover:bg-muted/30 border-b border-border/50 transition-colors cursor-pointer">
                       <TableCell className="px-8 py-5">
                          <div className="flex flex-col">
-                            <span className="text-[11px] font-black italic tracking-tighter text-neutral-900 dark:text-white leading-none">{row.time.split(' ')[1]}</span>
-                            <span className="text-[8px] font-bold text-muted-foreground uppercase opacity-40">{row.time.split(' ')[0]}</span>
+                            <span className="text-[11px] font-black italic tracking-tighter text-neutral-900 dark:text-white leading-none">{new Date(row.created_at).toLocaleTimeString()}</span>
+                            <span className="text-[8px] font-bold text-muted-foreground uppercase opacity-40">{new Date(row.created_at).toLocaleDateString()}</span>
                          </div>
                       </TableCell>
                       <TableCell>
                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-[9px] font-black italic border border-border/50">JW</div>
-                            <span className="text-[10px] font-black italic uppercase tracking-widest">{row.actor}</span>
+                            <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-[9px] font-black italic border border-border/50">{row.actor_id.substring(0,2).toUpperCase()}</div>
+                            <span className="text-[10px] font-black italic uppercase tracking-widest">{row.actor_id}</span>
                          </div>
                       </TableCell>
                       <TableCell className="text-center">
-                         <Badge variant="outline" className="text-[9px] font-black uppercase italic tracking-widest border-border/50 group-hover:border-brand-lime transition-colors">
+                         <Badge variant="outline" className={`text-[9px] font-black uppercase italic tracking-widest border-border/50 group-hover:border-brand-lime transition-colors ${row.severity === 'CRITICAL' ? 'text-rose-500 border-rose-500' : ''}`}>
                             {row.action}
                          </Badge>
                       </TableCell>
                       <TableCell>
-                         <Link href={`/dashboard/audit/${row.entity}`} className="text-[11px] font-black italic underline underline-offset-4 decoration-border/50 group-hover:decoration-neutral-900 transition-all">{row.entity}</Link>
+                         <Link href={`/dashboard/audit/${row.id}`} className="text-[11px] font-black italic underline underline-offset-4 decoration-border/50 group-hover:decoration-neutral-900 transition-all">{row.entity_type} {row.entity_id}</Link>
                       </TableCell>
                       <TableCell>
                          <div className="flex flex-col">
-                            <span className="text-[10px] font-black italic tracking-tight uppercase leading-none">{row.ip}</span>
-                            <span className="text-[8px] font-bold text-muted-foreground uppercase mt-1 opacity-40 italic">{row.loc}</span>
+                            <span className="text-[10px] font-black italic tracking-tight uppercase leading-none">{row.ip_address}</span>
+                            <span className="text-[8px] font-bold text-muted-foreground uppercase mt-1 opacity-40 italic">{row.user_agent ? "Web" : "Unknown"}</span>
                          </div>
                       </TableCell>
                       <TableCell className="px-8 text-right">
                          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/5 text-emerald-500 border border-emerald-500/10 shadow-sm shadow-emerald-500/5">
                             <Lock className="w-2.5 h-2.5" />
-                            <span className="text-[8px] font-black uppercase tracking-[0.2em] italic">{row.integrity}</span>
+                            <span className="text-[8px] font-black uppercase tracking-[0.2em] italic">Verified</span>
                          </div>
                       </TableCell>
                     </TableRow>
                   ))}
+                  {items.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-10 text-slate-500">
+                        No audit events found.
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -297,29 +354,14 @@ export default function AuditTrailsPage() {
               </div>
               
               <div className="space-y-6 flex-1">
-                 {[
-                   { type: "Threshold Adjustment", entity: "Rule: KYC_001", user: "jwilson_adm", change: { from: "10,000", to: "7,500" }, time: "1h ago" },
-                   { type: "Permission Change", entity: "Group: Compliance_Lead", user: "root_adm", change: { from: "Read-Only", to: "Read-Write" }, time: "4h ago" },
-                   { type: "Webhook Update", entity: "Relay: Payout_API", user: "system_eng", change: { from: "Disabled", to: "Active" }, time: "12h ago" },
-                 ].map((change, i) => (
+                 {items.filter((i: any) => i.event_type === 'SYSTEM' || i.event_type === 'CONFIG').slice(0, 3).map((change: any, i: number) => (
                    <div key={i} className="p-6 bg-muted/20 border border-border/50 rounded-3xl space-y-4 hover:border-orange-500/30 transition-all group">
                       <div className="flex justify-between items-start">
                          <div className="space-y-1">
-                            <div className="text-[10px] font-black uppercase italic tracking-widest text-orange-500 leading-none">{change.type}</div>
-                            <div className="text-[13px] font-black italic">{change.entity}</div>
+                            <div className="text-[10px] font-black uppercase italic tracking-widest text-orange-500 leading-none">{change.action}</div>
+                            <div className="text-[13px] font-black italic">{change.entity_type} {change.entity_id}</div>
                          </div>
-                         <span className="text-[9px] font-black text-muted-foreground/40 italic uppercase">{change.time}</span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-8 relative font-bold italic">
-                         <div className="space-y-1">
-                            <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40 italic">Previous Value</div>
-                            <div className="text-[11px] text-muted-foreground line-through opacity-40">{change.change.from}</div>
-                         </div>
-                         <div className="space-y-1">
-                            <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/40 italic">Proposed Value</div>
-                            <div className="text-[11px] text-orange-500">{change.change.to}</div>
-                         </div>
-                         <ArrowRight className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-orange-500/20" />
+                         <span className="text-[9px] font-black text-muted-foreground/40 italic uppercase">{new Date(change.created_at).toLocaleTimeString()}</span>
                       </div>
                    </div>
                  ))}
@@ -340,27 +382,21 @@ export default function AuditTrailsPage() {
               </div>
               
               <div className="space-y-6 flex-1 relative z-10">
-                 {[
-                   { event: "Login Attempt Failure", user: "anon_88b (Unknown)", ip: "45.2.112.9", loc: "St. Petersburg, RU", time: "2m ago", risk: "HIGH" },
-                   { event: "MFA Authentication Success", user: "smiller_cpl", ip: "Auth-Vault-B", loc: "Internal Proxy", time: "28m ago", risk: "LOW" },
-                   { event: "Sensitive Query Detected", user: "jwilson_adm", ip: "192.168.1.12", loc: "London, UK", time: "52m ago", risk: "MEDIUM" },
-                   { event: "Direct Token Exchange", user: "API-M2M-Gateway", ip: "Cloud-Relay-X", loc: "Intra-VPC", time: "1h ago", risk: "LOW" },
-                 ].map((ev, i) => (
+                 {items.filter((i: any) => i.event_type === 'SECURITY').slice(0, 4).map((ev: any, i: number) => (
                    <div key={i} className="flex gap-6 items-center border-b border-white/5 pb-6 last:border-0 last:pb-0 font-bold italic">
                       <div className={`w-12 h-12 rounded-[20px] flex items-center justify-center shrink-0 border ${
-                        ev.risk === 'HIGH' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-white/5 border-white/10 text-white/40'
+                        ev.severity === 'HIGH' || ev.severity === 'CRITICAL' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-white/5 border-white/10 text-white/40'
                       }`}>
-                         {ev.risk === 'HIGH' ? <ShieldAlert className="w-6 h-6" /> : <Lock className="w-5 h-5" />}
+                         {ev.severity === 'HIGH' || ev.severity === 'CRITICAL' ? <ShieldAlert className="w-6 h-6" /> : <Lock className="w-5 h-5" />}
                       </div>
                       <div className="flex-1 space-y-1">
                          <div className="flex justify-between items-baseline">
-                            <span className="text-[13px] font-black italic">{ev.event}</span>
-                            <span className="text-[8px] font-black uppercase italic text-white/40">{ev.time}</span>
+                            <span className="text-[13px] font-black italic">{ev.action}</span>
+                            <span className="text-[8px] font-black uppercase italic text-white/40">{new Date(ev.created_at).toLocaleTimeString()}</span>
                          </div>
                          <div className="flex items-center gap-4 text-[9px] font-bold text-white/40 uppercase italic tracking-widest">
-                            <span className="text-white/60">{ev.user}</span>
-                            <span>{ev.ip}</span>
-                            <span>{ev.loc}</span>
+                            <span className="text-white/60">{ev.actor_id}</span>
+                            <span>{ev.ip_address}</span>
                          </div>
                       </div>
                       <ChevronRight className="w-4 h-4 text-white/5 group-hover:text-white transition-colors" />
@@ -395,21 +431,16 @@ export default function AuditTrailsPage() {
                
                <div className="flex-1 space-y-1 relative">
                   <div className="absolute left-[39px] top-4 bottom-4 w-px bg-muted/60 z-0" />
-                  {[
-                    { e: "Investigation Escalated", d: "Senior Lead required due to PEP match complexity.", u: "smiller_cpl", t: "Oct 15, 12:44" },
-                    { e: "Evidence Bundle Added", d: "Attached 14.2MB of transaction forensics from Oct 1-7.", u: "jwilson_adm", t: "Oct 15, 10:15" },
-                    { e: "Risk Tier Re-classification", d: "Shifted from MEDIUM to HIGH based on velocity sig.", u: "system_eng", t: "Oct 14, 16:22" },
-                    { e: "Case Node Initialized", d: "Batch detection triggered from Rule #882b.", u: "system_eng", t: "Oct 14, 09:00" },
-                  ].map((trace, i) => (
+                  {items.filter((i: any) => i.event_type === 'COMPLIANCE').slice(0, 4).map((trace: any, i: number) => (
                     <div key={i} className="flex gap-8 relative z-10 pb-10 last:pb-0 group font-bold italic">
-                       <div className="w-20 text-[9px] font-black uppercase text-muted-foreground italic pt-2 shrink-0">{trace.t.split(',')[1]}</div>
+                       <div className="w-20 text-[9px] font-black uppercase text-muted-foreground italic pt-2 shrink-0">{new Date(trace.created_at).toLocaleTimeString()}</div>
                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-3.5 shrink-0 shadow-[0_0_8px_#6366f1] group-hover:scale-150 transition-transform" />
                        <div className="flex-1 p-6 bg-muted/20 border border-border/50 rounded-3xl group-hover:border-indigo-500/30 transition-all transition-transform hover:scale-[1.01]">
                           <div className="flex justify-between items-baseline mb-2">
-                             <h6 className="text-[13px] font-black italic underline underline-offset-4 decoration-border/50">{trace.e}</h6>
-                             <span className="text-[10px] font-black uppercase italic text-muted-foreground">{trace.u}</span>
+                             <h6 className="text-[13px] font-black italic underline underline-offset-4 decoration-border/50">{trace.action}</h6>
+                             <span className="text-[10px] font-black uppercase italic text-muted-foreground">{trace.actor_id}</span>
                           </div>
-                          <p className="text-[11px] text-muted-foreground/80 leading-relaxed font-bold italic">{trace.d}</p>
+                          <p className="text-[11px] text-muted-foreground/80 leading-relaxed font-bold italic">{trace.entity_type} {trace.entity_id}</p>
                        </div>
                     </div>
                   ))}
@@ -424,21 +455,16 @@ export default function AuditTrailsPage() {
                   <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-1 italic italic text-muted-foreground">Disclosure submission and regulator lifecycle trace</CardDescription>
                </CardHeader>
                <CardContent className="p-10 space-y-12 flex-1 italic font-bold">
-                  {[
-                    { r: "STR-4491", event: "Submitted to FinCEN", t: "2m ago", status: "Success" },
-                    { r: "STR-8822", event: "Review Rejected", t: "1h ago", status: "Rejected" },
-                    { r: "CTR-0012", event: "Draft v2 Created", t: "4h ago", status: "Draft" },
-                    { r: "STR-1102", event: "Batch Export Complete", t: "1d ago", status: "Success" },
-                  ].map((rep, i) => (
+                  {items.filter((i: any) => i.event_type === 'COMPLIANCE' && i.entity_type === 'REPORT').slice(0, 4).map((rep: any, i: number) => (
                     <div key={i} className="flex gap-4 items-center group">
                        <div className="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center shrink-0 border border-border/50 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/30 transition-all">
                           <FileText className="w-5 h-5 text-muted-foreground group-hover:text-indigo-500" />
                        </div>
                        <div className="flex-1">
-                          <div className="text-[11px] font-black italic tracking-tight">{rep.event} <span className="text-muted-foreground ml-2 text-[9px] uppercase tracking-widest italic">{rep.r}</span></div>
+                          <div className="text-[11px] font-black italic tracking-tight">{rep.action} <span className="text-muted-foreground ml-2 text-[9px] uppercase tracking-widest italic">{rep.entity_id}</span></div>
                           <div className="flex justify-between mt-1 items-baseline">
-                             <span className="text-[8px] font-black text-muted-foreground/40 uppercase">{rep.t}</span>
-                             <span className={`text-[8px] font-black uppercase italic ${rep.status === 'Success' ? 'text-brand-lime' : 'text-rose-500'}`}>{rep.status}</span>
+                             <span className="text-[8px] font-black text-muted-foreground/40 uppercase">{new Date(rep.created_at).toLocaleTimeString()}</span>
+                             <span className={`text-[8px] font-black uppercase italic text-brand-lime`}>Success</span>
                           </div>
                        </div>
                     </div>

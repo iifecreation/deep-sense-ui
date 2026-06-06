@@ -229,3 +229,78 @@ export function useSecuritySettings(enabled: boolean = true) {
   };
 }
 
+export function useOrganizationSettings(enabled: boolean = true) {
+  const [data, setData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchSettings = async () => {
+    if (!enabled) return;
+    
+    setIsLoading(true);
+    setIsError(false);
+    setError(null);
+
+    try {
+      const response = await settingsService.getOrganizationSettings();
+      setData(response);
+    } catch (err) {
+      setIsError(true);
+      setError(err as Error);
+      console.error('Failed to fetch organization settings:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, [enabled]);
+
+  return {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch: fetchSettings,
+  };
+}
+
+export function useNotificationSettings(enabled: boolean = true) {
+  const [data, setData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchSettings = async () => {
+    if (!enabled) return;
+    
+    setIsLoading(true);
+    setIsError(false);
+    setError(null);
+
+    try {
+      const response = await settingsService.getNotificationSettings();
+      setData(response);
+    } catch (err) {
+      setIsError(true);
+      setError(err as Error);
+      console.error('Failed to fetch notification settings:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, [enabled]);
+
+  return {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch: fetchSettings,
+  };
+}

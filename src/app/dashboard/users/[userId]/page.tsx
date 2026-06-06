@@ -50,45 +50,52 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { useCustomer } from "@/hooks/use-customers";
 
 export default function UserDetailPage() {
   const params = useParams();
   const userId = params.userId as string;
 
-  // Mock data for high-fidelity view
+  const { data: customerData, isLoading, isError, refetch } = useCustomer(userId);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-lime"></div>
+      </div>
+    );
+  }
+
+  if (isError || !customerData) {
+    return (
+      <div className="p-6 bg-red-50 text-red-700 rounded-lg flex flex-col items-center">
+        <AlertTriangle className="w-8 h-8 mb-2" />
+        <h2 className="font-bold">Failed to load entity</h2>
+        <Button onClick={refetch} className="mt-4" variant="outline">Retry</Button>
+      </div>
+    );
+  }
+
   const user = {
-    id: userId,
-    name: "Sarah Jenkins",
-    status: "Active",
-    segment: "Premium Institutional",
-    riskProfile: "Low",
-    joined: "Feb 14, 2024",
+    id: customerData.id,
+    name: customerData.full_name || "Unknown Entity",
+    status: customerData.status || "Active",
+    segment: "Standard",
+    riskProfile: customerData.risk_tier || "Unknown",
+    joined: new Date(customerData.created_at).toLocaleDateString(),
     profile: {
-      email: "sarah.j@enterprise.co",
-      phone: "+44 7700 900341",
-      location: "London, United Kingdom",
-      dob: "July 12, 1988",
-      kyc: "Verified (Level 3)"
+      email: customerData.email || "N/A",
+      phone: customerData.phone || "N/A",
+      location: customerData.address || "Unknown Location",
+      dob: customerData.date_of_birth || "N/A",
+      kyc: customerData.kyc_status || "Verified"
     },
-    accounts: [
-      { id: "ACC-9921-X", type: "Settlement", balance: "$4.2M", status: "Active" },
-      { id: "ACC-8812-Y", type: "Operational", balance: "$150k", status: "Active" }
-    ],
-    devices: [
-      { id: "DEV-1122", name: "iPhone 15 Pro", lastUsed: "now" },
-      { id: "DEV-4491", name: "MacBook Pro M3", lastUsed: "2h ago" }
-    ],
-    transactions: [
-      { id: "TXN-88219", amount: "$42,250.00", status: "Approved", date: "Oct 15, 2026" },
-      { id: "TXN-88102", amount: "$8,150.00", status: "Approved", date: "Oct 12, 2026" }
-    ],
-    alerts: [
-      { id: "ALT-4421", type: "Login Anomaly", status: "Resolved", severity: "Low" }
-    ],
+    accounts: [],
+    devices: [],
+    transactions: [],
+    alerts: [],
     timeline: [
-      { event: "Account Login", time: "19:32:11", detail: "Session initiated from London, UK" },
-      { event: "Compliance Review", time: "Oct 12", detail: "Annual KYC refresh completed" },
-      { event: "Limit Increase", time: "Sep 22", detail: "Daily threshold raised to $10M" }
+      { event: "Entity Created", time: new Date(customerData.created_at).toLocaleDateString(), detail: "System ingestion" }
     ]
   };
 
@@ -102,7 +109,9 @@ export default function UserDetailPage() {
                <ArrowLeft className="w-3 h-3" /> Entity Directory
             </Link>
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-neutral-900 flex items-center justify-center text-brand-lime font-black italic shadow-xl">SJ</div>
+              <div className="w-10 h-10 rounded-full bg-neutral-900 flex items-center justify-center text-brand-lime font-black italic shadow-xl">
+                 {user.name.substring(0,2).toUpperCase()}
+              </div>
               <h1 className="text-3xl font-black italic tracking-tighter uppercase leading-none">{user.name}</h1>
               <Badge className="bg-brand-lime text-black border-none h-6 px-4 text-[9px] font-black uppercase italic tracking-widest">
                 {user.segment}
@@ -141,14 +150,14 @@ export default function UserDetailPage() {
         </div>
       </section>
 
-      {/* KPI GRID */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-         {[
-           { label: "Entity Trust Score", value: "98.2", delta: "Top 1%", icon: <ShieldCheck className="text-brand-lime" />, color: "text-brand-lime" },
-           { label: "Total Assets", value: "$4.35M", delta: "USD Segment", icon: <CreditCard className="text-muted-foreground" /> },
-           { label: "Active Devices", value: user.devices.length, delta: "Verified: 02", icon: <Smartphone className="text-indigo-500" /> },
-           { label: "Institutional KYC", value: "Level 3", delta: "Verified", icon: <BadgeCheck className="text-brand-lime" /> },
-         ].map((kpi, i) => (
+       {/* KPI GRID */}
+       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: "Entity Trust Score", value: customerData.risk_score !== undefined && customerData.risk_score !== null ? 100 - customerData.risk_score : "N/A", delta: "Top 1%", icon: <ShieldCheck className="text-brand-lime" />, color: "text-brand-lime" },
+            { label: "Total Assets", value: "N/A", delta: "USD Segment", icon: <CreditCard className="text-muted-foreground" /> },
+            { label: "Active Devices", value: "N/A", delta: "Verified: 0", icon: <Smartphone className="text-indigo-500" /> },
+            { label: "Institutional KYC", value: "Level 1", delta: "Verified", icon: <BadgeCheck className="text-brand-lime" /> },
+          ].map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
@@ -234,24 +243,11 @@ export default function UserDetailPage() {
 
                <TabsContent value="accounts" className="m-0 space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                     {user.accounts.map((acc, i) => (
-                        <Card key={i} className="rounded-[40px] border-border/50 shadow-md p-10 bg-white group hover:border-neutral-900 transition-colors">
-                           <CardHeader className="p-0 mb-8 flex flex-row items-center justify-between">
-                              <div className="flex flex-col">
-                                 <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground">{acc.type} Node</span>
-                                 <CardTitle className="text-xl font-black italic uppercase tracking-tighter">{acc.id}</CardTitle>
-                              </div>
-                              <Badge className="bg-brand-lime text-black border-none text-[8px] font-black uppercase italic">{acc.status}</Badge>
-                           </CardHeader>
-                           <CardContent className="p-0">
-                              <div className="text-3xl font-black italic tracking-tighter text-neutral-900 mb-6">{acc.balance}</div>
-                              <div className="flex gap-4">
-                                 <Button variant="outline" className="flex-1 rounded-2xl text-[9px] font-black uppercase italic border-border">Statements</Button>
-                                 <Button variant="outline" className="flex-1 rounded-2xl text-[9px] font-black uppercase italic border-border">Settings</Button>
-                              </div>
-                           </CardContent>
-                        </Card>
-                     ))}
+                     <Card className="rounded-[40px] border-border/50 shadow-md p-10 bg-white">
+                        <CardContent className="p-0 text-center text-muted-foreground italic text-sm font-bold">
+                           No accounts linked.
+                        </CardContent>
+                     </Card>
                   </div>
                </TabsContent>
 
@@ -260,33 +256,8 @@ export default function UserDetailPage() {
                      <CardHeader className="p-10 border-b border-border/50">
                         <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Activity Ingress</CardTitle>
                      </CardHeader>
-                     <CardContent className="p-0">
-                        <Table>
-                           <TableHeader className="bg-muted px-10">
-                              <TableRow className="hover:bg-transparent border-none">
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 px-10 text-neutral-400">Transaction ID</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-neutral-400">Date Node</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-center text-neutral-400">Quantity</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-right px-10 text-neutral-400">Status</TableHead>
-                              </TableRow>
-                           </TableHeader>
-                           <TableBody>
-                              {user.transactions.map((txn, i) => (
-                                <TableRow key={i} className="group hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0 h-20 cursor-pointer" onClick={() => window.location.href=`/dashboard/transactions/${txn.id}`}>
-                                   <TableCell className="px-10 py-5">
-                                      <span className="text-[13px] font-black italic tracking-tighter uppercase text-neutral-900">{txn.id}</span>
-                                   </TableCell>
-                                   <TableCell className="text-[11px] font-black italic text-neutral-400 uppercase">{txn.date}</TableCell>
-                                   <TableCell className="text-center text-[13px] font-black italic text-neutral-900">{txn.amount}</TableCell>
-                                   <TableCell className="px-10 text-right">
-                                      <Badge variant="outline" className="text-[8px] font-black uppercase italic tracking-widest border-none text-brand-lime">
-                                         {txn.status}
-                                      </Badge>
-                                   </TableCell>
-                                </TableRow>
-                              ))}
-                           </TableBody>
-                        </Table>
+                     <CardContent className="p-10 text-center text-muted-foreground italic text-sm font-bold">
+                        No transactions recorded.
                      </CardContent>
                   </Card>
                </TabsContent>
@@ -313,19 +284,8 @@ export default function UserDetailPage() {
                   <CardTitle className="text-xl font-black italic uppercase tracking-tighter">Verified Devices</CardTitle>
                   <Smartphone className="w-6 h-6 text-muted-foreground/20" />
                </CardHeader>
-               <CardContent className="p-0 space-y-4">
-                  {user.devices.map((dev, i) => (
-                    <Link key={i} href={`/dashboard/devices/${dev.id}`} className="block p-5 bg-muted/20 border border-border rounded-[28px] group hover:bg-muted transition-all">
-                       <div className="flex items-center justify-between mb-2">
-                          <span className="text-[10px] font-black italic text-neutral-900">{dev.name}</span>
-                          <Badge className="bg-brand-lime text-black border-none text-[7px] font-black uppercase italic">TRUSTED</Badge>
-                       </div>
-                       <div className="flex justify-between items-center pt-2 border-t border-border/50">
-                          <span className="text-[9px] font-black uppercase italic text-muted-foreground">Used {dev.lastUsed}</span>
-                          <ChevronRight className="w-3 h-3 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-                       </div>
-                    </Link>
-                  ))}
+               <CardContent className="p-4 text-center text-muted-foreground italic text-sm font-bold">
+                  No verified devices.
                </CardContent>
             </Card>
 

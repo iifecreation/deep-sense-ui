@@ -69,33 +69,52 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import { useScreeningMatch } from "@/hooks/use-screening";
 
 export default function ScreeningMatchDetailPage() {
   const params = useParams();
   const matchId = params.matchId as string;
 
-  // Mock data for the screening match
+  const { data: matchData, isLoading, isError, refetch } = useScreeningMatch(matchId);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-lime"></div>
+      </div>
+    );
+  }
+
+  if (isError || !matchData) {
+    return (
+      <div className="p-6 bg-red-50 text-red-700 rounded-lg flex flex-col items-center">
+        <AlertTriangle className="w-8 h-8 mb-2" />
+        <h2 className="font-bold">Failed to load match</h2>
+        <Button onClick={refetch} className="mt-4" variant="outline">Retry</Button>
+      </div>
+    );
+  }
+
   const match = {
-    id: matchId,
-    entityName: "Elena V. Volkov",
-    type: "Sanctions / PEP Cluster",
-    confidence: "94.2%",
-    riskLevel: "Critical",
-    status: "Review Required",
-    source: "OFAC SDN / EU Consolidated",
-    matchedFields: [
-      { field: "Full Name", score: 98, detail: "Elena Victorovna Volkov" },
-      { field: "DOB", score: 100, detail: "1982-04-12" },
-      { field: "Nationality", score: 100, detail: "Cyprus / Russia" },
-      { field: "Address", score: 82, detail: "Larnaca, CY" }
-    ],
+    id: matchData.id,
+    entityName: matchData.watchlist_entity_name || "Unknown Entity",
+    type: matchData.watchlist_name || "Sanctions / PEP",
+    confidence: `${(matchData.match_score * 100).toFixed(1)}%`,
+    riskLevel: matchData.match_score > 0.9 ? "Critical" : matchData.match_score > 0.7 ? "High" : "Medium",
+    status: matchData.status || "Review Required",
+    source: matchData.watchlist_name || "Global Watchlist",
+    matchedFields: matchData.matched_fields ? Object.entries(matchData.matched_fields).map(([k, v]) => ({
+      field: k,
+      score: 100,
+      detail: String(v)
+    })) : [],
     customer: {
-      name: "Elena Volkov",
-      id: "CUST-9921",
-      riskTier: "High"
+      name: "Unknown Customer",
+      id: matchData.customer_id || "Unlinked",
+      riskTier: "Unknown"
     },
-    rationale: "Automated engine detected a 98% name similarity index combined with a 100% DOB match from the OFAC Specially Designated Nationals (SDN) list. The entity is linked to institutional flow gateways in high-opacity jurisdictions.",
-    lastScreened: "Oct 15, 2026 • 19:32:11"
+    rationale: matchData.match_summary || "Automated engine detected a similarity index from global watchlists.",
+    lastScreened: new Date(matchData.created_at).toLocaleString()
   };
 
   return (
@@ -243,29 +262,8 @@ export default function ScreeningMatchDetailPage() {
                      <CardHeader className="p-10 border-b border-border/50">
                         <CardTitle className="text-xl font-black italic uppercase tracking-tighter">Entity Aliases & Variations</CardTitle>
                      </CardHeader>
-                     <CardContent className="p-0">
-                        <Table>
-                           <TableHeader className="bg-muted px-10 border-b border-border/50 h-10">
-                              <TableRow className="hover:bg-transparent border-none font-black italic">
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 px-10 text-neutral-400">Alias Designation</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-neutral-400">Transcription Type</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-right px-10 text-neutral-400">Similarity Index</TableHead>
-                              </TableRow>
-                           </TableHeader>
-                           <TableBody className="font-black italic">
-                              {[
-                                { n: "E.V. Volkov", t: "Initials Override", s: "100%" },
-                                { n: "Елена Волкова", t: "Original Script (Cyrillic)", s: "94%" },
-                                { n: "Elena Viktorovna", t: "Partial Name Match", s: "82%" },
-                              ].map((alias, i) => (
-                                <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors h-16">
-                                 <TableCell className="px-10 py-5 font-black italic">{alias.n}</TableCell>
-                                 <TableCell className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground">{alias.t}</TableCell>
-                                 <TableCell className="px-10 text-right font-black italic text-brand-lime">{alias.s}</TableCell>
-                                </TableRow>
-                              ))}
-                           </TableBody>
-                        </Table>
+                     <CardContent className="p-10 text-center text-muted-foreground italic text-sm font-bold">
+                        No aliases available.
                      </CardContent>
                   </Card>
                </TabsContent>
@@ -273,28 +271,18 @@ export default function ScreeningMatchDetailPage() {
                <TabsContent value="history" className="m-0">
                   <Card className="rounded-[40px] border-border shadow-md p-12 bg-white font-black italic">
                      <div className="space-y-12">
-                        {[
-                          { event: "Periodic Re-Screening Hit", time: "Oct 15, 2026", detail: "OFAC list update triggered new collision index.", type: "system" },
-                          { event: "Onboarding Match Dismissed", time: "Jan 12, 2024", detail: "Investigated by Admin #42. Resulted in False Positive.", type: "manual" },
-                          { event: "PEP Registry Sync", time: "Jan 10, 2024", detail: "Initial entity ingress to risk perimeter.", type: "system" }
-                        ].map((step, i) => (
-                           <div key={i} className="flex gap-10 items-start relative group">
-                              {i !== 2 && (
-                                <div className="absolute left-[31px] top-10 bottom-[-48px] w-px bg-neutral-100 group-hover:bg-rose-500 transition-colors" />
-                              )}
-                              <div className={`w-16 h-16 rounded-[24px] bg-zinc-50 border border-neutral-100 flex flex-col items-center justify-center shrink-0 shadow-sm transition-all group-hover:bg-neutral-900 group-hover:text-white`}>
-                                 <span className="text-[11px] font-black italic">OCT</span>
-                                 <span className="text-[7px] font-black uppercase text-muted-foreground tracking-widest mt-0.5 group-hover:text-white/40">15</span>
-                              </div>
-                              <div className="flex-1 pt-2 space-y-1">
-                                 <div className="flex items-center gap-3">
-                                    <h5 className="text-xl font-black italic uppercase tracking-tighter text-neutral-900">{step.event}</h5>
-                                    <span className="text-[9px] font-black uppercase text-muted-foreground italic underline underline-offset-4 decoration-border">{step.type}</span>
-                                 </div>
-                                 <p className="text-[12px] text-muted-foreground italic font-medium">{step.detail}</p>
-                              </div>
+                        <div className="flex gap-10 items-start relative group">
+                           <div className={`w-16 h-16 rounded-[24px] bg-zinc-50 border border-neutral-100 flex flex-col items-center justify-center shrink-0 shadow-sm transition-all group-hover:bg-neutral-900 group-hover:text-white`}>
+                              <span className="text-[11px] font-black italic">SYS</span>
                            </div>
-                        ))}
+                           <div className="flex-1 pt-2 space-y-1">
+                              <div className="flex items-center gap-3">
+                                 <h5 className="text-xl font-black italic uppercase tracking-tighter text-neutral-900">Match Identified</h5>
+                                 <span className="text-[9px] font-black uppercase text-muted-foreground italic underline underline-offset-4 decoration-border">system</span>
+                              </div>
+                              <p className="text-[12px] text-muted-foreground italic font-medium">Automatic screening protocol execution.</p>
+                           </div>
+                        </div>
                      </div>
                   </Card>
                </TabsContent>

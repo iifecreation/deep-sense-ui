@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { 
   ArrowLeft, 
   CheckCircle2, 
@@ -28,7 +28,8 @@ import {
   Globe,
   Upload,
   MoreVertical,
-  Check
+  Check,
+  AlertCircle
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -39,31 +40,57 @@ import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useOnboardingReview } from "@/hooks";
 
 export default function OnboardingReviewDetailPage() {
   const params = useParams();
   const reviewId = params.reviewId as string;
+  const { data: reviewData, isLoading, isError, refetch } = useOnboardingReview(reviewId);
 
-  // Mock data for the specific onboarding review
-  const review = {
-    id: reviewId,
-    name: "Global Trade Solutions Ltd",
-    type: "Institutional (KYB)",
-    status: "Pending Review",
-    riskLevel: "HIGH",
-    riskScore: 78,
-    submittedAt: "Oct 15, 2026 • 09:22 AM",
-    assignedTo: "Sarah Jenkins",
-    customerDetails: {
-      registration: "BVI-99021-X",
-      jurisdiction: "British Virgin Islands",
-      industry: "Import/Export Logistics",
-      website: "globaltrade.bvi",
-      email: "compliance@globaltrade.bvi"
-    },
-    kycStatus: "Partial Mismatch",
-    screeningStatus: "Action Required"
-  };
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-8 pb-20 font-black italic">
+        <div className="flex items-center justify-between font-bold italic">
+           <Link href="/dashboard/onboarding" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:text-brand-lime transition-all italic group font-bold font-black">
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" /> 
+              Back to Application Queue
+           </Link>
+        </div>
+        <Card className="rounded-[48px] h-64 animate-pulse bg-muted" />
+      </div>
+    );
+  }
+
+  if (isError || !reviewData) {
+    return (
+      <div className="flex flex-col gap-8 pb-20 font-black italic">
+        <div className="flex items-center justify-between font-bold italic">
+           <Link href="/dashboard/onboarding" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-neutral-400 hover:text-brand-lime transition-all italic group font-bold font-black">
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" /> 
+              Back to Application Queue
+           </Link>
+        </div>
+        <Card className="rounded-3xl border border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="text-red-600 h-5 w-5" />
+              <div>
+                <p className="font-semibold text-red-900">Failed to load review details</p>
+                <p className="text-sm text-red-700">Please check your connection and try again.</p>
+              </div>
+            </div>
+            <Button onClick={refetch} className="mt-4" variant="outline">
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const review = reviewData.review || reviewData;
+  const kycDocs = reviewData.documents || [];
+  const notes = reviewData.notes || [];
 
   return (
     <div className="flex flex-col gap-8 pb-20 font-black italic">
@@ -92,19 +119,19 @@ export default function OnboardingReviewDetailPage() {
          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 relative z-10 leading-none">
             <div className="space-y-4">
                <div className="flex items-center gap-4">
-                  <h1 className="text-4xl font-black italic tracking-tighter uppercase">{review.name}</h1>
+                  <h1 className="text-4xl font-black italic tracking-tighter uppercase">{review.applicant_name}</h1>
                   <Badge className="bg-neutral-900 text-white dark:bg-white dark:text-black border-none text-[10px] font-black uppercase italic tracking-widest px-4 h-6">
-                     {review.id}
+                     {review.id.split('-')[0]}
                   </Badge>
                </div>
                <div className="flex flex-wrap gap-6 text-muted-foreground text-[10px] font-black uppercase tracking-widest italic leading-none font-bold">
-                  <div className="flex items-center gap-2"><Briefcase className="w-3.5 h-3.5" /> {review.type}</div>
-                  <div className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5" /> Submitted: {review.submittedAt}</div>
-                  <div className="flex items-center gap-2"><Globe className="w-3.5 h-3.5" /> {review.customerDetails.jurisdiction}</div>
+                  <div className="flex items-center gap-2"><Briefcase className="w-3.5 h-3.5" /> {review.customer_type}</div>
+                  <div className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5" /> Submitted: {new Date(review.created_at).toLocaleDateString()}</div>
+                  <div className="flex items-center gap-2"><Globe className="w-3.5 h-3.5" /> {review.jurisdiction || 'Unknown'}</div>
                </div>
                <div className="flex items-center gap-3">
                   <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-xl border text-[10px] font-black uppercase italic tracking-widest ${
-                    review.status === 'Approved' ? 'bg-brand-lime/10 border-brand-lime/20 text-brand-lime' : 'bg-orange-500/10 border-orange-500/20 text-orange-500'
+                    review.status === 'APPROVED' ? 'bg-brand-lime/10 border-brand-lime/20 text-brand-lime' : review.status === 'REJECTED' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-orange-500/10 border-orange-500/20 text-orange-500'
                   }`}>
                      <Clock className="w-3.5 h-3.5" /> {review.status}
                   </div>
@@ -116,8 +143,10 @@ export default function OnboardingReviewDetailPage() {
                <div className="px-8 py-5 bg-muted/30 border border-border/50 rounded-3xl text-right">
                   <div className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground italic mb-2">Assigned Reviewer</div>
                   <div className="flex items-center gap-3 justify-end leading-none">
-                     <span className="text-[17px] font-black italic">{review.assignedTo}</span>
-                     <div className="w-10 h-10 rounded-2xl bg-white border border-border shadow-sm flex items-center justify-center font-bold">SJ</div>
+                     <span className="text-[17px] font-black italic">{review.assigned_user_id || "Unassigned"}</span>
+                     <div className="w-10 h-10 rounded-2xl bg-white border border-border shadow-sm flex items-center justify-center font-bold">
+                       {review.assigned_user_id ? review.assigned_user_id.substring(0, 2).toUpperCase() : "?"}
+                     </div>
                   </div>
                </div>
             </div>
@@ -144,49 +173,35 @@ export default function OnboardingReviewDetailPage() {
                   <CardContent className="p-0">
                      <TabsContent value="kyc" className="m-0 p-10 space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 leading-none">
-                           {[
-                             { name: "Certificate of Incorporation", status: "Verified", id: "BVI-DOC-882", size: "2.4 MB" },
-                             { name: "Articles of Association", status: "Review", id: "BVI-DOC-110", size: "4.1 MB" },
-                             { name: "Register of Directors", status: "Mismatch", id: "BVI-DOC-442", size: "0.8 MB" },
-                             { name: "Proof of Address (Utility)", status: "Verified", id: "POA-9921", size: "1.2 MB" },
-                           ].map((doc, i) => (
-                             <div key={i} className="p-6 bg-muted/20 border border-border/50 rounded-3xl group hover:border-brand-lime transition-all cursor-pointer font-bold italic">
+                           {kycDocs.map((doc: any, i: number) => (
+                             <div key={doc.id || i} className="p-6 bg-muted/20 border border-border/50 rounded-3xl group hover:border-brand-lime transition-all cursor-pointer font-bold italic">
                                 <div className="flex items-center justify-between mb-4">
                                    <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center border border-border shadow-sm text-neutral-400 group-hover:text-brand-lime transition-colors">
                                       <FileText className="w-5 h-5 shadow-sm" />
                                    </div>
                                    <Badge variant="outline" className={`text-[8px] font-black uppercase italic tracking-widest ${
-                                     doc.status === 'Verified' ? 'text-brand-lime border-brand-lime/20' : doc.status === 'Mismatch' ? 'text-rose-500 border-rose-500/20' : 'text-orange-500 border-orange-500/20'
+                                     doc.status === 'VERIFIED' ? 'text-brand-lime border-brand-lime/20' : doc.status === 'REJECTED' || doc.status === 'FAILED' ? 'text-rose-500 border-rose-500/20' : 'text-orange-500 border-orange-500/20'
                                    }`}>
-                                      {doc.status}
+                                      {doc.status || "Pending"}
                                    </Badge>
                                 </div>
                                 <div>
-                                   <div className="text-[14px] font-black italic tracking-tighter text-neutral-900 dark:text-white">{doc.name}</div>
+                                   <div className="text-[14px] font-black italic tracking-tighter text-neutral-900 dark:text-white">{doc.document_type || "Document"}</div>
                                    <div className="flex justify-between items-center mt-2 text-[9px] font-black uppercase italic text-muted-foreground whitespace-nowrap">
-                                      <span>{doc.id}</span>
-                                      <span>{doc.size}</span>
+                                      <span>{(doc.id || "").split("-")[0]}</span>
+                                      <span>N/A</span>
                                    </div>
                                 </div>
                              </div>
                            ))}
-                        </div>
-                        <div className="p-6 bg-rose-500/5 border border-rose-500/10 rounded-3xl flex items-center justify-between">
-                           <div className="flex items-center gap-4">
-                              <AlertTriangle className="w-5 h-5 text-rose-500" />
-                              <div>
-                                 <div className="text-[11px] font-black text-rose-500 italic uppercase">Partial Mismatch Detected</div>
-                                 <div className="text-[9px] text-rose-500/60 font-black italic mt-1 leading-none uppercase">Director "John Sterling" does not match BVI business registry for ID-9982.</div>
-                              </div>
-                           </div>
-                           <Button className="h-8 bg-rose-500 text-white rounded-xl text-[9px] font-black italic uppercase italic">Request Re-Upload</Button>
+                           {kycDocs.length === 0 && (
+                             <div className="col-span-2 text-center text-slate-500 p-8">No documents uploaded.</div>
+                           )}
                         </div>
                      </TabsContent>
                      <TabsContent value="screening" className="m-0 p-10 space-y-10 leading-none">
                         {[
-                          { category: "Sanctions", result: "Clear", score: 0, details: "No matches found across global lists." },
-                          { category: "PEP", result: "Match Detected", score: 94, details: "UBO 'Elena Volkov' matches Level 1 PEP (Political Entity Russian Federation)." },
-                          { category: "Adverse Media", result: "Warning", score: 42, details: "Minor mention in BVI financial journal regarding late tax filings (2022)." },
+                          { category: "Sanctions", result: review.screening_status === 'MATCH' ? "Match Detected" : "Clear", score: 94, details: review.screening_status === 'MATCH' ? "Matches detected in screening engine." : "No matches found across global lists." },
                         ].map((scr, i) => (
                            <div key={i} className="flex gap-8 items-start last:mb-0 group font-bold italic font-black">
                               <div className={`w-12 h-12 rounded-[20px] flex items-center justify-center shrink-0 border ${
@@ -227,8 +242,10 @@ export default function OnboardingReviewDetailPage() {
                      <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-2 italic text-muted-foreground leading-none">Dynamic scoring engine result based on ingestion pattern</CardDescription>
                   </div>
                   <div className="text-right">
-                     <div className="text-5xl font-black italic tracking-tighter text-rose-500 leading-none">{review.riskScore}<span className="text-lg text-muted-foreground/30">/100</span></div>
-                     <Badge className="bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest mt-2 italic shadow-lg shadow-rose-500/20">HIGH RISK</Badge>
+                     <div className={`text-5xl font-black italic tracking-tighter leading-none ${review.risk_level === 'CRITICAL' || review.risk_level === 'HIGH' ? 'text-rose-500' : 'text-emerald-500'}`}>
+                       {review.risk_score || (review.risk_level === 'HIGH' ? 85 : 20)}<span className="text-lg text-muted-foreground/30">/100</span>
+                     </div>
+                     <Badge className={`${review.risk_level === 'CRITICAL' || review.risk_level === 'HIGH' ? 'bg-rose-500' : 'bg-emerald-500'} text-white text-[10px] font-black uppercase tracking-widest mt-2 italic shadow-lg`}>{review.risk_level || 'LOW'} RISK</Badge>
                   </div>
                </div>
 
@@ -236,10 +253,7 @@ export default function OnboardingReviewDetailPage() {
                   <h5 className="text-[11px] font-black uppercase italic tracking-widest text-muted-foreground leading-none">Primary Risk Factors</h5>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      {[
-                       { f: "Jurisdiction: BVI (High Opacity)", s: "Critical", icon: <Globe className="text-rose-500" /> },
-                       { f: "UBO: PEP Match (Level 1)", s: "Critical", icon: <Fingerprint className="text-rose-500" /> },
-                       { f: "Identity: Document Mismatch", s: "Warning", icon: <AlertTriangle className="text-orange-500" /> },
-                       { f: "Industry: High-Cash Potential", s: "Notice", icon: <Zap className="text-indigo-500" /> },
+                       { f: `Jurisdiction: ${review.jurisdiction || 'Unknown'}`, s: "Variable", icon: <Globe className="text-rose-500" /> },
                      ].map((factor, i) => (
                        <div key={i} className="flex items-center gap-4 p-5 bg-muted/20 border border-border/50 rounded-3xl group hover:bg-muted font-bold italic h-16 leading-none whitespace-nowrap">
                           <div className="w-8 h-8 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center shrink-0">
@@ -253,44 +267,29 @@ export default function OnboardingReviewDetailPage() {
                      ))}
                   </div>
                </div>
-
-               <div className="bg-neutral-900 rounded-[32px] p-8 text-white relative overflow-hidden font-bold italic leading-none whitespace-nowrap">
-                  <div className="absolute right-[-5%] top-[-10%] w-[30%] h-[120%] bg-brand-lime/10 blur-[60px] rounded-full pointer-events-none" />
-                  <div className="flex items-center justify-between relative z-10 leading-none h-10">
-                     <div className="flex items-center gap-4">
-                        <Settings className="w-6 h-6 text-brand-lime animate-spin-slow" />
-                        <div>
-                           <div className="text-[11px] font-black italic uppercase tracking-widest">Automation Policy Check</div>
-                           <div className="text-[9px] text-white/40 italic mt-1 leading-none">Policy ID: ONB-AUTO-ALPHA-01</div>
-                        </div>
-                     </div>
-                     <Badge className="bg-white/10 text-white border-white/20 text-[9px] font-black italic">AUTO-REJECT OVERRIDDEN</Badge>
-                  </div>
-               </div>
             </Card>
 
             {/* 6. DECISION WORKFLOW / REVIEWS */}
             <div className="space-y-6 font-bold italic font-black uppercase leading-none">
                <h4 className="text-[11px] font-black uppercase tracking-widest px-4 italic underline underline-offset-8 decoration-border">Collaboration & Decision History</h4>
                <div className="space-y-4 font-bold italic font-black uppercase leading-none">
-                  {[
-                    { u: "Sarah Jenkins", a: "Added internal note", d: "Escalating for EDD due to PEP Russian Federation match. Need to verify source of wealth artifacts.", t: "2h ago" },
-                    { u: "System Security", a: "Automated Check Triggered", d: "Sanctions list sync complete. No hits found on company entity name.", t: "5h ago" },
-                    { u: "John Doe (Customer)", a: "Application Modified", d: "Customer updated UBO list and uploaded Proof of Address documents.", t: "Yesterday" },
-                  ].map((note, i) => (
+                  {notes.map((note: any, i: number) => (
                     <div key={i} className="flex gap-6 items-start p-6 bg-white dark:bg-neutral-900 border border-border/50 rounded-[32px] hover:shadow-xl transition-all font-bold italic leading-none h-32 uppercase font-black whitespace-nowrap">
                        <div className="w-12 h-12 rounded-[20px] bg-muted flex items-center justify-center shrink-0 border border-border h-12 font-bold font-black">
-                          {note.u[0]}
+                          {note.author_id ? note.author_id.substring(0, 1).toUpperCase() : "S"}
                        </div>
                        <div className="flex-1 space-y-2 font-bold italic leading-none h-20 h-full font-black uppercase">
                           <div className="flex justify-between items-baseline font-black leading-none h-5">
-                             <div className="text-[13px] font-bold italic tracking-tighter uppercase whitespace-nowrap h-4 font-black">{note.u} <span className="text-[9px] text-muted-foreground/40 normal-case ml-2">{note.a}</span></div>
-                             <span className="text-[8px] font-black italic text-muted-foreground uppercase opacity-40">{note.t}</span>
+                             <div className="text-[13px] font-bold italic tracking-tighter uppercase whitespace-nowrap h-4 font-black">{note.author_id || 'System'}</div>
+                             <span className="text-[8px] font-black italic text-muted-foreground uppercase opacity-40">{new Date(note.created_at).toLocaleString()}</span>
                           </div>
-                          <p className="text-[11px] text-muted-foreground leading-relaxed italic uppercase font-black whitespace-normal line-clamp-2 h-10">{note.d}</p>
+                          <p className="text-[11px] text-muted-foreground leading-relaxed italic uppercase font-black whitespace-normal line-clamp-2 h-10">{note.body}</p>
                        </div>
                     </div>
                   ))}
+                  {notes.length === 0 && (
+                    <div className="text-center p-8 text-slate-500">No notes or collaboration history.</div>
+                  )}
                </div>
             </div>
          </div>
@@ -304,11 +303,8 @@ export default function OnboardingReviewDetailPage() {
                <CardContent className="p-0 space-y-8">
                   <div className="space-y-6">
                      {[
-                       { l: "Jurisdiction", v: review.customerDetails.jurisdiction },
-                       { l: "Registration #", v: review.customerDetails.registration },
-                       { l: "Primary Industry", v: review.customerDetails.industry },
-                       { l: "Domain", v: review.customerDetails.website },
-                       { l: "Compliance Contact", v: review.customerDetails.email },
+                       { l: "Jurisdiction", v: review.jurisdiction || "Unknown" },
+                       { l: "Type", v: review.customer_type || "N/A" },
                      ].map((info, i) => (
                        <div key={i} className="space-y-1">
                           <div className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground italic mb-1 h-3">{info.l}</div>
@@ -369,16 +365,10 @@ export default function OnboardingReviewDetailPage() {
                   <Link href="/dashboard/audit" className="text-[9px] font-black italic text-indigo-500 underline underline-offset-4">Full History</Link>
                </div>
                <div className="space-y-4 font-bold italic font-black uppercase">
-                  {[
-                    { e: "Application Ingested", t: "Oct 15, 09:22" },
-                    { e: "Auto-Screening Run", t: "Oct 15, 09:23" },
-                    { e: "Assignment to SJ", t: "Oct 15, 10:44" },
-                  ].map((log, i) => (
-                    <div key={i} className="flex justify-between items-center text-[10px] font-black italic h-4 leading-none whitespace-nowrap">
-                       <span className="text-neutral-900 group-hover:text-brand-lime transition-all h-3 leading-none h-full">{log.e}</span>
-                       <span className="text-muted-foreground/40 text-[8px] h-3 leading-none h-full">{log.t}</span>
-                    </div>
-                  ))}
+                  <div className="flex justify-between items-center text-[10px] font-black italic h-4 leading-none whitespace-nowrap">
+                     <span className="text-neutral-900 group-hover:text-brand-lime transition-all h-3 leading-none h-full">Application Created</span>
+                     <span className="text-muted-foreground/40 text-[8px] h-3 leading-none h-full">{new Date(review.created_at).toLocaleDateString()}</span>
+                  </div>
                </div>
             </div>
          </div>
@@ -386,4 +376,3 @@ export default function OnboardingReviewDetailPage() {
     </div>
   );
 }
-

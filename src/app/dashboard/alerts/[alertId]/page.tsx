@@ -43,6 +43,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useAlert } from "@/hooks/use-alerts";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -56,35 +57,27 @@ export default function AlertDetailView() {
   const params = useParams();
   const alertId = params.alertId as string;
 
-  // Mock data for the specific alert
-  const alert = {
-    id: alertId,
-    type: "Unusual Velocity Pattern",
-    severity: "High",
-    status: "In Progress",
-    riskScore: 88,
-    owner: "Marcus Aurelius",
-    createdAt: "Oct 15, 2026 • 19:32:14",
-    sla: "22m left",
-    customer: {
-      name: "Elena Volkov",
-      id: "CUST-9921",
-      riskTier: "High"
-    },
-    transaction: {
-      id: "TX-4281-BC",
-      amount: "4,250.00",
-      currency: "USD"
-    },
-    triggerReason: "Behavioral anomaly detected in institutional gateway ingress. magnitude exceeds 30-day baseline by 4.2x.",
-    explanation: "The alert fired because the internal pattern recognition service identified an institutional node originating from a Tier-3 jurisdiction (CY) with sub-second frequency between state changes.",
-    timeline: [
-      { event: "Alert Generated", time: "19:32:14", actor: "System" },
-      { event: "Auto-Assigned to Queue", time: "19:32:15", actor: "Orchestrator" },
-      { event: "Analyst Acknowledged", time: "19:44:02", actor: "Marcus Aurelius" },
-      { event: "Note Added", time: "19:46:12", actor: "Marcus Aurelius", detail: "Initiating forensic IP trace for ASN 29491." }
-    ]
-  };
+  const { data, isLoading, isError, refetch } = useAlert(alertId);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="p-6 bg-red-50 text-red-700 rounded-lg flex flex-col items-center">
+        <AlertTriangle className="w-8 h-8 mb-2" />
+        <h2 className="font-bold">Failed to load alert</h2>
+        <Button onClick={refetch} className="mt-4" variant="outline">Retry</Button>
+      </div>
+    );
+  }
+
+  const { alert } = data;
 
   return (
     <div className="space-y-6">
@@ -103,7 +96,7 @@ export default function AlertDetailView() {
               {alert.status}
             </Badge>
           </div>
-          <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">{alert.type} • Assigned to {alert.owner}</p>
+          <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">{alert.alert_type} • Assigned to {alert.assigned_user_name || "Unassigned"}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="font-semibold">
@@ -127,8 +120,8 @@ export default function AlertDetailView() {
       {/* KPI Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: "Risk Magnitude", value: alert.riskScore, subtext: "Historical high: 92", icon: <Zap className="text-red-500" />, color: "border-red-100 bg-red-50/20" },
-          { label: "SLA Response", value: alert.sla, subtext: "High priority cue", icon: <Clock className="text-amber-500" />, color: "border-amber-100 bg-amber-50/20" },
+          { label: "Risk Magnitude", value: alert.risk_score || "N/A", subtext: "Historical context", icon: <Zap className="text-red-500" />, color: "border-red-100 bg-red-50/20" },
+          { label: "Created At", value: new Date(alert.created_at).toLocaleDateString(), subtext: new Date(alert.created_at).toLocaleTimeString(), icon: <Clock className="text-amber-500" />, color: "border-amber-100 bg-amber-50/20" },
           { label: "Evidence Nodes", value: "04", subtext: "Verified signals", icon: <FileText className="text-blue-500" />, color: "border-blue-100 bg-blue-50/20" },
         ].map((kpi, i) => (
           <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
@@ -161,11 +154,11 @@ export default function AlertDetailView() {
                 </div>
              </div>
              <p className="text-sm font-medium leading-relaxed text-slate-300">
-                {alert.triggerReason}
+                {alert.title}
              </p>
              <div className="bg-black/40 p-4 rounded-lg font-mono text-[11px] text-emerald-400 leading-relaxed border border-white/5">
                 <span className="text-white/40 block mb-1 uppercase text-[9px]">Execution Trace</span>
-                {alert.explanation}
+                {alert.description}
              </div>
           </Card>
 
@@ -182,9 +175,9 @@ export default function AlertDetailView() {
                     <h4 className="text-sm font-bold text-slate-900 mb-6">Subject Identity</h4>
                     <div className="space-y-4">
                        {[
-                         { label: "Entity Name", value: alert.customer.name, icon: <User className="w-3.5 h-3.5" /> },
-                         { label: "Customer ID", value: alert.customer.id, icon: <Fingerprint className="w-3.5 h-3.5" /> },
-                         { label: "Risk Segment", value: alert.customer.riskTier, icon: <AlertCircle className="w-3.5 h-3.5" /> },
+                         { label: "Entity Name", value: alert.customer_name || "N/A", icon: <User className="w-3.5 h-3.5" /> },
+                         { label: "Customer ID", value: alert.customer_id || "N/A", icon: <Fingerprint className="w-3.5 h-3.5" /> },
+                         { label: "Risk Segment", value: "Unknown", icon: <AlertCircle className="w-3.5 h-3.5" /> },
                        ].map((item, i) => (
                          <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest flex items-center gap-2">{item.icon} {item.label}</span>
@@ -198,9 +191,9 @@ export default function AlertDetailView() {
                     <h4 className="text-sm font-bold text-slate-900 mb-6">Object Details</h4>
                     <div className="space-y-4">
                        {[
-                         { label: "Transaction ID", value: alert.transaction.id, icon: <CreditCard className="w-3.5 h-3.5" /> },
-                         { label: "Settlement Amt", value: `$${alert.transaction.amount}`, icon: <TrendingUp className="w-3.5 h-3.5" /> },
-                         { label: "Currency Node", value: alert.transaction.currency, icon: <Globe className="w-3.5 h-3.5" /> },
+                         { label: "Transaction ID", value: alert.transaction_id || "N/A", icon: <CreditCard className="w-3.5 h-3.5" /> },
+                         { label: "Settlement Amt", value: "N/A", icon: <TrendingUp className="w-3.5 h-3.5" /> },
+                         { label: "Currency Node", value: "N/A", icon: <Globe className="w-3.5 h-3.5" /> },
                        ].map((item, i) => (
                          <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest flex items-center gap-2">{item.icon} {item.label}</span>
@@ -215,18 +208,10 @@ export default function AlertDetailView() {
               <Card className="rounded-xl shadow-sm border bg-white p-6 space-y-4">
                  <div className="flex justify-between items-center">
                     <h4 className="text-sm font-bold text-slate-900">Analyst Observation Thread</h4>
-                    <Badge variant="outline" className="text-[9px] font-bold bg-slate-50 border-none">04 Notes</Badge>
+                    <Badge variant="outline" className="text-[9px] font-bold bg-slate-50 border-none">0 Notes</Badge>
                  </div>
                  <div className="space-y-4">
-                    {alert.timeline.filter(t => t.detail).map((note, i) => (
-                       <div key={i} className="p-4 rounded-lg bg-white border border-slate-100 shadow-sm space-y-2">
-                          <div className="flex justify-between items-center">
-                             <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">{note.actor}</span>
-                             <span className="text-[9px] font-medium text-slate-400 uppercase">{note.time}</span>
-                          </div>
-                          <p className="text-xs font-medium text-slate-600 italic">"{note.detail}"</p>
-                       </div>
-                    ))}
+                    <p className="text-xs text-slate-500 italic">No notes found.</p>
                  </div>
                  <div className="flex gap-2">
                     <input placeholder="Add observation to thread..." className="flex-1 text-xs border border-slate-200 rounded-md px-3 h-9 focus:outline-none focus:ring-1 focus:ring-blue-500" />
