@@ -34,10 +34,41 @@ import {
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { useCurrentPlan, useBillingUsage } from "@/hooks";
+import { billingService } from "@/services/billing.service";
 
 export default function BillingPage() {
   const { data: subscription, isLoading: subscriptionLoading, isError: subscriptionError, refetch: refetchSubscription } = useCurrentPlan();
   const { data: usage, isLoading: usageLoading, isError: usageError, refetch: refetchUsage } = useBillingUsage();
+
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  const handleManageBilling = async () => {
+    try {
+      setIsRedirecting(true);
+      const res = await billingService.createPortalSession({ return_url: window.location.href });
+      if (res.url) {
+        window.location.href = res.url;
+      }
+    } catch (err) {
+      console.error('Failed to create portal session:', err);
+    } finally {
+      setIsRedirecting(false);
+    }
+  };
+
+  const handleUpgradePlan = async () => {
+    try {
+      setIsRedirecting(true);
+      const res = await billingService.createCheckoutSession({ plan_id: "premium", success_url: window.location.href, cancel_url: window.location.href });
+      if (res.url) {
+        window.location.href = res.url;
+      }
+    } catch (err) {
+      console.error('Failed to create checkout session:', err);
+    } finally {
+      setIsRedirecting(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -105,16 +136,25 @@ export default function BillingPage() {
             <h1 className="text-3xl font-black italic tracking-tighter uppercase text-neutral-900 dark:text-white">
               Billing<span className="text-brand-lime">.</span>
             </h1>
-            <p className="text-muted-foreground text-sm font-medium">
+            <p className="text-muted-foreground text-[11px] font-bold uppercase tracking-widest italic leading-none">
               Manage your subscription, invoices, and usage.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" className="h-10 px-4 text-xs font-bold uppercase tracking-widest italic">
+            <Button 
+              variant="outline" 
+              onClick={handleManageBilling}
+              disabled={isRedirecting}
+              className="h-10 px-4 text-xs font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800"
+            >
               <Settings className="w-3.5 h-3.5 mr-2" />
-              Manage Payment Method
+              {isRedirecting ? 'Redirecting...' : 'Manage Payment Method'}
             </Button>
-            <Button className="h-10 px-6 bg-brand-lime text-neutral-900 hover:scale-105 transition-all font-bold text-xs uppercase tracking-widest italic shadow-xl shadow-brand-lime/20">
+            <Button 
+              onClick={handleUpgradePlan}
+              disabled={isRedirecting}
+              className="h-10 px-6 bg-brand-lime text-neutral-900 hover:scale-105 transition-all font-black text-xs uppercase tracking-widest italic shadow-xl shadow-brand-lime/20"
+            >
               <Plus className="w-3.5 h-3.5 mr-2" />
               Upgrade Plan
             </Button>
@@ -124,38 +164,38 @@ export default function BillingPage() {
 
       {/* Subscription Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="rounded-2xl border">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-              <Package className="w-4 h-4" />
+        <Card className="rounded-[40px] border-border/50 shadow-2xl p-10 bg-white">
+          <CardHeader className="p-0 mb-8">
+            <CardTitle className="text-xl font-black uppercase tracking-tighter italic flex items-center gap-2">
+              <Package className="w-5 h-5 text-indigo-500" />
               Current Plan
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="text-2xl font-black italic text-neutral-900 dark:text-white">
+          <CardContent className="p-0">
+            <div className="space-y-4">
+              <div className="text-4xl font-black italic text-neutral-900 tracking-tighter uppercase">
                 {subscription?.plan_name || 'Enterprise'}
               </div>
-              <Badge className={getStatusColor(subscription?.status || 'active')}>
+              <Badge className={`text-[10px] font-black uppercase italic tracking-widest ${getStatusColor(subscription?.status || 'active')}`}>
                 {subscription?.status || 'Active'}
               </Badge>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
+        <Card className="rounded-[40px] border-border/50 shadow-2xl p-10 bg-white">
+          <CardHeader className="p-0 mb-8">
+            <CardTitle className="text-xl font-black uppercase tracking-tighter flex items-center gap-2 italic">
+              <TrendingUp className="w-5 h-5 text-brand-lime" />
               Monthly Usage
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="text-2xl font-black italic text-neutral-900 dark:text-white">
+          <CardContent className="p-0">
+            <div className="space-y-4">
+              <div className="text-4xl font-black italic text-neutral-900 tracking-tighter uppercase">
                 {usage?.total_requests?.toLocaleString() || '0'}
               </div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground italic">
                 API requests this month
               </div>
               <Progress value={usage?.usage_percentage || 0} className="h-2" />
@@ -163,21 +203,21 @@ export default function BillingPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl border">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-              <DollarSign className="w-4 h-4" />
+        <Card className="rounded-[40px] border-border/50 shadow-2xl p-10 bg-white">
+          <CardHeader className="p-0 mb-8">
+            <CardTitle className="text-xl font-black uppercase tracking-tighter flex items-center gap-2 italic">
+              <DollarSign className="w-5 h-5 text-emerald-500" />
               Next Billing
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="text-2xl font-black italic text-neutral-900 dark:text-white">
+          <CardContent className="p-0">
+            <div className="space-y-4">
+              <div className="text-4xl font-black italic text-neutral-900 tracking-tighter uppercase">
                 ${subscription?.next_billing_amount || '0.00'}
               </div>
-              <div className="text-xs text-muted-foreground flex items-center gap-1">
-                <Calendar className="w-3 h-3" />
-                {subscription?.next_billing_date || 'N/A'}
+              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 italic">
+                <Calendar className="w-3.5 h-3.5" />
+                {subscription?.next_billing_date ? new Date(subscription.next_billing_date).toLocaleDateString() : 'N/A'}
               </div>
             </div>
           </CardContent>
@@ -185,30 +225,30 @@ export default function BillingPage() {
       </div>
 
       {/* Usage Details */}
-      <Card className="rounded-2xl border">
-        <CardHeader>
-          <CardTitle className="text-lg font-bold italic text-neutral-900 dark:text-white">
+      <Card className="rounded-[40px] border-border/50 shadow-2xl p-10 bg-white">
+        <CardHeader className="p-0 mb-10">
+          <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">
             Usage Details
           </CardTitle>
-          <CardDescription className="text-sm">
+          <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-2 italic text-muted-foreground">
             Monitor your API usage and quotas
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        <CardContent className="p-0">
+          <div className="space-y-6">
             {usage && Array.isArray(usage) ? usage.map((item: any, index: number) => (
-              <div key={index} className="flex items-center justify-between p-4 bg-muted/30 rounded-xl">
+              <div key={index} className="flex items-center justify-between p-6 bg-muted/20 border border-border/50 rounded-3xl group hover:border-brand-lime transition-all">
                 <div className="space-y-1">
-                  <div className="font-bold text-sm">{item.feature_key || 'Feature'}</div>
-                  <div className="text-xs text-muted-foreground">{item.description || ''}</div>
+                  <div className="text-[13px] font-black italic uppercase">{item.feature_key || 'Feature'}</div>
+                  <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground italic">{item.description || ''}</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-sm">{item.current || 0} / {item.limit || '∞'}</div>
-                  <Progress value={item.percentage || 0} className="h-2 w-32 mt-1" />
+                  <div className="text-[11px] font-black uppercase italic tracking-tighter">{item.current || 0} / {item.limit || '∞'}</div>
+                  <Progress value={item.percentage || 0} className="h-2 w-32 mt-2 bg-neutral-200 [&>div]:bg-brand-lime" />
                 </div>
               </div>
             )) : (
-              <div className="text-center text-muted-foreground py-8">
+              <div className="text-center text-slate-500 p-8 font-black italic">
                 No usage data available
               </div>
             )}

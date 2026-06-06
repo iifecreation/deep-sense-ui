@@ -27,7 +27,8 @@ import {
   Cloud,
   Server,
   ExternalLink,
-  Table as TableIcon
+  Table as TableIcon,
+  AlertTriangle
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -51,41 +52,53 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { useIntegration } from "@/hooks/use-integrations";
 
 export default function IntegrationDetailPage() {
   const params = useParams();
   const integrationId = params.integrationId as string;
 
-  // Mock data for high-fidelity view
+  const { data: integrationData, isLoading, isError, refetch } = useIntegration(integrationId);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-lime"></div>
+      </div>
+    );
+  }
+
+  if (isError || !integrationData) {
+    return (
+      <div className="p-6 bg-red-50 text-red-700 rounded-lg flex flex-col items-center">
+        <AlertTriangle className="w-8 h-8 mb-2" />
+        <h2 className="font-bold">Failed to load integration</h2>
+        <Button onClick={refetch} className="mt-4" variant="outline">Retry</Button>
+      </div>
+    );
+  }
+
   const integration = {
-    id: integrationId,
-    name: "Stripe Production Mesh",
-    status: "Active",
+    id: integrationData.id,
+    name: integrationData.name || "Unnamed Integration",
+    status: integrationData.status || "Active",
     environment: "Production",
-    type: "Payment Gateway",
-    endpoint: "https://api.stripe.com/v1",
+    type: integrationData.type || "Generic Webhook",
+    endpoint: integrationData.endpoint_url || "N/A",
     description: "Core payment processing mesh for institutional settlements and multi-currency clearing.",
     health: {
-      uptime: "99.98%",
-      lastSync: "12s ago",
-      errorRate: "0.02%",
-      latency: "142ms"
+      uptime: "N/A",
+      lastSync: "N/A",
+      errorRate: "N/A",
+      latency: "N/A"
     },
     usage: {
-      requests24h: "4.2M",
-      rateLimit: "10,000 req/min",
-      consumption: 42
+      requests24h: "0",
+      rateLimit: "N/A",
+      consumption: 0
     },
-    webhooks: [
-      { event: "charge.succeeded", status: "Delivered", time: "2m ago" },
-      { event: "payment_intent.created", status: "Delivered", time: "5m ago" },
-      { event: "payout.failed", status: "Retrying", time: "12m ago" }
-    ],
-    logs: [
-      { t: "19:32:11", msg: "POST /v1/charges", status: 200 },
-      { t: "19:31:58", msg: "GET /v1/customers", status: 200 },
-      { t: "19:30:44", msg: "POST /v1/refunds", status: 402 }
-    ]
+    webhooks: [],
+    logs: []
   };
 
   return (
@@ -269,33 +282,8 @@ export default function IntegrationDetailPage() {
                      <CardHeader className="p-10 border-b border-border/50">
                         <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Inbound Delivery Registry</CardTitle>
                      </CardHeader>
-                     <CardContent className="p-0">
-                        <Table>
-                           <TableHeader className="bg-muted px-10">
-                              <TableRow className="hover:bg-transparent border-none">
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 px-10 text-neutral-400">Event Topic</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-neutral-400">Timestamp</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-right px-10 text-neutral-400">Status</TableHead>
-                              </TableRow>
-                           </TableHeader>
-                           <TableBody>
-                              {integration.webhooks.map((hook, i) => (
-                                <TableRow key={i} className="group hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0 h-20">
-                                   <TableCell className="px-10 py-5">
-                                      <span className="text-[13px] font-black italic tracking-tighter uppercase text-neutral-900">{hook.event}</span>
-                                   </TableCell>
-                                   <TableCell className="text-[11px] font-black italic text-neutral-400 uppercase">{hook.time}</TableCell>
-                                   <TableCell className="px-10 text-right">
-                                      <Badge variant="outline" className={`text-[8px] font-black uppercase italic tracking-widest border-none ${
-                                        hook.status === 'Delivered' ? 'text-brand-lime' : 'text-orange-500 animate-pulse'
-                                      }`}>
-                                         {hook.status}
-                                      </Badge>
-                                   </TableCell>
-                                </TableRow>
-                              ))}
-                           </TableBody>
-                        </Table>
+                     <CardContent className="p-10 text-center text-muted-foreground italic text-sm font-bold">
+                        No webhooks delivered recently.
                      </CardContent>
                   </Card>
                </TabsContent>
@@ -310,13 +298,9 @@ export default function IntegrationDetailPage() {
                            <div className="w-3 h-3 rounded-full bg-brand-lime" />
                         </div>
                      </div>
-                     {integration.logs.map((log, i) => (
-                        <div key={i} className="flex gap-6 group hover:bg-white/5 p-2 rounded-lg transition-colors">
-                           <span className="text-white/20 whitespace-nowrap">{log.t}</span>
-                           <span className="flex-1 text-white/60 truncate">{log.msg}</span>
-                           <span className={log.status >= 400 ? "text-rose-500" : "text-brand-lime"}>{log.status}</span>
-                        </div>
-                     ))}
+                     <div className="py-10 text-center text-white/50 italic text-sm font-bold">
+                        No recent logs available.
+                     </div>
                      <div className="pt-8 flex justify-center">
                         <Button variant="outline" className="border-white/10 text-white rounded-2xl text-[9px] font-black uppercase italic h-10 px-8 hover:bg-white/5">Load Historical Logs</Button>
                      </div>

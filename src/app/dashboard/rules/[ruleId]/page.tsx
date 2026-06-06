@@ -45,45 +45,56 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { useFraudRule } from "@/hooks/use-fraud-rules";
 
 export default function RuleDetailPage() {
   const params = useParams();
   const ruleId = params.ruleId as string;
 
-  // Mock data for high-fidelity view
+  const { data: ruleData, isLoading, isError, refetch } = useFraudRule(ruleId);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-lime"></div>
+      </div>
+    );
+  }
+
+  if (isError || !ruleData) {
+    return (
+      <div className="p-6 bg-red-50 text-red-700 rounded-lg flex flex-col items-center">
+        <AlertTriangle className="w-8 h-8 mb-2" />
+        <h2 className="font-bold">Failed to load rule</h2>
+        <Button onClick={refetch} className="mt-4" variant="outline">Retry</Button>
+      </div>
+    );
+  }
+
   const rule = {
-    id: ruleId,
-    name: "High-Opacity Velocity Breach",
-    status: "Active",
-    severity: "High",
-    description: "Detects rapid transaction sequences in high-risk jurisdictions exceeding 30-day baseline.",
+    id: ruleData.id,
+    name: ruleData.name || "Unnamed Rule",
+    status: ruleData.is_active ? "Active" : "Disabled",
+    severity: ruleData.action === "FLAG" ? "Medium" : ruleData.action === "BLOCK" ? "High" : "Low",
+    description: ruleData.description || "No description provided.",
     logic: {
-      dsl: "IF transaction.amount > 5000 AND origin.risk_score > 70 AND account.velocity_1h > 3 THEN FLAG_FOR_REVIEW",
-      conditions: [
-        { parameter: "transaction.amount", operator: ">", value: "5000" },
-        { parameter: "origin.risk_score", operator: ">", value: "70" },
-        { parameter: "account.velocity_1h", operator: ">", value: "3" }
-      ]
+      dsl: JSON.stringify(ruleData.conditions, null, 2),
+      conditions: []
     },
     metrics: {
-      totalHits: 1242,
-      precision: "94.2%",
-      recall: "88.1%",
-      falsePositiveRate: "2.4%",
-      avgExecutionTime: "1.2ms"
+      totalHits: 0,
+      precision: "N/A",
+      recall: "N/A",
+      falsePositiveRate: "N/A",
+      avgExecutionTime: "N/A"
     },
-    lastTriggered: "2 mins ago",
-    author: "Sarah Jenkins",
-    version: "v1.4.2",
+    lastTriggered: "N/A",
+    author: ruleData.created_by_user_name || "System",
+    version: `v1.${ruleData.version || 0}`,
     history: [
-      { version: "v1.4.2", date: "Oct 12, 2026", author: "Sarah Jenkins", change: "Updated threshold delta from 5 to 3" },
-      { version: "v1.4.1", date: "Sep 28, 2026", author: "Marcus Reed", change: "Added origin.risk_score parameter" },
-      { version: "v1.4.0", date: "Aug 15, 2026", author: "Sarah Jenkins", change: "Initial rule deployment" }
+      { version: `v1.${ruleData.version || 0}`, date: new Date(ruleData.updated_at).toLocaleDateString(), author: ruleData.created_by_user_name || "System", change: "Latest rule deployment" }
     ],
-    linkedAlerts: [
-      { id: "ALT-9921", date: "Oct 15, 2026", status: "Active", severity: "High" },
-      { id: "ALT-9871", date: "Oct 14, 2026", status: "Resolved", severity: "Medium" }
-    ]
+    linkedAlerts: []
   };
 
   return (
@@ -175,20 +186,8 @@ export default function RuleDetailPage() {
                         </div>
                      </CardHeader>
                      <CardContent className="p-0 relative z-10">
-                        <div className="bg-black/40 p-10 rounded-[32px] border border-white/5 font-mono text-[14px] leading-relaxed text-white/80 italic">
+                        <div className="bg-black/40 p-10 rounded-[32px] border border-white/5 font-mono text-[14px] leading-relaxed text-white/80 italic whitespace-pre">
                            {rule.logic.dsl}
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
-                           {rule.logic.conditions.map((cond, i) => (
-                             <div key={i} className="p-6 bg-white/5 border border-white/5 rounded-3xl">
-                                <div className="text-[9px] font-black uppercase text-white/30 italic mb-1">Parameter</div>
-                                <div className="text-[12px] font-black text-white italic">{cond.parameter}</div>
-                                <div className="flex gap-2 items-baseline mt-2">
-                                   <span className="text-brand-lime font-black underline">{cond.operator}</span>
-                                   <span className="text-white font-black">{cond.value}</span>
-                                </div>
-                             </div>
-                           ))}
                         </div>
                      </CardContent>
                   </Card>
@@ -199,10 +198,7 @@ export default function RuleDetailPage() {
                      </CardHeader>
                      <CardContent className="p-0 space-y-4">
                         <p className="text-[13px] text-muted-foreground leading-relaxed italic font-medium">
-                           This rule evaluates the cumulative transaction volume for an account within a 1-hour window. 
-                           It specifically filters for origins with a high-risk jurisdiction score derived from the Institutional Geo-Risk model. 
-                           A positive match triggers an immediate <span className="text-rose-500 font-black italic underline underline-offset-4 decoration-rose-500/30">FLAG_FOR_REVIEW</span> action, 
-                           placing the transaction in the Level 2 manual review queue.
+                           {rule.description}
                         </p>
                      </CardContent>
                   </Card>
@@ -249,35 +245,8 @@ export default function RuleDetailPage() {
                      <CardHeader className="p-10 border-b border-border/50">
                         <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Triggered Alert Registry</CardTitle>
                      </CardHeader>
-                     <CardContent className="p-0">
-                        <Table>
-                           <TableHeader className="bg-muted px-10">
-                              <TableRow className="hover:bg-transparent border-none">
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 px-10 text-neutral-400">Alert Node</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-neutral-400">Timestamp</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-center text-neutral-400">Severity</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-right px-10 text-neutral-400">Resolution</TableHead>
-                              </TableRow>
-                           </TableHeader>
-                           <TableBody>
-                              {rule.linkedAlerts.map((alert, i) => (
-                                <TableRow key={i} className="group hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0 h-20 cursor-pointer" onClick={() => window.location.href=`/dashboard/alerts/${alert.id}`}>
-                                   <TableCell className="px-10 py-5">
-                                      <span className="text-[13px] font-black italic tracking-tighter uppercase text-neutral-900">{alert.id}</span>
-                                   </TableCell>
-                                   <TableCell className="text-[11px] font-black italic text-neutral-400 uppercase">{alert.date}</TableCell>
-                                   <TableCell className="text-center font-black italic text-rose-500 uppercase text-[10px] tracking-widest">{alert.severity}</TableCell>
-                                   <TableCell className="px-10 text-right">
-                                      <Badge variant="outline" className={`text-[8px] font-black uppercase italic tracking-widest border-none ${
-                                        alert.status === 'Active' ? 'text-orange-500' : 'text-brand-lime'
-                                      }`}>
-                                         {alert.status}
-                                      </Badge>
-                                   </TableCell>
-                                </TableRow>
-                              ))}
-                           </TableBody>
-                        </Table>
+                     <CardContent className="p-10 text-center text-muted-foreground italic text-sm font-bold">
+                        No alerts linked to this rule.
                      </CardContent>
                   </Card>
                </TabsContent>

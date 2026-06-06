@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { 
   CheckCircle2, 
   Search, 
@@ -31,7 +31,8 @@ import {
   Plus,
   ArrowUpRight,
   ExternalLink,
-  ChevronDown
+  ChevronDown,
+  AlertCircle
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -54,8 +55,61 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { useOnboardingReviews } from "@/hooks";
 
 export default function OnboardingReviewsPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data: reviewsData, isLoading, isError, refetch } = useOnboardingReviews({ search: searchQuery });
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-10 pb-20">
+        <section className="sticky top-0 z-40 -mx-6 px-6 py-6 bg-background/80 backdrop-blur-md border-b border-border/50">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="space-y-1">
+              <h1 className="text-3xl font-black italic tracking-tighter uppercase">Onboarding Reviews<span className="text-brand-lime">.</span></h1>
+            </div>
+          </div>
+        </section>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="rounded-xl shadow-sm border bg-white h-24 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col gap-10 pb-20">
+        <section className="sticky top-0 z-40 -mx-6 px-6 py-6 bg-background/80 backdrop-blur-md border-b border-border/50">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="space-y-1">
+              <h1 className="text-3xl font-black italic tracking-tighter uppercase">Onboarding Reviews<span className="text-brand-lime">.</span></h1>
+            </div>
+          </div>
+        </section>
+        <Card className="rounded-3xl border border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="text-red-600 h-5 w-5" />
+              <div>
+                <p className="font-semibold text-red-900">Failed to load reviews</p>
+                <p className="text-sm text-red-700">Please check your connection and try again.</p>
+              </div>
+            </div>
+            <Button onClick={refetch} className="mt-4" variant="outline">
+              <RefreshCcw className="w-4 h-4 mr-2" /> Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const items = reviewsData?.items || [];
+
   return (
     <div className="flex flex-col gap-10 pb-20">
       {/* 1. PAGE HEADER */}
@@ -78,7 +132,7 @@ export default function OnboardingReviewsPage() {
                <Plus className="w-3.5 h-3.5 mr-2" />
                New Review
             </Button>
-            <Button size="icon" variant="ghost" className="h-10 w-10">
+            <Button size="icon" variant="ghost" className="h-10 w-10" onClick={refetch}>
                <RefreshCcw className="w-3.5 h-3.5" />
             </Button>
           </div>
@@ -90,6 +144,8 @@ export default function OnboardingReviewsPage() {
             <Search className="w-3.5 h-3.5 text-muted-foreground" />
             <Input 
               placeholder="Filter by ID, Name, or Reviewer..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="h-8 w-64 text-[11px] font-bold border-none shadow-none focus-visible:ring-0 italic"
             />
           </div>
@@ -117,12 +173,12 @@ export default function OnboardingReviewsPage() {
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {[
-          { label: "Pending Reviews", value: "142", delta: "+12", icon: <Clock className="text-neutral-400" /> },
-          { label: "High-Risk Apps", value: "28", delta: "+4", icon: <AlertTriangle className="text-rose-500 animate-pulse" /> },
-          { label: "Approved Today", value: "45", delta: "+18", icon: <CheckCircle2 className="text-brand-lime" /> },
-          { label: "Rejected Apps", value: "14", delta: "+2", icon: <XCircle className="text-rose-600" /> },
-          { label: "PEP/Sanct Matches", value: "09", delta: "+1", icon: <ShieldAlert className="text-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.3)] font-bold" /> },
-          { label: "Escalated EDD", value: "12", delta: "+3", icon: <Briefcase className="text-indigo-500" /> },
+          { label: "Total Reviews", value: reviewsData?.total || 0, delta: "+12", icon: <Clock className="text-neutral-400" /> },
+          { label: "High-Risk Apps", value: "0", delta: "+0", icon: <AlertTriangle className="text-rose-500 animate-pulse" /> },
+          { label: "Approved Today", value: "0", delta: "+0", icon: <CheckCircle2 className="text-brand-lime" /> },
+          { label: "Rejected Apps", value: "0", delta: "+0", icon: <XCircle className="text-rose-600" /> },
+          { label: "PEP/Sanct Matches", value: "0", delta: "+0", icon: <ShieldAlert className="text-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.3)] font-bold" /> },
+          { label: "Escalated EDD", value: "0", delta: "+0", icon: <Briefcase className="text-indigo-500" /> },
         ].map((kpi, i) => (
           <div 
             key={i} 
@@ -171,45 +227,42 @@ export default function OnboardingReviewsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[
-                  { id: "APP-8842", name: "Global Trade Ltd", type: "Business", risk: "CRITICAL", screen: "Alert", kyc: "Verified", time: "2h left", user: "Michael Chen" },
-                  { id: "APP-1102", name: "Elena Volkov", type: "Individual", risk: "HIGH", screen: "PEP Match", kyc: "Pending", time: "5h left", user: "Sarah Jenkins" },
-                  { id: "APP-9981", name: "Z-Crypt Solutions", type: "Business", risk: "HIGH", screen: "Sanction Proximity", kyc: "Mismatch", time: "8h left", user: "John Carter" },
-                  { id: "APP-4421", name: "Hiroshi Tanaka", type: "Individual", risk: "MEDIUM", screen: "Watchlist", kyc: "Verified", time: "12h left", user: "Unassigned" },
-                ].map((row, i) => (
-                  <TableRow key={i} className="group hover:bg-muted border-b border-border/50 transition-colors cursor-pointer">
+                {items.filter((i: any) => i.risk_level === 'CRITICAL' || i.risk_level === 'HIGH' || i.status === 'ESCALATED').slice(0,4).map((row: any, i: number) => (
+                  <TableRow key={row.id} className="group hover:bg-muted border-b border-border/50 transition-colors cursor-pointer">
                     <TableCell className="px-8 py-5">
                        <Link href={`/dashboard/onboarding/${row.id}`} className="flex flex-col">
-                          <span className="text-[13px] font-black italic tracking-tighter text-neutral-900 dark:text-white leading-none">{row.name}</span>
-                          <span className="text-[10px] font-black text-muted-foreground uppercase mt-1 italic opacity-40">{row.id} • {row.type}</span>
+                          <span className="text-[13px] font-black italic tracking-tighter text-neutral-900 dark:text-white leading-none">{row.applicant_name}</span>
+                          <span className="text-[10px] font-black text-muted-foreground uppercase mt-1 italic opacity-40">{row.id.split('-')[0]} • {row.customer_type}</span>
                        </Link>
                     </TableCell>
                     <TableCell>
                        <div className={`p-1 pl-3 rounded-full border ${
-                         row.risk === 'CRITICAL' ? 'bg-rose-500/10 border-rose-500/20 text-rose-600' : 'bg-orange-500/10 border-orange-500/20 text-orange-600'
+                         row.risk_level === 'CRITICAL' ? 'bg-rose-500/10 border-rose-500/20 text-rose-600' : 'bg-orange-500/10 border-orange-500/20 text-orange-600'
                        } text-[9px] font-black uppercase italic tracking-widest flex items-center gap-2 w-fit`}>
-                         {row.risk}
-                         <div className={`w-1 h-1 rounded-full ${row.risk === 'CRITICAL' ? 'bg-rose-500 animate-pulse' : 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)]'}`} />
+                         {row.risk_level || 'HIGH'}
+                         <div className={`w-1 h-1 rounded-full ${row.risk_level === 'CRITICAL' ? 'bg-rose-500 animate-pulse' : 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)]'}`} />
                        </div>
                     </TableCell>
                     <TableCell className="text-center">
                        <Badge variant="outline" className={`text-[9px] font-black uppercase italic tracking-widest ${
-                         row.screen === 'Alert' || row.screen === 'PEP Match' || row.screen === 'Sanction Proximity' ? 'border-rose-500/20 text-rose-500 bg-rose-500/5' : 'border-orange-500/20 text-orange-500 bg-orange-500/5'
+                         row.screening_status === 'MATCH' ? 'border-rose-500/20 text-rose-500 bg-rose-500/5' : 'border-orange-500/20 text-orange-500 bg-orange-500/5'
                        }`}>
-                         {row.screen}
+                         {row.screening_status || 'Pending'}
                        </Badge>
                     </TableCell>
                     <TableCell className="text-center">
                        <Badge className={`text-[9px] font-black uppercase italic tracking-widest ${
-                         row.kyc === 'Verified' ? 'bg-brand-lime text-black shadow-[0_0_12px_rgba(209,247,1,0.3)] font-bold' : row.kyc === 'Mismatch' ? 'bg-rose-500 text-white' : 'bg-muted text-muted-foreground'
+                         row.kyc_status === 'VERIFIED' ? 'bg-brand-lime text-black shadow-[0_0_12px_rgba(209,247,1,0.3)] font-bold' : row.kyc_status === 'FAILED' ? 'bg-rose-500 text-white' : 'bg-muted text-muted-foreground'
                        }`}>
-                         {row.kyc}
+                         {row.kyc_status || 'Pending'}
                        </Badge>
                     </TableCell>
-                    <TableCell className="text-[11px] font-black italic text-rose-500">{row.time}</TableCell>
+                    <TableCell className="text-[11px] font-black italic text-rose-500">
+                      {new Date(row.created_at).toLocaleDateString()}
+                    </TableCell>
                     <TableCell className="px-8 text-right">
                        <div className="flex items-center justify-end gap-3 group/actor font-bold italic">
-                          <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground group-hover/actor:text-neutral-900 dark:group-hover/actor:text-white transition-colors">{row.user}</span>
+                          <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground group-hover/actor:text-neutral-900 dark:group-hover/actor:text-white transition-colors">{row.assigned_user_id ? 'Assigned' : 'Unassigned'}</span>
                           <div className="w-8 h-8 rounded-full bg-muted border border-border border-dashed flex items-center justify-center">
                              <Users className="w-3.5 h-3.5 text-muted-foreground/40 group-hover/actor:text-brand-lime" />
                           </div>
@@ -217,6 +270,13 @@ export default function OnboardingReviewsPage() {
                     </TableCell>
                   </TableRow>
                 ))}
+                {items.filter((i: any) => i.risk_level === 'CRITICAL' || i.risk_level === 'HIGH' || i.status === 'ESCALATED').length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-10 text-slate-500">
+                      No priority reviews in queue.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </CardContent>
@@ -259,48 +319,50 @@ export default function OnboardingReviewsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {[
-                      { name: "Atlas Logistics", id: "APP-0091", risk: "LOW", kyc: "Verified", status: "Approved", time: "2h ago" },
-                      { name: "John Doe", id: "APP-8812", risk: "MEDIUM", kyc: "Pending", status: "Review", time: "5h ago" },
-                      { name: "CryptoFlow LLC", id: "APP-4491", risk: "HIGH", kyc: "Mismatch", status: "Escalated", time: "12h ago" },
-                      { name: "Marina Silva", id: "APP-1102", risk: "LOW", kyc: "Verified", status: "Rejected", time: "1d ago" },
-                      { name: "Terraform Tech", id: "APP-2291", risk: "MEDIUM", kyc: "Verified", status: "Approved", time: "2d ago" },
-                      { name: "Swift Pay Limited", id: "APP-4422", risk: "HIGH", kyc: "Pending", status: "Review", time: "3d ago" },
-                    ].map((row, i) => (
-                      <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors cursor-pointer">
+                    {items.map((row: any) => (
+                      <TableRow key={row.id} className="group hover:bg-muted/30 border-b border-border/50 transition-colors cursor-pointer">
                         <TableCell className="px-8 py-5">
                            <div className="flex flex-col">
-                              <span className="text-[11px] font-black italic tracking-tighter text-neutral-900 dark:text-white leading-none whitespace-nowrap">{row.name}</span>
-                              <span className="text-[8px] font-bold text-muted-foreground uppercase mt-1 opacity-40">{row.id} • {row.time}</span>
+                              <span className="text-[11px] font-black italic tracking-tighter text-neutral-900 dark:text-white leading-none whitespace-nowrap">{row.applicant_name}</span>
+                              <span className="text-[8px] font-bold text-muted-foreground uppercase mt-1 opacity-40">{row.id.split('-')[0]} • {new Date(row.created_at).toLocaleDateString()}</span>
                            </div>
                         </TableCell>
                         <TableCell>
                            <div className={`text-[10px] font-black uppercase italic tracking-widest ${
-                             row.risk === 'HIGH' ? 'text-rose-500' : row.risk === 'MEDIUM' ? 'text-orange-500' : 'text-emerald-500'
+                             row.risk_level === 'HIGH' || row.risk_level === 'CRITICAL' ? 'text-rose-500' : row.risk_level === 'MEDIUM' ? 'text-orange-500' : 'text-emerald-500'
                            }`}>
-                             {row.risk}
+                             {row.risk_level || 'LOW'}
                            </div>
                         </TableCell>
                         <TableCell>
                            <Badge variant="outline" className={`text-[8px] font-black tracking-widest uppercase italic px-2 border-border/50 ${
-                             row.kyc === 'Verified' ? 'text-emerald-500' : 'text-rose-500'
+                             row.kyc_status === 'VERIFIED' ? 'text-emerald-500' : row.kyc_status === 'FAILED' ? 'text-rose-500' : 'text-muted-foreground'
                            }`}>
-                             {row.kyc}
+                             {row.kyc_status}
                            </Badge>
                         </TableCell>
                         <TableCell>
                            <div className="flex items-center gap-2">
-                              {row.status === 'Approved' ? <ShieldCheck className="w-3.5 h-3.5 text-brand-lime" /> : row.status === 'Rejected' ? <XCircle className="w-3.5 h-3.5 text-rose-500" /> : <Clock className="w-3.5 h-3.5 text-muted-foreground" />}
+                              {row.status === 'APPROVED' ? <ShieldCheck className="w-3.5 h-3.5 text-brand-lime" /> : row.status === 'REJECTED' ? <XCircle className="w-3.5 h-3.5 text-rose-500" /> : <Clock className="w-3.5 h-3.5 text-muted-foreground" />}
                               <span className="text-[10px] font-black uppercase italic tracking-widest">{row.status}</span>
                            </div>
                         </TableCell>
                         <TableCell className="px-8 text-right">
-                           <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg group-hover:bg-background shadow-none border-none">
-                              <ArrowRight className="w-3.5 h-3.5" />
-                           </Button>
+                           <Link href={`/dashboard/onboarding/${row.id}`}>
+                             <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg group-hover:bg-background shadow-none border-none">
+                                <ArrowRight className="w-3.5 h-3.5" />
+                             </Button>
+                           </Link>
                         </TableCell>
                       </TableRow>
                     ))}
+                    {items.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-10 text-slate-500">
+                          No applications found.
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -337,15 +399,15 @@ export default function OnboardingReviewsPage() {
                   <div className="flex flex-col gap-4">
                      <div className="flex justify-between items-center text-[11px] font-black italic">
                         <span>Submitted Applications</span>
-                        <span className="text-neutral-900">442</span>
+                        <span className="text-neutral-900">{items.length}</span>
                      </div>
                      <div className="flex justify-between items-center text-[11px] font-black italic">
                         <span>Auto-Approved (Low)</span>
-                        <span className="text-brand-lime">+310</span>
+                        <span className="text-brand-lime">{items.filter((i:any) => i.status === 'APPROVED').length}</span>
                      </div>
                      <div className="flex justify-between items-center text-[11px] font-black italic">
                         <span>Manual Review Queue</span>
-                        <span className="text-rose-500">-132</span>
+                        <span className="text-rose-500">{items.filter((i:any) => i.status === 'PENDING' || i.status === 'IN_REVIEW').length}</span>
                      </div>
                   </div>
                </div>
@@ -370,27 +432,31 @@ export default function OnboardingReviewsPage() {
              </div>
              
              <div className="space-y-0 relative z-10 font-bold italic font-black">
-                {[
-                  { user: "Sarah J.", action: "Approved Application", target: "Atlas Logistics (KYB)", time: "12m ago", status: "success" },
-                  { user: "System", action: "Matched PEP Profile", target: "Viktor Petrov", time: "44m ago", status: "warning" },
-                  { user: "Michael C.", action: "Escalated for EDD", target: "Z-Crypt Solutions", time: "1h ago", status: "info" },
-                  { user: "John Carter", action: "Rejected Application", target: "Unknown_8812 (Fraud Sync)", time: "3h ago", status: "danger" },
-                ].map((act, i) => (
+                {items.slice(0, 4).map((act: any, i: number) => {
+                  const statusColor = act.status === 'APPROVED' ? 'success' : act.status === 'REJECTED' ? 'danger' : act.status === 'ESCALATED' ? 'info' : 'warning';
+                  const actionMap: any = {
+                    APPROVED: "Approved Application",
+                    REJECTED: "Rejected Application",
+                    ESCALATED: "Escalated to EDD",
+                    PENDING: "Submitted Application",
+                    IN_REVIEW: "Review Started"
+                  };
+                  return (
                   <div key={i} className="flex gap-6 py-6 border-b border-border/50 last:border-0 hover:bg-muted/10 transition-colors group px-4 -mx-4 rounded-2xl">
                      <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${
-                       act.status === 'success' ? 'bg-brand-lime' : act.status === 'warning' ? 'bg-orange-500' : act.status === 'danger' ? 'bg-rose-500' : 'bg-indigo-500'
+                       statusColor === 'success' ? 'bg-brand-lime' : statusColor === 'warning' ? 'bg-orange-500' : statusColor === 'danger' ? 'bg-rose-500' : 'bg-indigo-500'
                      } shadow-[0_0_8px_currentColor]`} />
                      <div className="flex-1 space-y-1">
                         <div className="flex justify-between items-baseline font-bold italic">
-                           <span className="text-[13px] font-black italic">{act.action}</span>
-                           <span className="text-[8px] font-black text-muted-foreground uppercase opacity-40">{act.time}</span>
+                           <span className="text-[13px] font-black italic">{actionMap[act.status] || act.status}</span>
+                           <span className="text-[8px] font-black text-muted-foreground uppercase opacity-40">{new Date(act.updated_at || act.created_at).toLocaleDateString()}</span>
                         </div>
                         <div className="text-[11px] font-black italic tracking-tighter text-muted-foreground group-hover:text-neutral-900 transition-colors">
-                           {act.user} <span className="mx-2 opacity-20">•</span> {act.target}
+                           {act.assigned_user_id || "System"} <span className="mx-2 opacity-20">•</span> {act.applicant_name}
                         </div>
                      </div>
                   </div>
-                ))}
+                )})}
              </div>
           </Card>
         </section>

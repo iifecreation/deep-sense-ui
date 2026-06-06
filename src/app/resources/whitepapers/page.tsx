@@ -13,44 +13,16 @@ import {
   Zap,
   Globe,
   Star,
-  Search
+  Search,
+  Loader2
 } from "lucide-react";
-
-const whitepapers = [
-  {
-    title: "The Future of Real-Time Fraud Detection",
-    summary: "How millisecond-latency scoring is replacing batch processing as the standard for financial integrity.",
-    date: "March 2026",
-    size: "4.2 MB",
-    pages: "24",
-    featured: true
-  },
-  {
-    title: "Graph Intelligence in Fraud Rings",
-    summary: "Detecting coordinated networks through relational mapping and graph-based analysis.",
-    date: "February 2026",
-    size: "3.8 MB",
-    pages: "18"
-  },
-  {
-    title: "AI in Financial Fraud Prevention",
-    summary: "Why generative models are the new threat and how to build a defensive AI posture.",
-    date: "January 2026",
-    size: "5.1 MB",
-    pages: "32"
-  },
-  {
-    title: "Scalable Risk Infrastructure for Neobanks",
-    summary: "A technical blueprint for scaling fraud operations without compromising user growth.",
-    date: "December 2025",
-    size: "4.5 MB",
-    pages: "28"
-  }
-];
+import { useWhitepapers } from "@/hooks";
 
 export default function WhitepapersPage() {
-  const featuredWP = whitepapers.find(w => w.featured);
-  const remainingWPs = whitepapers.filter(w => !w.featured);
+  const { data: whitepapers, isLoading, isError } = useWhitepapers();
+
+  const featuredWP = whitepapers?.find(w => w.featured) || whitepapers?.[0];
+  const remainingWPs = whitepapers?.filter(w => w.id !== featuredWP?.id) || [];
 
   return (
     <div className="min-h-screen bg-white font-manrope">
@@ -75,8 +47,20 @@ export default function WhitepapersPage() {
           </div>
         </section>
 
+        {isLoading && (
+          <div className="max-w-[1440px] mx-auto px-8 mb-40 flex justify-center py-20">
+            <Loader2 className="w-10 h-10 animate-spin text-brand-lime" />
+          </div>
+        )}
+
+        {isError && (
+          <div className="max-w-[1440px] mx-auto px-8 mb-40 text-center py-20 text-red-500 font-bold italic uppercase tracking-widest">
+            Failed to load whitepapers.
+          </div>
+        )}
+
         {/* 2. 🧠 FEATURED WHITEPAPER */}
-        {featuredWP && (
+        {!isLoading && !isError && featuredWP && (
           <section className="max-w-[1440px] mx-auto px-8 mb-40">
              <div className="bg-neutral-900 rounded-[100px] p-12 lg:p-32 border border-white/5 relative overflow-hidden group shadow-3xl">
                 <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
@@ -89,8 +73,8 @@ export default function WhitepapersPage() {
                       <h2 className="text-5xl lg:text-8xl font-bold uppercase leading-none italic text-white tracking-tighter italic">{featuredWP.title}</h2>
                       <p className="text-xl text-white/40 leading-relaxed font-inter italic max-w-lg">{featuredWP.summary}</p>
                       <div className="flex items-center gap-10 text-white/20 text-xs font-bold uppercase tracking-widest">
-                         <span className="flex items-center gap-2">PAGES: {featuredWP.pages}</span>
-                         <span className="flex items-center gap-2">SIZE: {featuredWP.size}</span>
+                         <span className="flex items-center gap-2">PAGES: {featuredWP.pages || '24'}</span>
+                         <span className="flex items-center gap-2">SIZE: {featuredWP.size || '4.2 MB'}</span>
                       </div>
                       <button className="px-14 py-7 bg-brand-lime text-neutral-900 rounded-full font-bold text-xl hover:scale-110 transition-all flex items-center gap-4">
                          Download Whitepaper <Download className="w-6 h-6" />
@@ -117,34 +101,38 @@ export default function WhitepapersPage() {
         )}
 
         {/* 3. 📚 LIST */}
-        <section className="max-w-[1440px] mx-auto px-8 mb-40">
-           <h3 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter mb-24 font-manrope italic underline decoration-zinc-100 decoration-8 underline-offset-16 italic text-neutral-900">Research Archive.</h3>
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-              {remainingWPs.map((wp, i) => (
-                <div key={i} className="group p-12 bg-zinc-50 border border-gray-100 rounded-[72px] hover:bg-white hover:shadow-3xl transition-all shadow-sm border-b-4 border-b-transparent hover:border-b-brand-lime relative overflow-hidden">
-                   <div className="absolute top-0 right-0 p-12 opacity-5 scale-0 group-hover:scale-100 transition-transform duration-1000">
-                      <Download className="w-16 h-16 text-neutral-900" />
-                   </div>
-                   <div className="space-y-8 relative z-10">
-                      <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest text-zinc-400">
-                         <span>{wp.date}</span>
-                         <span className="flex items-center gap-2"><FileText className="w-3.5 h-3.5" /> PDF</span>
-                      </div>
-                      <h4 className="text-3xl font-bold italic uppercase tracking-tight text-neutral-900 leading-tight italic group-hover:text-brand-lime transition-colors">{wp.title}</h4>
-                      <p className="text-sm text-zinc-400 font-inter leading-relaxed italic">{wp.summary}</p>
-                      <div className="flex items-center gap-6 pt-6 border-t border-zinc-100 group-hover:border-brand-lime/20 transition-all font-bold text-[10px] uppercase tracking-widest text-zinc-300">
-                         <span>{wp.pages} PAGES</span>
-                         <span>{wp.size}</span>
-                      </div>
-                      <button className="w-full py-6 bg-neutral-900 text-white rounded-full font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-brand-lime hover:text-neutral-900 transition-all italic">
-                         Download Now
-                         <Download className="w-4 h-4" />
-                      </button>
-                   </div>
-                </div>
-              ))}
-           </div>
-        </section>
+        {!isLoading && !isError && remainingWPs.length > 0 && (
+          <section className="max-w-[1440px] mx-auto px-8 mb-40">
+             <h3 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter mb-24 font-manrope italic underline decoration-zinc-100 decoration-8 underline-offset-16 italic text-neutral-900">Research Archive.</h3>
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                {remainingWPs.map((wp: any, i: number) => (
+                  <div key={i} className="group p-12 bg-zinc-50 border border-gray-100 rounded-[72px] hover:bg-white hover:shadow-3xl transition-all shadow-sm border-b-4 border-b-transparent hover:border-b-brand-lime relative overflow-hidden flex flex-col justify-between min-h-[400px]">
+                     <div className="absolute top-0 right-0 p-12 opacity-5 scale-0 group-hover:scale-100 transition-transform duration-1000">
+                        <Download className="w-16 h-16 text-neutral-900" />
+                     </div>
+                     <div className="space-y-8 relative z-10 flex-grow">
+                        <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest text-zinc-400">
+                           <span>{wp.date || 'March 2026'}</span>
+                           <span className="flex items-center gap-2"><FileText className="w-3.5 h-3.5" /> PDF</span>
+                        </div>
+                        <h4 className="text-3xl font-bold italic uppercase tracking-tight text-neutral-900 leading-tight italic group-hover:text-brand-lime transition-colors">{wp.title}</h4>
+                        <p className="text-sm text-zinc-400 font-inter leading-relaxed italic line-clamp-3">{wp.summary}</p>
+                     </div>
+                     <div className="relative z-10 mt-8 space-y-6">
+                        <div className="flex items-center gap-6 pt-6 border-t border-zinc-100 group-hover:border-brand-lime/20 transition-all font-bold text-[10px] uppercase tracking-widest text-zinc-300">
+                           <span>{wp.pages || '18'} PAGES</span>
+                           <span>{wp.size || '3.8 MB'}</span>
+                        </div>
+                        <button className="w-full py-6 bg-neutral-900 text-white rounded-full font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-brand-lime hover:text-neutral-900 transition-all italic">
+                           Download Now
+                           <Download className="w-4 h-4" />
+                        </button>
+                     </div>
+                  </div>
+                ))}
+             </div>
+          </section>
+        )}
 
         {/* 📣 CTA */}
         <section className="max-w-[1300px] mx-auto px-4 mb-24 mt-24 text-center italic">

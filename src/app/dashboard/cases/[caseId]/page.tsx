@@ -55,6 +55,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useCase } from "@/hooks/use-cases";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -75,47 +76,60 @@ export default function CaseDetailPage() {
   const params = useParams();
   const caseId = params.caseId as string;
 
-  // Mock data for the specific case
+  const { data, isLoading, isError, refetch } = useCase(caseId);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-lime"></div>
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="p-6 bg-red-50 text-red-700 rounded-lg flex flex-col items-center">
+        <AlertTriangle className="w-8 h-8 mb-2" />
+        <h2 className="font-bold">Failed to load case</h2>
+        <Button onClick={refetch} className="mt-4" variant="outline">Retry</Button>
+      </div>
+    );
+  }
+
+  const { case: investigationData, notes, actions } = data;
+  
+  // Safe mapping of investigation data
   const investigation = {
-    id: caseId,
-    title: "High-Opacity Node Velocity Breach",
-    type: "AML / Transaction Monitoring",
-    priority: "Critical",
-    status: "Investigation",
-    owner: "Marcus Aurelius",
-    openedAt: "Oct 15, 2026 • 19:44:02",
-    dueAt: "Oct 16, 2026 • 00:00:00",
-    sla: "4h 12m left",
-    description: "Deep dive into a cluster of high-velocity transactions matching cash-out patterns from Cyprus-based institutional nodes.",
-    hypothesis: "The entity is utilizing a multi-layered IP mesh to bypass per-node velocity limits, likely testing institutional gateway resistance.",
+    id: investigationData.id,
+    title: investigationData.title || "Untitled Case",
+    type: "Investigation",
+    priority: investigationData.priority || "Medium",
+    status: investigationData.status || "Open",
+    owner: investigationData.assigned_user_name || "Unassigned",
+    openedAt: new Date(investigationData.created_at).toLocaleString(),
+    dueAt: "N/A",
+    sla: "N/A",
+    description: investigationData.description || "No description provided.",
+    hypothesis: "Hypothesis not recorded.",
     stats: {
-      alerts: 3,
-      transactions: 12,
-      totalValue: "42,500.00",
-      entities: 4
+      alerts: 0,
+      transactions: investigationData.transaction_id ? 1 : 0,
+      totalValue: "N/A",
+      entities: investigationData.customer_id ? 1 : 0
     },
     evidence: {
-      alerts: [
-        { id: "ALT-9921", type: "Velocity Breach", status: "Active", severity: "High" },
-        { id: "ALT-8812", type: "Multiple IP Switch", status: "Closed", severity: "Medium" }
-      ],
-      transactions: [
-        { id: "TX-4281-BC", amount: "4,250.00", currency: "USD", status: "Flagged" },
-        { id: "TX-4282-BC", amount: "1,150.00", currency: "USD", status: "Approved" }
-      ]
+      alerts: [],
+      transactions: investigationData.transaction_id ? [
+        { id: investigationData.transaction_id, amount: "N/A", currency: "N/A", status: "Linked" }
+      ] : []
     },
-    tasks: [
-      { id: 1, text: "Perform institutional IP trace on ASN 29491", done: true },
-      { id: 2, text: "Verify account beneficial ownership in CY registry", done: false },
-      { id: 3, text: "Review related signals from cluster-7", done: false },
-      { id: 4, text: "Finalize STR report recommendation", done: false }
-    ],
-    timeline: [
-      { event: "Case Initialized", time: "19:44:02", actor: "Marcus Aurelius", type: "system" },
-      { event: "Evidence Linked: ALT-9921", time: "19:44:05", actor: "System", type: "link" },
-      { event: "Note Added: Hypothesis formulated", time: "19:48:12", actor: "Marcus Aurelius", type: "note" },
-      { event: "Task Completed: IP Trace", time: "20:02:44", actor: "Marcus Aurelius", type: "task" }
-    ]
+    tasks: [] as any[],
+    timeline: actions.map(a => ({
+      event: a.action_type,
+      time: new Date(a.created_at).toLocaleTimeString(),
+      actor: a.actor_user_name || "System",
+      type: "system"
+    }))
   };
 
   return (
@@ -235,34 +249,13 @@ export default function CaseDetailPage() {
 
                <TabsContent value="evidence" className="m-0 space-y-8">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                     {/* EVIDENCE: ALERTS */}
                      <Card className="rounded-[40px] border-border shadow-md overflow-hidden bg-white">
                         <CardHeader className="p-8 border-b border-border/50 flex flex-row items-center justify-between">
                            <CardTitle className="text-xl font-black italic uppercase tracking-tighter">Linked Alerts</CardTitle>
-                           <Badge className="bg-muted text-muted-foreground border-none text-[8px] font-black italic">02</Badge>
+                           <Badge className="bg-muted text-muted-foreground border-none text-[8px] font-black italic">{investigation.evidence.alerts.length}</Badge>
                         </CardHeader>
-                        <CardContent className="p-0">
-                           <Table>
-                              <TableBody>
-                                 {investigation.evidence.alerts.map((alert, i) => (
-                                   <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 last:border-0 h-20">
-                                      <TableCell className="px-8">
-                                         <Link href={`/dashboard/alerts/${alert.id}`} className="block">
-                                            <div className="text-[12px] font-black italic uppercase tracking-tighter text-neutral-900">{alert.id}</div>
-                                            <div className="text-[9px] font-black uppercase text-muted-foreground italic mt-0.5">{alert.type}</div>
-                                         </Link>
-                                      </TableCell>
-                                      <TableCell className="text-right px-8">
-                                         <Badge variant="outline" className={`text-[7px] font-black uppercase italic border-none ${
-                                           alert.severity === 'High' ? 'text-rose-500' : 'text-orange-500'
-                                         }`}>
-                                            {alert.severity} SEVERITY
-                                         </Badge>
-                                      </TableCell>
-                                   </TableRow>
-                                 ))}
-                              </TableBody>
-                           </Table>
+                        <CardContent className="p-8 text-center text-muted-foreground italic text-sm font-bold">
+                           No alerts linked.
                         </CardContent>
                      </Card>
 
@@ -393,22 +386,19 @@ export default function CaseDetailPage() {
                   <MessageCircle className="w-4 h-4 text-muted-foreground/30 h-full" />
                </div>
                <div className="space-y-4 font-black italic">
-                  <div className="p-5 bg-white border border-border shadow-sm rounded-3xl space-y-3 h-fit leading-none font-bold uppercase overflow-hidden">
-                     <div className="flex justify-between items-center h-4 font-black italic">
-                        <span className="text-[9px] font-black text-indigo-500 italic h-4 leading-none uppercase">Marcus A.</span>
-                        <span className="text-[8px] font-black text-muted-foreground h-4 leading-none uppercase">12m ago</span>
+                  {notes && notes.length > 0 ? notes.map((note: any, i: number) => (
+                     <div key={i} className="p-5 bg-white border border-border shadow-sm rounded-3xl space-y-3 h-fit leading-none font-bold uppercase overflow-hidden">
+                        <div className="flex justify-between items-center h-4 font-black italic">
+                           <span className="text-[9px] font-black text-indigo-500 italic h-4 leading-none uppercase">{note.created_by_user_name || "Unknown"}</span>
+                           <span className="text-[8px] font-black text-muted-foreground h-4 leading-none uppercase">{new Date(note.created_at).toLocaleTimeString()}</span>
+                        </div>
+                        <p className="text-[11px] text-neutral-500 italic leading-relaxed font-black uppercase italic">{note.body}</p>
                      </div>
-                     <p className="text-[11px] text-neutral-500 italic leading-relaxed font-black uppercase italic">CY registry check incoming. ASN 29491 confirmed high-opacity.</p>
-                  </div>
-                  <div className="p-5 bg-white border border-border shadow-sm rounded-3xl space-y-3 h-fit leading-none font-bold uppercase overflow-hidden">
-                     <div className="flex justify-between items-center h-4 font-black italic">
-                        <span className="text-[9px] font-black text-brand-lime italic h-4 leading-none uppercase">System</span>
-                        <span className="text-[8px] font-black text-muted-foreground h-4 leading-none uppercase">1h ago</span>
-                     </div>
-                     <p className="text-[11px] text-neutral-500 italic leading-relaxed font-black uppercase italic">Auto-discovery: Identified 4 similar signals in sub-cluster 091-B.</p>
-                  </div>
+                  )) : (
+                     <p className="text-xs text-muted-foreground italic font-medium">No notes available.</p>
+                  )}
                </div>
-               <Button className="w-full h-12 bg-white text-neutral-900 border border-border rounded-2xl text-[9px] font-black uppercase italic shadow-sm hover:bg-zinc-50 transition-all h-12 leading-none uppercase">Quick Reply Thread</Button>
+               <Button className="w-full h-12 bg-white text-neutral-900 border border-border rounded-2xl text-[9px] font-black uppercase italic shadow-sm hover:bg-zinc-50 transition-all leading-none uppercase">Add Note</Button>
             </div>
          </div>
       </div>

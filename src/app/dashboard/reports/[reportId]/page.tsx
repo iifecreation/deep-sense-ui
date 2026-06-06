@@ -70,32 +70,47 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { useReport } from "@/hooks/use-reports";
 
 export default function RegulatoryReportDetailPage() {
   const params = useParams();
   const reportId = params.reportId as string;
 
-  // Mock data for the specific report
+  const { data: reportData, isLoading, isError, refetch } = useReport(reportId);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-lime"></div>
+      </div>
+    );
+  }
+
+  if (isError || !reportData) {
+    return (
+      <div className="p-6 bg-red-50 text-red-700 rounded-lg flex flex-col items-center">
+        <AlertTriangle className="w-8 h-8 mb-2" />
+        <h2 className="font-bold">Failed to load report</h2>
+        <Button onClick={refetch} className="mt-4" variant="outline">Retry</Button>
+      </div>
+    );
+  }
+
   const report = {
-    id: reportId,
-    type: "Suspicious Transaction Report (STR)",
-    status: "Draft",
-    caseId: "CASE-0992-B",
-    owner: "Marcus Aurelius",
-    classification: "Modern Slavery / Human Trafficking",
-    subject: "Elena Volkov (CUST-9921)",
-    description: "Detailed investigation into high-velocity institutional gateway ingress from Cyprus-based nodes matching high-risk patterns.",
-    suspicionReason: "Customer exhibited structure activity ($9,900 fragments) immediately following onboarding, combined with a high-opacity jurisdiction hit and known PEP-SDN collision (98% confidence).",
-    amount: "42,500.00",
-    currency: "USD",
-    transactions: [
-      { id: "TX-4281", date: "Oct 15", amount: "4,250", status: "Flagged" },
-      { id: "TX-4282", date: "Oct 15", amount: "1,150", status: "Approved" }
-    ],
+    id: reportData.id,
+    type: reportData.report_type || "Generic Report",
+    status: reportData.status || "Draft",
+    caseId: reportData.case_id || "Unlinked",
+    owner: reportData.created_by_user_name || "System",
+    classification: reportData.metadata?.classification || "Unknown",
+    subject: reportData.metadata?.subject_name ? `${reportData.metadata.subject_name} (${reportData.customer_id || 'Unknown'})` : "Unknown Entity",
+    description: reportData.metadata?.description || "No description provided.",
+    suspicionReason: reportData.metadata?.suspicion_reason || "Suspicion details not recorded.",
+    amount: reportData.metadata?.amount || "0.00",
+    currency: reportData.metadata?.currency || "USD",
+    transactions: [],
     timeline: [
-      { event: "Report Initialized", time: "Oct 15, 2026 • 20:02:44", actor: "Marcus Aurelius" },
-      { event: "Subject Data Sync", time: "Oct 15, 2026 • 20:05:12", actor: "System" },
-      { event: "Narrative Authored", time: "Oct 15, 2026 • 20:44:11", actor: "Marcus Aurelius" }
+      { event: "Report Created", time: new Date(reportData.created_at).toLocaleString(), actor: reportData.created_by_user_name || "System" }
     ]
   };
 
@@ -201,8 +216,7 @@ export default function RegulatoryReportDetailPage() {
                            </div>
                            <div className="relative z-10 font-black italic h-fit leading-none uppercase">
                               <span className="text-brand-lime">[[NARRATIVE_START]]</span><br />
-                              Institutional monitoring identified a cluster of fragmentation activity originating from gateway cluster-CY. The subject (Elena Volkov) bypassed standard velocity filters via a multi-layered IP mesh protocol. Forensic IP trace confirmed ASN 29491 correlates with known high-opacity asset hubs. <br /><br />
-                              <span className="text-indigo-400">FINANCIALS:</span> Total exposure identified at $42,500.00 USD across 12 distinct nodes. Aggregation pattern matches typologies documented in FinCEN Advisory FIN-2023-A004.<br /><br />
+                              {report.description}<br /><br />
                               <span className="text-brand-lime">[[NARRATIVE_END]]</span>
                            </div>
                         </div>
@@ -223,8 +237,7 @@ export default function RegulatoryReportDetailPage() {
                            <User className="w-8 h-8 text-rose-500" />
                         </div>
                         <div className="font-black italic">
-                           <h5 className="text-[14px] font-black italic uppercase italic uppercase font-black">{report.subject.split('(')[0]}</h5>
-                           <p className="text-[10px] font-black text-rose-600/60 tracking-widest uppercase italic font-black">{report.subject.split('(')[1].replace(')', '')}</p>
+                           <h5 className="text-[14px] font-black italic uppercase italic uppercase font-black">{report.subject}</h5>
                         </div>
                      </div>
                      <Button variant="outline" className="w-full text-[9px] font-black uppercase italic border-border rounded-2xl h-12 shadow-sm italic font-bold font-black">View Full Subject DNA</Button>
@@ -288,22 +301,7 @@ export default function RegulatoryReportDetailPage() {
                   <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full border border-border italic font-black italic font-bold"><Plus className="w-4 h-4" /></Button>
                </CardHeader>
                <div className="space-y-4 font-black italic">
-                  {[
-                    { n: "forensic_trace_CY.log", s: "4.2MB", t: "Log Trace" },
-                    { n: "subject_risk_dna.pdf", s: "1.8MB", t: "Risk Profile" },
-                    { n: "gateway_auth_trace.xml", s: "420KB", t: "System Data" },
-                  ].map((file, i) => (
-                    <div key={i} className="p-5 bg-muted/20 border border-border rounded-[28px] group hover:bg-muted transition-all cursor-pointer font-black italic h-24 overflow-hidden leading-none uppercase">
-                       <div className="flex items-center gap-4 mb-2 font-black italic h-4 leading-none truncate">
-                          <Paperclip className="w-4 h-4 text-muted-foreground group-hover:text-indigo-500 transition-colors h-full" />
-                          <span className="text-[11px] font-black italic text-neutral-900 h-4 leading-none uppercase">{file.n}</span>
-                       </div>
-                       <div className="flex justify-between items-center text-[9px] font-black uppercase italic text-muted-foreground h-4 leading-none uppercase">
-                          <span>{file.t}</span>
-                          <span>{file.s}</span>
-                       </div>
-                    </div>
-                  ))}
+                  <p className="text-sm font-medium text-slate-500">No attachments provided.</p>
                </div>
             </Card>
 

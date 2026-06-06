@@ -422,8 +422,11 @@ export interface AnalyticsFilters {
 }
 
 export interface SummaryMetric {
+  key?: string;
   label: string;
   value: number;
+  delta?: number;
+  trend?: 'up' | 'down' | 'flat' | string | null;
   change?: number;
   change_type?: 'increase' | 'decrease';
 }
@@ -431,13 +434,18 @@ export interface SummaryMetric {
 export interface TimeSeriesPoint {
   timestamp: string;
   value: number;
+  grouped_values?: Record<string, number>;
 }
 
 export interface TopEntityRow {
   id: string;
-  name: string;
-  value: number;
+  label?: string;
+  name?: string;
+  count?: number;
+  value?: number;
+  risk_score?: number | null;
   metadata?: Record<string, any>;
+  extra?: Record<string, any> | null;
 }
 
 export interface AnalyticsOverview {

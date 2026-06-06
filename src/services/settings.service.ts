@@ -149,4 +149,32 @@ export const settingsService = {
   async getSettingsAudit(limit: number = 50, offset: number = 0): Promise<any> {
     return await get<any>('/settings/audit', { params: { limit, offset } });
   },
+
+  /**
+   * Get organization settings
+   */
+  async getOrganizationSettings(): Promise<any> {
+    return await get<any>('/organization/settings');
+  },
+
+  /**
+   * Update organization settings
+   */
+  async updateOrganizationSettings(data: any): Promise<any> {
+    return await patch<any>('/organization/settings', data);
+  },
+
+  /**
+   * Get notification settings
+   */
+  async getNotificationSettings(): Promise<any> {
+    return await get<any>('/settings/notifications');
+  },
+
+  /**
+   * Update notification settings
+   */
+  async updateNotificationSettings(data: any): Promise<any> {
+    return await patch<any>('/settings/notifications', data);
+  },
 };

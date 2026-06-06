@@ -24,7 +24,8 @@ import {
   ExternalLink,
   Table as TableIcon,
   AlertCircle,
-  FileText
+  FileText,
+  RefreshCcw
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -48,46 +49,65 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { useDevice } from "@/hooks";
 
 export default function DeviceDetailView() {
   const params = useParams();
   const deviceId = params.deviceId as string;
 
-  // Mock data for high-fidelity view
-  const device = {
-    id: deviceId,
-    riskScore: 32,
-    status: "Trusted",
-    info: {
-      browser: "Chrome 122.0.0",
-      os: "macOS 14.4",
-      ip: "185.112.42.9",
-      isp: "MTN Cyprus",
-      geo: "Larnaca, Cyprus",
-      lastSeen: "Oct 15, 2026 • 19:32:11"
-    },
-    signals: [
-      { name: "Velocity Breach (1h)", status: "Clean", detail: "0 txns in last 60m" },
-      { name: "Geolocation Anomaly", status: "Clean", detail: "Matches primary residence" },
-      { name: "VPN Ingress", status: "Detected", detail: "Active ProtonVPN Node", risk: "Amber" },
-      { name: "Hardware Emulation", status: "Clean", detail: "Genuine Secure Enclave" }
-    ],
-    customers: [
-      { id: "CUST-9921", name: "Elena Volkov", risk: "Low", lastUsed: "2 mins ago" },
-      { id: "CUST-4412", name: "Marcus Reed", risk: "Low", lastUsed: "14 days ago" }
-    ],
-    transactions: [
-      { id: "TXN-88219", amount: "$4,250.00", status: "Review", date: "Oct 15, 2026" },
-      { id: "TXN-88102", amount: "$150.00", status: "Approved", date: "Oct 12, 2026" },
-      { id: "TXN-87991", amount: "$1,200.00", status: "Approved", date: "Oct 10, 2026" }
-    ],
-    timeline: [
-      { event: "Device Fingerprinted", time: "19:32:11", detail: "Hardware ID indexed via WebSDK" },
-      { event: "Integrity Check", time: "19:32:11", detail: "Secure Enclave signature verified" },
-      { event: "Customer Sync", time: "19:32:12", detail: "Linked to Elena Volkov (CUST-9921)" },
-      { event: "Risk Scan", time: "19:32:14", detail: "No anomalies detected in last 30 days" }
-    ]
-  };
+  const { data: device, isLoading, isError, refetch } = useDevice(deviceId);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 pb-20">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="space-y-1">
+            <div className="h-4 w-32 bg-slate-100 animate-pulse rounded mb-1" />
+            <div className="h-8 w-64 bg-slate-100 animate-pulse rounded" />
+            <div className="h-4 w-48 bg-slate-100 animate-pulse rounded mt-2" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="rounded-xl shadow-sm border bg-white h-24 animate-pulse" />
+          ))}
+        </div>
+        <div className="h-96 bg-slate-100 animate-pulse rounded-xl" />
+      </div>
+    );
+  }
+
+  if (isError || !device) {
+    return (
+      <div className="space-y-6 pb-20">
+        <Link href="/dashboard/devices" className="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors mb-1">
+          <ArrowLeft className="w-3 h-3" /> Hardware Registry
+        </Link>
+        <Card className="rounded-3xl border border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="text-red-600 h-5 w-5" />
+              <div>
+                <p className="font-semibold text-red-900">Failed to load device details</p>
+                <p className="text-sm text-red-700">Please check your connection and try again.</p>
+              </div>
+            </div>
+            <Button onClick={refetch} className="mt-4" variant="outline">
+              <RefreshCcw className="w-4 h-4 mr-2" /> Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const riskScore = device.risk_score || device.riskScore || 0;
+  const status = device.status || 'Unknown';
+  const info = device.info || {};
+  const signals = device.signals || [];
+  const customers = device.customers || [];
+  const transactions = device.transactions || [];
+  const timeline = device.timeline || [];
 
   return (
     <div className="space-y-6">
@@ -100,15 +120,15 @@ export default function DeviceDetailView() {
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">{device.id}</h1>
             <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide border-none ${
-              device.status === 'Blocked' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'
+              status === 'Blocked' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'
             }`}>
-              {device.status}
+              {status}
             </Badge>
             <Badge variant="outline" className="rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide bg-blue-50 text-blue-700 border-none">
               Active Node
             </Badge>
           </div>
-          <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">{device.info.os} • {device.info.geo}</p>
+          <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">{info.os || 'Unknown OS'} • {info.geo || 'Unknown Location'}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="font-semibold">
@@ -132,9 +152,9 @@ export default function DeviceDetailView() {
       {/* KPI Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: "Trust Score", value: 100 - device.riskScore, subtext: "Integrity: High", icon: <ShieldCheck className="text-emerald-500" />, color: "border-emerald-100 bg-emerald-50/20" },
-          { label: "Linked Accounts", value: device.customers.length, subtext: "1 primary owner", icon: <Users className="text-blue-500" />, color: "border-blue-100 bg-blue-50/20" },
-          { label: "Network Integrity", value: "Verified", subtext: "Residential IP", icon: <Globe className="text-amber-500" />, color: "border-amber-100 bg-amber-50/20" },
+          { label: "Trust Score", value: 100 - riskScore, subtext: "Integrity: " + (riskScore < 20 ? "High" : riskScore < 60 ? "Medium" : "Low"), icon: <ShieldCheck className="text-emerald-500" />, color: "border-emerald-100 bg-emerald-50/20" },
+          { label: "Linked Accounts", value: device.linked_customers_count || customers.length, subtext: "1 primary owner", icon: <Users className="text-blue-500" />, color: "border-blue-100 bg-blue-50/20" },
+          { label: "Network Integrity", value: "Verified", subtext: info.isp || "Residential IP", icon: <Globe className="text-amber-500" />, color: "border-amber-100 bg-amber-50/20" },
         ].map((kpi, i) => (
           <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
             <CardContent className="p-4 flex gap-4 items-center">
@@ -167,10 +187,10 @@ export default function DeviceDetailView() {
                   <h4 className="text-sm font-bold text-slate-900 mb-6">Hardware & OS</h4>
                   <div className="space-y-4">
                     {[
-                      { label: "Platform", value: device.info.os },
-                      { label: "Browser Engine", value: device.info.browser },
-                      { label: "Resolution", value: "2560 x 1440" },
-                      { label: "CPU Architecture", value: "ARM64 (M3)" },
+                      { label: "Platform", value: info.os || device.platform || 'Unknown' },
+                      { label: "Browser Engine", value: info.browser || 'Unknown' },
+                      { label: "Resolution", value: info.resolution || "2560 x 1440" },
+                      { label: "CPU Architecture", value: info.cpu || "ARM64 (M3)" },
                     ].map((item, i) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                         <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">{item.label}</span>
@@ -184,11 +204,11 @@ export default function DeviceDetailView() {
                   <h4 className="text-sm font-bold text-slate-900 mb-6">Network Context</h4>
                   <div className="space-y-4">
                     {[
-                      { label: "Public IP", value: device.info.ip },
-                      { label: "ISP / Provider", value: device.info.isp },
-                      { label: "Geo City", value: device.info.geo },
-                      { label: "ASN Number", value: "AS37518" },
-                      { label: "Last Sync", value: device.info.lastSeen },
+                      { label: "Public IP", value: info.ip || 'Unknown' },
+                      { label: "ISP / Provider", value: info.isp || 'Unknown' },
+                      { label: "Geo City", value: info.geo || 'Unknown' },
+                      { label: "ASN Number", value: info.asn || "AS37518" },
+                      { label: "Last Sync", value: device.last_seen_at ? new Date(device.last_seen_at).toLocaleString() : (info.lastSeen || 'Unknown') },
                     ].map((item, i) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                         <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">{item.label}</span>
@@ -211,21 +231,50 @@ export default function DeviceDetailView() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {device.signals.map((signal, i) => (
+                    {signals.map((signal: any, i: number) => (
                       <TableRow key={i} className="h-16">
                         <TableCell className="pl-6 text-xs font-bold text-slate-900">{signal.name}</TableCell>
-                        <TableCell className="text-[11px] font-medium text-slate-500 italic">{signal.detail}</TableCell>
+                        <TableCell className="text-[11px] font-medium text-slate-500 italic">{signal.detail || signal.description}</TableCell>
                         <TableCell className="text-right pr-6">
                            <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold border-none ${
-                             signal.status === 'Clean' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                             (signal.status === 'Clean' || signal.status === 'ok') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
                            }`}>
                              {signal.status}
                            </Badge>
                         </TableCell>
                       </TableRow>
                     ))}
+                    {signals.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={3} className="text-center py-8 text-slate-500 text-sm">
+                          No signals found for this device.
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="history" className="mt-6">
+              <Card className="rounded-xl shadow-sm border bg-white p-6">
+                <div className="space-y-6">
+                  {timeline.map((event: any, i: number) => (
+                    <div key={i} className="flex gap-4">
+                      <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 shrink-0" />
+                      <div>
+                        <div className="text-sm font-bold text-slate-900">{event.event || event.action}</div>
+                        <div className="text-xs text-slate-500 mt-1">{event.detail || event.description}</div>
+                        <div className="text-[10px] text-slate-400 mt-1 uppercase tracking-widest">{event.time || (event.timestamp && new Date(event.timestamp).toLocaleString())}</div>
+                      </div>
+                    </div>
+                  ))}
+                  {timeline.length === 0 && (
+                    <div className="text-center py-8 text-slate-500 text-sm">
+                      No timeline events recorded.
+                    </div>
+                  )}
+                </div>
               </Card>
             </TabsContent>
           </Tabs>
@@ -236,15 +285,20 @@ export default function DeviceDetailView() {
           <Card className="rounded-xl shadow-sm border bg-white p-6 space-y-4">
             <h4 className="text-sm font-bold text-slate-900">Linked Customers</h4>
             <div className="space-y-3">
-              {device.customers.map((cust, i) => (
-                <Link key={i} href={`/dashboard/customer-risk/${cust.id}`} className="block p-4 rounded-lg border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+              {customers.map((cust: any, i: number) => (
+                <Link key={i} href={`/dashboard/customer-risk/${cust.id || cust.customer_id}`} className="block p-4 rounded-lg border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors">
                   <div className="flex justify-between mb-1">
-                    <span className="text-xs font-bold text-slate-900">{cust.name}</span>
-                    <Badge variant="outline" className="text-[8px] font-bold bg-emerald-100 text-emerald-700 border-none">{cust.risk}</Badge>
+                    <span className="text-xs font-bold text-slate-900">{cust.name || cust.customer_id}</span>
+                    <Badge variant="outline" className="text-[8px] font-bold bg-emerald-100 text-emerald-700 border-none">{cust.risk || 'Low'}</Badge>
                   </div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase">{cust.id} • Seen {cust.lastUsed}</p>
+                  <p className="text-[10px] font-medium text-slate-400 uppercase">{cust.id || cust.customer_id} • Seen {cust.lastUsed || 'recently'}</p>
                 </Link>
               ))}
+              {customers.length === 0 && (
+                <div className="text-center py-4 text-slate-500 text-xs">
+                  No linked customers.
+                </div>
+              )}
             </div>
           </Card>
 

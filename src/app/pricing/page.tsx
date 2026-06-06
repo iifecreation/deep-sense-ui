@@ -14,64 +14,11 @@ import {
   Cpu, 
   Terminal,
   Plus,
-  Minus
+  Minus,
+  Loader2,
+  ServerOff
 } from "lucide-react";
-
-const pricingPlans = [
-  {
-    name: "Starter",
-    description: "Ideal for startups and small fintech teams looking to secure their first transactions.",
-    price: "$99",
-    period: "/mo",
-    icon: <Zap />,
-    color: "bg-emerald-50 text-emerald-600",
-    features: [
-      "Up to 5k transactions/mo",
-      "Standard Fraud Scoring",
-      "Basic Rules Engine (10 slots)",
-      "Standard API Access",
-      "Email Support"
-    ],
-    cta: "Get Started",
-    popular: false
-  },
-  {
-    name: "Growth",
-    description: "For scaling fintechs and e-commerce platforms requiring advanced real-time intelligence.",
-    price: "$499",
-    period: "/mo",
-    icon: <TrendingUp />,
-    color: "bg-neutral-900 text-brand-lime",
-    features: [
-      "Up to 50k transactions/mo",
-      "Real-time Fraud Scoring",
-      "Advanced Rules + Customization",
-      "Device Intelligence",
-      "Webhooks & Case Management",
-      "Priority 24/7 Support"
-    ],
-    cta: "Start Free Trial",
-    popular: true
-  },
-  {
-    name: "Enterprise",
-    description: "For banks and global payment systems requiring infinite scale and total compliance.",
-    price: "Custom",
-    period: "",
-    icon: <Building2 />,
-    color: "bg-gray-50 text-neutral-900 border border-gray-100 shadow-sm",
-    features: [
-      "Unlimited transactions",
-      "Graph & Fraud Ring Detection",
-      "AI Investigation Assistant",
-      "Custom SLAs & Support",
-      "Dedicated Infrastructure",
-      "Full Compliance Reports"
-    ],
-    cta: "Contact Sales",
-    popular: false
-  }
-];
+import { usePricingPlans } from "@/hooks";
 
 const faqData = [
   { q: "How is pricing calculated?", a: "Pricing is based on your monthly transaction volume and the set of features enabled for your organization." },
@@ -94,11 +41,11 @@ const featureComparison = [
 ];
 
 function FaqItem({ q, a }: { q: string, a: string }) {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, ReactSetIsOpen] = React.useState(false);
   return (
     <div className="border-b border-gray-100 last:border-0 py-8">
       <button 
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => ReactSetIsOpen(!isOpen)}
         className="w-full flex justify-between items-center text-left group"
       >
         <span className="text-xl font-bold font-manrope group-hover:text-neutral-500 transition-colors">{q}</span>
@@ -114,6 +61,26 @@ function FaqItem({ q, a }: { q: string, a: string }) {
 }
 
 export default function PricingPage() {
+  const { data: pricingPlans, isLoading, isError } = usePricingPlans();
+
+  const getIcon = (name: string) => {
+    switch(name?.toLowerCase()) {
+      case 'starter': return <Zap />;
+      case 'growth': return <TrendingUp />;
+      case 'enterprise': return <Building2 />;
+      default: return <Zap />;
+    }
+  };
+
+  const getColor = (name: string) => {
+    switch(name?.toLowerCase()) {
+      case 'starter': return "bg-emerald-50 text-emerald-600";
+      case 'growth': return "bg-neutral-900 text-brand-lime";
+      case 'enterprise': return "bg-gray-50 text-neutral-900 border border-gray-100 shadow-sm";
+      default: return "bg-emerald-50 text-emerald-600";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white font-manrope">
       <Navbar />
@@ -135,6 +102,86 @@ export default function PricingPage() {
                Deep Sense pricing is designed to scale with your business — from early-stage startups to global enterprise fraud operations.
              </p>
           </div>
+        </section>
+
+        {/* 💳 PRICING PLANS */}
+        <section className="py-20 relative z-10">
+           <div className="max-w-[1440px] mx-auto px-8 relative z-10">
+              <div className="text-center mb-32">
+                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter">Plans for Every Stage.</h2>
+              </div>
+              
+              {isLoading && (
+                <div className="flex justify-center items-center py-20">
+                  <Loader2 className="w-12 h-12 animate-spin text-brand-lime" />
+                </div>
+              )}
+
+              {isError && (
+                <div className="flex flex-col items-center justify-center p-20 bg-red-50 rounded-[64px] border border-red-100">
+                  <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20 shadow-[0_0_40px_rgba(239,68,68,0.2)] mb-6">
+                    <ServerOff className="w-12 h-12 text-red-500" />
+                  </div>
+                  <h3 className="text-3xl font-black italic tracking-tighter text-neutral-900 uppercase">Pricing Not Configured</h3>
+                  <p className="text-zinc-500 mt-4 max-w-lg text-center">
+                    The pricing plans could not be loaded from the server (501 Not Implemented). Please try again later.
+                  </p>
+                </div>
+              )}
+
+              {!isLoading && !isError && pricingPlans && pricingPlans.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                   {pricingPlans.map((plan: any, i: number) => {
+                     const isPopular = plan.popular || plan.name?.toLowerCase() === 'growth';
+                     return (
+                     <div key={i} className={`p-12 lg:p-16 rounded-[72px] border transition-all duration-700 relative overflow-hidden flex flex-col ${isPopular ? "bg-neutral-900 text-white border-white/5 scale-105 shadow-3xl" : "bg-white border-gray-100 text-neutral-900 hover:shadow-2xl"}`}>
+                        {isPopular && (
+                           <div className="absolute top-0 right-0 p-12">
+                              <Zap className="w-10 h-10 text-brand-lime opacity-20 animate-pulse" />
+                           </div>
+                        )}
+                        
+                        <div className="mb-14">
+                           <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-10 ${getColor(plan.name)}`}>
+                              {React.cloneElement(getIcon(plan.name) as React.ReactElement<{ className: string }>, { className: "w-6 h-6" })}
+                           </div>
+                           <h3 className="text-3xl font-bold italic uppercase tracking-tight mb-6">{plan.name}</h3>
+                           <p className={`text-sm leading-relaxed mb-12 h-14 italic font-inter ${isPopular ? "text-white/40" : "text-zinc-400"}`}>{plan.description}</p>
+                           
+                           <div className="flex items-baseline gap-2 mb-10">
+                              <span className="text-6xl font-black italic tracking-tighter">{plan.price}</span>
+                              <span className={`text-sm font-bold uppercase tracking-widest ${isPopular ? "text-white/20" : "text-zinc-300"}`}>{plan.period}</span>
+                           </div>
+                           
+                           <button className={`w-full py-6 rounded-full font-bold text-lg transition-all active:scale-95 group ${isPopular ? "bg-brand-lime text-neutral-900 hover:bg-white" : "bg-neutral-900 text-white hover:bg-neutral-800"}`}>
+                              {plan.cta || "Get Started"}
+                              <ArrowRight className="w-5 h-5 ml-2 inline group-hover:translate-x-1" />
+                           </button>
+                        </div>
+
+                        <div className="space-y-6 pt-12 border-t border-current/5 mt-auto">
+                           <span className={`text-[10px] font-bold uppercase tracking-[0.2em] block mb-4 ${isPopular ? "text-white/10" : "text-zinc-300"}`}>What&apos;s Included</span>
+                           {(plan.features || []).map((feat: string, j: number) => (
+                             <div key={j} className="flex gap-4 items-center">
+                                <CheckCircle2 className={`w-4 h-4 ${isPopular ? "text-brand-lime" : "text-zinc-200"}`} />
+                                <span className={`text-[11px] font-bold uppercase tracking-wider ${isPopular ? "text-white/60" : "text-zinc-500"}`}>{feat}</span>
+                             </div>
+                           ))}
+                        </div>
+                     </div>
+                   )})}
+                </div>
+              )}
+              
+              {!isLoading && !isError && (!pricingPlans || pricingPlans.length === 0) && (
+                <div className="flex flex-col items-center justify-center p-20 bg-gray-50 rounded-[64px] border border-gray-100">
+                  <h3 className="text-3xl font-black italic tracking-tighter text-neutral-900 uppercase">No Plans Available</h3>
+                  <p className="text-zinc-500 mt-4 max-w-lg text-center">
+                    Check back later for updated pricing options.
+                  </p>
+                </div>
+              )}
+           </div>
         </section>
 
         {/* 💡 PRICING PHILOSOPHY & ⚙️ USAGE-BASED */}
@@ -170,55 +217,6 @@ export default function PricingPage() {
                     <div className="w-3 h-3 bg-brand-lime rounded-full animate-pulse" />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-brand-lime">Volume Discount Logic Active</span>
                  </div>
-              </div>
-           </div>
-        </section>
-
-        {/* 💳 PRICING PLANS */}
-        <section className="py-40">
-           <div className="max-w-[1440px] mx-auto px-8 relative z-10">
-              <div className="text-center mb-32">
-                 <h2 className="text-4xl lg:text-7xl font-bold uppercase italic tracking-tighter">Plans for Every Stage.</h2>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                 {pricingPlans.map((plan, i) => (
-                   <div key={i} className={`p-12 lg:p-16 rounded-[72px] border transition-all duration-700 relative overflow-hidden flex flex-col ${plan.popular ? "bg-neutral-900 text-white border-white/5 scale-105 shadow-3xl" : "bg-white border-gray-100 text-neutral-900 hover:shadow-2xl"}`}>
-                      {plan.popular && (
-                         <div className="absolute top-0 right-0 p-12">
-                            <Zap className="w-10 h-10 text-brand-lime opacity-20 animate-pulse" />
-                         </div>
-                      )}
-                      
-                      <div className="mb-14">
-                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-10 ${plan.color}`}>
-                            {React.cloneElement(plan.icon as React.ReactElement<{ className: string }>, { className: "w-6 h-6" })}
-                         </div>
-                         <h3 className="text-3xl font-bold italic uppercase tracking-tight mb-6">{plan.name}</h3>
-                         <p className={`text-sm leading-relaxed mb-12 h-14 italic font-inter ${plan.popular ? "text-white/40" : "text-zinc-400"}`}>{plan.description}</p>
-                         
-                         <div className="flex items-baseline gap-2 mb-10">
-                            <span className="text-6xl font-black italic tracking-tighter">{plan.price}</span>
-                            <span className={`text-sm font-bold uppercase tracking-widest ${plan.popular ? "text-white/20" : "text-zinc-300"}`}>{plan.period}</span>
-                         </div>
-                         
-                         <button className={`w-full py-6 rounded-full font-bold text-lg transition-all active:scale-95 group ${plan.popular ? "bg-brand-lime text-neutral-900 hover:bg-white" : "bg-neutral-900 text-white hover:bg-neutral-800"}`}>
-                            {plan.cta}
-                            <ArrowRight className="w-5 h-5 ml-2 inline group-hover:translate-x-1" />
-                         </button>
-                      </div>
-
-                      <div className="space-y-6 pt-12 border-t border-current/5 mt-auto">
-                         <span className={`text-[10px] font-bold uppercase tracking-[0.2em] block mb-4 ${plan.popular ? "text-white/10" : "text-zinc-300"}`}>What&apos;s Included</span>
-                         {plan.features.map((feat, j) => (
-                           <div key={j} className="flex gap-4 items-center">
-                              <CheckCircle2 className={`w-4 h-4 ${plan.popular ? "text-brand-lime" : "text-zinc-200"}`} />
-                              <span className={`text-[11px] font-bold uppercase tracking-wider ${plan.popular ? "text-white/60" : "text-zinc-500"}`}>{feat}</span>
-                           </div>
-                         ))}
-                      </div>
-                   </div>
-                 ))}
               </div>
            </div>
         </section>
