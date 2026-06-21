@@ -127,8 +127,8 @@ export default function DecisionPoliciesPage() {
             <h1 className="text-3xl font-black italic tracking-tighter uppercase text-neutral-900 dark:text-white">
               Decision Policies<span className="text-brand-lime">.</span>
             </h1>
-            <p className="text-muted-foreground text-sm font-medium">
-              Configure automated decision rules for fraud detection and risk assessment.
+            <p className="text-neutral-400 text-xs font-bold uppercase tracking-widest italic font-black">
+              Configure automated decision rules for fraud detection and risk assessment
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Users, Key, Globe, ShieldCheck, Bell, Save, Copy, CheckCircle2,
   Trash2, Plus, FileText, History, RefreshCcw, AlertCircle, MoreHorizontal,
@@ -15,6 +15,9 @@ import {
 import { apiKeysService } from "@/services/api-keys.service";
 import { webhooksService } from "@/services/webhooks.service";
 import { settingsService } from "@/services/settings.service";
+import { authService } from "@/services/auth.service";
+import { organizationService } from "@/services/organization.service";
+import { AvailableService } from "@/types";
 
 export default function SettingsPage() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -32,6 +35,45 @@ export default function SettingsPage() {
   const { data: notSettings, isLoading: notLoading } = useNotificationSettings();
 
   const [saving, setSaving] = useState(false);
+
+  // Services tab states
+  const [availableServices, setAvailableServices] = useState<AvailableService[]>([]);
+  const [enabledServices, setEnabledServices] = useState<string[]>([]);
+  const [servicesLoading, setServicesLoading] = useState(true);
+  const [updatingServices, setUpdatingServices] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    async function loadServicesData() {
+      try {
+        const [avail, active] = await Promise.all([
+          authService.getAvailableServices(),
+          organizationService.getServices()
+        ]);
+        setAvailableServices(avail);
+        setEnabledServices(active.services || []);
+      } catch (err) {
+        console.error("Failed to load settings services:", err);
+      } finally {
+        setServicesLoading(false);
+      }
+    }
+    loadServicesData();
+  }, []);
+
+  const handleSaveServices = async () => {
+    setUpdatingServices(true);
+    try {
+      await organizationService.updateServices({ services: enabledServices });
+      alert("Services updated successfully. Reloading organization workspace...");
+      window.location.reload();
+    } catch (err) {
+      console.error("Failed to update services:", err);
+      alert("Failed to update organization services.");
+    } finally {
+      setUpdatingServices(false);
+    }
+  };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -98,6 +140,7 @@ export default function SettingsPage() {
         <div className="lg:col-span-3 space-y-4">
            {[
              { n: "Organization", i: <Globe /> },
+             { n: "Services", i: <ShieldCheck /> },
              { n: "Team & Roles", i: <Users /> },
              { n: "API Keys", i: <Key /> },
              { n: "Webhooks", i: <Bell /> },
@@ -265,6 +308,80 @@ export default function SettingsPage() {
                 </div>
              </div>
            )}
+
+            {/* Services Settings */}
+            {activeTab === "Services" && (
+              <div className="p-12 bg-white rounded-[64px] border border-neutral-100 shadow-2xl space-y-12 transition-all font-bold italic">
+                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-2">
+                       <h3 className="text-2xl font-black tracking-tighter text-neutral-900 uppercase leading-none">Service Entitlements.</h3>
+                       <p className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Enable or disable cloud tenant capabilities</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                       <input 
+                         type="text" 
+                         placeholder="Search services..." 
+                         value={searchQuery}
+                         onChange={(e) => setSearchQuery(e.target.value)}
+                         className="px-4 py-2 bg-zinc-50 border border-neutral-100 rounded-xl text-xs text-neutral-900 focus:outline-none focus:border-brand-lime transition-all"
+                       />
+                       <button 
+                         onClick={handleSaveServices} 
+                         disabled={updatingServices} 
+                         className="px-6 py-3 bg-neutral-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-brand-lime hover:text-neutral-900 transition-all shadow-md disabled:opacity-50"
+                       >
+                          {updatingServices ? "Saving..." : "Save Services"}
+                       </button>
+                    </div>
+                 </div>
+
+                 {servicesLoading ? (
+                   <div className="text-center p-8 text-neutral-400"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>
+                 ) : (
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[500px] overflow-y-auto pr-2 no-scrollbar">
+                     {availableServices
+                       .filter(s => s.label.toLowerCase().includes(searchQuery.toLowerCase()) || (s.description || "").toLowerCase().includes(searchQuery.toLowerCase()))
+                       .map(service => {
+                         const isEnabled = enabledServices.includes(service.key);
+                         return (
+                           <div 
+                             key={service.key}
+                             onClick={() => {
+                               if (isEnabled) {
+                                 setEnabledServices(enabledServices.filter(k => k !== service.key));
+                               } else {
+                                 setEnabledServices([...enabledServices, service.key]);
+                               }
+                             }}
+                             className={`p-6 border rounded-[32px] cursor-pointer transition-all duration-200 select-none flex items-start gap-4 ${
+                               isEnabled 
+                                 ? "bg-neutral-900 text-white border-neutral-900 shadow-lg" 
+                                 : "bg-zinc-50 text-neutral-600 border-neutral-100 hover:border-neutral-200"
+                             }`}
+                           >
+                             <div className="pt-0.5">
+                               <input 
+                                 type="checkbox" 
+                                 checked={isEnabled} 
+                                 onChange={() => {}} // handled by parent div click
+                                 className="w-4 h-4 rounded border-gray-300 text-neutral-900 focus:ring-neutral-900 shrink-0" 
+                               />
+                             </div>
+                             <div className="space-y-1">
+                               <p className={`text-sm font-black uppercase tracking-tight ${isEnabled ? "text-brand-lime" : "text-neutral-900"}`}>
+                                 {service.label}
+                               </p>
+                               <p className={`text-[10px] font-medium leading-relaxed ${isEnabled ? "text-neutral-300" : "text-neutral-400"}`}>
+                                 {service.description || "No description provided."}
+                               </p>
+                             </div>
+                           </div>
+                         );
+                       })}
+                   </div>
+                 )}
+              </div>
+            )}
 
            {/* Organization Settings */}
            {activeTab === "Organization" && (

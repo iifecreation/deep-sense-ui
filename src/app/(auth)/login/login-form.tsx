@@ -32,7 +32,7 @@ function LoginFormContent({ redirect }: { redirect: string | null }) {
 
     try {
       const response = await authService.login(data);
-      
+
       if (response.requires_2fa) {
         if (response.challenge && typeof window !== 'undefined') {
           localStorage.setItem('deep_sense_2fa_challenge', response.challenge);
@@ -49,6 +49,10 @@ function LoginFormContent({ redirect }: { redirect: string | null }) {
       }
     } catch (err) {
       const apiError = err as ApiError;
+      if (apiError.statusCode === 403 && apiError.message === 'Email not verified') {
+        router.push(`/verify-email?email=${encodeURIComponent(data.email)}&status=unverified`);
+        return;
+      }
       setError(apiError.message || 'Login failed. Please check your credentials and try again.');
     } finally {
       setIsLoading(false);
@@ -131,28 +135,6 @@ function LoginFormContent({ redirect }: { redirect: string | null }) {
             </>
           )}
         </Button>
-
-        <div className="relative py-4">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border" />
-          </div>
-          <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-[0.2em]">
-            <span className="bg-background px-4 text-muted-foreground/60">
-              Enterprise SSO
-            </span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Button variant="outline" type="button" className="h-11 rounded-xl border-border hover:bg-muted font-bold transition-all duration-300 group">
-            <Github className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
-            GitHub
-          </Button>
-          <Button variant="outline" type="button" className="h-11 rounded-xl border-border hover:bg-muted font-bold transition-all duration-300 group">
-            <Mail className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
-            Google
-          </Button>
-        </div>
       </form>
 
       <div className="mt-12 text-center">
