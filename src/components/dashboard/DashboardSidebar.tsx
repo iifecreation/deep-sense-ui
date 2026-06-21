@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
@@ -22,10 +22,25 @@ import {
   History,
   CheckCircle2,
   Plug,
-  ChevronRight
+  ChevronRight,
+  HelpCircle,
+  Bell
 } from "lucide-react";
+import { organizationService } from "@/services/organization.service";
 
-const navigation = [
+interface NavItem {
+  name: string;
+  icon: React.ReactNode;
+  href: string;
+  services?: string[];
+}
+
+interface NavGroup {
+  name: string;
+  items: NavItem[];
+}
+
+const navigation: NavGroup[] = [
   {
     name: "Overview",
     items: [
@@ -35,37 +50,44 @@ const navigation = [
   {
     name: "Monitoring",
     items: [
-      { name: "Transactions", icon: <Activity />, href: "/dashboard/transactions" },
-      { name: "Alerts", icon: <AlertCircle />, href: "/dashboard/alerts" },
-      { name: "Cases", icon: <FolderSearch />, href: "/dashboard/cases" }
+      { name: "Transactions", icon: <Activity />, href: "/dashboard/transactions", services: ["checkout", "cnp_advanced", "card_intelligence", "friendly_fraud"] },
+      { name: "Alerts", icon: <AlertCircle />, href: "/dashboard/alerts", services: ["alerts"] },
+      { name: "Cases", icon: <FolderSearch />, href: "/dashboard/cases", services: ["cases"] }
     ]
   },
   {
     name: "Compliance",
     items: [
-      { name: "Compliance Workspace", icon: <ShieldCheck />, href: "/dashboard/compliance" },
-      { name: "Customer Risk", icon: <ShieldAlert />, href: "/dashboard/customer-risk" },
-      { name: "Screening Center", icon: <Search />, href: "/dashboard/screening" },
-      { name: "Regulatory Reports", icon: <FileText />, href: "/dashboard/reports" },
+      { name: "Compliance Workspace", icon: <ShieldCheck />, href: "/dashboard/compliance", services: ["compliance"] },
+      { name: "Customer Risk", icon: <ShieldAlert />, href: "/dashboard/customer-risk", services: ["customer_risk"] },
+      { name: "Screening Center", icon: <Search />, href: "/dashboard/screening", services: ["screening"] },
+      { name: "Regulatory Reports", icon: <FileText />, href: "/dashboard/reports", services: ["compliance"] },
       { name: "Audit Trails", icon: <History />, href: "/dashboard/audit" }
     ]
   },
   {
     name: "Intelligence",
     items: [
-      { name: "Rules Engine", icon: <BrainCircuit />, href: "/dashboard/rules" },
-      { name: "Models", icon: <Binary />, href: "/dashboard/models" },
-      { name: "Graph Intelligence", icon: <Share2 />, href: "/dashboard/graph" },
-      { name: "Devices", icon: <Smartphone />, href: "/dashboard/devices" },
+      { name: "Rules Engine", icon: <BrainCircuit />, href: "/dashboard/rules", services: ["controls", "risk_orchestration"] },
+      { name: "Models", icon: <Binary />, href: "/dashboard/models", services: ["risk_orchestration"] },
+      { name: "Graph Intelligence", icon: <Share2 />, href: "/dashboard/graph", services: ["graph"] },
+      { name: "Devices", icon: <Smartphone />, href: "/dashboard/devices", services: ["device_fingerprinting"] },
       { name: "Users", icon: <Users />, href: "/dashboard/users" }
     ]
   },
   {
     name: "Operations",
     items: [
-      { name: "Onboarding Reviews", icon: <CheckCircle2 />, href: "/dashboard/onboarding" },
+      { name: "Onboarding Reviews", icon: <CheckCircle2 />, href: "/dashboard/onboarding", services: ["onboarding"] },
       { name: "Integrations", icon: <Plug />, href: "/dashboard/integrations" },
-      { name: "Analytics", icon: <BarChart3 />, href: "/dashboard/analytics" }
+      { name: "Analytics", icon: <BarChart3 />, href: "/dashboard/analytics", services: ["analytics"] }
+    ]
+  },
+  {
+    name: "Help & Support",
+    items: [
+      { name: "Notifications", icon: <Bell />, href: "/dashboard/notifications" },
+      { name: "Support Center", icon: <HelpCircle />, href: "/dashboard/support" }
     ]
   },
   {
@@ -78,12 +100,39 @@ const navigation = [
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
+  const [enabledServices, setEnabledServices] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadServices() {
+      try {
+        const response = await organizationService.getServices();
+        setEnabledServices(response.services || []);
+      } catch (err) {
+        console.error("Failed to load organization service list:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadServices();
+  }, []);
+
+  // Filter navigation groups and items
+  const filteredNavigation = navigation
+    .map(group => {
+      const items = group.items.filter(item => {
+        if (!item.services) return true;
+        return item.services.some(service => enabledServices.includes(service));
+      });
+      return { ...group, items };
+    })
+    .filter(group => group.items.length > 0);
 
   return (
     <aside className="w-full h-full flex flex-col font-sans max-h-screen overflow-y-auto no-scrollbar py-4">
       {/* Navigation */}
       <nav className="flex-1 space-y-8 pb-8">
-        {navigation.map((group, i) => (
+        {filteredNavigation.map((group, i) => (
           <div key={i} className="space-y-2">
             <h5 className="px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400">
               {group.name}

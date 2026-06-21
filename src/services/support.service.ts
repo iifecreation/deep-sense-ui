@@ -1,44 +1,51 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { get, post, patch } from '@/lib/api/client';
+import { get, post } from '@/lib/api/client';
+
+export interface SupportMessage {
+  id: string;
+  ticket_id: string;
+  sender_user_id: string | null;
+  sender_type: string;
+  body: string;
+  created_at: string;
+}
 
 export interface SupportTicket {
   id: string;
+  organization_id: string | null;
+  requester_user_id: string | null;
   subject: string;
-  description: string;
+  description: string | null;
   status: string;
   priority: string;
   category: string;
   created_at: string;
   updated_at: string;
+  last_response_at: string | null;
+  messages?: SupportMessage[];
 }
 
 export interface SupportTicketCreate {
   subject: string;
-  description: string;
-  priority?: string;
-  category?: string;
-}
-
-export interface SupportTicketUpdate {
-  status?: string;
-  priority?: string;
-  description?: string;
+  message: string;
+  priority: string;
+  category: string;
 }
 
 export const supportService = {
-  async list(params?: { page?: number; page_size?: number; status?: string }) {
-    return await get<any>('/platform-support/tickets', { params });
+  async list(params?: { status?: string; limit?: number; offset?: number }) {
+    return await get<SupportTicket[]>('/support/tickets', { params });
   },
 
   async create(data: SupportTicketCreate) {
-    return await post<any>('/platform-support/tickets', data);
+    return await post<SupportTicket>('/support/tickets', data);
   },
 
   async get(ticketId: string) {
-    return await get<any>(`/platform-support/tickets/${ticketId}`);
+    return await get<SupportTicket>(`/support/tickets/${ticketId}`);
   },
 
-  async update(ticketId: string, data: SupportTicketUpdate) {
-    return await patch<any>(`/platform-support/tickets/${ticketId}`, data);
+  async reply(ticketId: string, message: string) {
+    return await post<SupportMessage>(`/support/tickets/${ticketId}/messages`, { message });
   },
 };

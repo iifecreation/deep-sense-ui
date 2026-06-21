@@ -45,6 +45,7 @@ export interface SignupRequest {
   organization_name: string;
   organization_slug: string;
   country: string;
+  industry: string;
   services: string[];
   email: string;
   password: string;
@@ -60,6 +61,7 @@ export interface SignupResponse {
   organization_name: string;
   country: string;
   services: string[];
+  industry?: string;
 }
 
 export interface UserPublic {
@@ -80,11 +82,13 @@ export interface ForgotPasswordRequest {
 }
 
 export interface ResetPasswordRequest {
+  email: string;
   token: string;
   new_password: string;
 }
 
 export interface VerifyEmailRequest {
+  email: string;
   token: string;
 }
 
@@ -93,10 +97,9 @@ export interface ResendVerifyEmailRequest {
 }
 
 export interface AvailableService {
-  id: string;
-  name: string;
+  key: string;
+  label: string;
   description: string;
-  category: string;
 }
 
 export interface AvailableCountry {

@@ -80,7 +80,9 @@ const navConfig: NavMenu[] = [
           { label: "Risk Scoring Engine", href: "/product/scoring-engine", icon: <BarChart2 className="w-3.5 h-3.5" /> },
           { label: "Rules Engine", href: "/product/rules-engine", icon: <Cpu className="w-3.5 h-3.5" /> },
           { label: "Graph Intelligence", href: "/product/graph-intelligence", icon: <Database className="w-3.5 h-3.5" /> },
-          { label: "Case Management", href: "/product/case-management", icon: <AlertTriangle className="w-3.5 h-3.5" /> }
+          { label: "Case Management", href: "/product/case-management", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
+          { label: "Consortium Threat Intel", href: "/product/consortium", icon: <Network className="w-3.5 h-3.5" /> },
+          { label: "Interventions & Step-Up", href: "/product/interventions", icon: <Shield className="w-3.5 h-3.5" /> }
         ]
       },
       {
@@ -93,7 +95,9 @@ const navConfig: NavMenu[] = [
           { label: "Deepfake Detection", href: "/product/deepfake-detection", icon: <Eye className="w-3.5 h-3.5" /> },
           { label: "Synthetic Identity Detection", href: "/product/synthetic-identity", icon: <UserCheck className="w-3.5 h-3.5" /> },
           { label: "Device Fingerprinting", href: "/product/device-fingerprinting", icon: <Smartphone className="w-3.5 h-3.5" /> },
-          { label: "Behavioral Biometrics", href: "/product/behavioral-biometrics", icon: <Fingerprint className="w-3.5 h-3.5" /> }
+          { label: "Behavioral Biometrics", href: "/product/behavioral-biometrics", icon: <Fingerprint className="w-3.5 h-3.5" /> },
+          { label: "Bot Detection", href: "/product/bot-detection", icon: <Cpu className="w-3.5 h-3.5" /> },
+          { label: "Domain & Website Risk", href: "/product/domain-risk", icon: <Globe className="w-3.5 h-3.5" /> }
         ]
       },
       {
@@ -103,7 +107,10 @@ const navConfig: NavMenu[] = [
           { label: "Card-Not-Present Fraud", href: "/product/card-not-present-fraud", icon: <CreditCard className="w-3.5 h-3.5" /> },
           { label: "NFC / Contactless Fraud", href: "/product/nfc-contactless-fraud", icon: <Smartphone className="w-3.5 h-3.5" /> },
           { label: "Bonus & Promo Abuse", href: "/product/bonus-abuse", icon: <TrendingDown className="w-3.5 h-3.5" /> },
-          { label: "Friendly Fraud / Chargebacks", href: "/product/friendly-fraud", icon: <Shield className="w-3.5 h-3.5" /> }
+          { label: "Friendly Fraud / Chargebacks", href: "/product/friendly-fraud", icon: <Shield className="w-3.5 h-3.5" /> },
+          { label: "Checkout Journey Analytics", href: "/product/checkout-analytics", icon: <ShoppingBag className="w-3.5 h-3.5" /> },
+          { label: "BIN & Card Intelligence", href: "/product/card-intelligence", icon: <CreditCard className="w-3.5 h-3.5" /> },
+          { label: "Dispute Intelligence", href: "/product/dispute-intelligence", icon: <Briefcase className="w-3.5 h-3.5" /> }
         ]
       },
       {
@@ -114,7 +121,8 @@ const navConfig: NavMenu[] = [
           { label: "PEP Screening", href: "/product/pep-screening", icon: <Users className="w-3.5 h-3.5" /> },
           { label: "Adverse Media Screening", href: "/product/adverse-media", icon: <BookOpen className="w-3.5 h-3.5" /> },
           { label: "Customer Risk Profiling", href: "/product/risk-profiling", icon: <UserCheck className="w-3.5 h-3.5" /> },
-          { label: "Regulatory Reporting", href: "/product/regulatory-reporting", icon: <FileSpreadsheet className="w-3.5 h-3.5" /> }
+          { label: "Regulatory Reporting", href: "/product/regulatory-reporting", icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
+          { label: "Enhanced Due Diligence (EDD)", href: "/product/edd", icon: <FileCheck className="w-3.5 h-3.5" /> }
         ]
       },
       {
@@ -125,7 +133,8 @@ const navConfig: NavMenu[] = [
           { label: "DLP Monitoring", href: "/product/dlp", icon: <Eye className="w-3.5 h-3.5" /> },
           { label: "Procurement & Vendor Risk", href: "/product/procurement-risk", icon: <Briefcase className="w-3.5 h-3.5" /> },
           { label: "Third-Party Risk", href: "/product/third-party-risk", icon: <Users className="w-3.5 h-3.5" /> },
-          { label: "UEBA", href: "/product/ueba", icon: <Cpu className="w-3.5 h-3.5" /> }
+          { label: "UEBA", href: "/product/ueba", icon: <Cpu className="w-3.5 h-3.5" /> },
+          { label: "Audit Trails & Logging", href: "/product/audit-trails", icon: <History className="w-3.5 h-3.5" /> }
         ]
       }
     ]

@@ -26,8 +26,8 @@ export default function CustomerRegistry() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Customer Registry</h1>
-          <p className="text-sm text-slate-500 mt-1">Managed entities, identity trust scores, and risk profiles.</p>
+          <h1 className="text-4xl font-black italic tracking-tighter text-neutral-900 uppercase leading-none mb-2">Customer Registry.</h1>
+          <p className="text-neutral-400 text-xs font-bold uppercase tracking-widest italic font-black">Managed entities, identity trust scores, and risk profiles</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="font-semibold">

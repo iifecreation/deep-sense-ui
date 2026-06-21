@@ -22,6 +22,7 @@ export default function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [emailValue, setEmailValue] = useState("");
 
   const {
     register,
@@ -34,13 +35,14 @@ export default function ForgotPasswordForm() {
   async function onSubmit(data: ForgotPasswordInput) {
     setIsLoading(true);
     setError(null);
+    setEmailValue(data.email);
 
     try {
       await authService.forgotPassword(data);
       setSuccess(true);
     } catch (err) {
       const apiError = err as ApiError;
-      setError(apiError.message || 'Failed to send reset link. Please try again.');
+      setError(apiError.message || 'Failed to send verification code. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -54,12 +56,16 @@ export default function ForgotPasswordForm() {
             <CheckCircle2 className="w-8 h-8 text-primary" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold font-heading mb-3 tracking-tight">Check Your Email</h1>
+        <h1 className="text-3xl font-bold font-heading mb-3 tracking-tight">Code Dispatched</h1>
         <p className="text-muted-foreground text-[15px] leading-relaxed mb-8">
-          We have sent a password reset link to your email. Please check your inbox and spam folder.
+          We have sent a 6-digit password reset code to <strong className="text-foreground">{emailValue}</strong>.
+          Please check your inbox and paste the code below.
         </p>
         <Button asChild className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold hover:bg-primary/90">
-          <Link href="/login">Return to Login</Link>
+          <Link href={`/reset-password?email=${encodeURIComponent(emailValue)}`}>
+            Enter Reset Code
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
         </Button>
       </div>
     );
@@ -70,7 +76,7 @@ export default function ForgotPasswordForm() {
       <div className="mb-10">
         <h1 className="text-3xl font-bold font-heading mb-3 tracking-tight">Reset Password</h1>
         <p className="text-muted-foreground text-[15px] leading-relaxed">
-          Enter your email address and we'll send you a link to reset your password.
+          Enter your email address and we'll send you a 6-digit PIN code to verify and reset your password.
         </p>
       </div>
 
@@ -110,7 +116,7 @@ export default function ForgotPasswordForm() {
             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
           ) : (
             <>
-              Send Reset Link
+              Send Verification PIN
               <ArrowRight className="ml-2 h-4 w-4" />
             </>
           )}

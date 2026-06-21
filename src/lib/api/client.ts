@@ -119,7 +119,7 @@ const createApiClient = (): AxiosInstance => {
       }
 
       // Normalize error to ApiError
-      const errorMessage = (error.response?.data as any)?.detail || error.message || 'An error occurred';
+      const errorMessage = (error.response?.data as any)?.message || (error.response?.data as any)?.detail || error.message || 'An error occurred';
       const statusCode = error.response?.status;
       const code = (error.response?.data as any)?.code;
       const details = error.response?.data;

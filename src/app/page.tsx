@@ -55,6 +55,8 @@ export default function Home() {
           {/* Subtle neon gradient background blobs */}
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[900px] h-[400px] bg-brand-lime/10 blur-[130px] rounded-full pointer-events-none" />
           <div className="absolute top-10 right-10 w-96 h-96 bg-indigo-50/50 blur-[100px] rounded-full pointer-events-none" />
+          {/* Background grid pattern */}
+          <div className="absolute inset-0 z-0 pointer-events-none bg-grid-pattern opacity-[0.4] [mask-image:radial-gradient(ellipse_at_center,white,transparent_75%)]" />
 
           <div className="max-w-[1200px] mx-auto flex flex-col items-center text-center gap-16 relative z-10">
             {/* Centered Hero Content */}
@@ -74,7 +76,7 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6 w-full max-w-md mx-auto">
-                <Link href="/request-demo" className="px-8 py-4 bg-neutral-900 text-white rounded-full text-base font-bold font-manrope hover:bg-neutral-800 transition-all hover:scale-105 active:scale-95 shadow-xl text-center flex-1">
+                <Link href="/request-demo" className="px-8 py-4 bg-brand-lime text-neutral-900 rounded-full text-base font-bold font-manrope hover:bg-brand-lime/90 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-brand-lime/15 text-center flex-1">
                   Request Demo
                 </Link>
                 <Link href="/product/overview" className="px-8 py-4 border border-zinc-200 bg-white text-neutral-900 rounded-full text-base font-bold font-manrope hover:bg-zinc-50 hover:border-zinc-300 transition-all hover:scale-105 active:scale-95 text-center flex-1">
@@ -453,9 +455,9 @@ export default function Home() {
             </div>
 
             <div className="flex justify-center">
-              <Link href="/product/document-fraud" className="px-10 py-5 bg-neutral-900 text-white rounded-full font-bold text-base font-manrope hover:bg-neutral-800 transition-all hover:scale-105 active:scale-95 shadow-xl inline-flex items-center gap-3">
+              <Link href="/product/document-fraud" className="px-10 py-5 bg-brand-lime text-neutral-900 rounded-full font-bold text-base font-manrope hover:bg-brand-lime/90 transition-all hover:scale-105 active:scale-95 shadow-xl inline-flex items-center gap-3">
                 Explore Document Fraud Detection
-                <ArrowRight className="w-4 h-4 text-brand-lime" />
+                <ArrowRight className="w-4 h-4 text-neutral-900" />
               </Link>
             </div>
           </div>

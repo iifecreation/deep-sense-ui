@@ -10,11 +10,8 @@ export default function DashboardHeader() {
     <header className="w-full flex items-center justify-between p-4 bg-white rounded-xl border border-slate-200 shadow-sm relative">
        <div className="flex items-center gap-8">
           {/* Dashboard Logo */}
-          <Link href="/dashboard" className="group flex items-center gap-3">
-             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-neutral-900 shadow-lg shadow-primary/20">
-                <ShieldCheck className="w-6 h-6" />
-             </div>
-             <span className="text-xl font-bold tracking-tight text-slate-900 hidden sm:block">Deep Sense</span>
+          <Link href="/dashboard" className="group flex items-center">
+             <Logo variant="primary" className="h-10" iconClassName="h-10 w-10" nameClassName="h-5" />
           </Link>
 
           <div className="h-6 w-px bg-slate-200 hidden lg:block" />

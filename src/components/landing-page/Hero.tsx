@@ -9,7 +9,7 @@ export default function Hero() {
     <section className="relative w-full pt-48 pb-20 px-4 md:px-8 overflow-hidden bg-neutral-50/50">
       {/* Background Decor */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[40px_40px]" />
+        <div className="absolute inset-0 bg-grid-pattern opacity-[0.4] [mask-image:radial-gradient(ellipse_at_center,white,transparent_75%)]" />
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-lime/10 blur-[120px] rounded-full" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-lime/5 blur-[120px] rounded-full" />
       </div>
