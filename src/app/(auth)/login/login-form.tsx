@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Code as Github, Mail, ArrowRight, LoaderCircle as Loader2, AlertCircle } from "lucide-react";
+import { Code as Github, Mail, ArrowRight, LoaderCircle as Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { loginSchema, type LoginInput } from "@/schemas";
 import { authService } from "@/services/auth.service";
@@ -16,6 +16,7 @@ import { ApiError } from "@/lib/api/client";
 function LoginFormContent({ redirect }: { redirect: string | null }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const {
@@ -62,9 +63,9 @@ function LoginFormContent({ redirect }: { redirect: string | null }) {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
       <div className="mb-10">
-        <h1 className="text-3xl font-bold font-heading mb-3 tracking-tight">Access Control</h1>
+        <h1 className="text-3xl font-bold font-heading mb-3 tracking-tight">Welcome Back</h1>
         <p className="text-muted-foreground text-[15px] leading-relaxed">
-          Log in with your enterprise credentials to manage your fraud prevention infrastructure.
+          Enter your details to access the dashboard.
         </p>
       </div>
 
@@ -107,13 +108,22 @@ function LoginFormContent({ redirect }: { redirect: string | null }) {
               Forgot secret?
             </Link>
           </div>
-          <Input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            className="h-11 px-4 rounded-xl border-border bg-muted/30 focus:bg-background focus:ring-2 focus:ring-[#D1F701]/20 transition-all duration-300"
-            {...register("password")}
-          />
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              className="h-11 px-4 pr-10 rounded-xl border-border bg-muted/30 focus:bg-background focus:ring-2 focus:ring-[#D1F701]/20 transition-all duration-300"
+              {...register("password")}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
+          </div>
           {errors.password && (
             <p className="text-sm text-destructive mt-1 ml-0.5 font-medium animate-in fade-in slide-in-from-top-1">
               {errors.password.message}

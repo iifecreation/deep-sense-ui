@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Shield, Mail, ArrowRight, ArrowLeft, LoaderCircle as Loader2, BadgeInfo as Info, AlertCircle } from "lucide-react";
+import { Shield, Mail, ArrowRight, ArrowLeft, LoaderCircle as Loader2, BadgeInfo as Info, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { authService } from "@/services/auth.service";
 import { ApiError } from "@/lib/api/client";
@@ -48,6 +48,7 @@ export default function RegisterPage() {
   const [isFetchingData, setIsFetchingData] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<1 | 2>(1);
+  const [showPassword, setShowPassword] = useState(false);
   const [countries, setCountries] = useState<AvailableCountry[]>([]);
   const [services, setServices] = useState<AvailableService[]>([]);
   const router = useRouter();
@@ -297,13 +298,22 @@ export default function RegisterPage() {
               <Label htmlFor="password" title="Password" className="text-zinc-600 dark:text-zinc-400 font-semibold ml-0.5">
                 Create Password
               </Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                className="h-11 px-4 rounded-xl border-border bg-muted/30 focus:bg-background focus:ring-2 focus:ring-[#D1F701]/20 transition-all duration-300 shadow-sm text-sm"
-                {...register("password")}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  className="h-11 px-4 pr-10 rounded-xl border-border bg-muted/30 focus:bg-background focus:ring-2 focus:ring-[#D1F701]/20 transition-all duration-300 shadow-sm text-sm"
+                  {...register("password")}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-xs text-destructive mt-1 ml-0.5 font-medium">
                   {errors.password.message}

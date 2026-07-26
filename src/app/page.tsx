@@ -4,30 +4,30 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Activity, 
-  UserCheck, 
-  AlertTriangle, 
-  Settings, 
-  Cpu, 
-  Zap, 
-  Database, 
-  Lock, 
-  Terminal, 
-  Eye, 
-  Users, 
-  BookOpen, 
-  FileSpreadsheet, 
-  Clock, 
-  TrendingDown, 
-  Briefcase, 
-  Building2, 
-  Coins, 
-  ShoppingBag, 
-  Wallet, 
-  CheckCircle2, 
-  ArrowRight, 
+import {
+  Shield,
+  Activity,
+  UserCheck,
+  AlertTriangle,
+  Settings,
+  Cpu,
+  Zap,
+  Database,
+  Lock,
+  Terminal,
+  Eye,
+  Users,
+  BookOpen,
+  FileSpreadsheet,
+  Clock,
+  TrendingDown,
+  Briefcase,
+  Building2,
+  Coins,
+  ShoppingBag,
+  Wallet,
+  CheckCircle2,
+  ArrowRight,
   Globe,
   FileCheck,
   ChevronDown,
@@ -49,7 +49,7 @@ export default function Home() {
     <>
       <Navbar />
       <main className="flex flex-col min-h-screen bg-white">
-        
+
         {/* ================= SECTION 1: HERO ================= */}
         <section className="relative pt-40 pb-28 px-6 md:px-12 lg:px-24 overflow-hidden border-b border-gray-100 bg-white">
           {/* Subtle neon gradient background blobs */}
@@ -61,11 +61,7 @@ export default function Home() {
           <div className="max-w-[1200px] mx-auto flex flex-col items-center text-center gap-16 relative z-10">
             {/* Centered Hero Content */}
             <div className="flex flex-col gap-6 items-center max-w-[950px]">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-lime-400 text-[11px] font-extrabold uppercase tracking-widest shadow-xl shadow-neutral-900/10">
-                <Shield className="w-3.5 h-3.5 text-lime-400" />
-                Fraud, AML, Identity & Risk Intelligence Platform
-              </div>
-              
+
               <h1 className="text-4xl md:text-6xl lg:text-[76px] font-bold font-manrope leading-[1.05] tracking-tighter text-neutral-900">
                 Detect Fraud, Verify Identity, <br />
                 <span className="text-zinc-400">and Stop Financial Crime in Real Time.</span>
@@ -181,25 +177,25 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left w-full">
               {[
-                { 
-                  title: "Fraud is cross-channel", 
-                  desc: "Criminals move across payments, accounts, devices, documents, wallets, merchants, and identities.", 
-                  icon: <Activity className="w-5 h-5" /> 
+                {
+                  title: "Fraud is cross-channel",
+                  desc: "Criminals move across payments, accounts, devices, documents, wallets, merchants, and identities.",
+                  icon: <Activity className="w-5 h-5" />
                 },
-                { 
-                  title: "AML teams are overloaded", 
-                  desc: "Suspicious activity, sanctions hits, PEP exposure, and regulatory workflows are often disconnected.", 
-                  icon: <Globe className="w-5 h-5" /> 
+                {
+                  title: "AML teams are overloaded",
+                  desc: "Suspicious activity, sanctions hits, PEP exposure, and regulatory workflows are often disconnected.",
+                  icon: <Globe className="w-5 h-5" />
                 },
-                { 
-                  title: "Identity fraud is evolving", 
-                  desc: "Synthetic identities, deepfakes, fake documents, mule accounts, and multi-account abuse bypass simple checks.", 
-                  icon: <UserCheck className="w-5 h-5" /> 
+                {
+                  title: "Identity fraud is evolving",
+                  desc: "Synthetic identities, deepfakes, fake documents, mule accounts, and multi-account abuse bypass simple checks.",
+                  icon: <UserCheck className="w-5 h-5" />
                 },
-                { 
-                  title: "Risk systems are fragmented", 
-                  desc: "Fraud, AML, compliance, security, procurement, and GRC teams often work from separate tools.", 
-                  icon: <Settings className="w-5 h-5" /> 
+                {
+                  title: "Risk systems are fragmented",
+                  desc: "Fraud, AML, compliance, security, procurement, and GRC teams often work from separate tools.",
+                  icon: <Settings className="w-5 h-5" />
                 }
               ].map((card, idx) => (
                 <div key={idx} className="bg-white border border-gray-100 p-8 rounded-[32px] hover:shadow-xl transition-all duration-300 flex flex-col gap-6">
@@ -240,25 +236,25 @@ export default function Home() {
               {/* Right Pillars Grid */}
               <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                 {[
-                  { 
-                    t: "Real-Time Decisioning", 
-                    d: "Score payments, logins, documents, wallets, vendors, and customers instantly.", 
-                    icon: <Zap className="w-5 h-5" /> 
+                  {
+                    t: "Real-Time Decisioning",
+                    d: "Score payments, logins, documents, wallets, vendors, and customers instantly.",
+                    icon: <Zap className="w-5 h-5" />
                   },
-                  { 
-                    t: "Unified Risk Intelligence", 
-                    d: "Connect fraud, AML, identity, device, graph, and compliance signals into one profile.", 
-                    icon: <Database className="w-5 h-5" /> 
+                  {
+                    t: "Unified Risk Intelligence",
+                    d: "Connect fraud, AML, identity, device, graph, and compliance signals into one profile.",
+                    icon: <Database className="w-5 h-5" />
                   },
-                  { 
-                    t: "Investigation Workflow", 
-                    d: "Create alerts, cases, evidence timelines, analyst actions, and audit trails automatically.", 
-                    icon: <Activity className="w-5 h-5" /> 
+                  {
+                    t: "Investigation Workflow",
+                    d: "Create alerts, cases, evidence timelines, analyst actions, and audit trails automatically.",
+                    icon: <Activity className="w-5 h-5" />
                   },
-                  { 
-                    t: "Enterprise Governance", 
-                    d: "Monitor controls, regulatory reports, third-party risk, DLP, and policy compliance.", 
-                    icon: <Settings className="w-5 h-5" /> 
+                  {
+                    t: "Enterprise Governance",
+                    d: "Monitor controls, regulatory reports, third-party risk, DLP, and policy compliance.",
+                    icon: <Settings className="w-5 h-5" />
                   }
                 ].map((pillar, idx) => (
                   <div key={idx} className="bg-zinc-50 border border-zinc-100 p-8 rounded-[32px] hover:bg-white hover:shadow-xl hover:border-zinc-200 transition-all duration-300 flex flex-col gap-4">
@@ -284,35 +280,35 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
               {[
-                { 
-                  title: "Fraud Detection", 
-                  desc: "Transaction fraud, CNP fraud, APP scams, NFC fraud, friendly fraud, bonus abuse.", 
-                  icon: <Shield className="w-5 h-5" /> 
+                {
+                  title: "Fraud Detection",
+                  desc: "Transaction fraud, CNP fraud, APP scams, NFC fraud, friendly fraud, bonus abuse.",
+                  icon: <Shield className="w-5 h-5" />
                 },
-                { 
-                  title: "Document Fraud & KYC", 
-                  desc: "Fake IDs, OCR extraction, MRZ validation, metadata forensics, biometrics, liveness, deepfake detection, and synthetic identity signals.", 
-                  icon: <UserCheck className="w-5 h-5" /> 
+                {
+                  title: "Document Fraud & KYC",
+                  desc: "Fake IDs, OCR extraction, MRZ validation, metadata forensics, biometrics, liveness, deepfake detection, and synthetic identity signals.",
+                  icon: <UserCheck className="w-5 h-5" />
                 },
-                { 
-                  title: "AML Monitoring", 
-                  desc: "Sanctions, PEP, adverse media, transaction monitoring, mule detection, STR/SAR/CTR workflows.", 
-                  icon: <Globe className="w-5 h-5" /> 
+                {
+                  title: "AML Monitoring",
+                  desc: "Sanctions, PEP, adverse media, transaction monitoring, mule detection, STR/SAR/CTR workflows.",
+                  icon: <Globe className="w-5 h-5" />
                 },
-                { 
-                  title: "Identity & Access Risk", 
-                  desc: "Account takeover, behavioral biometrics, device fingerprinting, session risk, adaptive challenges.", 
-                  icon: <Fingerprint className="w-5 h-5" /> 
+                {
+                  title: "Identity & Access Risk",
+                  desc: "Account takeover, behavioral biometrics, device fingerprinting, session risk, adaptive challenges.",
+                  icon: <Fingerprint className="w-5 h-5" />
                 },
-                { 
-                  title: "Graph Intelligence", 
-                  desc: "Fraud rings, mule networks, shared devices, shared beneficiaries, duplicate documents, and multi-account abuse.", 
-                  icon: <Database className="w-5 h-5" /> 
+                {
+                  title: "Graph Intelligence",
+                  desc: "Fraud rings, mule networks, shared devices, shared beneficiaries, duplicate documents, and multi-account abuse.",
+                  icon: <Database className="w-5 h-5" />
                 },
-                { 
-                  title: "Enterprise Risk & GRC", 
-                  desc: "Controls monitoring, DLP, procurement fraud, third-party risk, SOX/PCI/ISO/GDPR reporting.", 
-                  icon: <FileSpreadsheet className="w-5 h-5" /> 
+                {
+                  title: "Enterprise Risk & GRC",
+                  desc: "Controls monitoring, DLP, procurement fraud, third-party risk, SOX/PCI/ISO/GDPR reporting.",
+                  icon: <FileSpreadsheet className="w-5 h-5" />
                 }
               ].map((mod, idx) => (
                 <div key={idx} className="bg-white border border-gray-100 p-10 rounded-[40px] hover:shadow-2xl hover:shadow-indigo-50/50 hover:border-indigo-100 transition-all duration-300 flex flex-col gap-6 relative group overflow-hidden">
@@ -341,7 +337,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 w-full text-left relative">
               {/* Connector line for large screens */}
               <div className="hidden lg:block absolute top-12 left-[10%] right-[10%] h-0.5 bg-gray-100 z-0" />
-              
+
               {[
                 { title: "1. Ingest", desc: "Send transactions, logins, documents, wallet events, screening requests, vendor data, or behavioral telemetry." },
                 { title: "2. Enrich", desc: "DeepSense adds device, IP, graph, identity, sanctions, merchant, terminal, and behavioral context." },
@@ -713,10 +709,10 @@ export default function Home() {
         {/* ================= SECTION 15: CTA ================= */}
         <section className="py-32 px-6 md:px-12 lg:px-24 bg-white relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-indigo-50/50 blur-[130px] rounded-full pointer-events-none" />
-          
+
           <div className="max-w-[1200px] mx-auto bg-neutral-900 rounded-[56px] p-12 md:p-24 flex flex-col items-center text-center gap-10 relative overflow-hidden border border-white/5 shadow-3xl">
             <div className="absolute inset-0 bg-radial-gradient from-brand-lime/10 to-transparent opacity-50 pointer-events-none" />
-            
+
             <div className="space-y-4 max-w-[700px] relative z-10">
               <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold font-manrope text-white tracking-tight leading-tight">
                 Ready to Unify Fraud, AML, <br />
@@ -748,43 +744,43 @@ export default function Home() {
 
             <div className="w-full flex flex-col gap-4">
               {[
-                { 
-                  q: "What is DeepSense?", 
-                  a: "DeepSense is an enterprise risk intelligence platform for fraud detection, AML monitoring, identity verification, payment risk, GRC, and case management." 
+                {
+                  q: "What is DeepSense?",
+                  a: "DeepSense is an enterprise risk intelligence platform for fraud detection, AML monitoring, identity verification, payment risk, GRC, and case management."
                 },
-                { 
-                  q: "Can DeepSense make real-time decisions?", 
-                  a: "Yes. DeepSense is designed for inline scoring and can return allow, review, block, step-up, hold, or case-creation decisions in under 100ms." 
+                {
+                  q: "Can DeepSense make real-time decisions?",
+                  a: "Yes. DeepSense is designed for inline scoring and can return allow, review, block, step-up, hold, or case-creation decisions in under 100ms."
                 },
-                { 
-                  q: "Does DeepSense support AML?", 
-                  a: "Yes. It supports sanctions screening, PEP screening, adverse media, transaction monitoring, customer risk profiling, and regulatory reporting workflows." 
+                {
+                  q: "Does DeepSense support AML?",
+                  a: "Yes. It supports sanctions screening, PEP screening, adverse media, transaction monitoring, customer risk profiling, and regulatory reporting workflows."
                 },
-                { 
-                  q: "Does DeepSense support identity fraud?", 
-                  a: "Yes. It supports document fraud detection, OCR, MRZ validation, biometrics, liveness, deepfake detection, duplicate document detection, and synthetic identity signals." 
+                {
+                  q: "Does DeepSense support identity fraud?",
+                  a: "Yes. It supports document fraud detection, OCR, MRZ validation, biometrics, liveness, deepfake detection, duplicate document detection, and synthetic identity signals."
                 },
-                { 
-                  q: "Can DeepSense detect account takeover?", 
-                  a: "Yes. It uses login telemetry, device intelligence, behavioral biometrics, credential abuse detection, session risk, and adaptive intervention policies." 
+                {
+                  q: "Can DeepSense detect account takeover?",
+                  a: "Yes. It uses login telemetry, device intelligence, behavioral biometrics, credential abuse detection, session risk, and adaptive intervention policies."
                 },
-                { 
-                  q: "Can DeepSense be deployed on-premise?", 
-                  a: "Yes. DeepSense can run as SaaS, private cloud, customer VPC, on-premise, or air-gapped depending on customer requirements." 
+                {
+                  q: "Can DeepSense be deployed on-premise?",
+                  a: "Yes. DeepSense can run as SaaS, private cloud, customer VPC, on-premise, or air-gapped depending on customer requirements."
                 },
-                { 
-                  q: "Is DeepSense only for banks?", 
-                  a: "No. It supports banks, fintechs, payment companies, e-commerce, crypto, telecom wallets, gaming, insurance, and enterprise risk teams." 
+                {
+                  q: "Is DeepSense only for banks?",
+                  a: "No. It supports banks, fintechs, payment companies, e-commerce, crypto, telecom wallets, gaming, insurance, and enterprise risk teams."
                 },
-                { 
-                  q: "Does DeepSense integrate with SIEM tools?", 
-                  a: "Yes. It can export risk and security events to SIEM systems through webhooks, CEF/LEEF/syslog, and connector-based integrations." 
+                {
+                  q: "Does DeepSense integrate with SIEM tools?",
+                  a: "Yes. It can export risk and security events to SIEM systems through webhooks, CEF/LEEF/syslog, and connector-based integrations."
                 }
               ].map((faq, idx) => {
                 const isOpen = openFaq === idx;
                 return (
                   <div key={idx} className="bg-white border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300">
-                    <button 
+                    <button
                       onClick={() => toggleFaq(idx)}
                       className="w-full px-6 py-5 flex justify-between items-center text-left hover:bg-zinc-50 transition-colors"
                     >
