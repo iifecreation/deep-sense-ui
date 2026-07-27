@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Search, Bell, HelpCircle, ShieldCheck, Zap, MoreVertical } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
+import EnvironmentSwitcher from "@/components/dashboard/EnvironmentSwitcher";
 
 export default function DashboardHeader() {
   return (
@@ -30,6 +31,7 @@ export default function DashboardHeader() {
        </div>
 
        <div className="flex items-center gap-4">
+          <EnvironmentSwitcher />
           {/* Notifications & Help */}
           <div className="flex items-center gap-1">
              <button className="w-10 h-10 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all relative flex items-center justify-center">

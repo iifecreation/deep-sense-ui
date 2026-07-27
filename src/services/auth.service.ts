@@ -11,14 +11,19 @@ import {
   AvailableService,
   AvailableCountry,
 } from '@/types';
-import { post, get, setToken, setRefreshToken, clearTokens, apiClient } from '@/lib/api/client';
+import { post, get, setToken, setRefreshToken, clearTokens, getToken } from '@/lib/api/client';
+import axios from 'axios';
+import { getControlApiUrl, getRuntimeEnvironment } from '@/lib/runtime-environment';
 
 export const authService = {
   /**
    * Login with email and password
    */
   async login(data: LoginRequest): Promise<TokenResponse & { challenge?: string }> {
-    const response = await apiClient.post<TokenResponse>('/auth/login', data);
+    const response = await axios.post<TokenResponse>(
+      `${getControlApiUrl()}/api/v1/identity/login`,
+      { ...data, environment: getRuntimeEnvironment() },
+    );
     
     // Store tokens only if 2FA is not required
     if (!response.data.requires_2fa) {
@@ -54,7 +59,10 @@ export const authService = {
    * Refresh access token
    */
   async refreshToken(refreshToken: string): Promise<TokenResponse> {
-    const response = await post<TokenResponse>('/auth/refresh', { refresh_token: refreshToken });
+    const response = await post<TokenResponse>(
+      `${getControlApiUrl()}/api/v1/identity/refresh`,
+      { refresh_token: refreshToken },
+    );
     
     // Update tokens
     setToken(response.access_token);
@@ -67,11 +75,12 @@ export const authService = {
    * Sign up new organization and admin user
    */
   async signup(data: SignupRequest): Promise<SignupResponse> {
-    const response = await post<SignupResponse>('/auth/signup', data);
-    
-    // Store tokens
-    setToken(response.access_token);
-    setRefreshToken(response.refresh_token);
+    const response = (
+      await axios.post<SignupResponse>(
+        `${getControlApiUrl()}/api/v1/identity/signup`,
+        data,
+      )
+    ).data;
     
     return response;
   },
@@ -108,14 +117,22 @@ export const authService = {
    * Verify email with token
    */
   async verifyEmail(data: VerifyEmailRequest): Promise<{ message: string }> {
-    return await post<{ message: string }>('/auth/verify-email', data);
+    const response = await axios.post<{ message: string }>(
+      `${getControlApiUrl()}/api/v1/identity/verify-email`,
+      data,
+    );
+    return response.data;
   },
 
   /**
    * Resend email verification
    */
   async resendVerifyEmail(data: ResendVerifyEmailRequest): Promise<{ message: string }> {
-    return await post<{ message: string }>('/auth/resend-verify-email', data);
+    const response = await axios.post<{ message: string }>(
+      `${getControlApiUrl()}/api/v1/identity/resend-verify-email`,
+      data,
+    );
+    return response.data;
   },
 
   /**
@@ -147,6 +164,6 @@ export const authService = {
    */
   isAuthenticated(): boolean {
     if (typeof window === 'undefined') return false;
-    return !!localStorage.getItem('deep_sense_access_token');
+    return Boolean(getToken());
   },
 };
