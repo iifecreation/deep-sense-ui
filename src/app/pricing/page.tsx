@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
 import { 
@@ -89,6 +90,16 @@ export default function PricingPage() {
         {/* 🔥 HERO SECTION */}
         <section className="max-w-[1440px] mx-auto px-8 mb-32 relative">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-lime/5 rounded-full blur-[140px] pointer-events-none" />
+          
+          <div className="absolute top-10 right-20 hidden lg:block opacity-20 pointer-events-none">
+            <Image 
+              src="/assets/images/dashboard/crown.svg" 
+              alt="Premium Pricing" 
+              width={400} 
+              height={400} 
+            />
+          </div>
+
           <div className="max-w-[850px] relative z-10">
              <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-brand-lime text-[11px] font-bold uppercase tracking-widest mb-10 shadow-2xl">
                <Activity className="w-3.5 h-3.5" />

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
 import { 
@@ -113,106 +114,15 @@ export default function DocumentFraudPage() {
             </div>
 
             {/* Hero Illustration: Interactive Verification Dashboard Mockup */}
-            <div className="w-full bg-neutral-950 p-8 rounded-[48px] border border-white/10 shadow-3xl text-left relative overflow-hidden">
-              <div className="absolute inset-0 bg-radial-gradient from-brand-lime/10 to-transparent pointer-events-none opacity-50" />
-              
-              <div className="flex flex-col gap-8 relative z-10 text-white">
-                <div className="flex justify-between items-center pb-6 border-b border-white/5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-brand-lime animate-pulse" />
-                    <span className="text-white text-xs font-bold font-manrope tracking-wider">IDENTITY DOCUMENT FORENSICS & VERIFICATION WORKSPACE</span>
-                  </div>
-                  <span className="text-zinc-500 text-[10px] font-mono">FORENSIC ENGINE ACTIVE • V3.1</span>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-                  {/* Left Column: Document portrait and extraction details */}
-                  <div className="lg:col-span-5 bg-white/5 border border-white/10 p-6 rounded-3xl space-y-6">
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 block">Uploaded Identity Card Preview</span>
-                    
-                    <div className="aspect-[1.586/1] bg-black/60 border border-white/5 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-tr from-brand-lime/5 to-transparent pointer-events-none" />
-                      
-                      <div className="flex justify-between items-start">
-                        <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center border border-white/5">
-                          <Eye className="w-6 h-6 text-zinc-400" />
-                        </div>
-                        <span className="px-2 py-0.5 bg-brand-lime/20 border border-brand-lime/40 text-brand-lime text-[8px] font-black rounded uppercase">PASSPORT</span>
-                      </div>
-
-                      <div className="space-y-1 z-10 font-mono text-[9px] text-zinc-400">
-                        <p>NAME: JOHNATHAN DOE</p>
-                        <p>NATIONALITY: GBR</p>
-                        <p>MRZ: P&lt;GBRDOE&lt;&lt;JOHNATHAN&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</p>
-                      </div>
-                    </div>
-
-                    {/* Checkboxes controls */}
-                    <div className="space-y-2">
-                      {[
-                        { id: "forensics", label: "Tampering & Metadata Forensics" },
-                        { id: "biometrics", label: "Face Match & Liveness checks" },
-                        { id: "screening", label: "AML / Sanctions Watchlist Screening" }
-                      ].map((step) => (
-                        <div 
-                          key={step.id}
-                          onClick={() => handleStepChange(step.id)}
-                          className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                            activeStep === step.id 
-                              ? "bg-brand-lime/10 border-brand-lime text-white" 
-                              : "bg-black/40 border-white/5 text-zinc-400 hover:border-white/10"
-                          }`}
-                        >
-                          <span className="text-[10px] font-bold font-manrope">{step.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Right Column: Risk and verification signals */}
-                  <div className="lg:col-span-7 bg-white/5 border border-white/10 p-8 rounded-3xl flex flex-col justify-between">
-                    <div className="space-y-6">
-                      <div className="flex justify-between items-start pb-4 border-b border-white/5">
-                        <div>
-                          <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400">Forensics Risk Analysis</span>
-                          <h4 className="text-4xl md:text-5xl font-black italic tracking-tighter text-red-500 animate-pulse mt-1">
-                            {riskLevel}/100 Risk
-                          </h4>
-                        </div>
-                        <span className="text-zinc-500 text-[10px] font-mono">STATUS: ACTION_REQUIRED</span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4 font-mono text-[10px] text-zinc-400">
-                        <div className="p-3 bg-black/40 border border-white/5 rounded-xl">
-                          <span className="text-white/60 block">MRZ Checksum Check</span>
-                          <span className="text-red-400 font-bold">FAILED (Composite Error)</span>
-                        </div>
-                        <div className="p-3 bg-black/40 border border-white/5 rounded-xl">
-                          <span className="text-white/60 block">EXIF Software Check</span>
-                          <span className="text-red-400 font-bold">TAMPER_DETECTED (Photoshop V25)</span>
-                        </div>
-                        <div className="p-3 bg-black/40 border border-white/5 rounded-xl">
-                          <span className="text-white/60 block">Liveness Validation</span>
-                          <span className="text-brand-lime font-bold">{livenessStatus}</span>
-                        </div>
-                        <div className="p-3 bg-black/40 border border-white/5 rounded-xl">
-                          <span className="text-white/60 block">Identity Duplicate Check</span>
-                          <span className="text-white font-bold">3 Accounts Linked (Multi-Reuse)</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-3 pt-6 border-t border-white/5 mt-6">
-                      <button className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-red-600 transition-all text-center">
-                        Auto-Reject Identity
-                      </button>
-                      <button className="flex-1 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-white/10 transition-all text-center">
-                        Escalate to Case Management
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="w-full flex justify-center items-center rounded-[48px] overflow-hidden">
+              <Image 
+                src="/assets/images/document/6851290792cfe174aab1b25e_Image document processing.png"
+                alt="Document Processing"
+                width={1200}
+                height={800}
+                className="w-full h-auto object-contain rounded-[32px] shadow-2xl border border-gray-100"
+                priority
+              />
             </div>
           </div>
         </section>

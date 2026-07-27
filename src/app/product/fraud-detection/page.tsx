@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
 import { 
@@ -121,86 +122,16 @@ export default function FraudDetectionPage() {
               </div>
             </div>
 
-            {/* Hero Illustration: Dark Enterprise Fraud Command-Center Dashboard */}
-            <div className="w-full bg-neutral-950 p-8 rounded-[48px] border border-white/10 shadow-3xl text-left relative overflow-hidden">
-              <div className="absolute inset-0 bg-radial-gradient from-brand-lime/10 to-transparent pointer-events-none opacity-50" />
-              
-              <div className="flex flex-col gap-8 relative z-10">
-                <div className="flex justify-between items-center pb-6 border-b border-white/5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
-                    <span className="text-white text-xs font-bold font-manrope tracking-wider">LIVE FRAUD COMMAND CENTER</span>
-                  </div>
-                  <span className="text-zinc-500 text-[10px] font-mono">LATENCY: 42ms</span>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                  {/* Left Column: Live Transaction Stream */}
-                  <div className="lg:col-span-8 flex flex-col gap-4">
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 block">Live Event Ingestion Stream</span>
-                    
-                    <div className="flex flex-col gap-3">
-                      {liveEvents.map((ev, idx) => (
-                        <div key={idx} className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between text-xs transition-all duration-300 hover:bg-white/10">
-                          <div className="flex items-center gap-4">
-                            <span className="text-zinc-500 font-mono">{ev.time}</span>
-                            <div className="flex flex-col">
-                              <span className="text-white font-bold">{ev.id}</span>
-                              <span className="text-[10px] text-zinc-400">{ev.channel}</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-6">
-                            <span className="text-white font-bold">${ev.amount.toFixed(2)}</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-zinc-500 text-[10px]">Risk Score:</span>
-                              <span className={`font-black ${ev.risk > 80 ? 'text-red-500' : ev.risk > 50 ? 'text-amber-500' : 'text-brand-lime'}`}>
-                                {ev.risk}
-                              </span>
-                            </div>
-                            <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${ev.status === 'BLOCKED' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : ev.status === 'REVIEW' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-brand-lime/10 text-brand-lime border border-brand-lime/20'}`}>
-                              {ev.status}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Right Column: Mini Panels */}
-                  <div className="lg:col-span-4 flex flex-col gap-6">
-                    {/* Device Risk Panel */}
-                    <div className="bg-white/5 border border-white/10 p-5 rounded-3xl space-y-3">
-                      <span className="text-[9px] uppercase font-bold tracking-widest text-zinc-400 block">Device Risk Panel</span>
-                      <div className="space-y-2 text-xs">
-                        <div className="flex justify-between">
-                          <span className="text-white/60">Device ID Profile</span>
-                          <span className="text-red-400 font-bold">EMULATOR MATCHED</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-white/60">Connection Route</span>
-                          <span className="text-amber-400 font-bold">TOR Exit Node</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Network Health / Heatmap Alert */}
-                    <div className="bg-white/5 border border-white/10 p-5 rounded-3xl space-y-3">
-                      <span className="text-[9px] uppercase font-bold tracking-widest text-zinc-400 block">Sanctions & Watchlist Check</span>
-                      <div className="space-y-2 text-xs">
-                        <div className="flex justify-between">
-                          <span className="text-white/60">OFAC SDN Match</span>
-                          <span className="text-red-500 font-black">94.8% CRITICAL MATCH</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-white/60">Risk Policy</span>
-                          <span className="text-red-500 font-extrabold">AUTO-REJECT ONBOARDING</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            {/* Hero Illustration: Interactive Dark Enterprise Fraud Command-Center Dashboard Mockup replaced with Image */}
+            <div className="w-full flex justify-center items-center rounded-[48px] overflow-hidden bg-neutral-50 p-8 border border-gray-100 shadow-2xl relative">
+              <Image 
+                src="/assets/images/home/Money Transform Card.svg"
+                alt="Fraud Detection Dashboard"
+                width={1200}
+                height={800}
+                className="w-full h-auto object-contain"
+                priority
+              />
             </div>
           </div>
         </section>
