@@ -6,7 +6,8 @@ import {
   LivenessRequest,
   BiometricCheckRead,
 } from '@/types';
-import { get, post, patch } from '@/lib/api/client';
+import { get, getToken, post, patch } from '@/lib/api/client';
+import { getRuntimeApiUrl } from '@/lib/runtime-environment';
 
 export const documentsService = {
   /**
@@ -50,10 +51,10 @@ export const documentsService = {
   async uploadSessionSelfie(sessionId: string, file: File): Promise<IdentityVerificationSessionRead> {
     const formData = new FormData();
     formData.append('file', file);
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/documents/sessions/${sessionId}/selfie`, {
+    const response = await fetch(`${getRuntimeApiUrl()}/api/v1/documents/sessions/${sessionId}/selfie`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('deep_sense_access_token')}`,
+        Authorization: `Bearer ${getToken()}`,
       },
       body: formData,
     });

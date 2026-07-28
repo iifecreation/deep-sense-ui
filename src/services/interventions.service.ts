@@ -1,56 +1,41 @@
-import { get, post, patch, del } from '@/lib/api/client';
+import { get, post } from '@/lib/api/client';
 
-export interface Intervention {
+export interface InterventionPolicy {
   id: string;
-  title: string;
-  description: string;
-  intervention_type: string;
-  status: string;
-  priority: string;
-  target_type: string;
-  target_id: string;
-  reason: string;
+  name: string;
+  description: string | null;
+  fraud_domain: string;
+  trigger_conditions: Record<string, unknown>;
+  actions: Array<Record<string, unknown>>;
+  priority: number;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
-  created_by: string;
 }
 
-export interface InterventionCreate {
-  title: string;
-  description?: string;
-  intervention_type: string;
-  priority?: string;
-  target_type: string;
-  target_id: string;
-  reason: string;
-}
-
-export interface InterventionUpdate {
-  title?: string;
-  description?: string;
-  status?: string;
-  priority?: string;
-  reason?: string;
+export interface InterventionEvaluation {
+  fraud_domain: string;
+  trigger_type: string;
+  risk_score: number;
+  factors?: Record<string, unknown>;
+  user_id?: string;
+  account_id?: string;
+  session_id?: string;
+  transaction_id?: string;
+  external_reference?: string;
 }
 
 export const interventionsService = {
-  async list(params?: { page?: number; page_size?: number; search?: string; status?: string }) {
-    return await get<any>('/interventions', { params });
-  },
-
-  async create(data: InterventionCreate) {
-    return await post<any>('/interventions', data);
-  },
-
-  async get(interventionId: string) {
-    return await get<any>(`/interventions/${interventionId}`);
-  },
-
-  async update(interventionId: string, data: InterventionUpdate) {
-    return await patch<any>(`/interventions/${interventionId}`, data);
-  },
-
-  async delete(interventionId: string) {
-    return await del<any>(`/interventions/${interventionId}`);
-  },
+  listPolicies: (params?: { include_inactive?: boolean; limit?: number; offset?: number }) =>
+    get<InterventionPolicy[]>('/interventions/policies', { params }),
+  createPolicy: (data: Omit<InterventionPolicy, 'id' | 'created_at' | 'updated_at'>) =>
+    post<InterventionPolicy>('/interventions/policies', data),
+  evaluate: (data: InterventionEvaluation, idempotencyKey?: string) =>
+    post<Record<string, unknown>>('/interventions/evaluate', data, {
+      headers: idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : undefined,
+    }),
+  execute: (data: Record<string, unknown>, idempotencyKey?: string) =>
+    post<Record<string, unknown>>('/interventions/execute', data, {
+      headers: idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : undefined,
+    }),
 };

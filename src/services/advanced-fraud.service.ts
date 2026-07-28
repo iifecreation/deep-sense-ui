@@ -1,158 +1,132 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { get, post } from '@/lib/api/client';
 
-// Deepfake Detection
-export interface DeepfakeCheck {
-  id: string;
-  status: string;
-  result: {
-    is_deepfake: boolean;
-    confidence: number;
-    details: Record<string, any>;
-  } | null;
+export type JsonObject = Record<string, unknown>;
+export type Signal = {
+  id?: string;
+  signal_id?: string;
+  signal_type: string;
+  severity: string;
+  score?: number;
+  confidence?: number;
   created_at: string;
-}
+};
 
 export const deepfakeService = {
-  async check(data: { image_url?: string; video_url?: string }) {
-    return await post<any>('/deepfake/deepfake-check', data);
-  },
-
-  async uploadCheck(file: File) {
+  check: (data: { image_url?: string; video_url?: string; check_type?: string }) =>
+    post<JsonObject>('/biometrics/deepfake-check', data),
+  uploadCheck: (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    return await post<any>('/deepfake/deepfake-check/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    return post<JsonObject>('/biometrics/deepfake-check/upload', formData);
   },
-
-  async getCheck(checkId: string) {
-    return await get<any>(`/deepfake/deepfake-checks/${checkId}`);
-  },
-
-  async listChecks(params?: { page?: number; page_size?: number }) {
-    return await get<any>('/deepfake/deepfake-checks', { params });
-  },
-
-  async getModelStatus() {
-    return await get<any>('/deepfake/deepfake-model/status');
-  },
+  getCheck: (checkId: string) => get<JsonObject>(`/biometrics/deepfake-checks/${checkId}`),
+  listChecks: (params?: { limit?: number; offset?: number }) =>
+    get<JsonObject>('/biometrics/deepfake-checks', { params }),
+  getModelStatus: () => get<JsonObject>('/biometrics/deepfake-model/status'),
 };
 
-// Synthetic Identity Detection
 export const syntheticAdvancedService = {
-  async createSession(data: any) {
-    return await post<any>('/synthetic-advanced/sessions', data);
-  },
-
-  async ingestEvent(sessionId: string, data: any) {
-    return await post<any>('/synthetic-advanced/events', { session_id: sessionId, ...data });
-  },
-
-  async getSessionRisk(sessionId: string) {
-    return await get<any>(`/synthetic-advanced/sessions/${sessionId}/risk`);
-  },
-
-  async listSignals(params?: { page?: number; page_size?: number }) {
-    return await get<any>('/synthetic-advanced/signals', { params });
-  },
+  check: (data: {
+    customer_id: string;
+    attributes: Record<string, string>;
+    device_id?: string;
+    ip_address?: string;
+  }) => post<JsonObject>('/identity-risk/check', data),
+  getProfile: (customerId: string) =>
+    get<JsonObject>(`/identity-risk/profiles/${customerId}`),
+  listSignals: (params?: { customer_id?: string }) =>
+    get<Signal[]>('/identity-risk/signals', { params }),
+  runProviderCheck: (data: {
+    customer_id: string;
+    provider_name: string;
+    attributes: Record<string, string>;
+  }) => post<JsonObject>('/identity-risk/provider-checks', data),
 };
 
-// Friendly Fraud Detection
 export const friendlyFraudAdvancedService = {
-  async createSession(data: any) {
-    return await post<any>('/friendly-fraud-advanced/sessions', data);
-  },
-
-  async ingestEvent(sessionId: string, data: any) {
-    return await post<any>('/friendly-fraud-advanced/events', { session_id: sessionId, ...data });
-  },
-
-  async getSessionRisk(sessionId: string) {
-    return await get<any>(`/friendly-fraud-advanced/sessions/${sessionId}/risk`);
-  },
-
-  async listSignals(params?: { page?: number; page_size?: number }) {
-    return await get<any>('/friendly-fraud-advanced/signals', { params });
-  },
+  submitDispute: (data: JsonObject) => post<JsonObject>('/friendly-fraud/disputes', data),
+  submitRefund: (data: JsonObject) => post<JsonObject>('/friendly-fraud/refunds', data),
+  submitReturn: (data: JsonObject) => post<JsonObject>('/friendly-fraud/returns', data),
+  submitDeliveryEvidence: (data: JsonObject) =>
+    post<JsonObject>('/friendly-fraud/delivery-evidence', data),
+  getCustomerRisk: (customerId: string) =>
+    get<JsonObject>(`/friendly-fraud/customers/${customerId}/risk`),
+  listSignals: (params?: {
+    customer_id?: string;
+    transaction_id?: string;
+    signal_type?: string;
+    severity?: string;
+    limit?: number;
+  }) => get<Signal[]>('/friendly-fraud/signals', { params }),
 };
 
-// CNP Advanced
 export const cnpAdvancedService = {
-  async createSession(data: any) {
-    return await post<any>('/cnp-advanced/sessions', data);
-  },
-
-  async ingestEvent(sessionId: string, data: any) {
-    return await post<any>('/cnp-advanced/events', { session_id: sessionId, ...data });
-  },
-
-  async getSessionRisk(sessionId: string) {
-    return await get<any>(`/cnp-advanced/sessions/${sessionId}/risk`);
-  },
-
-  async listSignals(params?: { page?: number; page_size?: number }) {
-    return await get<any>('/cnp-advanced/signals', { params });
-  },
+  ingestTransaction: (data: JsonObject) => post<JsonObject>('/cnp/transactions', data),
+  recordCheckoutEvent: (data: {
+    session_id: string;
+    event_type: string;
+    metadata?: JsonObject;
+  }) => post<JsonObject>('/cnp/checkout-events', data),
+  score: (data: JsonObject) => post<JsonObject>('/cnp/score', data),
+  listSignals: (params?: { session_id?: string; limit?: number }) =>
+    get<Signal[]>('/cnp/signals', { params }),
+  getPaymentInstrumentRisk: (id: string) =>
+    get<JsonObject>(`/cnp/payment-instruments/${id}/risk`),
 };
 
-// App Scams
 export const appScamsService = {
-  async createSession(data: any) {
-    return await post<any>('/app-scams/sessions', data);
-  },
-
-  async ingestEvent(sessionId: string, data: any) {
-    return await post<any>('/app-scams/events', { session_id: sessionId, ...data });
-  },
-
-  async getSessionRisk(sessionId: string) {
-    return await get<any>(`/app-scams/sessions/${sessionId}/risk`);
-  },
-
-  async listSignals(params?: { page?: number; page_size?: number }) {
-    return await get<any>('/app-scams/signals', { params });
-  },
+  scorePayment: (data: {
+    transaction_id: string;
+    beneficiary_identifier: string;
+    beneficiary_type?: string;
+    narrative?: string;
+    context?: JsonObject;
+  }) => post<JsonObject>('/app-scams/score-payment', data),
+  listSignals: (params?: { transaction_id?: string }) =>
+    get<Signal[]>('/app-scams/signals', { params }),
+  getBeneficiaryRisk: (identifier: string) =>
+    get<JsonObject>(`/app-scams/beneficiaries/${encodeURIComponent(identifier)}/risk`),
+  createIntervention: (transactionId: string, decision: string) =>
+    post<JsonObject>('/app-scams/interventions', undefined, {
+      params: { transaction_id: transactionId, decision },
+    }),
+  completeIntervention: (interventionId: string, customerResponse: string) =>
+    post<JsonObject>(`/app-scams/interventions/${interventionId}/complete`, {
+      customer_response: customerResponse,
+    }),
 };
 
-// Fraud Domains
-export const fraudDomainsService = {
-  async list(params?: { page?: number; page_size?: number }) {
-    return await get<any>('/fraud-domains', { params });
-  },
-
-  async add(data: { domain: string; reason: string }) {
-    return await post<any>('/fraud-domains', data);
-  },
-
-  async remove(domainId: string) {
-    return await post<any>(`/fraud-domains/${domainId}/remove`);
-  },
+export const atoService = {
+  ingestLoginEvent: (data: JsonObject) => post<JsonObject>('/ato/login-event', data),
+  ingestSessionEvent: (data: JsonObject) => post<JsonObject>('/ato/session-event', data),
+  getRisk: (accountId: string) => get<JsonObject>(`/ato/risk/${accountId}`),
+  listSignals: (params?: { limit?: number; offset?: number }) =>
+    get<Signal[]>('/ato/signals', { params }),
 };
 
-// Consortium
+export const botDetectionService = {
+  ingestEvent: (data: JsonObject) => post<JsonObject>('/bot/events', data),
+  getSessionRisk: (sessionId: string) =>
+    get<JsonObject>(`/bot/sessions/${sessionId}/risk`),
+  listSignals: (params?: { session_id?: string; severity?: string; limit?: number }) =>
+    get<Signal[]>('/bot/signals', { params }),
+  getEntityRisk: (entityType: 'customer' | 'ip_address' | 'device', entityId: string) =>
+    get<JsonObject>(`/bot/entities/${entityType}/${encodeURIComponent(entityId)}/risk`),
+};
+
+export const uebaService = {
+  listEvents: (params?: JsonObject) => get<JsonObject>('/ueba/events', { params }),
+  listAnomalies: (params?: JsonObject) => get<JsonObject>('/ueba/anomalies', { params }),
+  dashboard: () => get<JsonObject>('/ueba/dashboard'),
+  computeBaseline: (data: JsonObject) => post<JsonObject>('/ueba/baselines/compute', data),
+};
+
 export const consortiumService = {
-  async optIn() {
-    return await post<any>('/consortium/opt-in');
-  },
-
-  async shareSignal(data: any) {
-    return await post<any>('/consortium/share-signal', data);
-  },
-
-  async query(data: any) {
-    return await post<any>('/consortium/query', data);
-  },
-
-  async getMatches(params?: { page?: number; page_size?: number }) {
-    return await get<any>('/consortium/matches', { params });
-  },
-
-  async getAudit() {
-    return await get<any>('/consortium/audit');
-  },
-
-  async optOut() {
-    return await post<any>('/consortium/opt-out');
-  },
+  optIn: () => post<JsonObject>('/consortium/opt-in'),
+  shareSignal: (data: JsonObject) => post<JsonObject>('/consortium/share-signal', data),
+  query: (data: JsonObject) => post<JsonObject>('/consortium/query', data),
+  getMatches: (params?: { page?: number; page_size?: number }) =>
+    get<JsonObject>('/consortium/matches', { params }),
+  getAudit: () => get<JsonObject>('/consortium/audit'),
+  optOut: () => post<JsonObject>('/consortium/opt-out'),
 };

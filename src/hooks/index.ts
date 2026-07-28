@@ -7,7 +7,7 @@ export { useCustomers, useCustomer, useCustomerRisk } from './use-customers';
 export { useScreeningMatches, useScreeningMatch, useWatchlists, useScreeningJobs } from './use-screening';
 export { useFraudRules, useFraudRule, useFraudRuleMetrics } from './use-fraud-rules';
 export { useDecisionPolicies, useDecisionPolicy } from './use-decision-policies';
-export { useInterventions, useIntervention } from './use-interventions';
+export { useInterventions } from './use-interventions';
 export { useIntegrations, useIntegration } from './use-integrations';
 export { useWebhooks, useWebhook } from './use-webhooks';
 export { useReports, useReport } from './use-reports';

@@ -1,85 +1,43 @@
-import { useState, useEffect } from 'react';
-import { interventionsService } from '@/services/interventions.service';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  InterventionPolicy,
+  interventionsService,
+} from '@/services/interventions.service';
 
 export interface UseInterventionsOptions {
-  query?: any;
+  query?: { include_inactive?: boolean; limit?: number; offset?: number };
   enabled?: boolean;
 }
 
 export function useInterventions(options: UseInterventionsOptions = {}) {
-  const [data, setData] = useState<any[] | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const { query, enabled = true } = options;
+  const [data, setData] = useState<InterventionPolicy[]>([]);
+  const [isLoading, setIsLoading] = useState(enabled);
   const [error, setError] = useState<Error | null>(null);
 
-  const { query = {}, enabled = true } = options;
-
-  const fetchInterventions = async () => {
+  const fetchPolicies = useCallback(async () => {
     if (!enabled) return;
-    
     setIsLoading(true);
-    setIsError(false);
     setError(null);
-
     try {
-      const response = await interventionsService.list(query);
-      setData(response.items || []);
-    } catch (err) {
-      setIsError(true);
-      setError(err as Error);
-      console.error('Failed to fetch interventions:', err);
+      setData(await interventionsService.listPolicies(query));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught : new Error('Failed to load intervention policies'));
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [enabled, query]);
 
   useEffect(() => {
-    fetchInterventions();
-  }, [enabled, JSON.stringify(query)]);
+    void fetchPolicies();
+  }, [fetchPolicies]);
 
   return {
     data,
     isLoading,
-    isError,
+    isError: error !== null,
     error,
-    refetch: fetchInterventions,
-  };
-}
-
-export function useIntervention(interventionId: string, enabled: boolean = true) {
-  const [data, setData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchIntervention = async () => {
-    if (!enabled || !interventionId) return;
-    
-    setIsLoading(true);
-    setIsError(false);
-    setError(null);
-
-    try {
-      const response = await interventionsService.get(interventionId);
-      setData(response);
-    } catch (err) {
-      setIsError(true);
-      setError(err as Error);
-      console.error('Failed to fetch intervention:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchIntervention();
-  }, [interventionId, enabled]);
-
-  return {
-    data,
-    isLoading,
-    isError,
-    error,
-    refetch: fetchIntervention,
+    isEmpty: !isLoading && error === null && data.length === 0,
+    refetch: fetchPolicies,
   };
 }
