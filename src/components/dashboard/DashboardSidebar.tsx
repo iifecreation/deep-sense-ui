@@ -22,7 +22,6 @@ import {
   History,
   CheckCircle2,
   Plug,
-  ChevronRight,
   HelpCircle,
   Bell
 } from "lucide-react";
@@ -80,6 +79,7 @@ const navigation: NavGroup[] = [
     items: [
       { name: "Onboarding Reviews", icon: <CheckCircle2 />, href: "/dashboard/onboarding", services: ["onboarding"] },
       { name: "Integrations", icon: <Plug />, href: "/dashboard/integrations" },
+      { name: "Risk Operations", icon: <Activity />, href: "/dashboard/risk-operations", services: ["unified_risk"] },
       { name: "Analytics", icon: <BarChart3 />, href: "/dashboard/analytics", services: ["analytics"] }
     ]
   },
@@ -101,7 +101,6 @@ const navigation: NavGroup[] = [
 export default function DashboardSidebar() {
   const pathname = usePathname();
   const [enabledServices, setEnabledServices] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadServices() {
@@ -110,8 +109,6 @@ export default function DashboardSidebar() {
         setEnabledServices(response.services || []);
       } catch (err) {
         console.error("Failed to load organization service list:", err);
-      } finally {
-        setIsLoading(false);
       }
     }
     loadServices();
@@ -166,10 +163,10 @@ export default function DashboardSidebar() {
       {/* Footer Info */}
       <div className="mt-auto px-4 pt-6 border-t border-slate-100">
          <div className="flex items-center gap-2 mb-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Operational</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+            <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Runtime selected</span>
          </div>
-         <p className="text-[10px] text-slate-400 font-medium">Node: DS-4281-PROD</p>
+         <p className="text-[10px] text-slate-400 font-medium">Health is shown only from API evidence.</p>
       </div>
     </aside>
   );

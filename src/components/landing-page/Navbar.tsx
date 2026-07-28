@@ -238,27 +238,7 @@ const navConfig: NavMenu[] = [
       }
     ]
   },
-  {
-    title: "Developers",
-    groups: [
-      {
-        title: "API Overview",
-        items: [
-          { label: "Developer Hub Home", href: "/developers", icon: <Terminal className="w-3.5 h-3.5" /> },
-          { label: "API Reference", href: "/developers/api-overview", icon: <BookOpen className="w-3.5 h-3.5" /> },
-          { label: "Authentication", href: "/developers/authentication", icon: <Lock className="w-3.5 h-3.5" /> },
-          { label: "Quickstart Guide", href: "/developers/quickstart", icon: <Zap className="w-3.5 h-3.5" /> },
-          { label: "Webhook Events", href: "/developers/webhooks", icon: <Bell className="w-3.5 h-3.5" /> }
-        ]
-      },
-      {
-        title: "Developer Tools",
-        items: [
-          { label: "Developer Sandbox", href: "/developers", icon: <Play className="w-3.5 h-3.5" /> }
-        ]
-      }
-    ]
-  },
+
   {
     title: "Resources",
     groups: [
@@ -280,6 +260,22 @@ const navConfig: NavMenu[] = [
           { label: "Regulatory Reporting Guide", href: "/resources/reporting-guide", icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
           { label: "Documentation", href: "/resources/documentation", icon: <BookOpen className="w-3.5 h-3.5" /> },
           { label: "Contact Support Office", href: "/company/contact", icon: <HelpCircle className="w-3.5 h-3.5" /> }
+        ]
+      },
+      {
+        title: "API Overview",
+        items: [
+          { label: "Developer Hub Home", href: "/developers", icon: <Terminal className="w-3.5 h-3.5" /> },
+          { label: "API Reference", href: "/developers/api-overview", icon: <BookOpen className="w-3.5 h-3.5" /> },
+          { label: "Authentication", href: "/developers/authentication", icon: <Lock className="w-3.5 h-3.5" /> },
+          { label: "Quickstart Guide", href: "/developers/quickstart", icon: <Zap className="w-3.5 h-3.5" /> },
+          { label: "Webhook Events", href: "/developers/webhooks", icon: <Bell className="w-3.5 h-3.5" /> }
+        ]
+      },
+      {
+        title: "Developer Tools",
+        items: [
+          { label: "Developer Sandbox", href: "/developers", icon: <Play className="w-3.5 h-3.5" /> }
         ]
       }
     ]
@@ -392,11 +388,8 @@ export default function Navbar() {
           <Link href="/login" className="text-[13px] font-bold font-manrope text-white/70 hover:text-white transition-colors" onMouseEnter={() => setActiveMenu(null)}>
             Log in
           </Link>
-          <Link href="/request-demo" className="text-[13px] font-bold font-manrope text-white/70 hover:text-white transition-colors" onMouseEnter={() => setActiveMenu(null)}>
-            Request Demo
-          </Link>
-          <Link href="/dashboard" className="px-5 py-2.5 bg-brand-lime text-neutral-900 rounded-full text-[13px] font-bold font-manrope hover:bg-brand-lime/90 transition-all active:scale-95 shadow-lg shadow-brand-lime/10" onMouseEnter={() => setActiveMenu(null)}>
-            Start App
+          <Link href="/request-demo" className="px-5 py-2.5 bg-brand-lime text-neutral-900 rounded-full text-[13px] font-bold font-manrope hover:bg-brand-lime/90 transition-all active:scale-95 shadow-lg shadow-brand-lime/10" onMouseEnter={() => setActiveMenu(null)}>
+            Request a Demo
           </Link>
         </div>
 
@@ -523,17 +516,10 @@ export default function Navbar() {
              </Link>
              <Link 
                href="/request-demo" 
-               className="w-full py-3 border border-white/20 text-white rounded-full font-bold text-sm text-center hover:bg-white/5 transition-colors"
-               onClick={() => setIsMobileMenuOpen(false)}
-             >
-               Request Demo
-             </Link>
-             <Link 
-               href="/dashboard" 
                className="w-full py-3.5 bg-brand-lime text-neutral-900 rounded-full font-bold text-sm text-center hover:bg-brand-lime/90 active:scale-95 transition-all"
                onClick={() => setIsMobileMenuOpen(false)}
              >
-               Start App
+               Request a Demo
              </Link>
            </div>
         </div>

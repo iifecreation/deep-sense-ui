@@ -13,7 +13,8 @@ import {
   PaginatedResponse,
   ListQueryParams,
 } from '@/types';
-import { get, post, patch } from '@/lib/api/client';
+import { get, getToken, patch, post } from '@/lib/api/client';
+import { getRuntimeApiUrl } from '@/lib/runtime-environment';
 
 export const reportsService = {
   /**
@@ -88,10 +89,10 @@ export const reportsService = {
    */
   async exportReport(reportId: string, formatType: string): Promise<any> {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/reports/${reportId}/export?format_type=${formatType}`,
+      `${getRuntimeApiUrl()}/api/v1/reports/${reportId}/export?format_type=${formatType}`,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('deep_sense_access_token')}`,
+          Authorization: `Bearer ${getToken()}`,
         },
       }
     );
