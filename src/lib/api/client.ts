@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { getRuntimeApiUrl, tokenStorageKey } from '@/lib/runtime-environment';
 
 // Environment configuration
-const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://api.deepsense.ai' : 'http://localhost:8000');
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === 'production' ? 'https://app.deepsense.ai' : 'http://localhost:3000');
 
 
@@ -20,39 +20,36 @@ export class ApiError extends Error {
 }
 
 // Auth token management
-const TOKEN_KEY = 'deep_sense_access_token';
-const REFRESH_TOKEN_KEY = 'deep_sense_refresh_token';
-
 export const getToken = (): string | null => {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem(TOKEN_KEY);
+  return localStorage.getItem(tokenStorageKey("access"));
 };
 
 export const setToken = (token: string): void => {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(tokenStorageKey("access"), token);
 };
 
 export const getRefreshToken = (): string | null => {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem(REFRESH_TOKEN_KEY);
+  return localStorage.getItem(tokenStorageKey("refresh"));
 };
 
 export const setRefreshToken = (token: string): void => {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(REFRESH_TOKEN_KEY, token);
+  localStorage.setItem(tokenStorageKey("refresh"), token);
 };
 
 export const clearTokens = (): void => {
   if (typeof window === 'undefined') return;
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
+  localStorage.removeItem(tokenStorageKey("access"));
+  localStorage.removeItem(tokenStorageKey("refresh"));
 };
 
 // Create axios instance
 const createApiClient = (): AxiosInstance => {
   const client = axios.create({
-    baseURL: `${API_URL}/api/v1`,
+    baseURL: '/api/v1',
     timeout: 30000,
     headers: {
       'Content-Type': 'application/json',
@@ -62,9 +59,7 @@ const createApiClient = (): AxiosInstance => {
   // Request interceptor - add auth token
   client.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      if (!process.env.NEXT_PUBLIC_API_URL && process.env.NODE_ENV === 'production') {
-        throw new Error('NEXT_PUBLIC_API_URL environment variable is required in production');
-      }
+      config.baseURL = `${getRuntimeApiUrl()}/api/v1`;
       if (!process.env.NEXT_PUBLIC_APP_URL && process.env.NODE_ENV === 'production') {
         throw new Error('NEXT_PUBLIC_APP_URL environment variable is required in production');
       }
@@ -92,7 +87,7 @@ const createApiClient = (): AxiosInstance => {
         try {
           const refreshToken = getRefreshToken();
           if (refreshToken) {
-            const response = await axios.post(`${API_URL}/api/v1/auth/refresh`, {
+            const response = await axios.post(`${getRuntimeApiUrl()}/api/v1/auth/refresh`, {
               refresh_token: refreshToken,
             });
 
@@ -191,4 +186,4 @@ export const del = async <T>(url: string, config?: AxiosRequestConfig): Promise<
   return response.data;
 };
 
-export { API_URL, APP_URL };
+export { APP_URL };

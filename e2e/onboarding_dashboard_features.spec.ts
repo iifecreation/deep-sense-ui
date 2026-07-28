@@ -64,7 +64,8 @@ test.describe('Onboarding and Dashboard Features Integration', () => {
       pin = execSync(`../deep-sense-api/backend/.venv/bin/python ../deep-sense-api/backend/find_pin_cli.py ${email}`).toString().trim();
       console.log(`Retrieved email verification PIN from DB: ${pin}`);
     } catch (e) {
-      throw new Error(`Failed to retrieve PIN from DB: ${e.message}`);
+      const message = e instanceof Error ? e.message : String(e);
+      throw new Error(`Failed to retrieve PIN from DB: ${message}`);
     }
     expect(pin).toHaveLength(6);
 

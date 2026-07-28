@@ -53,15 +53,13 @@ export interface SignupRequest {
 }
 
 export interface SignupResponse {
-  access_token: string;
-  refresh_token: string;
-  expires_in: number;
   user_id: string;
   organization_id: string;
   organization_name: string;
   country: string;
   services: string[];
   industry?: string;
+  verification_required: boolean;
 }
 
 export interface UserPublic {

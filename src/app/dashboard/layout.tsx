@@ -4,6 +4,7 @@ import React from "react";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useAuth } from "@/lib/auth";
+import { useRuntimeEnvironment } from "@/hooks/use-runtime-environment";
 
 export default function DashboardLayout({
   children,
@@ -11,6 +12,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { isAuthenticated, isLoading } = useAuth();
+  const isSandbox = useRuntimeEnvironment() === "sandbox";
 
   if (isLoading) {
     return (
@@ -27,6 +29,11 @@ export default function DashboardLayout({
   return (
     <div className="h-screen bg-zinc-50 text-slate-900 overflow-hidden font-sans selection:bg-blue-100 selection:text-blue-900">
       <div className="h-full flex flex-col p-6 gap-6">
+        {isSandbox && (
+          <div className="rounded-lg border border-amber-300 bg-amber-100 px-4 py-2 text-center text-xs font-bold uppercase tracking-widest text-amber-950">
+            Sandbox environment — synthetic test data only
+          </div>
+        )}
         {/* Global Dashboard Header */}
         <DashboardHeader />
 
