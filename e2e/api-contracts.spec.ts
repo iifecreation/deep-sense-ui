@@ -60,3 +60,101 @@ test('priority operations uses the tenant endpoint and no fabricated node health
   expect(sidebar).not.toContain('DS-4281-PROD');
   expect(sidebar).not.toContain('>Operational<');
 });
+
+test('investigation workspace uses tenant-scoped normalized decision routes', () => {
+  const service = readFileSync(
+    join(process.cwd(), 'src/services/risk-decisions.service.ts'),
+    'utf8',
+  );
+  const listPage = readFileSync(
+    join(process.cwd(), 'src/app/dashboard/investigations/page.tsx'),
+    'utf8',
+  );
+  const detailPage = readFileSync(
+    join(
+      process.cwd(),
+      'src/app/dashboard/investigations/[decisionId]/page.tsx',
+    ),
+    'utf8',
+  );
+  expect(service).toContain('/risk-decisions');
+  expect(service).toContain('/intervention/execute');
+  expect(service).not.toContain('/platform-admin/');
+  expect(listPage).toContain('Unified Risk is not enabled');
+  expect(listPage).toContain('Permission denied');
+  expect(listPage).toContain('No persisted decisions found');
+  expect(detailPage).toContain('This decision does not exist in your organization');
+});
+
+test('decision view distinguishes recommendations, pending, completed and failures', () => {
+  const source = readFileSync(
+    join(
+      process.cwd(),
+      'src/components/investigations/RiskDecisionView.tsx',
+    ),
+    'utf8',
+  );
+  for (const required of [
+    'Engine contributions',
+    'Evidence',
+    'Investigation timeline',
+    'Open alert',
+    'Open case',
+    'customer_pending',
+    'customer_completed',
+    'timed_out',
+    'Provider is not configured',
+    'Not executed',
+  ]) {
+    expect(source).toContain(required);
+  }
+});
+
+test('P1.2 investigation workflows use tenant APIs and expose authoritative states', () => {
+  const service = readFileSync(
+    join(process.cwd(), 'src/services/risk-decisions.service.ts'),
+    'utf8',
+  );
+  const pages = [
+    'src/app/dashboard/investigations/beneficiaries/page.tsx',
+    'src/app/dashboard/investigations/beneficiaries/[profileId]/page.tsx',
+    'src/app/dashboard/investigations/ato-controls/page.tsx',
+    'src/app/dashboard/investigations/cnp-journey/page.tsx',
+    'src/app/dashboard/investigations/customer-risk/page.tsx',
+    'src/app/dashboard/investigations/unified-risk/page.tsx',
+  ].map((path) => readFileSync(join(process.cwd(), path), 'utf8')).join('\n');
+
+  for (const route of [
+    '/risk-decisions/beneficiaries',
+    '/risk-decisions/ato/trusted-devices',
+    '/risk-decisions/ato/sessions',
+    '/risk-decisions/cnp/checkouts/',
+    '/risk-decisions/cnp/merchant-policies',
+    '/risk-decisions/customer-risk/',
+    '/risk-decisions/unified-risk/reevaluate',
+    '/risk-decisions/unified-risk/reevaluations',
+    '/intervention/cancel',
+  ]) {
+    expect(service).toContain(route);
+  }
+  expect(service).not.toContain('/platform-admin/');
+
+  for (const state of [
+    'disabled for this organization',
+    'Permission denied',
+    'Provider not configured',
+    'No beneficiary profiles found',
+    'No trusted devices',
+    'No persisted login sessions',
+    'No source contributions',
+    'stale',
+    'unavailable',
+    'conflict retained',
+    'No re-evaluation lineage',
+    'Audit evidence was recorded',
+  ]) {
+    expect(pages).toContain(state);
+  }
+  expect(pages).toContain('The external identity-provider session was not claimed as revoked');
+  expect(pages).toContain('Roll back to this version');
+});
