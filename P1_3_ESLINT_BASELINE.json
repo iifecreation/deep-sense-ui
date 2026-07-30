@@ -1,0 +1,2586 @@
+[
+  {
+    "file": "e2e/auth/logout.spec.ts",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 1,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "e2e/dashboard/fraud-investigation.spec.ts",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 1,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/(auth)/forgot-password/forgot-password-form.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 1,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/(auth)/layout.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/(auth)/login/login-form.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/(auth)/register/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/blog/[slug]/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/blog/[slug]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/blog/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 4,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/blog/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 5,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/company/about/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 5,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/company/about/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 2,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/company/careers/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/company/careers/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 8,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/company/careers/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 7,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/company/contact/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/company/trust/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/company/trust/page.tsx",
+    "rule": "react/jsx-no-comment-textnodes",
+    "count": 1,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/alerts/[alertId]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 25,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/alerts/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 8,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/alerts/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 6,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/analytics/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/audit/[eventId]/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/audit/[eventId]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 47,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/audit/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 13,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/audit/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 18,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/audit/page.tsx",
+    "rule": "react-hooks/purity",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/billing/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/billing/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 16,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/cases/[caseId]/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/cases/[caseId]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 30,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/cases/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 5,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/cases/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 14,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/compliance-reports/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 4,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/compliance-reports/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 8,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/compliance/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/compliance/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 8,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/compliance/page.tsx",
+    "rule": "react-hooks/purity",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/compliance/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 5,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/customer-risk/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 8,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/customer-risk/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 6,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/decision-policies/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 5,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/decision-policies/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 7,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/detail-template.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 10,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/devices/[deviceId]/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/devices/[deviceId]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 22,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/devices/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/devices/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 3,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/graph/entities/[entityId]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 11,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/integrations/[integrationId]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 22,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/integrations/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/integrations/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 18,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/integrations/page.tsx",
+    "rule": "react-hooks/purity",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/models/[modelId]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 10,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/models/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/models/page.tsx",
+    "rule": "react-hooks/purity",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/models/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 1,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/notifications/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 3,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/notifications/page.tsx",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 1,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/onboarding/[reviewId]/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/onboarding/[reviewId]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 15,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/onboarding/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 9,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/onboarding/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 17,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/reports/[reportId]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 38,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/reports/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/reports/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 15,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/reports/page.tsx",
+    "rule": "react-hooks/purity",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/rules/[ruleId]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 15,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/rules/%5BruleId%5D/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 17,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/rules/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 4,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/rules/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 6,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/rules/page.tsx",
+    "rule": "react/jsx-no-comment-textnodes",
+    "count": 1,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/screening/matches/[matchId]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 41,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/screening/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 12,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/screening/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 12,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/screening/page.tsx",
+    "rule": "react-hooks/purity",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/settings/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/settings/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 7,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/settings/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 2,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/support/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 6,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/support/page.tsx",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 1,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/transactions/[transactionId]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/transactions/%5BtransactionId%5D/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 30,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/transactions/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 4,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/transactions/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 7,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/usage/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/usage/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 9,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/users/[userId]/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 15,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/users/%5BuserId%5D/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 23,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/users/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 5,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/webhooks/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 5,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/dashboard/webhooks/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 6,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/developers/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/developers/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 10,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/developers/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 21,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/developers/quickstart/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 11,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/developers/quickstart/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 28,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/legal/layout.tsx",
+    "rule": "react-hooks/rules-of-hooks",
+    "count": 1,
+    "severity": "error",
+    "category": "correctness",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 6,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/admin-console/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/ai-copilot/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 34,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/ai-intelligence/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/architecture/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/behavioral-analytics/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/capabilities/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/case-management/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/device-intelligence/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/governance-compliance/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/governance/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/graph-intelligence/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 30,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/identity-intelligence/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/integrations/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/privacy/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/reporting/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/scalability/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/security/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/transaction-monitoring/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/webhooks/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 33,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/platform/workflow-automation/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/pricing/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/account-takeover/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 28,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/adverse-media/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/aml-monitoring/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 32,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/app-scam-detection/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 28,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/audit-trails/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/audit-trails/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 7,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/audit-trails/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 5,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/behavioral-biometrics/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 29,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/bonus-abuse/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 20,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/case-management/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 29,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/cnp-fraud/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 29,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/compliance-dashboard/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/compliance-dashboard/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 7,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/compliance-ops/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/compliance-ops/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 6,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/compliance-ops/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 4,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/continuous-controls/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/core-banking/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 4,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/core-banking/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 5,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/core-banking/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 2,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/customer-risk-profiling/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 23,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/data-security/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/data-security/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 8,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/data-security/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 10,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/deepfake-detection/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 23,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/device-fingerprinting/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 20,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/dispute-intelligence/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 23,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/dispute-intelligence/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 2,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/dlp/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/document-fraud/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/fraud-detection/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 18,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/friendly-fraud/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 21,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/friendly-fraud/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 2,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/graph-intelligence/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 20,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/grc/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 23,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/kyc-onboarding/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 4,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/kyc-onboarding/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/kyc-onboarding/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 3,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/kyc-verification/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 29,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/nfc-fraud/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 20,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 14,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/pep-screening/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 30,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/procurement-risk/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 25,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/regulatory-reporting/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/risk-profiling/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 4,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/risk-profiling/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 3,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/risk-profiling/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 2,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/risk-scoring/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 16,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/rules-engine/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/sanctions-screening/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 30,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/synthetic-identity/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 21,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/third-party-risk/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/ueba/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/product/ueba/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 1,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/request-demo/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 1,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/aml-checklist/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 5,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/blog/page.tsx",
+    "rule": "@next/next/no-img-element",
+    "count": 2,
+    "severity": "warning",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/blog/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/case-studies/page.tsx",
+    "rule": "@next/next/no-img-element",
+    "count": 1,
+    "severity": "warning",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/case-studies/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 8,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/cbn-guide/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/cbn-guide/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 8,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/cbn-guide/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 2,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/compliance-center/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 31,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/documentation/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 3,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/guides/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 3,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/reporting-guide/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/reporting-guide/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 4,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/reporting-guide/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 2,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/whitepapers/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/resources/whitepapers/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 6,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/account-takeover/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/account-takeover/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 10,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/account-takeover/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 5,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/aml/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/aml/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 10,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/aml/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 5,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/automate-compliance-controls/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/banking/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 25,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/cbn-compliance/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/cbn-compliance/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 7,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/cbn-compliance/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 2,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/crypto-web3/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/crypto/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/crypto/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 9,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/crypto/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 6,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/detect-app-scams/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/detect-document-fraud/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/detect-document-fraud/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 1,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/ecommerce-marketplace/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/ecommerce/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/ecommerce/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 10,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/ecommerce/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 4,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/education-edtech/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/energy-utilities/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/enterprise-risk-teams/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/enterprise-saas-platforms/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/fintech/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/gaming-betting/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/gaming-digital-entertainment/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/government-public-sector/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/healthcare/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/hospitality-travel-booking/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/insurance/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/logistics-supply-chain/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/manufacturing-industrial/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/merchant-fraud/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/merchant-fraud/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 11,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/merchant-fraud/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 8,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/monitor-vendor-risk/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 25,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/nonprofits-ngos/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/payment-fraud/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/payment-fraud/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 11,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/payment-fraud/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 4,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/payment-processors/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/payments/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/pep-monitoring/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/pep-monitoring/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 8,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/pep-monitoring/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 2,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/prevent-bonus-abuse/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/reduce-chargebacks/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/retail-consumer-platforms/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/sanctions-screening/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/sanctions-screening/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 5,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/sanctions-screening/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 3,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/stop-synthetic-identity-fraud/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/str-reporting/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/str-reporting/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 5,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/str-reporting/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 3,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/telecom-mobile-money/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/telecom-wallets/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/telecommunications/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 24,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/transaction-fraud/page.tsx",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/transaction-fraud/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 10,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/transaction-fraud/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 6,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/verify-customer-identity/page.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 26,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/app/solutions/verify-customer-identity/page.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 1,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/common/CategoryPageTemplate.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 3,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/dashboard/DashboardHeader.tsx",
+    "rule": "@next/next/no-img-element",
+    "count": 1,
+    "severity": "warning",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/dashboard/DashboardHeader.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/dashboard/EarningChart.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 3,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/dashboard/MarketplaceCards.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/dashboard/RecentActivity.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 5,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/dashboard/StatsOverview.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 3,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/landing-page/DashboardPreview.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 1,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/landing-page/Footer.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 3,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/landing-page/Hero.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 1,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/landing-page/Navbar.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 1,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/landing-page/Problem.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 2,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/landing-page/SecurityTrust.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 1,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/landing-page/TrustedBy.tsx",
+    "rule": "react/no-unescaped-entities",
+    "count": 2,
+    "severity": "error",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/ui/logo.tsx",
+    "rule": "@next/next/no-img-element",
+    "count": 2,
+    "severity": "warning",
+    "category": "style",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/components/ui/logo.tsx",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 1,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-alerts.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-alerts.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 4,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-analytics.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-analytics.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-api-keys.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-audit.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 4,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-audit.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-billing.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-billing.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-blog.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 6,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-blog.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 4,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-cases.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-cases.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 4,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-content.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-customers.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-customers.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 5,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-decision-policies.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-decision-policies.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 3,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-devices.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-devices.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-fraud-rules.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 4,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-fraud-rules.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 5,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-integrations.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-integrations.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 3,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-models.ts",
+    "rule": "react-hooks/set-state-in-effect",
+    "count": 1,
+    "severity": "error",
+    "category": "correctness",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-onboarding.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-onboarding.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 2,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-pricing.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-reports.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-reports.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 4,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-resources.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-screening.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 5,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-screening.ts",
+    "rule": "@typescript-eslint/no-unused-vars",
+    "count": 1,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-screening.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 8,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-settings.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 8,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-settings.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 8,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-transactions.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 1,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-transactions.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 4,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-webhooks.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/hooks/use-webhooks.ts",
+    "rule": "react-hooks/exhaustive-deps",
+    "count": 3,
+    "severity": "warning",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/services/api-keys.service.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 4,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/services/audit.service.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 6,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/services/content.service.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 5,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/services/decision-policies.service.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 17,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/services/devices.service.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 14,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/services/models.service.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 3,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/services/onboarding.service.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 15,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/services/pricing.service.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 2,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/services/resources.service.ts",
+    "rule": "@typescript-eslint/no-explicit-any",
+    "count": 6,
+    "severity": "error",
+    "category": "maintainability",
+    "owner": "tenant-ui"
+  },
+  {
+    "file": "src/services/support.service.ts",
+    "rule": "fatal-parser-error",
+    "count": 1,
+    "severity": "warning",
+    "category": "style",
+    "owner": "tenant-ui"
+  }
+]

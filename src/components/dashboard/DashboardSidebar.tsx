@@ -18,6 +18,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   Search,
+  FileSearch,
   FileText,
   History,
   CheckCircle2,
@@ -51,6 +52,9 @@ const navigation: NavGroup[] = [
     items: [
       { name: "Transactions", icon: <Activity />, href: "/dashboard/transactions", services: ["checkout", "cnp_advanced", "card_intelligence", "friendly_fraud"] },
       { name: "Alerts", icon: <AlertCircle />, href: "/dashboard/alerts", services: ["alerts"] },
+      { name: "Investigations", icon: <FileSearch />, href: "/dashboard/investigations", services: ["unified_risk"] },
+      { name: "Beneficiaries", icon: <ShieldAlert />, href: "/dashboard/investigations/beneficiaries", services: ["app_scams"] },
+      { name: "ATO Controls", icon: <ShieldCheck />, href: "/dashboard/investigations/ato-controls", services: ["ato"] },
       { name: "Cases", icon: <FolderSearch />, href: "/dashboard/cases", services: ["cases"] }
     ]
   },
