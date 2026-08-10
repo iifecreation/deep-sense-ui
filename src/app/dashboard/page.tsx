@@ -135,15 +135,6 @@ export default function DashboardOverview() {
 
   if (!data) return null;
 
-  const hasActivity =
-    data.metrics.totalTransactions > 0 ||
-    data.metrics.openAlerts > 0 ||
-    data.metrics.openCases > 0 ||
-    data.metrics.screeningMatches > 0 ||
-    data.recent.transactions.length > 0 ||
-    data.recent.alerts.length > 0 ||
-    data.recent.cases.length > 0;
-
   const metricCards = [
     { label: 'Risk Score Summary', value: data.metrics.riskScore.toFixed(3), icon: Gauge, helper: 'Average transaction risk score' },
     { label: 'Total Transactions', value: formatNumber(data.metrics.totalTransactions), icon: CreditCard, helper: 'Recorded by the transaction API' },
@@ -187,11 +178,7 @@ export default function DashboardOverview() {
         </Card>
       )}
 
-      {!hasActivity ? (
-        <EmptyDashboard onRefresh={refetch} />
-      ) : (
-        <>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
             {metricCards.map((item) => {
               const Icon = item.icon;
               return (
@@ -325,11 +312,9 @@ export default function DashboardOverview() {
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Documents</p>
                   <p className="mt-1 text-sm text-slate-500">Feature not configured. Configure the document list endpoint to show reviews here.</p>
                 </section>
-              </CardContent>
-            </Card>
-          </div>
-        </>
-      )}
+            </CardContent>
+          </Card>
+        </div>
     </div>
   );
 }

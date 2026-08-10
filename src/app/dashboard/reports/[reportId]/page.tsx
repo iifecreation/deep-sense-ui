@@ -165,14 +165,7 @@ export default function RegulatoryReportDetailPage() {
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 font-black italic leading-none">
-         {[
-           { label: "Report Value", value: `$${report.amount}`, delta: "USD MAGNITUDE", icon: <CreditCard className="text-muted-foreground" />, color: "text-neutral-900" },
-           { label: "Subject Risk", value: "High", delta: "CUST-9921", icon: <User className="text-rose-500" /> },
-           { label: "Evidence Nodes", value: "14", delta: "Verified Info", icon: <Layers className="text-indigo-500" /> },
-           { label: "Review Status", value: "New", delta: "Marcus A.", icon: <Fingerprint className="text-brand-lime" /> },
-           { label: "SLA Deadline", value: "48h", delta: "Active Trace", icon: <Clock className="text-orange-500" /> },
-           { label: "File Format", value: "XM/S", delta: "REG-V2.1", icon: <FileText className="text-muted-foreground" /> },
-         ].map((kpi, i) => (
+         {([] as any[]).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border shadow-sm flex flex-col gap-4 font-black italic leading-none">
               <div className="flex items-center justify-between font-black italic">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center font-black h-10 leading-none">{kpi.icon}</div>

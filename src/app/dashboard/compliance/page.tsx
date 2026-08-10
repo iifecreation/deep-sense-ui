@@ -25,7 +25,8 @@ import {
   BarChart3,
   Calendar,
   UserPlus,
-  Flag
+  Flag,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -49,6 +50,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function ComplianceWorkspacePage() {
+  const [isGenerating, setIsGenerating] = React.useState(false);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const [isFiltering, setIsFiltering] = React.useState(false);
+
   return (
     <div className="flex flex-col gap-10 pb-20">
       {/* 1. PAGE HEADER */}
@@ -71,12 +76,27 @@ export default function ComplianceWorkspacePage() {
               <Plus className="w-3.5 h-3.5 mr-2" />
               Create Case
             </Button>
-            <Button variant="outline" className="h-10 px-4 text-xs font-bold uppercase tracking-widest italic">
-              <FileText className="w-3.5 h-3.5 mr-2" />
+            <Button 
+              variant="outline" 
+              className="h-10 px-4 text-xs font-bold uppercase tracking-widest italic"
+              disabled={isGenerating}
+              onClick={() => {
+                setIsGenerating(true);
+                setTimeout(() => setIsGenerating(false), 1500);
+              }}
+            >
+              {isGenerating ? <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" /> : <FileText className="w-3.5 h-3.5 mr-2" />}
               Generate Report
             </Button>
-            <Button className="h-10 px-6 bg-brand-lime text-black hover:bg-brand-lime/90 font-bold text-xs uppercase tracking-widest italic shadow-lg shadow-brand-lime/20">
-              <RefreshCcw className="w-3.5 h-3.5 mr-2" />
+            <Button 
+              className="h-10 px-6 bg-brand-lime text-black hover:bg-brand-lime/90 font-bold text-xs uppercase tracking-widest italic shadow-lg shadow-brand-lime/20"
+              disabled={isRefreshing}
+              onClick={() => {
+                setIsRefreshing(true);
+                setTimeout(() => setIsRefreshing(false), 1500);
+              }}
+            >
+              {isRefreshing ? <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" /> : <RefreshCcw className="w-3.5 h-3.5 mr-2" />}
               Refresh Data
             </Button>
           </div>
@@ -84,21 +104,24 @@ export default function ComplianceWorkspacePage() {
 
         {/* Filters Row */}
         <div className="mt-6 flex flex-wrap gap-2 items-center bg-muted/30 p-2 rounded-2xl border border-border/50">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-background rounded-xl border border-border shadow-sm">
+          <div 
+            className="flex items-center gap-2 px-3 py-1.5 bg-background rounded-xl border border-border shadow-sm cursor-pointer hover:bg-muted transition-colors"
+            onClick={() => {
+              setIsFiltering(true);
+              setTimeout(() => setIsFiltering(false), 1000);
+            }}
+          >
             <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-[10px] font-black uppercase tracking-widest italic">Date Range</span>
             <ChevronRight className="w-3 h-3 text-muted-foreground" />
-            <span className="text-[10px] font-black uppercase tracking-widest italic text-neutral-900 dark:text-white">Last 30 Days</span>
+            {isFiltering ? (
+              <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
+            ) : (
+              <span className="text-[10px] font-black uppercase tracking-widest italic text-neutral-900 dark:text-white">Last 30 Days</span>
+            )}
           </div>
           
-          {[
-            { label: "Priority", value: "All" },
-            { label: "Status", value: "Pending" },
-            { label: "Case Owner", value: "Me" },
-            { label: "Risk Level", value: "High/Critical" },
-            { label: "Alert Type", value: "All" },
-            { label: "Entity Type", value: "Corporate" },
-          ].map((filter, i) => (
+          {([] as any[]).map((filter, i) => (
             <div key={i} className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group">
               <span className="text-[10px] font-black uppercase tracking-widest italic text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                 {filter.label}: {filter.value}
@@ -123,62 +146,7 @@ export default function ComplianceWorkspacePage() {
 
       {/* 2. EXECUTIVE KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {[
-          { 
-            label: "Open AML Alerts", 
-            value: "142", 
-            delta: "+12%", 
-            trend: "up", 
-            icon: <AlertCircle className="text-red-500" />,
-            subtext: "vs yesterday",
-            href: "/dashboard/alerts"
-          },
-          { 
-            label: "High-Risk Customers", 
-            value: "842", 
-            delta: "+5", 
-            trend: "up", 
-            icon: <Users className="text-orange-500" />,
-            subtext: "new today",
-            href: "/dashboard/customer-risk"
-          },
-          { 
-            label: "Pending Screening", 
-            value: "28", 
-            delta: "-4", 
-            trend: "down", 
-            icon: <ShieldCheck className="text-indigo-500" />,
-            subtext: "reviews awaiting",
-            href: "/dashboard/screening"
-          },
-          { 
-            label: "Open Investigations", 
-            value: "56", 
-            delta: "0", 
-            trend: "neutral", 
-            icon: <Activity className="text-brand-lime" />,
-            subtext: "active cases",
-            href: "/dashboard/cases"
-          },
-          { 
-            label: "Reports Pending", 
-            value: "14", 
-            delta: "-2", 
-            trend: "down", 
-            icon: <FileText className="text-emerald-500" />,
-            subtext: "awaiting submission",
-            href: "/dashboard/reports"
-          },
-          { 
-            label: "SLA Breaches", 
-            value: "3", 
-            delta: "+1", 
-            trend: "up", 
-            icon: <Clock className="text-rose-600 animate-pulse" />,
-            subtext: "overdue items",
-            href: "/dashboard/alerts?status=overdue"
-          },
-        ].map((kpi, i) => (
+        {([] as any[]).map((kpi, i) => (
           <Link 
             key={i} 
             href={kpi.href}
@@ -240,13 +208,7 @@ export default function ComplianceWorkspacePage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[
-                  { type: "AML Alert", id: "AL-8821", entity: "Global Trade Solutions", reason: "Structuring threshold exceeded", risk: "High", due: "2h 15m", color: "text-orange-500" },
-                  { type: "Screening", id: "SC-1042", entity: "Vladislav Orlov", reason: "Sanctions list match (SDN)", risk: "Critical", due: "45m", color: "text-red-500" },
-                  { type: "Investigation", id: "CS-4029", entity: "Nexus Crypto OTC", reason: "High-volume cross-border flow", risk: "Medium", due: "1d 4h", color: "text-amber-500" },
-                  { type: "Report Draft", id: "RP-0091", entity: "SAR #44921", reason: "Filing deadline tomorrow", risk: "High", due: "5h 20m", color: "text-orange-500" },
-                  { type: "Onboarding", id: "OB-5510", entity: "Silk Road Logistics", reason: "UBO verification failed", risk: "High", due: "8h 10m", color: "text-orange-500" },
-                ].map((row, i) => (
+                {([] as any[]).map((row: any, i) => (
                   <TableRow key={i} className="group hover:bg-muted/30 transition-colors border-b border-border/50 cursor-pointer">
                     <TableCell className="px-8 py-5">
                       <Badge variant="outline" className="text-[9px] font-bold uppercase italic tracking-widest px-2 py-0.5 rounded-md">
@@ -333,11 +295,7 @@ export default function ComplianceWorkspacePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {[
-                    { id: "AL-7741", entity: "Dmitry Volkov", score: "92/100", type: "Structuring" },
-                    { id: "AL-7742", entity: "Green Oasis Inc", score: "78/100", type: "SAR Trigger" },
-                    { id: "AL-7743", entity: "Sarah O'Connell", score: "85/100", type: "Cross-Border" },
-                  ].map((alert, i) => (
+                  {([] as any[]).map((alert: any, i) => (
                     <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-4 text-xs font-black italic text-neutral-400">{alert.id}</TableCell>
                       <TableCell>
@@ -391,11 +349,7 @@ export default function ComplianceWorkspacePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {[
-                    { name: "Al-Bashir Logistics", type: "Sanctions", conf: "98%", list: "OFAC SDN" },
-                    { name: "Chen Wei", type: "PEP", conf: "84%", list: "World-Check" },
-                    { name: "Z-Group Holdings", type: "Watchlist", conf: "91%", list: "EU Freeze" },
-                  ].map((match, i) => (
+                  {([] as any[]).map((match: any, i) => (
                     <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-4">
                         <div className="text-[11px] font-black italic tracking-tight">{match.name}</div>
@@ -435,14 +389,7 @@ export default function ComplianceWorkspacePage() {
             <CardContent className="px-2">
               <ScrollArea className="h-[400px]">
                 <div className="space-y-1 px-4 pb-4">
-                  {[
-                    { name: "Ouroboros Trading", tier: "Critical", score: 94, alert: true, trend: "up" },
-                    { name: "Atlas Global Services", tier: "High", score: 82, alert: false, trend: "down" },
-                    { name: "Mirage Assets Ltd", tier: "High", score: 85, alert: true, trend: "up" },
-                    { name: "Quantum Horizon", tier: "Critical", score: 91, alert: true, trend: "up" },
-                    { name: "Silverado Partners", tier: "High", score: 79, alert: false, trend: "stable" },
-                    { name: "Elysium Wealth", tier: "High", score: 88, alert: true, trend: "up" },
-                  ].map((cust, i) => (
+                  {([] as any[]).map((cust: any, i) => (
                     <div key={i} className="flex items-center justify-between p-5 rounded-3xl hover:bg-muted/50 border border-transparent hover:border-border/50 transition-all cursor-pointer group">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-muted rounded-2xl flex items-center justify-center font-black italic text-sm group-hover:bg-brand-lime group-hover:text-black transition-colors">
@@ -487,12 +434,7 @@ export default function ComplianceWorkspacePage() {
             <CardContent className="px-2">
               <ScrollArea className="h-[400px]">
                 <div className="space-y-4 px-4 pb-4">
-                  {[
-                    { id: "CS-4011", type: "SAR Investigation", subject: "Crypto-Fiat Off-ramp Flow", owner: "James Wilson", progress: 65, priority: "High" },
-                    { id: "CS-4015", type: "EDD Review", subject: "Shell Corp Verification - BVI", owner: "Sarah Jenkins", progress: 20, priority: "Critical" },
-                    { id: "CS-4018", type: "Fraud Alert", subject: "Card Not Present Spike", owner: "Unassigned", progress: 0, priority: "High" },
-                    { id: "CS-4022", type: "Periodic Review", subject: "Annual Institutional Tier 1", owner: "James Wilson", progress: 85, priority: "Medium" },
-                  ].map((caseItem, i) => (
+                  {([] as any[]).map((caseItem: any, i) => (
                     <div key={i} className="p-6 rounded-3xl border border-border/50 bg-muted/20 hover:bg-muted/40 transition-all cursor-pointer group">
                       <div className="flex justify-between items-start mb-4">
                         <div>
@@ -515,7 +457,7 @@ export default function ComplianceWorkspacePage() {
                       <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/50">
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-full bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center text-[8px] font-black uppercase italic">
-                            {caseItem.owner.split(' ').map(n => n[0]).join('')}
+                            {caseItem.owner.split(' ').map((n: any) => n[0]).join('')}
                           </div>
                           <span className="text-[10px] font-bold text-muted-foreground italic">{caseItem.owner}</span>
                         </div>
@@ -565,12 +507,7 @@ export default function ComplianceWorkspacePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                   {[
-                     { id: "SAR-2026-004", type: "Suspicious Activity", sub: "Bitcoin OTC Wash Trading", due: "Today, 5PM", status: "Ready" },
-                     { id: "CTR-2026-081", type: "Currency Transaction", sub: "Retail Branch #44 - Cash", due: "In 2 days", status: "Draft" },
-                     { id: "AML-2026-Q1", type: "Periodic Q-Report", sub: "Institutional Annual Alpha", due: "In 4 days", status: "Pending" },
-                     { id: "SAR-2026-005", type: "Structuring Alert", sub: "Structuring - Account _8810", due: "Tomorrow, 9AM", status: "Ready" },
-                   ].map((report, i) => (
+                   {([] as any[]).map((report: any, i) => (
                     <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-5 text-xs font-black italic text-neutral-400">{report.id}</TableCell>
                       <TableCell>
@@ -604,13 +541,7 @@ export default function ComplianceWorkspacePage() {
             <CardContent className="p-0 overflow-hidden">
                <ScrollArea className="h-[400px]">
                   <div className="p-8 space-y-8">
-                     {[
-                       { type: "Case Escalated", user: "James Wilson", time: "2m ago", detail: "Escalated SAR-2026-004 to Lead Reviewer", icon: <TrendingUp className="text-orange-500" /> },
-                       { type: "Match Confirmed", user: "Sarah Jenkins", time: "14m ago", detail: "Confirmed Sanctions match for 'Al-Bashir'", icon: <Flag className="text-rose-500" /> },
-                       { type: "Report Submitted", user: "System", time: "1h ago", detail: "CTR-2026-080 auto-submitted to FINTRAC", icon: <CheckCircle2 className="text-brand-lime" /> },
-                       { type: "EDD Initiated", user: "James Wilson", time: "2h ago", detail: "Deep sense audit triggered for 'Nexus OTC'", icon: <Search className="text-indigo-500" /> },
-                       { type: "Audit Recorded", user: "Admin", time: "4h ago", detail: "Full system state audit snapshot captured", icon: <Activity className="text-neutral-400" /> },
-                     ].map((activity, i) => (
+                     {([] as any[]).map((activity, i) => (
                        <div key={i} className="flex gap-4 relative">
                           {i !== 4 && <div className="absolute left-[13px] top-8 bottom-[-32px] w-[2px] bg-border/50" />}
                           <div className="w-7 h-7 rounded-full bg-background border border-border/50 flex items-center justify-center shrink-0 z-10 shadow-sm">
@@ -676,12 +607,7 @@ export default function ComplianceWorkspacePage() {
              <h4 className="text-[10px] font-black uppercase tracking-widest italic">Team Workload Distribution</h4>
           </div>
           <div className="grid grid-cols-4 gap-4">
-             {[
-               { name: "J. Wilson", cases: 14, status: "Overloaded" },
-               { name: "S. Jenkins", cases: 8, status: "Optimal" },
-               { name: "M. Chen", cases: 22, status: "Critical" },
-               { name: "Unassigned", cases: 6, status: "Pending" },
-             ].map((analyst, i) => (
+             {([] as any[]).map((analyst, i) => (
                <div key={i} className="space-y-2">
                   <div className="flex justify-between text-[8px] font-black uppercase italic">
                      <span className="truncate">{analyst.name}</span>
@@ -726,8 +652,8 @@ export default function ComplianceWorkspacePage() {
             <div className="h-64 flex items-end gap-3 pb-4">
                {/* Mock Visualization */}
                {Array.from({ length: 24 }).map((_, i) => {
-                 const h1 = 20 + Math.random() * 60;
-                 const h2 = 30 + Math.random() * 40;
+                 const h1 = 20 + ((i * 17 + 5) % 61);
+                 const h2 = 30 + ((i * 23 + 7) % 41);
                  return (
                    <div key={i} className="flex-1 flex flex-col items-center gap-1 group">
                       <div className="w-full flex-1 flex items-end justify-center relative cursor-help">
@@ -748,14 +674,7 @@ export default function ComplianceWorkspacePage() {
           <Card className="rounded-[40px] border-border/50 bg-neutral-900 text-white p-8 h-full shadow-3xl">
              <h4 className="text-xl font-black italic uppercase tracking-tighter mb-10">Quick Actions</h4>
              <div className="space-y-3">
-                {[
-                  { label: "Create AI Case", icon: <Activity />, color: "bg-white/10 hover:bg-brand-lime hover:text-black" },
-                  { label: "Start EDD Review", icon: <UserPlus />, color: "bg-white/10 hover:bg-indigo-500" },
-                  { label: "Review Matches", icon: <ShieldCheck />, color: "bg-white/10 hover:bg-emerald-500" },
-                  { label: "Generate STR", icon: <FileText />, color: "bg-white/10 hover:bg-rose-500" },
-                  { label: "Export Audit", icon: <Download />, color: "bg-white/10 hover:bg-neutral-700" },
-                  { label: "Onboarding Queue", icon: <ExternalLink />, color: "bg-white/10 hover:bg-orange-500" },
-                ].map((action, i) => (
+                {([] as any[]).map((action, i) => (
                   <button key={i} className={`w-full p-4 rounded-2xl flex items-center gap-4 text-left transition-all group ${action.color}`}>
                      <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors">
                         {React.cloneElement(action.icon as any, { className: "w-4 h-4" })}
@@ -779,4 +698,3 @@ export default function ComplianceWorkspacePage() {
     </div>
   );
 }
-

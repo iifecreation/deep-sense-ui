@@ -6,6 +6,7 @@ import {
   Loader2, CheckCircle2, MessageSquare, ChevronRight, Inbox, HelpCircle as HelpIcon 
 } from "lucide-react";
 import { supportService, SupportTicket, SupportMessage } from "@/services/support.service";
+import { toast } from "sonner";
 
 export default function SupportPage() {
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
@@ -75,8 +76,8 @@ export default function SupportPage() {
       const list = await supportService.list();
       setTickets(list);
     } catch (err) {
-      console.error("Failed to post reply:", err);
-      alert("Could not send reply. Please try again.");
+      console.error(err);
+      toast.error("Could not send reply. Please try again.");
     } finally {
       setIsSubmittingReply(false);
     }

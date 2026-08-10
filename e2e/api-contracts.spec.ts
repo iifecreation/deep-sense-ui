@@ -12,7 +12,6 @@ test('runtime API origins normalize /api/v1 exactly once', () => {
   expect(() => normalizeApiOrigin('https://example.com/private', 'TEST_URL'))
     .toThrow('must be an API origin or end with /api/v1');
 });
-
 test('nine advanced fraud clients use registered route families', () => {
   const advanced = readFileSync(
     join(process.cwd(), 'src/services/advanced-fraud.service.ts'),

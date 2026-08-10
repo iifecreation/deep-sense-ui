@@ -152,12 +152,7 @@ export default function UserDetailPage() {
 
        {/* KPI GRID */}
        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { label: "Entity Trust Score", value: customerData.risk_score !== undefined && customerData.risk_score !== null ? 100 - customerData.risk_score : "N/A", delta: "Top 1%", icon: <ShieldCheck className="text-brand-lime" />, color: "text-brand-lime" },
-            { label: "Total Assets", value: "N/A", delta: "USD Segment", icon: <CreditCard className="text-muted-foreground" /> },
-            { label: "Active Devices", value: "N/A", delta: "Verified: 0", icon: <Smartphone className="text-indigo-500" /> },
-            { label: "Institutional KYC", value: "Level 1", delta: "Verified", icon: <BadgeCheck className="text-brand-lime" /> },
-          ].map((kpi, i) => (
+          {([] as any[]).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
@@ -191,13 +186,7 @@ export default function UserDetailPage() {
                            </div>
                         </CardHeader>
                         <CardContent className="p-0 space-y-6">
-                           {[
-                             { label: "Email Address", value: user.profile.email, icon: <Mail className="w-4 h-4" /> },
-                             { label: "Mobile Node", value: user.profile.phone, icon: <Phone className="w-4 h-4" /> },
-                             { label: "Date of Birth", value: user.profile.dob, icon: <Calendar className="w-4 h-4" /> },
-                             { label: "Residency", value: user.profile.location, icon: <MapPin className="w-4 h-4" /> },
-                             { label: "Joined Registry", value: user.joined, icon: <Clock className="w-4 h-4" /> },
-                           ].map((item, i) => (
+                           {([] as any[]).map((item, i) => (
                              <div key={i} className="flex justify-between items-center text-[11px] font-black uppercase italic tracking-widest border-b border-border/50 pb-4 last:border-0">
                                 <span className="text-muted-foreground flex items-center gap-2">{item.icon} {item.label}</span>
                                 <span className="text-neutral-900">{item.value}</span>

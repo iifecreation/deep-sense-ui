@@ -476,7 +476,7 @@ export default function TrustCenterPage() {
                         DeepSense LLM orchestration synthesizes complex multi-vector risk signals into clear, auditable natural language summaries, enabling compliance officers to instantly verify the exact rationale behind an intervention.
                       </p>
                       <div className="p-6 bg-white/5 border border-white/10 rounded-2xl space-y-3 font-mono text-xs">
-                        <div className="text-brand-lime font-bold">// AI EXPLAINABILITY SUMMARY OUTPUT:</div>
+                        <div className="text-brand-lime font-bold">{'// AI EXPLAINABILITY SUMMARY OUTPUT:'}</div>
                         <p className="text-zinc-300 leading-relaxed bg-black/40 p-4 rounded-xl border border-white/5">
                           &ldquo;High probability of synthetic identity takeover detected. User velocity exceeded 5x standard deviation across 3 unrelated merchant tenants within 14 minutes. Device fingerprint matches known emulator cluster (Hash: #882B). Action: Challenge session via biometric liveness.&rdquo;
                         </p>

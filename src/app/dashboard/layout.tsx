@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useAuth } from "@/lib/auth";
 import { useRuntimeEnvironment } from "@/hooks/use-runtime-environment";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 export default function DashboardLayout({
   children,
@@ -13,6 +14,7 @@ export default function DashboardLayout({
 }) {
   const { isAuthenticated, isLoading } = useAuth();
   const isSandbox = useRuntimeEnvironment() === "sandbox";
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -35,13 +37,20 @@ export default function DashboardLayout({
           </div>
         )}
         {/* Global Dashboard Header */}
-        <DashboardHeader />
+        <DashboardHeader onMenuClick={() => setMobileMenuOpen(true)} />
 
-        <div className="flex-1 flex flex-row gap-6 overflow-hidden">
-          {/* Global Dashboard Sidebar */}
-          <div className="w-72 shrink-0 h-full overflow-hidden">
+        <div className="flex-1 flex flex-col lg:flex-row gap-6 overflow-hidden">
+          {/* Global Dashboard Sidebar - Desktop */}
+          <div className="hidden lg:block w-72 shrink-0 h-full overflow-hidden">
             <DashboardSidebar />
           </div>
+
+          {/* Global Dashboard Sidebar - Mobile */}
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetContent side="left" className="p-0 w-72 bg-white border-none">
+              <DashboardSidebar />
+            </SheetContent>
+          </Sheet>
 
           {/* Independent Content Scroll */}
           <main className="flex-1 overflow-y-auto no-scrollbar bg-white rounded-xl border border-slate-200 shadow-sm">

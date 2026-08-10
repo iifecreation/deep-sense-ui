@@ -169,12 +169,7 @@ export default function RegulatoryReportsPage() {
             />
           </div>
           
-          {[
-            { label: "Report Type", value: "STR / CTR" },
-            { label: "Status", value: "All Active" },
-            { label: "Reviewer", value: "Assigned" },
-            { label: "Deadline", value: "This Week" },
-          ].map((filter, i) => (
+          {([] as any[]).map((filter: any, i: number) => (
             <div key={i} className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group">
               <span className="text-[10px] font-black uppercase tracking-widest italic text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                 {filter.label}: {filter.value}
@@ -191,14 +186,7 @@ export default function RegulatoryReportsPage() {
 
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {[
-          { label: "Draft Reports", value: "14", delta: "+3", trend: "up", icon: <FileText className="text-neutral-400" /> },
-          { label: "Pending Review", value: "08", delta: "+2", trend: "up", icon: <Clock className="text-orange-500" /> },
-          { label: "Ready to Submit", value: "05", delta: "+1", trend: "up", icon: <CheckCircle2 className="text-brand-lime" /> },
-          { label: "Submitted", value: "242", delta: "+12", trend: "up", icon: <Send className="text-indigo-500" /> },
-          { label: "Rejected/Returned", value: "02", delta: "-1", trend: "down", icon: <XCircle className="text-rose-500" /> },
-          { label: "Overdue Reports", value: "03", delta: "+2", trend: "up", icon: <AlertTriangle className="text-rose-600 animate-pulse" /> },
-        ].map((kpi, i) => (
+        {([] as any[]).map((kpi: any, i: number) => (
           <Link 
             key={i} 
             href={`/dashboard/reports?status=${kpi.label.toLowerCase().replace(/ /g, '-')}`}
@@ -254,12 +242,7 @@ export default function RegulatoryReportsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[
-                  { id: "STR-4491", type: "STR", case: "CASE-9921", subject: "Vladislav Orlov", status: "Ready", dead: "2h left", color: "rose" },
-                  { id: "CTR-1102", type: "CTR", case: "CASE-4402", subject: "Mercury Digital", status: "Draft", dead: "6h left", color: "orange" },
-                  { id: "STR-8812", type: "STR", case: "CASE-7712", subject: "Chen Wei", status: "Review", dead: "1d left", color: "neutral" },
-                  { id: "STR-5521", type: "STR", case: "CASE-5501", subject: "Global Assets BVI", status: "Rejected", dead: "EXPIRED", color: "rose" },
-                ].map((row, i) => (
+                {([] as any[]).map((row: any, i) => (
                   <TableRow key={i} className="group hover:bg-muted/30 transition-colors border-b border-border/50 cursor-pointer">
                     <TableCell className="px-8 py-5">
                       <Link href={`/dashboard/reports/${row.id}`} className="font-black italic text-xs underline underline-offset-4 decoration-border group-hover:decoration-neutral-900 transition-all">{row.id}</Link>
@@ -353,26 +336,26 @@ export default function RegulatoryReportsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {[
-                    { id: "STR-2291", type: "STR", entity: "Alex Reed", user: "J. Wilson", status: "Submitted", date: "Oct 12, 14:02" },
-                    { id: "STR-1104", type: "STR", entity: "Sarah Jenkins", user: "S. Miller", status: "Submitted", date: "Oct 12, 09:15" },
-                    { id: "CTR-4521", type: "CTR", entity: "Global Assets BVI", user: "J. Wilson", status: "Rejected", date: "Oct 11, 16:22" },
-                    { id: "STR-7712", type: "STR", entity: "Jordan Peterson", user: "M. Chen", status: "Submitted", date: "Oct 10, 11:30" },
-                    { id: "CTR-2201", type: "CTR", entity: "Atlas Trading", user: "S. Miller", status: "Submitted", date: "Oct 09, 15:45" },
-                  ].map((row, i) => (
-                    <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
+                  {filteredReports.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-10 text-slate-500">No reports found.</TableCell>
+                    </TableRow>
+                  ) : filteredReports.map((row: any) => (
+                    <TableRow key={row.id} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-4 font-black italic text-[11px] text-muted-foreground">{row.id}</TableCell>
-                      <TableCell className="text-[10px] font-black italic">{row.type}</TableCell>
-                      <TableCell className="text-[11px] font-black italic">{row.entity}</TableCell>
-                      <TableCell className="text-[10px] font-medium text-muted-foreground italic">{row.user}</TableCell>
+                      <TableCell className="text-[10px] font-black italic">{row.report_type || 'Unknown'}</TableCell>
+                      <TableCell className="text-[11px] font-black italic">{row.target_entity_name || row.case_id || 'Unknown'}</TableCell>
+                      <TableCell className="text-[10px] font-medium text-muted-foreground italic">{row.assignee_id || 'System'}</TableCell>
                       <TableCell className="text-center font-black italic text-[11px]">
                          <Badge variant="outline" className={`text-[8px] font-black uppercase italic tracking-widest ${
-                           row.status === 'Submitted' ? 'border-indigo-500 text-indigo-500' : 'border-rose-500 text-rose-500'
+                           row.status === 'submitted' ? 'border-indigo-500 text-indigo-500' : 
+                           row.status === 'rejected' ? 'border-rose-500 text-rose-500' : 
+                           'border-slate-500 text-slate-500'
                          }`}>
                            {row.status}
                          </Badge>
                       </TableCell>
-                      <TableCell className="px-8 text-right text-[10px] font-bold text-muted-foreground uppercase">{row.date}</TableCell>
+                      <TableCell className="px-8 text-right text-[10px] font-bold text-muted-foreground uppercase">{row.created_at ? new Date(row.created_at).toLocaleDateString() : 'N/A'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -410,10 +393,7 @@ export default function RegulatoryReportsPage() {
                  <div className="p-8 bg-neutral-900 text-white rounded-[32px] space-y-6 shadow-2xl">
                     <h5 className="text-[10px] font-black uppercase italic tracking-widest text-white/40">Suggested for Reporting</h5>
                     <div className="space-y-4">
-                       {[
-                         { case: "CASE-9921", subject: "Vladislav Orlov", reason: "Sudden account balance velocity shift" },
-                         { case: "CASE-7712", subject: "Ouroboros Holdings", reason: "Multiple UBO sanctions matches" },
-                       ].map((item, i) => (
+                       {([] as any[]).map((item, i) => (
                          <div key={i} className="flex items-center justify-between group cursor-pointer border-b border-white/5 pb-4 last:border-0 hover:translate-x-1 transition-transform">
                             <div className="space-y-1">
                                <div className="text-[12px] font-black italic tracking-tight">{item.subject}</div>
@@ -498,11 +478,7 @@ export default function RegulatoryReportsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                   {[
-                     { id: "STR-2291", reg: "FinCEN E-Filing", st: "Accepted", ref: "ACK-9921b", date: "12m ago" },
-                     { id: "STR-1104", reg: "FinCEN E-Filing", st: "Processing", ref: "QUE-8812c", date: "4h ago" },
-                     { id: "CTR-4521", reg: "goAML Center", st: "Rejected", ref: "ERR-403", date: "1d ago" },
-                   ].map((sub, i) => (
+                   {([] as any[]).map((sub: any, i) => (
                      <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                         <TableCell className="px-8 py-5 font-black italic text-[11px]">{sub.id}</TableCell>
                         <TableCell className="text-[10px] font-bold italic text-muted-foreground">{sub.reg}</TableCell>
@@ -542,18 +518,14 @@ export default function RegulatoryReportsPage() {
                <div className="flex-1 min-h-[300px] flex items-end gap-1 px-4">
                   {Array.from({ length: 24 }).map((_, i) => (
                     <div key={i} className="flex-1 bg-indigo-500/10 rounded-full relative group">
-                       <div className="absolute bottom-0 inset-x-0 bg-brand-lime transition-all group-hover:h-full rounded-full" style={{ height: `${30 + Math.random() * 70}%` }} />
-                       <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{Math.floor(Math.random() * 50)} Reports</div>
+                       <div className="absolute bottom-0 inset-x-0 bg-brand-lime transition-all group-hover:h-full rounded-full" style={{ height: `${30 + ((i * 19 + 3) % 71)}%` }} />
+                       <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{(i * 13 + 5) % 50} Reports</div>
                     </div>
                   ))}
                </div>
                
                <div className="mt-12 grid grid-cols-3 gap-8">
-                  {[
-                    { l: "Avg Submission Time", v: "1.2h" },
-                    { l: "Auto-Fill Accuracy", v: "94%" },
-                    { l: "Regulator Acceptance", v: "98.8%" },
-                  ].map((stat, i) => (
+                  {([] as any[]).map((stat, i) => (
                     <div key={i} className="space-y-1">
                        <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic">{stat.l}</div>
                        <div className="text-xl font-black italic">{stat.v}</div>
@@ -570,12 +542,7 @@ export default function RegulatoryReportsPage() {
                   <CardDescription className="text-white/40 text-[10px] font-black uppercase tracking-widest mt-1 italic">Disclosure lifecycle integrity logging</CardDescription>
                </CardHeader>
                <CardContent className="p-10 space-y-8 flex-1">
-                  {[
-                    { e: "STR-4401 Submitted", u: "J. Wilson", t: "12m ago", icon: <CheckCircle2 className="text-brand-lime" /> },
-                    { e: "Version 4 Drafted", u: "Engine", t: "3h ago", icon: <FileText className="text-white/40" /> },
-                    { e: "Review Assigned", u: "System", t: "1d ago", icon: <Users className="text-indigo-400" /> },
-                    { e: "New STR Initialized", u: "J. Wilson", t: "2d ago", icon: <Plus className="text-white/40" /> },
-                  ].map((log, i) => (
+                  {([] as any[]).map((log, i) => (
                     <div key={i} className="flex gap-4 group">
                        <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5 group-hover:border-white/20 transition-all">
                           {React.cloneElement(log.icon as any, { className: "w-3.5 h-3.5" })}
@@ -601,13 +568,7 @@ export default function RegulatoryReportsPage() {
                </CardHeader>
                <ScrollArea className="h-[300px]">
                   <div className="p-8 space-y-6">
-                     {[
-                       { l: "Report Created", t: "2m ago", c: "STR-9921" },
-                       { l: "Report Updated", t: "1h ago", c: "CTR-8810" },
-                       { l: "Review Passed", t: "3h ago", c: "STR-4522" },
-                       { l: "Report Rejected", t: "1d ago", c: "STR-1102" },
-                       { l: "Access Logged", t: "2d ago", c: "Audit Hub" },
-                     ].map((ac, i) => (
+                     {([] as any[]).map((ac, i) => (
                        <div key={i} className="flex justify-between items-center text-[10px] font-black italic tracking-tight border-b border-border/50 pb-3 last:border-0 last:pb-0">
                           <span className="text-muted-foreground">{ac.l} <span className="text-neutral-900 dark:text-white ml-2 text-[9px] uppercase tracking-widest">{ac.c}</span></span>
                           <span className="text-muted-foreground/40">{ac.t}</span>
@@ -620,14 +581,7 @@ export default function RegulatoryReportsPage() {
 
          <section className="xl:col-span-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 h-full">
-               {[
-                 { label: "Create STR", icon: <Plus />, color: "bg-neutral-900 text-white shadow-xl shadow-black/20" },
-                 { label: "Create CTR", icon: <Plus />, color: "bg-neutral-900 text-white shadow-xl shadow-black/20" },
-                 { label: "Pending Workflow", icon: <Clock />, color: "bg-orange-500 text-white shadow-xl shadow-orange-500/20" },
-                 { label: "Regulator Portal", icon: <ExternalLink />, color: "bg-indigo-600 text-white shadow-xl shadow-indigo-600/20" },
-                 { label: "Quick Submit", icon: <Zap />, color: "bg-brand-lime text-black shadow-xl shadow-brand-lime/20 font-black" },
-                 { label: "Audit Trace", icon: <ShieldCheck />, color: "bg-white border border-border/50 shadow-sm" },
-               ].map((action, i) => (
+               {([] as any[]).map((action, i) => (
                  <button key={i} className={`flex flex-col items-center justify-center gap-3 p-6 rounded-3xl font-black text-[9px] uppercase tracking-widest italic hover:scale-105 active:scale-95 transition-all group ${action.color}`}>
                     <div className="w-8 h-8 rounded-xl bg-black/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-all">
                       {React.cloneElement(action.icon as any, { className: "w-4 h-4" })}
@@ -641,4 +595,3 @@ export default function RegulatoryReportsPage() {
     </div>
   );
 }
-

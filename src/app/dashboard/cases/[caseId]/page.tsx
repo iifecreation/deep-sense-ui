@@ -188,14 +188,7 @@ export default function CaseDetailPage() {
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-         {[
-           { label: "SLA Deadline", value: investigation.sla, delta: "Case Due", icon: <Clock className="text-rose-500" />, color: "text-rose-500" },
-           { label: "Investigation Age", value: "2h 12m", delta: "Normal", icon: <History className="text-muted-foreground" /> },
-           { label: "Linked Evidence", value: investigation.stats.alerts + investigation.stats.transactions, delta: "Critical Cluster", icon: <Layers className="text-indigo-500" /> },
-           { label: "Total Exposure", value: `$${investigation.stats.totalValue}`, delta: "USD MAGNITUDE", icon: <BarChart3 className="text-orange-500" /> },
-           { label: "Analyst Owner", value: investigation.owner.split(' ')[0], delta: "Institutional", icon: <Fingerprint className="text-brand-lime" /> },
-           { label: "Report Status", value: "Pending", delta: "STR Candidate", icon: <FileCheck className="text-muted-foreground" /> },
-         ].map((kpi, i) => (
+         {([] as any[]).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>

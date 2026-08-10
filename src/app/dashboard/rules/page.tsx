@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Zap, 
   Search, 
@@ -17,7 +17,8 @@ import {
   RefreshCcw,
   PlayCircle,
   AlertTriangle,
-  RefreshCw
+  RefreshCw,
+  ChevronLeft
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,10 +30,24 @@ import { useFraudRules, useFraudRuleMetrics } from "@/hooks/use-fraud-rules";
 
 export default function RulesManagement() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const { data: rules, isLoading, isError, error, refetch } = useFraudRules({ 
-    query: { page: 1, page_size: 50, ...(statusFilter ? { status: statusFilter } : {}) },
-    filters: {}
+  const [page, setPage] = useState(1);
+  const pageSize = 15;
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, statusFilter]);
+
+  const { data: rules, total, isLoading, isError, error, refetch } = useFraudRules({ 
+    query: { page, page_size: pageSize, ...(statusFilter ? { status: statusFilter } : {}) },
+    filters: debouncedSearch ? { search: debouncedSearch } : {}
   });
   const { data: metrics } = useFraudRuleMetrics(30);
 
@@ -46,15 +61,7 @@ export default function RulesManagement() {
     }
   };
 
-  const filteredRules = rules?.filter((r: any) => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      r.id?.toLowerCase().includes(query) ||
-      r.name?.toLowerCase().includes(query) ||
-      r.description?.toLowerCase().includes(query)
-    );
-  }) || [];
+  const filteredRules = rules || [];
 
   if (isLoading) {
     return (
@@ -239,6 +246,32 @@ export default function RulesManagement() {
               ))}
             </TableBody>
           </Table>
+          
+          <div className="flex items-center justify-between px-6 py-3 border-t border-slate-100 bg-slate-50/50">
+             <div className="text-xs text-slate-500 font-medium">
+               Showing {filteredRules.length > 0 ? (page - 1) * pageSize + 1 : 0} - {Math.min(page * pageSize, total || 0)} of {total || 0} rules
+             </div>
+             <div className="flex items-center gap-2">
+               <Button 
+                 variant="outline" 
+                 size="sm" 
+                 onClick={() => setPage(p => Math.max(1, p - 1))} 
+                 disabled={page === 1}
+                 className="h-8 px-2"
+               >
+                 <ChevronLeft className="w-4 h-4 mr-1" /> Prev
+               </Button>
+               <Button 
+                 variant="outline" 
+                 size="sm" 
+                 onClick={() => setPage(p => p + 1)} 
+                 disabled={page * pageSize >= (total || 0)}
+                 className="h-8 px-2"
+               >
+                 Next <ChevronRight className="w-4 h-4 ml-1" />
+               </Button>
+             </div>
+          </div>
         </Card>
 
         {/* Logic Architect Sidebar */}
@@ -252,7 +285,7 @@ export default function RulesManagement() {
           </div>
           
           <div className="bg-black/40 rounded-lg p-4 font-mono text-emerald-400 text-[11px] leading-relaxed relative z-10 border border-white/5 space-y-1">
-            <p className="opacity-40 italic">// DSL v4.2</p>
+            <p className="opacity-40 italic">{'// DSL v4.2'}</p>
             <p><span className="text-blue-400">define</span> Rule_HighVelocity &#123;</p>
             <p className="pl-4"><span className="text-slate-500">condition:</span> txn.amt &gt; <span className="text-amber-500">10k</span></p>
             <p className="pl-4"><span className="text-slate-500">context:</span> velocity_30d &gt; <span className="text-amber-500">0.85</span></p>

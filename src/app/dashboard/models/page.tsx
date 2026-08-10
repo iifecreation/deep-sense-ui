@@ -139,7 +139,7 @@ export default function ModelsPage() {
                  {Array.from({ length: 48 }).map((_, i) => (
                    <div key={i} className="flex-1 space-y-1 group/tick flex flex-col items-center">
                       <div 
-                        style={{ height: `${Math.random() * 80 + 20}%` }} 
+                        style={{ height: `${20 + ((i * 31 + 17) % 81)}%` }}
                         className="w-full bg-white/5 rounded-full group-hover/tick:bg-brand-lime transition-all cursor-crosshair shadow-sm" 
                       />
                       {i % 12 === 0 && <span className="text-[8px] font-black text-white/20 uppercase tracking-widest mt-4 italic">Epoch {i/12}</span>}

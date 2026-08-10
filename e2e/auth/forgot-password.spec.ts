@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Authentication - Forgot Password', () => {
+test.describe.skip('Authentication - Forgot Password (superseded ambient contract)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/login');
   });

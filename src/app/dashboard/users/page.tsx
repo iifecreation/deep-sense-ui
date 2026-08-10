@@ -19,8 +19,50 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import { useCustomers } from "@/hooks/use-customers";
+import { useState } from "react";
 
 export default function CustomerRegistry() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data: customers, isLoading, isError, refetch } = useCustomers({ query: { search: searchQuery } });
+
+  const getStatusColor = (status: string) => {
+    switch ((status || '').toLowerCase()) {
+      case 'trusted':
+      case 'verified':
+        return 'bg-emerald-100 text-emerald-700 border-none';
+      case 'flagged':
+      case 'review':
+        return 'bg-amber-100 text-amber-700 border-none';
+      case 'suspended':
+      case 'rejected':
+        return 'bg-red-100 text-red-700 border-none';
+      default:
+        return 'bg-slate-100 text-slate-700 border-none';
+    }
+  };
+
+  const getRiskColor = (score: number) => {
+    if (score > 80) return 'bg-red-500 text-white border-none';
+    if (score > 40) return 'bg-amber-500 text-white border-none';
+    return 'bg-emerald-500 text-white border-none';
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 pb-20">
+        <div className="flex justify-between items-center">
+          <h1 className="text-4xl font-black italic tracking-tighter text-neutral-900 uppercase leading-none mb-2">Customer Registry.</h1>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="rounded-xl shadow-sm border bg-white h-24 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -41,11 +83,7 @@ export default function CustomerRegistry() {
 
       {/* KPI Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { label: "Total Entities", value: "14.2M", subtext: "Verified identities", icon: <Users className="text-blue-500" />, color: "border-blue-100 bg-blue-50/20" },
-          { label: "High-Risk Segment", value: "1,842", subtext: "Requires manual review", icon: <UserMinus className="text-red-500" />, color: "border-red-100 bg-red-50/20" },
-          { label: "Identity Trust Avg", value: "98.4%", subtext: "Confidence interval", icon: <UserCheck className="text-emerald-500" />, color: "border-emerald-100 bg-emerald-50/20" },
-        ].map((kpi, i) => (
+        {([] as any[]).map((kpi, i) => (
           <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
             <CardContent className="p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
@@ -66,13 +104,18 @@ export default function CustomerRegistry() {
         <div className="p-4 border-b border-slate-100 bg-slate-50/30 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative w-full md:w-80">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <Input placeholder="Search Customer ID, Email, Name..." className="pl-9 bg-white text-sm" />
+            <Input 
+              placeholder="Search Customer ID, Email, Name..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 bg-white text-sm" 
+            />
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
             <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold">
               <Filter className="w-4 h-4 mr-2" /> All Risk Tiers
             </Button>
-            <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold">
+            <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold" onClick={refetch}>
                <RefreshCcw className="w-4 h-4 mr-2" /> Refresh
             </Button>
           </div>
@@ -83,49 +126,40 @@ export default function CustomerRegistry() {
               <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-6 h-12">Customer / Entity</TableHead>
               <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center h-12">Risk Score</TableHead>
               <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center h-12">Status</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 h-12">Last Activity</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-right h-12">Volume (30d)</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 h-12">Created At</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-right h-12">Email</TableHead>
               <TableHead className="text-right pr-6 h-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {[
-              { id: "alex_reed", e: "alex@deepsense.ai", s: 12, st: "Trusted", t: "2m ago", v: "$42,800.00", initial: "AR" },
-              { id: "unknown_8102", e: "risk_shadow@tor.io", s: 94, st: "Flagged", t: "14m ago", v: "$1,200,000.00", initial: "US" },
-              { id: "mike.jones", e: "mike.jones@gmail.com", s: 22, st: "Trusted", t: "1h ago", v: "$150.00", initial: "MJ" },
-              { id: "user_49201", e: "cluster_seed@net.io", s: 82, st: "Suspended", t: "3h ago", v: "$542,200.00", initial: "U4" },
-              { id: "e_volkov", e: "elena.v@globalsecure.io", s: 64, st: "Review", t: "5h ago", v: "$8,450.00", initial: "EV" },
-            ].map((row, i) => (
-              <TableRow key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer">
+            {customers && customers.length > 0 ? customers.map((row: any) => (
+              <TableRow key={row.id} className="group hover:bg-slate-50 transition-colors cursor-pointer">
                 <TableCell className="pl-6 py-4">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-9 w-9 border border-slate-100">
-                      <AvatarFallback className="text-[11px] font-bold bg-slate-50 text-slate-500">{row.initial}</AvatarFallback>
+                      <AvatarFallback className="text-[11px] font-bold bg-slate-50 text-slate-500">
+                        {row.first_name ? row.first_name.charAt(0) : 'U'}
+                        {row.last_name ? row.last_name.charAt(0) : ''}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-900">{row.id}</span>
-                      <span className="text-[10px] font-medium text-slate-400 lowercase">{row.e}</span>
+                      <span className="text-sm font-bold text-slate-900">{row.first_name} {row.last_name}</span>
+                      <span className="text-[10px] font-medium text-slate-400 lowercase">{row.id}</span>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell className="text-center">
-                  <Badge variant="outline" className={`rounded-full px-2 py-0 border-none uppercase text-[10px] font-bold ${
-                    row.s > 80 ? 'bg-red-500 text-white' : row.s > 40 ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white'
-                  }`}>
-                    {row.s}
+                  <Badge variant="outline" className={`rounded-full px-2 py-0 uppercase text-[10px] font-bold ${getRiskColor(row.risk_score || 0)}`}>
+                    {row.risk_score || 0}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-center">
-                  <Badge variant="outline" className={`rounded-full px-2 py-0 border-none uppercase text-[10px] font-bold ${
-                    row.st === 'Trusted' ? 'bg-emerald-100 text-emerald-700' : 
-                    row.st === 'Flagged' ? 'bg-amber-100 text-amber-700' : 
-                    'bg-red-100 text-red-700'
-                  }`}>
-                    {row.st}
+                  <Badge variant="outline" className={`rounded-full px-2 py-0 uppercase text-[10px] font-bold ${getStatusColor(row.status)}`}>
+                    {row.status || 'Active'}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-xs font-medium text-slate-500">{row.t}</TableCell>
-                <TableCell className="text-right text-xs font-bold text-slate-900 pr-10">{row.v}</TableCell>
+                <TableCell className="text-xs font-medium text-slate-500">{row.created_at ? new Date(row.created_at).toLocaleDateString() : 'Unknown'}</TableCell>
+                <TableCell className="text-right text-xs font-medium text-slate-500 pr-10">{row.email || 'N/A'}</TableCell>
                 <TableCell className="text-right pr-6">
                   <Link href={`/dashboard/users/${row.id}`}>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 group-hover:text-blue-600">
@@ -134,11 +168,15 @@ export default function CustomerRegistry() {
                   </Link>
                 </TableCell>
               </TableRow>
-            ))}
+            )) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-10 text-slate-500">No customers found.</TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
         <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Showing 5 of 14.2M Entities</p>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Showing {customers?.length || 0} Entities</p>
           <div className="flex gap-2">
             <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase tracking-wider text-slate-400">Previous</Button>
             <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase tracking-wider text-slate-400">Next</Button>

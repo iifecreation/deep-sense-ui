@@ -321,12 +321,7 @@ export default function ComplianceReportsPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  { name: "AML/CFT", description: "Anti-Money Laundering and Counter-Terrorism Financing", status: "Active" },
-                  { name: "KYC", description: "Know Your Customer verification standards", status: "Active" },
-                  { name: "GDPR", description: "General Data Protection Regulation", status: "Active" },
-                  { name: "SOC 2", description: "Service Organization Control 2", status: "Draft" },
-                ].map((framework, i) => (
+                {([] as any[]).map((framework, i) => (
                   <div key={i} className="p-4 border rounded-xl hover:bg-muted/50 transition-colors">
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="font-bold text-sm">{framework.name}</h4>

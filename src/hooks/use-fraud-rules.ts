@@ -10,6 +10,7 @@ export interface UseFraudRulesOptions {
 
 export function useFraudRules(options: UseFraudRulesOptions = {}) {
   const [data, setData] = useState<any[] | null>(null);
+  const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -26,6 +27,7 @@ export function useFraudRules(options: UseFraudRulesOptions = {}) {
     try {
       const response = await fraudRulesService.listRules(query, filters);
       setData(response.items || []);
+      setTotal(response.total || 0);
     } catch (err) {
       setIsError(true);
       setError(err as Error);
@@ -39,13 +41,7 @@ export function useFraudRules(options: UseFraudRulesOptions = {}) {
     fetchRules();
   }, [enabled, JSON.stringify(query), JSON.stringify(filters)]);
 
-  return {
-    data,
-    isLoading,
-    isError,
-    error,
-    refetch: fetchRules,
-  };
+  return { data, total, isLoading, isError, error, refetch: fetchRules };
 }
 
 export function useFraudRule(ruleId: string, enabled: boolean = true) {

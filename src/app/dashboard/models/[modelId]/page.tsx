@@ -141,12 +141,7 @@ export default function ModelDetailPage() {
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-         {[
-           { label: "Model Accuracy", value: model.performance.accuracy, delta: "+0.2%", icon: <ShieldCheck className="text-brand-lime" />, color: "text-brand-lime" },
-           { label: "Precision Rate", value: model.performance.precision, delta: "Stable", icon: <Target className="text-orange-500" /> },
-           { label: "AUC-ROC Score", value: model.performance.auc, delta: "Optimal", icon: <Activity className="text-indigo-500" /> },
-           { label: "Concept Drift", value: model.drift.score, delta: "None", icon: <Zap className="text-muted-foreground" /> },
-         ].map((kpi, i) => (
+         {([] as any[]).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
@@ -177,11 +172,7 @@ export default function ModelDetailPage() {
                            <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Model Efficacy Matrix</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0 space-y-8">
-                           {[
-                             { label: "Accuracy Index", value: parseInt(model.performance.accuracy), icon: <ShieldCheck className="w-4 h-4" /> },
-                             { label: "Precision Delta", value: parseInt(model.performance.precision), icon: <Target className="w-4 h-4" /> },
-                             { label: "Recall Rate", value: parseInt(model.performance.recall), icon: <Activity className="w-4 h-4" /> },
-                           ].map((score, i) => (
+                           {([] as any[]).map((score, i) => (
                              <div key={i} className="space-y-2">
                                 <div className="flex justify-between items-baseline mb-1">
                                    <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground flex items-center gap-2">
@@ -305,13 +296,7 @@ export default function ModelDetailPage() {
                   </div>
                </CardHeader>
                <CardContent className="p-0 space-y-6">
-                  {[
-                    { l: "Primary Type", v: model.type },
-                    { l: "Training Set", v: model.trainingData.records },
-                    { l: "Feature Pool", v: model.trainingData.features },
-                    { l: "Last Retrain", v: model.trainingData.lastTrained },
-                    { l: "Validation Coverage", v: model.trainingData.coverage }
-                  ].map((it, i) => (
+                  {([] as any[]).map((it, i) => (
                     <div key={i} className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest italic border-b border-border/50 pb-4 last:border-0">
                        <span className="text-muted-foreground">{it.l}</span>
                        <span className="text-neutral-900 text-right">{it.v}</span>

@@ -119,11 +119,7 @@ export default function AlertDetailView() {
 
       {/* KPI Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { label: "Risk Magnitude", value: alert.risk_score || "N/A", subtext: "Historical context", icon: <Zap className="text-red-500" />, color: "border-red-100 bg-red-50/20" },
-          { label: "Created At", value: new Date(alert.created_at).toLocaleDateString(), subtext: new Date(alert.created_at).toLocaleTimeString(), icon: <Clock className="text-amber-500" />, color: "border-amber-100 bg-amber-50/20" },
-          { label: "Evidence Nodes", value: "04", subtext: "Verified signals", icon: <FileText className="text-blue-500" />, color: "border-blue-100 bg-blue-50/20" },
-        ].map((kpi, i) => (
+        {([] as any[]).map((kpi, i) => (
           <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
             <CardContent className="p-4 flex gap-4 items-center">
               <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
@@ -174,11 +170,7 @@ export default function AlertDetailView() {
                  <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
                     <h4 className="text-sm font-bold text-slate-900 mb-6">Subject Identity</h4>
                     <div className="space-y-4">
-                       {[
-                         { label: "Entity Name", value: alert.customer_name || "N/A", icon: <User className="w-3.5 h-3.5" /> },
-                         { label: "Customer ID", value: alert.customer_id || "N/A", icon: <Fingerprint className="w-3.5 h-3.5" /> },
-                         { label: "Risk Segment", value: "Unknown", icon: <AlertCircle className="w-3.5 h-3.5" /> },
-                       ].map((item, i) => (
+                       {([] as any[]).map((item, i) => (
                          <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest flex items-center gap-2">{item.icon} {item.label}</span>
                            <span className="text-[11px] font-bold text-slate-900">{item.value}</span>
@@ -190,11 +182,7 @@ export default function AlertDetailView() {
                  <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
                     <h4 className="text-sm font-bold text-slate-900 mb-6">Object Details</h4>
                     <div className="space-y-4">
-                       {[
-                         { label: "Transaction ID", value: alert.transaction_id || "N/A", icon: <CreditCard className="w-3.5 h-3.5" /> },
-                         { label: "Settlement Amt", value: "N/A", icon: <TrendingUp className="w-3.5 h-3.5" /> },
-                         { label: "Currency Node", value: "N/A", icon: <Globe className="w-3.5 h-3.5" /> },
-                       ].map((item, i) => (
+                       {([] as any[]).map((item, i) => (
                          <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest flex items-center gap-2">{item.icon} {item.label}</span>
                            <span className="text-[11px] font-bold text-slate-900">{item.value}</span>
@@ -245,11 +233,7 @@ export default function AlertDetailView() {
           <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
              <h4 className="text-sm font-bold text-slate-900 mb-6">Linked Intelligence</h4>
              <div className="space-y-3">
-                {[
-                  { label: "Related User", href: `/dashboard/customer-risk`, icon: <User className="w-3.5 h-3.5" /> },
-                  { label: "Device Spec", href: `/dashboard/devices`, icon: <Smartphone className="w-3.5 h-3.5" /> },
-                  { label: "KYC Snapshot", href: `/dashboard/users`, icon: <BadgeCheck className="w-3.5 h-3.5" /> },
-                ].map((link, i) => (
+                {([] as any[]).map((link, i) => (
                   <Link key={i} href={link.href} className="flex justify-between items-center p-3 rounded-lg border border-slate-50 bg-slate-50/50 hover:bg-slate-50 transition-colors">
                      <span className="text-[11px] font-bold text-slate-600 flex items-center gap-2">{link.icon} {link.label}</span>
                      <ArrowUpRight className="w-3 h-3 text-slate-400" />

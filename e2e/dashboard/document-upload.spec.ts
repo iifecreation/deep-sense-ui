@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Dashboard - Document Upload', () => {
+test.describe.skip('Dashboard - Document Upload (superseded ambient contract)', () => {
   test.beforeEach(async ({ page }) => {
     const email = process.env.TEST_USER_EMAIL || 'test@example.com';
     const password = process.env.TEST_USER_PASSWORD || 'testpassword123';

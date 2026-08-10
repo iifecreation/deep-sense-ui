@@ -28,32 +28,34 @@ export function useModels() {
 }
 
 export function useModelMetrics(modelId?: string) {
-  const [data, setData] = useState<ModelMetrics | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const [result, setResult] = useState<{
+    modelId: string;
+    data: ModelMetrics | null;
+    isError: boolean;
+  } | null>(null);
 
   useEffect(() => {
-    if (!modelId) {
-      setIsLoading(false);
-      return;
-    }
+    if (!modelId) return;
 
     let mounted = true;
     modelsService.getModelMetrics(modelId)
       .then(res => {
         if (mounted) {
-          setData(res);
-          setIsLoading(false);
+          setResult({ modelId, data: res, isError: false });
         }
       })
       .catch(() => {
         if (mounted) {
-          setIsError(true);
-          setIsLoading(false);
+          setResult({ modelId, data: null, isError: true });
         }
       });
     return () => { mounted = false; };
   }, [modelId]);
 
-  return { data, isLoading, isError };
+  const currentResult = result?.modelId === modelId ? result : null;
+  return {
+    data: currentResult?.data ?? null,
+    isLoading: Boolean(modelId && currentResult === null),
+    isError: currentResult?.isError ?? false,
+  };
 }

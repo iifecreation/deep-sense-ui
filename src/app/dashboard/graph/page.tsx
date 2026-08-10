@@ -68,15 +68,7 @@ export default function GraphIntelPage() {
                 <line x1="50%" y1="80%" x2="80%" y2="60%" />
               </g>
 
-              {[
-                { x: "20%", y: "30%", s: 40, c: "fill-brand-lime" },
-                { x: "40%", y: "50%", s: 60, c: "fill-red-500", p: true },
-                { x: "60%", y: "20%", s: 30, c: "fill-neutral-200" },
-                { x: "80%", y: "40%", s: 50, c: "fill-brand-lime" },
-                { x: "20%", y: "70%", s: 35, c: "fill-neutral-200" },
-                { x: "50%", y: "80%", s: 45, c: "fill-orange-400" },
-                { x: "80%", y: "60%", s: 55, c: "fill-brand-lime" }
-              ].map((node, i) => (
+              {([] as any[]).map((node, i) => (
                 <g key={i} className="cursor-pointer group/node">
                    <circle 
                      cx={node.x} cy={node.y} r={node.s} 
@@ -154,11 +146,7 @@ export default function GraphIntelPage() {
               <div className="space-y-8">
                  <h5 className="text-[9px] font-black uppercase tracking-widest text-neutral-400 italic">Relational Affiliations</h5>
                  <div className="space-y-4">
-                    {[
-                      { l: "Primary IP Bridge", v: "192.168.1.1", i: <Globe />, r: "RED" },
-                      { l: "Device Hardlink", v: "APPLE_M2_3910", i: <Smartphone />, r: "LIME" },
-                      { l: "Common Bank Route", v: "CHASE-INGRESS-02", i: <Database />, r: "WHITE" }
-                    ].map((link, j) => (
+                    {([] as any[]).map((link, j) => (
                       <div key={j} className="p-6 bg-zinc-50 rounded-3xl border border-neutral-100 flex items-center justify-between group/link hover:bg-white hover:shadow-xl transition-all cursor-pointer">
                          <div className="flex items-center gap-4">
                             <div className={`w-10 h-10 rounded-xl bg-white border border-neutral-100 flex items-center justify-center shadow-sm ${link.r === 'RED' ? 'text-red-500' : link.r === 'LIME' ? 'text-brand-lime shadow-md' : 'text-neutral-300'}`}>

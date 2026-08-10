@@ -13,8 +13,9 @@ export interface Webhook {
 
 export interface WebhookCreate {
   url: string;
-  events: string[];
+  event_types: string[];
   secret?: string;
+  environment?: string;
 }
 
 export interface WebhookUpdate {
@@ -36,30 +37,30 @@ export interface WebhookDelivery {
 
 export const webhooksService = {
   async list(params?: { page?: number; page_size?: number }) {
-    return await get<any>('/webhooks', { params });
+    return await get<any>('/integrations/webhooks', { params });
   },
 
   async create(data: WebhookCreate) {
-    return await post<any>('/webhooks', data);
+    return await post<any>('/integrations/webhooks', data);
   },
 
   async get(webhookId: string) {
-    return await get<any>(`/webhooks/${webhookId}`);
+    return await get<any>(`/integrations/webhooks/${webhookId}`);
   },
 
   async update(webhookId: string, data: WebhookUpdate) {
-    return await patch<any>(`/webhooks/${webhookId}`, data);
+    return await patch<any>(`/integrations/webhooks/${webhookId}`, data);
   },
 
   async delete(webhookId: string) {
-    return await del<any>(`/webhooks/${webhookId}`);
+    return await del<any>(`/integrations/webhooks/${webhookId}`);
   },
 
   async test(webhookId: string) {
-    return await post<any>(`/webhooks/${webhookId}/test`);
+    return await post<any>(`/integrations/webhooks/${webhookId}/test`);
   },
 
   async listDeliveries(webhookId: string, params?: { page?: number; page_size?: number }) {
-    return await get<any>(`/webhooks/${webhookId}/deliveries`, { params });
+    return await get<any>(`/integrations/webhooks/${webhookId}/deliveries`, { params });
   },
 };

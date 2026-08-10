@@ -158,14 +158,7 @@ export default function ScreeningMatchDetailPage() {
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-         {[
-           { label: "Confidence Index", value: match.confidence, delta: "High Probability", icon: <ShieldCheck className="text-emerald-500" /> },
-           { label: "Alert Severity", value: match.riskLevel, delta: "SDN Hit", icon: <Zap className="text-rose-500" />, color: "text-rose-500" },
-           { label: "Match Type", value: "PEP/SDN", delta: "Dual Hit", icon: <Layers className="text-indigo-500" /> },
-           { label: "Matched Fields", value: match.matchedFields.length, delta: "Forensic Data", icon: <Database className="text-muted-foreground" /> },
-           { label: "Population Hits", value: "02", delta: "Global Range", icon: <Users className="text-muted-foreground" /> },
-           { label: "Due Date", value: "14m", delta: "SLA Tracker", icon: <Clock className="text-orange-500" /> },
-         ].map((kpi, i) => (
+         {([] as any[]).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
@@ -226,12 +219,7 @@ export default function ScreeningMatchDetailPage() {
                            <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Matched Entity Profile</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0 space-y-6">
-                           {[
-                             { l: "Primary Alias", v: match.entityName, icon: <User className="w-4 h-4" /> },
-                             { l: "Match Protocol", v: match.type, icon: <Settings className="w-4 h-4" /> },
-                             { l: "Collision Source", v: match.source, icon: <Database className="w-4 h-4 text-indigo-500" /> },
-                             { l: "Confidence Level", v: match.confidence, icon: <BarChart3 className="w-4 h-4 text-brand-lime" /> },
-                           ].map((it, i) => (
+                           {([] as any[]).map((it, i) => (
                              <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic group h-10 border-b border-border last:border-0 font-black">
                                 <span className="text-muted-foreground flex items-center gap-2">{it.icon} {it.l}</span>
                                 <span className="text-neutral-900 group-hover:text-brand-lime transition-colors cursor-pointer">{it.v}</span>
@@ -304,11 +292,7 @@ export default function ScreeningMatchDetailPage() {
                      </Link>
                   </div>
                   <div className="space-y-4 font-black italic">
-                     {[
-                       { label: "List Version", value: "2026.Q4" },
-                       { label: "Update Frequency", value: "Real-time Sync" },
-                       { label: "Registry Owner", value: "US Dept of Treasury" },
-                     ].map((it, i) => (
+                     {([] as any[]).map((it, i) => (
                        <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic border-b border-neutral-50 pb-4 last:border-0 font-black">
                           <span className="text-muted-foreground">{it.label}</span>
                           <span className="text-neutral-900 font-black italic uppercase">{it.value}</span>
