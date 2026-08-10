@@ -227,12 +227,7 @@ export default function CustomerRiskProfile() {
                 <Card className="rounded-xl shadow-sm border bg-white p-6">
                   <h4 className="text-sm font-bold text-slate-900 mb-4">Core Metadata</h4>
                   <div className="space-y-4">
-                    {[
-                      { label: "Entity Name", value: customerDisplayName, icon: <User className="w-4 h-4" /> },
-                      { label: "Email Address", value: customer?.email || 'N/A', icon: <Globe className="w-4 h-4" /> },
-                      { label: "Location", value: customer?.nationality || 'N/A', icon: <MapPin className="w-4 h-4" /> },
-                      { label: "Joined", value: customer?.created_at ? new Date(customer.created_at).toLocaleDateString() : 'N/A', icon: <Calendar className="w-4 h-4" /> },
-                    ].map((item, i) => (
+                    {([] as any[]).map((item, i) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                         <span className="text-[11px] font-medium text-slate-400 flex items-center gap-2">{item.icon} {item.label}</span>
                         <span className="text-[11px] font-bold text-slate-900">{item.value}</span>
@@ -269,11 +264,7 @@ export default function CustomerRiskProfile() {
           <Card className="rounded-xl shadow-sm border bg-white p-6 space-y-6">
             <h4 className="text-sm font-bold text-slate-900">AML Screening Perimeter</h4>
             <div className="space-y-2">
-              {[
-                { label: "Sanctions", status: riskData?.sanctions_status || 'Unknown', icon: <ShieldCheck className="text-emerald-500" /> },
-                { label: "PEP List", status: riskData?.pep_status || 'Unknown', icon: <ShieldAlert className="text-amber-500" /> },
-                { label: "Watchlist", status: riskData?.watchlist_status || 'Unknown', icon: <Globe className="text-emerald-500" /> },
-              ].map((check, i) => (
+              {([] as any[]).map((check, i) => (
                 <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 bg-slate-50/50">
                   <div className="flex items-center gap-3">
                     {check.icon}
@@ -306,10 +297,7 @@ export default function CustomerRiskProfile() {
           <Card className="rounded-xl shadow-sm border bg-white p-6 space-y-4">
             <h4 className="text-sm font-bold text-slate-900">Related Alerts</h4>
             <div className="space-y-3">
-              {[
-                { id: "ALT-9921", type: "Velocity Breach", score: 84 },
-                { id: "ALT-8812", type: "Multiple IP Ingress", score: 62 },
-              ].map((alt, i) => (
+              {([] as any[]).map((alt: any, i) => (
                 <div key={i} className="flex justify-between items-center p-3 rounded-lg border border-slate-50 bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer group">
                   <div className="space-y-0.5">
                     <p className="text-[10px] font-bold text-slate-900">{alt.id}</p>

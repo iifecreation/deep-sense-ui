@@ -13,28 +13,40 @@ import {
 } from '@/types';
 import { post, get, setToken, setRefreshToken, clearTokens, getToken } from '@/lib/api/client';
 import axios from 'axios';
-import { getControlApiUrl, getRuntimeEnvironment } from '@/lib/runtime-environment';
+import { getControlApiUrl, getRuntimeEnvironment, setRuntimeEnvironment } from '@/lib/runtime-environment';
 
 export const authService = {
   /**
    * Login with email and password
    */
   async login(data: LoginRequest): Promise<TokenResponse & { challenge?: string }> {
-    const response = await axios.post<TokenResponse>(
-      `${getControlApiUrl()}/api/v1/identity/login`,
-      { ...data, environment: getRuntimeEnvironment() },
-    );
-    
-    // Store tokens only if 2FA is not required
-    if (!response.data.requires_2fa) {
-      setToken(response.data.access_token);
-      setRefreshToken(response.data.refresh_token);
+    try {
+      const response = await axios.post<TokenResponse>(
+        `${getControlApiUrl()}/api/v1/identity/login`,
+        { ...data, environment: getRuntimeEnvironment() },
+      );
+      
+      // Store tokens only if 2FA is not required
+      if (!response.data.requires_2fa) {
+        setToken(response.data.access_token);
+        setRefreshToken(response.data.refresh_token);
+      }
+      
+      return {
+        ...response.data,
+        challenge: response.headers['x-2fa-challenge']
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        const errorData = error.response.data as { message?: string };
+        if (errorData.message === "No active production workspace membership" && getRuntimeEnvironment() === "production") {
+          // Fallback to sandbox if user doesn't have a production workspace yet
+          setRuntimeEnvironment("sandbox");
+          return this.login(data);
+        }
+      }
+      throw error;
     }
-    
-    return {
-      ...response.data,
-      challenge: response.headers['x-2fa-challenge']
-    };
   },
 
   /**

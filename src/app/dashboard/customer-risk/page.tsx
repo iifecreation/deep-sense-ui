@@ -255,12 +255,7 @@ export default function CustomerRiskRegistry() {
             <PieChart className="w-5 h-5 text-slate-200" />
           </div>
           <div className="space-y-3">
-            {[
-              { label: "Critical Risk", value: customers?.filter((c: any) => c.risk_tier === 'critical').length || 0, color: "bg-red-800" },
-              { label: "High Risk", value: customers?.filter((c: any) => c.risk_tier === 'high').length || 0, color: "bg-red-500" },
-              { label: "Medium Risk", value: customers?.filter((c: any) => c.risk_tier === 'medium').length || 0, color: "bg-amber-500" },
-              { label: "Low Risk", value: customers?.filter((c: any) => c.risk_tier === 'low').length || 0, color: "bg-emerald-500" },
-            ].map((segment, i) => {
+            {([] as any[]).map((segment, i) => {
               const total = customers?.length || 1;
               const percentage = ((segment.value / total) * 100).toFixed(0);
               return (

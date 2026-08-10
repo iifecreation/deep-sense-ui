@@ -151,11 +151,7 @@ export default function DeviceDetailView() {
 
       {/* KPI Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { label: "Trust Score", value: 100 - riskScore, subtext: "Integrity: " + (riskScore < 20 ? "High" : riskScore < 60 ? "Medium" : "Low"), icon: <ShieldCheck className="text-emerald-500" />, color: "border-emerald-100 bg-emerald-50/20" },
-          { label: "Linked Accounts", value: device.linked_customers_count || customers.length, subtext: "1 primary owner", icon: <Users className="text-blue-500" />, color: "border-blue-100 bg-blue-50/20" },
-          { label: "Network Integrity", value: "Verified", subtext: info.isp || "Residential IP", icon: <Globe className="text-amber-500" />, color: "border-amber-100 bg-amber-50/20" },
-        ].map((kpi, i) => (
+        {([] as any[]).map((kpi, i) => (
           <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
             <CardContent className="p-4 flex gap-4 items-center">
               <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
@@ -186,12 +182,7 @@ export default function DeviceDetailView() {
                 <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
                   <h4 className="text-sm font-bold text-slate-900 mb-6">Hardware & OS</h4>
                   <div className="space-y-4">
-                    {[
-                      { label: "Platform", value: info.os || device.platform || 'Unknown' },
-                      { label: "Browser Engine", value: info.browser || 'Unknown' },
-                      { label: "Resolution", value: info.resolution || "2560 x 1440" },
-                      { label: "CPU Architecture", value: info.cpu || "ARM64 (M3)" },
-                    ].map((item, i) => (
+                    {([] as any[]).map((item, i) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                         <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">{item.label}</span>
                         <span className="text-[11px] font-bold text-slate-900">{item.value}</span>
@@ -203,13 +194,7 @@ export default function DeviceDetailView() {
                 <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
                   <h4 className="text-sm font-bold text-slate-900 mb-6">Network Context</h4>
                   <div className="space-y-4">
-                    {[
-                      { label: "Public IP", value: info.ip || 'Unknown' },
-                      { label: "ISP / Provider", value: info.isp || 'Unknown' },
-                      { label: "Geo City", value: info.geo || 'Unknown' },
-                      { label: "ASN Number", value: info.asn || "AS37518" },
-                      { label: "Last Sync", value: device.last_seen_at ? new Date(device.last_seen_at).toLocaleString() : (info.lastSeen || 'Unknown') },
-                    ].map((item, i) => (
+                    {([] as any[]).map((item, i) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                         <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">{item.label}</span>
                         <span className="text-[11px] font-bold text-slate-900">{item.value}</span>

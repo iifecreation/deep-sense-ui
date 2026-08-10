@@ -19,11 +19,49 @@ import {
 
 export default function RequestDemoPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    company: "",
+    jobTitle: "",
+    useCase: "",
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
-    // In a real app, this would send data to the backend/CRM
+    setIsSubmitting(true);
+    setError(null);
+    
+    try {
+      // NOTE: We assume next.config.js proxies /api to the backend
+      const response = await fetch("/api/v1/public/demo-requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name: `${formData.firstName} ${formData.lastName}`.trim(),
+          work_email: formData.email,
+          company_name: formData.company,
+          role: formData.jobTitle,
+          use_case: formData.useCase,
+          source: "demo_page",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit request");
+      }
+
+      setIsSubmitted(true);
+    } catch (err) {
+      console.error(err);
+      setError("An error occurred. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -109,14 +147,28 @@ export default function RequestDemoPage() {
                           <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">First Name</label>
                           <div className="relative">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                            <input required type="text" className="w-full bg-zinc-50 border border-zinc-200 text-neutral-900 text-sm rounded-xl focus:ring-2 focus:ring-brand-lime focus:border-transparent outline-none py-3.5 pl-11 pr-4 transition-all" placeholder="John" />
+                            <input 
+                              required 
+                              type="text" 
+                              value={formData.firstName}
+                              onChange={(e) => setFormData(p => ({ ...p, firstName: e.target.value }))}
+                              className="w-full bg-zinc-50 border border-zinc-200 text-neutral-900 text-sm rounded-xl focus:ring-2 focus:ring-brand-lime focus:border-transparent outline-none py-3.5 pl-11 pr-4 transition-all" 
+                              placeholder="John" 
+                            />
                           </div>
                         </div>
                         <div className="space-y-1.5">
                           <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Last Name</label>
                           <div className="relative">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                            <input required type="text" className="w-full bg-zinc-50 border border-zinc-200 text-neutral-900 text-sm rounded-xl focus:ring-2 focus:ring-brand-lime focus:border-transparent outline-none py-3.5 pl-11 pr-4 transition-all" placeholder="Doe" />
+                            <input 
+                              required 
+                              type="text" 
+                              value={formData.lastName}
+                              onChange={(e) => setFormData(p => ({ ...p, lastName: e.target.value }))}
+                              className="w-full bg-zinc-50 border border-zinc-200 text-neutral-900 text-sm rounded-xl focus:ring-2 focus:ring-brand-lime focus:border-transparent outline-none py-3.5 pl-11 pr-4 transition-all" 
+                              placeholder="Doe" 
+                            />
                           </div>
                         </div>
                       </div>
@@ -125,7 +177,14 @@ export default function RequestDemoPage() {
                         <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Work Email</label>
                         <div className="relative">
                           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                          <input required type="email" className="w-full bg-zinc-50 border border-zinc-200 text-neutral-900 text-sm rounded-xl focus:ring-2 focus:ring-brand-lime focus:border-transparent outline-none py-3.5 pl-11 pr-4 transition-all" placeholder="john@company.com" />
+                          <input 
+                            required 
+                            type="email" 
+                            value={formData.email}
+                            onChange={(e) => setFormData(p => ({ ...p, email: e.target.value }))}
+                            className="w-full bg-zinc-50 border border-zinc-200 text-neutral-900 text-sm rounded-xl focus:ring-2 focus:ring-brand-lime focus:border-transparent outline-none py-3.5 pl-11 pr-4 transition-all" 
+                            placeholder="john@company.com" 
+                          />
                         </div>
                       </div>
 
@@ -133,7 +192,14 @@ export default function RequestDemoPage() {
                         <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Company Name</label>
                         <div className="relative">
                           <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                          <input required type="text" className="w-full bg-zinc-50 border border-zinc-200 text-neutral-900 text-sm rounded-xl focus:ring-2 focus:ring-brand-lime focus:border-transparent outline-none py-3.5 pl-11 pr-4 transition-all" placeholder="Acme Corp" />
+                          <input 
+                            required 
+                            type="text" 
+                            value={formData.company}
+                            onChange={(e) => setFormData(p => ({ ...p, company: e.target.value }))}
+                            className="w-full bg-zinc-50 border border-zinc-200 text-neutral-900 text-sm rounded-xl focus:ring-2 focus:ring-brand-lime focus:border-transparent outline-none py-3.5 pl-11 pr-4 transition-all" 
+                            placeholder="Acme Corp" 
+                          />
                         </div>
                       </div>
 
@@ -141,7 +207,13 @@ export default function RequestDemoPage() {
                         <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Job Title</label>
                         <div className="relative">
                           <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                          <input type="text" className="w-full bg-zinc-50 border border-zinc-200 text-neutral-900 text-sm rounded-xl focus:ring-2 focus:ring-brand-lime focus:border-transparent outline-none py-3.5 pl-11 pr-4 transition-all" placeholder="Head of Risk, Compliance Manager..." />
+                          <input 
+                            type="text" 
+                            value={formData.jobTitle}
+                            onChange={(e) => setFormData(p => ({ ...p, jobTitle: e.target.value }))}
+                            className="w-full bg-zinc-50 border border-zinc-200 text-neutral-900 text-sm rounded-xl focus:ring-2 focus:ring-brand-lime focus:border-transparent outline-none py-3.5 pl-11 pr-4 transition-all" 
+                            placeholder="Head of Risk, Compliance Manager..." 
+                          />
                         </div>
                       </div>
 
@@ -149,7 +221,11 @@ export default function RequestDemoPage() {
                         <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Primary Use Case</label>
                         <div className="relative">
                           <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                          <select className="w-full bg-zinc-50 border border-zinc-200 text-neutral-900 text-sm rounded-xl focus:ring-2 focus:ring-brand-lime focus:border-transparent outline-none py-3.5 pl-11 pr-4 transition-all appearance-none cursor-pointer">
+                          <select 
+                            value={formData.useCase}
+                            onChange={(e) => setFormData(p => ({ ...p, useCase: e.target.value }))}
+                            className="w-full bg-zinc-50 border border-zinc-200 text-neutral-900 text-sm rounded-xl focus:ring-2 focus:ring-brand-lime focus:border-transparent outline-none py-3.5 pl-11 pr-4 transition-all appearance-none cursor-pointer"
+                          >
                             <option value="">Select a use case...</option>
                             <option value="fraud">Fraud Detection & Prevention</option>
                             <option value="aml">AML Transaction Monitoring</option>
@@ -160,9 +236,19 @@ export default function RequestDemoPage() {
                         </div>
                       </div>
 
-                      <button type="submit" className="w-full mt-4 py-4 bg-neutral-900 text-white rounded-xl font-bold text-lg hover:bg-neutral-800 transition-all group flex items-center justify-center gap-2">
-                        Get Your Demo
-                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      {error && (
+                        <div className="text-red-500 text-sm bg-red-50 border border-red-200 p-3 rounded-lg">
+                          {error}
+                        </div>
+                      )}
+
+                      <button 
+                        type="submit" 
+                        disabled={isSubmitting}
+                        className="w-full mt-4 py-4 bg-neutral-900 text-white rounded-xl font-bold text-lg hover:bg-neutral-800 transition-all group flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isSubmitting ? "Submitting..." : "Get Your Demo"}
+                        {!isSubmitting && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
                       </button>
                       
                       <p className="text-[10px] text-zinc-400 text-center mt-2 px-4">

@@ -172,11 +172,7 @@ export default function IntegrationsPage() {
             />
           </div>
           
-          {[
-            { label: "Type", value: "All Systems" },
-            { label: "Status", value: "Active" },
-            { label: "Environment", value: "Production" },
-          ].map((filter, i) => (
+          {([] as any[]).map((filter: any, i: number) => (
             <div key={i} className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group border border-transparent hover:border-border font-black shadow-sm font-bold h-10">
               <span className="text-[10px] font-black uppercase tracking-widest italic text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                 {filter.label}: {filter.value}
@@ -193,14 +189,7 @@ export default function IntegrationsPage() {
 
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 font-black">
-        {[
-          { label: "Active Connections", value: "18", delta: "Normal", icon: <Server className="text-neutral-400" /> },
-          { label: "Critical Failures", value: "01", delta: "+1", icon: <AlertTriangle className="text-rose-500 animate-pulse h-5 w-5 font-black uppercase leading-tight italic" /> },
-          { label: "Webhook Success", value: "99.2%", delta: "-0.4%", icon: <Webhook className="text-brand-lime shadow-lg shadow-brand-lime/10" /> },
-          { label: "API Requests", value: "4.2M", delta: "+15%", icon: <Zap className="text-indigo-500 font-black h-5 w-5 uppercase leading-tight italic" /> },
-          { label: "Ingestion Rate", value: "842e/s", delta: "Peak", icon: <Database className="text-orange-500 font-black h-5 w-5 uppercase leading-tight italic" /> },
-          { label: "Avg Latency", value: "12ms", delta: "-2ms", icon: <Cpu className="text-emerald-500 font-black h-5 w-5 uppercase leading-tight italic" /> },
-        ].map((kpi, i) => (
+        {([] as any[]).map((kpi: any, i: number) => (
           <div 
             key={i} 
             className="flex flex-col gap-4 p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-xl shadow-black/5 hover:border-brand-lime hover:translate-y-[-4px] transition-all group cursor-pointer font-black"
@@ -231,7 +220,7 @@ export default function IntegrationsPage() {
           <CardHeader className="p-8 border-b border-border/50 flex flex-row items-center justify-between space-y-0 font-black italic font-bold">
             <div>
               <CardTitle className="text-xl font-black italic uppercase tracking-tighter shadow-sm font-black italic">Connected Systems</CardTitle>
-              <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-1 italic text-muted-foreground shadow-sm">Master registry of institutional and internal endpoints</CardDescription>
+              <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-1 italic text-muted-foreground shadow-sm font-black italic">Master registry of institutional and internal endpoints</CardDescription>
             </div>
             <div className="flex gap-2">
                <Button variant="outline" className="h-8 text-[9px] font-black uppercase italic border-border shadow-sm font-black italic font-bold">Test All Connections</Button>
@@ -251,13 +240,13 @@ export default function IntegrationsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody className="font-black italic font-bold text-neutral-900">
-                {[
-                  { name: "Fintech Core Gateway", id: "INT-880", type: "Core Banking", status: "HEALTHY", uptime: "99.98%", sync: "12s ago", env: "Production" },
-                  { name: "Stripe Connect Hub", id: "INT-442", type: "Payments", status: "DEGRADED", uptime: "98.42%", sync: "1m ago", env: "Production" },
-                  { name: "Global KYC Provider", id: "INT-112", type: "Identity", status: "HEALTHY", uptime: "100%", sync: "4s ago", env: "Production" },
-                  { name: "Internal Data Pipeline", id: "INT-001", type: "Analytics", status: "HEALTHY", uptime: "99.99%", sync: "Now", env: "Sandbox" },
-                  { name: "Twilio Auth Node", id: "INT-552", type: "Security", status: "DISABLED", uptime: "0.00%", sync: "2d ago", env: "Production" },
-                ].map((row, i) => (
+                {filteredIntegrations.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
+                      No integrations found.
+                    </TableCell>
+                  </TableRow>
+                ) : filteredIntegrations.map((row: any, i: number) => (
                   <TableRow key={i} className="group hover:bg-muted border-b border-border/50 transition-colors cursor-pointer font-black italic font-bold text-neutral-900 shadow-sm leading-none h-20">
                     <TableCell className="px-8 py-5">
                        <Link href={`/dashboard/integrations/${row.id}`} className="flex flex-col font-black italic font-bold text-neutral-900 shadow-sm leading-none">
@@ -274,12 +263,12 @@ export default function IntegrationsPage() {
                        </div>
                     </TableCell>
                     <TableCell className="text-center font-black italic font-bold text-neutral-900 shadow-sm leading-none h-4">
-                       <span className="text-[12px] font-black italic tracking-tighter h-4 leading-none uppercase">{row.uptime}</span>
+                       <span className="text-[12px] font-black italic tracking-tighter h-4 leading-none uppercase">{row.uptime || "100%"}</span>
                     </TableCell>
-                    <TableCell className="text-[10px] font-black text-muted-foreground uppercase italic h-4 leading-none h-full">{row.sync}</TableCell>
+                    <TableCell className="text-[10px] font-black text-muted-foreground uppercase italic h-4 leading-none h-full">{row.updated_at ? new Date(row.updated_at).toLocaleDateString() : "Just now"}</TableCell>
                     <TableCell>
                        <Badge variant="outline" className={`text-[9px] font-black uppercase italic tracking-widest border-border/50 font-black italic font-bold text-neutral-900 h-4 leading-none h-full shadow-sm`}>
-                         {row.env}
+                         {row.env || "Production"}
                        </Badge>
                     </TableCell>
                     <TableCell className="px-8 text-right font-black italic font-bold text-neutral-900 shadow-sm leading-none h-4">
@@ -328,12 +317,7 @@ export default function IntegrationsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className="font-black italic font-bold text-neutral-900">
-                  {[
-                    { url: "https://api.deepsense.ai/hooks/payments", event: "transaction.created", status: "SUCCESS", code: "200 OK", time: "2m ago" },
-                    { url: "https://api.deepsense.ai/hooks/kyc", event: "identity.verified", status: "FAILED", code: "502 BAD", time: "12m ago" },
-                    { url: "https://api.deepsense.ai/hooks/auth", event: "session.started", status: "SUCCESS", code: "200 OK", time: "1h ago" },
-                    { url: "https://api.deepsense.ai/hooks/alerts", event: "risk.detected", status: "SUCCESS", code: "201 CRE", time: "4h ago" },
-                  ].map((hook, i) => (
+                  {([] as any[]).map((hook: any, i: number) => (
                     <TableRow key={i} className="group hover:bg-muted border-b border-border/50 transition-colors cursor-pointer font-black italic font-bold text-neutral-900 shadow-sm leading-none h-20 h-full"> 
                       <TableCell className="px-10 py-5 font-black italic font-bold text-neutral-900 shadow-sm leading-none h-4">
                          <div className="flex flex-col font-black italic font-bold text-neutral-900 shadow-sm leading-none">
@@ -385,11 +369,7 @@ export default function IntegrationsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className="font-black italic font-bold text-white">
-                  {[
-                    { name: "PROD-WRITE-MAIN", key: "•••• •••• •••• 9921", used: "4m ago", status: "Active", perms: "Admin" },
-                    { name: "SANDBOX-READ-DEMO", key: "•••• •••• •••• 1102", used: "1d ago", status: "Active", perms: "Read" },
-                    { name: "API-GATEWAY-TLS", key: "•••• •••• •••• 4421", used: "In Use", status: "Active", perms: "Gateway" },
-                  ].map((key, i) => (
+                  {([] as any[]).map((key: any, i: number) => (
                     <TableRow key={i} className="group hover:bg-white/5 border-b border-white/5 transition-colors cursor-pointer font-black italic font-bold h-20 h-full"> 
                       <TableCell className="px-10 py-5 font-black italic font-bold text-white leading-none h-4">
                          <div className="flex flex-col font-black italic font-bold text-white leading-none h-12">
@@ -429,11 +409,7 @@ export default function IntegrationsPage() {
                </div>
                
                <div className="space-y-10 flex-1 font-black italic font-bold">
-                  {[
-                    { label: "Transaction Core Feed", value: 842, limit: 1000, color: "bg-orange-500", unit: "e/s" },
-                    { label: "Identity Sync Stream", value: 44, limit: 100, color: "bg-indigo-500", unit: "e/s" },
-                    { label: "Ingestion Backlog Area", value: 12, limit: 100, color: "bg-neutral-900", unit: "%" },
-                  ].map((stream, i) => (
+                  {([] as any[]).map((stream: any, i: number) => (
                     <div key={i} className="space-y-3 font-black italic font-bold">
                        <div className="flex justify-between items-baseline font-black italic font-bold">
                           <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground font-black italic font-bold h-4 leading-none uppercase">{stream.label}</span>
@@ -482,12 +458,7 @@ export default function IntegrationsPage() {
                               </TableRow>
                            </TableHeader>
                            <TableBody className="font-black italic font-bold text-neutral-900">
-                              {[
-                                { id: "ERR-9912", component: "Stripe Connect", msg: "TLS Handshake Timeout", time: "2m ago", risk: "CRITICAL" },
-                                { id: "ERR-4401", component: "Global KYC", msg: "Rate Limit Exceeded (Tier 2)", time: "12m ago", risk: "WARNING" },
-                                { id: "ERR-0012", component: "Auth Node B", msg: "Missing X-API-Signature Header", time: "1h ago", risk: "MINOR" },
-                                { id: "ERR-7721", component: "Ingestion Hub", msg: "Malformed Payload Schema", time: "4h ago", risk: "WARNING" },
-                              ].map((err, i) => (
+                              {([] as any[]).map((err: any, i: number) => (
                                 <TableRow key={i} className="group hover:bg-rose-500/5 border-b border-border/50 transition-colors cursor-pointer font-black italic font-bold h-20 h-full"> 
                                  <TableCell className="px-10 py-5 font-black italic font-bold text-neutral-900 leading-none h-4">
                                     <div className="flex flex-col font-black italic font-bold text-neutral-900 leading-none h-12">
@@ -537,19 +508,14 @@ export default function IntegrationsPage() {
                <div className="flex-1 min-h-[240px] flex items-end gap-1 px-4 mb-8 font-black italic font-bold">
                   {Array.from({ length: 30 }).map((_, i) => (
                     <div key={i} className="flex-1 bg-muted/30 rounded-full relative group font-black italic font-bold">
-                       <div className="absolute bottom-0 inset-x-0 bg-neutral-900 transition-all group-hover:bg-brand-lime rounded-full h-full" style={{ height: `${20 + Math.random() * 80}%` }} />
-                       <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-black italic font-bold">{Math.floor(Math.random() * 50)}k Req</div>
+                       <div className="absolute bottom-0 inset-x-0 bg-neutral-900 transition-all group-hover:bg-brand-lime rounded-full h-full" style={{ height: `${20 + ((i * 29 + 13) % 81)}%` }} />
+                       <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-black italic font-bold">{(i * 11 + 7) % 50}k Req</div>
                     </div>
                   ))}
                </div>
                
                <div className="grid grid-cols-4 gap-8 border-t border-border/50 pt-8 italic font-black font-black italic font-bold">
-                  {[
-                    { l: "Success Rate", v: "99.98%" },
-                    { l: "Delivery Success", v: "99.2%" },
-                    { l: "Ingestion Peak", v: "1.2k/s" },
-                    { l: "Avg Latency", v: "12ms" },
-                  ].map((stat, i) => (
+                  {([] as any[]).map((stat: any, i: number) => (
                     <div key={i} className="space-y-1 font-black italic font-bold">
                        <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic leading-none font-black italic font-bold uppercase h-3 leading-none h-full">{stat.l}</div>
                        <div className="text-xl font-black italic font-black italic font-bold h-5 leading-none h-full uppercase">{stat.v}</div>
@@ -562,13 +528,7 @@ export default function IntegrationsPage() {
          {/* 11. QUICK ACTIONS & ACTIVITY */}
          <section className="xl:col-span-1 h-full font-black italic font-bold">
             <div className="flex flex-col gap-4 h-full font-black italic font-bold h-full">
-               {[
-                 { label: "Initialize Integration", icon: <Plug />, color: "bg-neutral-900 text-white shadow-2xl shadow-black/20" },
-                 { label: "New API Gateway Key", icon: <Key />, color: "bg-indigo-600 text-white shadow-2xl shadow-indigo-600/20" },
-                 { label: "Retry Failed Hooks", icon: <Webhook />, color: "bg-white border border-border shadow-sm text-neutral-900 h-14" },
-                 { label: "Diagnostic Health Check", icon: <ShieldCheck />, color: "bg-white border border-border shadow-sm text-neutral-900 h-14" },
-                 { label: "Emergency Flush", icon: <Zap />, color: "bg-brand-lime text-black font-black" },
-               ].map((action, i) => (
+               {([] as any[]).map((action, i) => (
                  <button key={i} className={`flex-1 p-6 rounded-3xl font-black text-[10px] uppercase tracking-widest italic hover:scale-[1.03] active:scale-95 transition-all group flex items-center justify-between min-h-[80px] h-20 ${action.color}`}>
                     <div className="flex items-center gap-4 font-black italic font-bold">
                        <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center shrink-0 group-hover:scale-110 transition-all font-black italic font-bold">
@@ -585,4 +545,3 @@ export default function IntegrationsPage() {
     </div>
   );
 }
-

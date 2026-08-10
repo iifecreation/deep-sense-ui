@@ -200,9 +200,7 @@ export default function OnboardingReviewDetailPage() {
                         </div>
                      </TabsContent>
                      <TabsContent value="screening" className="m-0 p-10 space-y-10 leading-none">
-                        {[
-                          { category: "Sanctions", result: review.screening_status === 'MATCH' ? "Match Detected" : "Clear", score: 94, details: review.screening_status === 'MATCH' ? "Matches detected in screening engine." : "No matches found across global lists." },
-                        ].map((scr, i) => (
+                        {([] as any[]).map((scr, i) => (
                            <div key={i} className="flex gap-8 items-start last:mb-0 group font-bold italic font-black">
                               <div className={`w-12 h-12 rounded-[20px] flex items-center justify-center shrink-0 border ${
                                 scr.result === 'Match Detected' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : scr.result === 'Warning' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' : 'bg-brand-lime/10 border-brand-lime/20 text-brand-lime'
@@ -252,9 +250,7 @@ export default function OnboardingReviewDetailPage() {
                <div className="space-y-6 leading-none">
                   <h5 className="text-[11px] font-black uppercase italic tracking-widest text-muted-foreground leading-none">Primary Risk Factors</h5>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     {[
-                       { f: `Jurisdiction: ${review.jurisdiction || 'Unknown'}`, s: "Variable", icon: <Globe className="text-rose-500" /> },
-                     ].map((factor, i) => (
+                     {([] as any[]).map((factor, i) => (
                        <div key={i} className="flex items-center gap-4 p-5 bg-muted/20 border border-border/50 rounded-3xl group hover:bg-muted font-bold italic h-16 leading-none whitespace-nowrap">
                           <div className="w-8 h-8 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center shrink-0">
                              {React.cloneElement(factor.icon as any, { className: "w-3.5 h-3.5" })}
@@ -302,10 +298,7 @@ export default function OnboardingReviewDetailPage() {
                </CardHeader>
                <CardContent className="p-0 space-y-8">
                   <div className="space-y-6">
-                     {[
-                       { l: "Jurisdiction", v: review.jurisdiction || "Unknown" },
-                       { l: "Type", v: review.customer_type || "N/A" },
-                     ].map((info, i) => (
+                     {([] as any[]).map((info, i) => (
                        <div key={i} className="space-y-1">
                           <div className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground italic mb-1 h-3">{info.l}</div>
                           <div className="text-[13px] font-black italic tracking-tighter h-5">{info.v}</div>

@@ -156,14 +156,7 @@ export default function AuditEventDetailPage() {
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 font-black italic leading-none">
-         {[
-           { label: "Entity Resolution", value: event.entity_type, delta: event.entity_id, icon: <Box className="text-muted-foreground" />, color: "text-neutral-900" },
-           { label: "Execution User", value: event.actor_id.substring(0,6), delta: "Actor", icon: <Fingerprint className="text-brand-lime" /> },
-           { label: "Event Pulse", value: event.event_type, delta: "Layer 4", icon: <Layers className="text-indigo-500" /> },
-           { label: "Timestamp", value: new Date(event.created_at).toLocaleTimeString(), delta: "UTC", icon: <Clock className="text-orange-500" /> },
-           { label: "Security Mesh", value: "SHA-256", delta: "Signed", icon: <Key className="text-muted-foreground" /> },
-           { label: "Verification", value: "100%", delta: "Immutable", icon: <ShieldCheck className="text-emerald-500" /> },
-         ].map((kpi, i) => (
+         {([] as any[]).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border shadow-sm flex flex-col gap-4 font-black italic leading-none h-fit">
               <div className="flex items-center justify-between font-black italic">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center font-black h-10 leading-none">{kpi.icon}</div>
@@ -258,10 +251,7 @@ export default function AuditEventDetailPage() {
                   </div>
                </div>
                <div className="pt-6 border-t border-border space-y-4 font-black italic">
-                  {[
-                    { l: "User ID", v: event.actor_id },
-                    { l: "Session State", v: "Authenticated" },
-                  ].map((it, i) => (
+                  {([] as any[]).map((it, i) => (
                     <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic font-black h-4 leading-none truncate">
                        <span className="text-muted-foreground mr-2">{it.l}</span>
                        <span className="text-neutral-900 font-black italic uppercase truncate">{it.v}</span>

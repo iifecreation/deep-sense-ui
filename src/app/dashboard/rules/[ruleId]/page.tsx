@@ -147,12 +147,7 @@ export default function RuleDetailPage() {
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-         {[
-           { label: "Execution Precision", value: rule.metrics.precision, delta: "Stable", icon: <ShieldCheck className="text-brand-lime" />, color: "text-brand-lime" },
-           { label: "Rule Hits (30d)", value: rule.metrics.totalHits, delta: "+12.4%", icon: <Zap className="text-orange-500" /> },
-           { label: "Compute Impact", value: rule.metrics.avgExecutionTime, delta: "High Perf", icon: <Activity className="text-indigo-500" /> },
-           { label: "Linked Alerts", value: rule.linkedAlerts.length, delta: "02 Active", icon: <AlertTriangle className="text-muted-foreground" /> },
-         ].map((kpi, i) => (
+         {([] as any[]).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
@@ -211,11 +206,7 @@ export default function RuleDetailPage() {
                            <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Statistical Efficacy</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0 space-y-8">
-                           {[
-                             { label: "Precision Rate", value: rule.metrics.precision, icon: <ShieldCheck className="w-4 h-4" /> },
-                             { label: "Recall Rate", value: rule.metrics.recall, icon: <Activity className="w-4 h-4" /> },
-                             { label: "False Positive Ratio", value: rule.metrics.falsePositiveRate, icon: <Zap className="text-indigo-500 w-4 h-4" /> },
-                           ].map((score, i) => (
+                           {([] as any[]).map((score, i) => (
                              <div key={i} className="space-y-2">
                                 <div className="flex justify-between items-baseline mb-1">
                                    <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground flex items-center gap-2">
@@ -307,12 +298,7 @@ export default function RuleDetailPage() {
                   <CardTitle className="text-xl font-black italic uppercase tracking-tighter">Diagnostics</CardTitle>
                </CardHeader>
                <CardContent className="p-0 space-y-6">
-                  {[
-                    { l: "Last Triggered", v: rule.lastTriggered },
-                    { l: "Author Node", v: rule.author },
-                    { l: "Version Ingress", v: rule.version },
-                    { l: "Policy ID", v: "POL-88219-X" }
-                  ].map((it, i) => (
+                  {([] as any[]).map((it, i) => (
                     <div key={i} className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest italic border-b border-border/50 pb-4 last:border-0">
                        <span className="text-muted-foreground">{it.l}</span>
                        <span className="text-neutral-900">{it.v}</span>

@@ -12,62 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 
 export default function AdvancedFraudPage() {
-  const integratedModules = [
-    { module: "APP Scam Prevention", routes: [
-      "POST /app-scams/score-payment",
-      "GET /app-scams/signals",
-      "GET /app-scams/beneficiaries/:identifier/risk",
-      "POST /app-scams/interventions"
-    ]},
-    { module: "Account Takeover", routes: [
-      "POST /ato/login-event",
-      "POST /ato/session-event",
-      "GET /ato/risk/:accountId",
-      "GET /ato/signals"
-    ]},
-    { module: "Bot Detection", routes: [
-      "POST /bot/events",
-      "GET /bot/sessions/:sessionId/risk",
-      "GET /bot/signals",
-      "GET /bot/entities/:entityType/:entityId/risk"
-    ]},
-    { module: "Deepfake Detection", routes: [
-      "POST /biometrics/deepfake-check",
-      "POST /biometrics/deepfake-check/upload",
-      "GET /biometrics/deepfake-checks",
-      "GET /biometrics/deepfake-model/status"
-    ]},
-    { module: "Synthetic Identity Detection", routes: [
-      "POST /identity-risk/check",
-      "GET /identity-risk/profiles/:customerId",
-      "GET /identity-risk/signals",
-      "POST /identity-risk/provider-checks"
-    ]},
-    { module: "Friendly Fraud Detection", routes: [
-      "POST /friendly-fraud/disputes",
-      "POST /friendly-fraud/refunds",
-      "GET /friendly-fraud/customers/:customerId/risk",
-      "GET /friendly-fraud/signals"
-    ]},
-    { module: "CNP Advanced", routes: [
-      "POST /cnp/transactions",
-      "POST /cnp/checkout-events",
-      "POST /cnp/score",
-      "GET /cnp/signals"
-    ]},
-    { module: "Real-time Interventions", routes: [
-      "POST /interventions/evaluate",
-      "POST /interventions/execute",
-      "GET /interventions/policies",
-      "POST /interventions/policies"
-    ]},
-    { module: "UEBA", routes: [
-      "GET /ueba/events",
-      "GET /ueba/anomalies",
-      "POST /ueba/baselines/compute",
-      "GET /ueba/dashboard"
-    ]}
-  ];
+  const integratedModules: any[] = [];
 
   return (
     <div className="flex flex-col gap-10 pb-20 max-w-5xl mx-auto mt-10">
@@ -108,7 +53,7 @@ export default function AdvancedFraudPage() {
             </CardHeader>
             <CardContent className="p-0">
               <ul className="divide-y divide-border/50 font-mono text-sm">
-                {mod.routes.map((route, rIdx) => {
+                {mod.routes?.map((route: string, rIdx: number) => {
                   const [method, path] = route.split(' ');
                   const methodColor = 
                     method === 'GET' ? 'text-blue-500' :

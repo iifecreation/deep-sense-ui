@@ -148,12 +148,7 @@ export default function AuditTrailsPage() {
             />
           </div>
           
-          {[
-            { label: "Date Range", value: "Last 24h" },
-            { label: "Action Type", value: "All Events" },
-            { label: "User", value: "Everyone" },
-            { label: "Severity", value: "Critical Only" },
-          ].map((filter, i) => (
+          {([] as any[]).map((filter, i) => (
             <div key={i} className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group border border-transparent hover:border-border">
               <span className="text-[10px] font-black uppercase tracking-widest italic text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                 {filter.label}: {filter.value}
@@ -170,14 +165,7 @@ export default function AuditTrailsPage() {
 
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {[
-          { label: "Total Events", value: summary.total_events || auditData?.total || 0, delta: "+1.2k", icon: <Database className="text-neutral-400 font-bold" /> },
-          { label: "User Actions", value: summary.events_by_type?.USER_ACTION || 0, delta: "+12", icon: <Users className="text-brand-lime" /> },
-          { label: "Critical Events", value: summary.critical_events || 0, delta: "+2", icon: <AlertTriangle className="text-rose-500 animate-pulse" /> },
-          { label: "Config Changes", value: summary.events_by_type?.SYSTEM || 0, delta: "+1", icon: <Settings className="text-orange-500 font-bold" /> },
-          { label: "Report Actions", value: summary.events_by_type?.COMPLIANCE || 0, delta: "-5", icon: <FileText className="text-indigo-500 font-bold" /> },
-          { label: "Security Events", value: summary.events_by_type?.SECURITY || 0, delta: "+4", icon: <ShieldAlert className="text-rose-600 font-bold" /> },
-        ].map((kpi, i) => (
+        {([] as any[]).map((kpi, i) => (
           <div 
             key={i} 
             className="flex flex-col gap-4 p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-xl shadow-black/5 hover:border-brand-lime hover:translate-y-[-4px] transition-all group cursor-pointer"
@@ -490,19 +478,14 @@ export default function AuditTrailsPage() {
                <div className="flex-1 min-h-[240px] flex items-end gap-1 px-4 mb-8">
                   {Array.from({ length: 30 }).map((_, i) => (
                     <div key={i} className="flex-1 bg-muted/30 rounded-full relative group">
-                       <div className="absolute bottom-0 inset-x-0 bg-neutral-900 dark:bg-white transition-all group-hover:bg-brand-lime rounded-full" style={{ height: `${20 + Math.random() * 80}%` }} />
-                       <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{Math.floor(Math.random() * 5000)} Logs</div>
+                       <div className="absolute bottom-0 inset-x-0 bg-neutral-900 dark:bg-white transition-all group-hover:bg-brand-lime rounded-full" style={{ height: `${20 + ((i * 37 + 11) % 81)}%` }} />
+                       <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{(i * 733 + 911) % 5000} Logs</div>
                     </div>
                   ))}
                </div>
                
                <div className="grid grid-cols-4 gap-8 border-t border-border/50 pt-8 italic font-black">
-                  {[
-                    { l: "Avg Daily Volume", v: "142k" },
-                    { l: "Security Flags", v: "0.2%" },
-                    { l: "Integrity Verified", v: "100%" },
-                    { l: "Peak Load (MT)", v: "1,2k/s" },
-                  ].map((stat, i) => (
+                  {([] as any[]).map((stat, i) => (
                     <div key={i} className="space-y-1">
                        <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic leading-none">{stat.l}</div>
                        <div className="text-xl font-black italic">{stat.v}</div>
@@ -514,13 +497,7 @@ export default function AuditTrailsPage() {
 
          <section className="xl:col-span-1 h-full">
             <div className="flex flex-col gap-4 h-full">
-               {[
-                 { label: "Export Global Ledger", icon: <Database />, color: "bg-neutral-900 text-white shadow-2xl shadow-black/20" },
-                 { label: "Compliance Report", icon: <ShieldCheck />, color: "bg-indigo-600 text-white shadow-2xl shadow-indigo-600/20" },
-                 { label: "Verify All Hashes", icon: <Lock />, color: "bg-white border border-border/50 shadow-sm" },
-                 { label: "Anomalous Traces", icon: <Activity />, color: "bg-white border border-border/50 shadow-sm" },
-                 { label: "Snapshot State", icon: <LayoutGrid />, color: "bg-brand-lime text-black font-black" },
-               ].map((action, i) => (
+               {([] as any[]).map((action, i) => (
                  <button key={i} className={`flex-1 p-6 rounded-3xl font-black text-[10px] uppercase tracking-widest italic hover:scale-[1.03] active:scale-95 transition-all group flex items-center justify-between min-h-[80px] ${action.color}`}>
                     <div className="flex items-center gap-4">
                        <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center shrink-0 group-hover:scale-110 transition-all">

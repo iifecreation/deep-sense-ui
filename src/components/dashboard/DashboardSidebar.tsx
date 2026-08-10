@@ -97,7 +97,8 @@ const navigation: NavGroup[] = [
   {
     name: "Admin",
     items: [
-      { name: "Settings", icon: <Settings />, href: "/dashboard/settings" }
+      { name: "Settings", icon: <Settings />, href: "/dashboard/settings" },
+      { name: "Provider Preferences", icon: <ShieldCheck />, href: "/dashboard/settings/providers" }
     ]
   }
 ];

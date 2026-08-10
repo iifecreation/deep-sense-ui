@@ -7,11 +7,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Code as Github, Mail, ArrowRight, LoaderCircle as Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { ArrowRight, LoaderCircle as Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { loginSchema, type LoginInput } from "@/schemas";
 import { authService } from "@/services/auth.service";
 import { ApiError } from "@/lib/api/client";
+import axios from "axios";
 
 function LoginFormContent({ redirect }: { redirect: string | null }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -50,11 +51,19 @@ function LoginFormContent({ redirect }: { redirect: string | null }) {
       }
     } catch (err) {
       const apiError = err as ApiError;
-      if (apiError.statusCode === 403 && apiError.message === 'Email not verified') {
+      const statusCode = axios.isAxiosError(err) ? err.response?.status : apiError.statusCode;
+      const detail = axios.isAxiosError(err)
+        ? (err.response?.data as { detail?: string } | undefined)?.detail
+        : apiError.message;
+      if (statusCode === 403 && detail === 'Email not verified') {
         router.push(`/verify-email?email=${encodeURIComponent(data.email)}&status=unverified`);
         return;
       }
-      setError(apiError.message || 'Login failed. Please check your credentials and try again.');
+      setError(
+        statusCode === 401
+          ? 'Invalid email or password'
+          : detail || 'Login failed. Please check your credentials and try again.',
+      );
     } finally {
       setIsLoading(false);
     }

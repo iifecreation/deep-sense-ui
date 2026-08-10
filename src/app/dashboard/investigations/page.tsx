@@ -152,33 +152,7 @@ export default function InvestigationsPage() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        {[
-          {
-            href: "/dashboard/investigations/beneficiaries",
-            title: "APP beneficiaries",
-            detail: "Profiles, relationships, challenges and disposition",
-          },
-          {
-            href: "/dashboard/investigations/ato-controls",
-            title: "ATO controls",
-            detail: "Trusted devices, sessions and revocation state",
-          },
-          {
-            href: "/dashboard/investigations/cnp-journey",
-            title: "CNP journey",
-            detail: "Checkout timeline and merchant policy versions",
-          },
-          {
-            href: "/dashboard/investigations/customer-risk",
-            title: "Customer risk",
-            detail: "Contributions, source freshness and score history",
-          },
-          {
-            href: "/dashboard/investigations/unified-risk",
-            title: "Unified risk",
-            detail: "Discovery, conflict policy and re-evaluation lineage",
-          },
-        ].map((workflow) => (
+        {([] as any[]).map((workflow) => (
           <Link
             key={workflow.href}
             href={workflow.href}

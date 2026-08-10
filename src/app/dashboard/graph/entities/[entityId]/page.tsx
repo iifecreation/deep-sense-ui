@@ -55,25 +55,10 @@ export default function EntityDetailPage() {
     type: "Customer Node",
     riskScore: 84,
     status: "Suspicious",
-    connectedEntities: [
-      { id: "DEV-9921", type: "Device", strength: "98%", risk: "High" },
-      { id: "CUST-4412", type: "Customer", strength: "82%", risk: "Medium" },
-      { id: "IP-185.112", type: "IP Node", strength: "65%", risk: "Low" }
-    ],
-    sharedAttributes: [
-      { key: "Hardware ID", value: "8AfX_9921_Lq", entities: 3 },
-      { key: "Shipping Address", value: "144 Baker St, London", entities: 2 },
-      { key: "Browser Fingerprint", value: "Chrome/122.0.0.0", entities: 12 }
-    ],
-    riskSignals: [
-      { name: "Cluster Density", status: "Critical", value: "8.4x baseline" },
-      { name: "Shared Device Collision", status: "High", value: "3 accounts" },
-      { name: "Transitive Risk", status: "Medium", value: "Score: 72" }
-    ],
-    transactions: [
-      { id: "TXN-88219", amount: "$4,250.00", date: "Oct 15, 2026", status: "Flagged" },
-      { id: "TXN-88102", amount: "$150.00", date: "Oct 12, 2026", status: "Approved" }
-    ]
+    connectedEntities: [],
+    sharedAttributes: [],
+    riskSignals: [],
+    transactions: []
   };
 
   return (
@@ -126,12 +111,7 @@ export default function EntityDetailPage() {
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-         {[
-           { label: "Relational Risk", value: entity.riskScore, delta: "High Cluster", icon: <ShieldAlert className="text-rose-500" />, color: "text-rose-500" },
-           { label: "1st Degree Links", value: entity.connectedEntities.length, delta: "02 High Risk", icon: <Link2 className="text-muted-foreground" /> },
-           { label: "Shared Attributes", value: entity.sharedAttributes.length, delta: "Collision Detected", icon: <Layers className="text-indigo-500" /> },
-           { label: "Confidence", value: "94%", delta: "Graph v3", icon: <ShieldCheck className="text-brand-lime" /> },
-         ].map((kpi, i) => (
+         {([] as any[]).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
@@ -198,7 +178,7 @@ export default function EntityDetailPage() {
                               </TableRow>
                            </TableHeader>
                            <TableBody>
-                              {entity.connectedEntities.map((conn, i) => (
+                              {entity.connectedEntities.map((conn: any, i: number) => (
                                 <TableRow key={i} className="group hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0 h-20 cursor-pointer">
                                    <TableCell className="px-10 py-5">
                                       <span className="text-[13px] font-black italic tracking-tighter uppercase text-neutral-900">{conn.id}</span>
@@ -222,7 +202,7 @@ export default function EntityDetailPage() {
 
                <TabsContent value="attributes" className="m-0 space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                     {entity.sharedAttributes.map((attr, i) => (
+                     {entity.sharedAttributes.map((attr: any, i: number) => (
                         <Card key={i} className="rounded-[40px] border-border/50 shadow-md p-10 bg-white group hover:border-neutral-900 transition-colors">
                            <CardHeader className="p-0 mb-8 flex flex-row items-center justify-between">
                               <div className="flex flex-col">
@@ -257,7 +237,7 @@ export default function EntityDetailPage() {
                               </TableRow>
                            </TableHeader>
                            <TableBody>
-                              {entity.transactions.map((txn, i) => (
+                              {entity.transactions.map((txn: any, i: number) => (
                                 <TableRow key={i} className="group hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0 h-20 cursor-pointer" onClick={() => window.location.href=`/dashboard/transactions/${txn.id}`}>
                                    <TableCell className="px-10 py-5">
                                       <span className="text-[13px] font-black italic tracking-tighter uppercase text-neutral-900">{txn.id}</span>
@@ -290,7 +270,7 @@ export default function EntityDetailPage() {
                   <Box className="w-5 h-5 text-muted-foreground/20" />
                </CardHeader>
                <CardContent className="p-0 space-y-6">
-                  {entity.riskSignals.map((signal, i) => (
+                  {entity.riskSignals.map((signal: any, i: number) => (
                     <div key={i} className="flex flex-col gap-1">
                        <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest italic">
                           <span className="text-neutral-400">{signal.name}</span>

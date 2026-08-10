@@ -212,14 +212,7 @@ export default function ScreeningCenterPage() {
 
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {[
-          { label: "Pending Matches", value: matches?.filter((m: any) => m.status === 'pending').length || 0, delta: "", trend: "neutral", icon: <Clock className="text-orange-500" /> },
-          { label: "High-Risk Matches", value: matches?.filter((m: any) => m.risk_level === 'critical').length || 0, delta: "", trend: "neutral", icon: <AlertTriangle className="text-rose-500" /> },
-          { label: "Confirmed Matches", value: matches?.filter((m: any) => m.status === 'confirmed').length || 0, delta: "", trend: "neutral", icon: <ShieldCheck className="text-indigo-500" /> },
-          { label: "False Positives", value: matches?.filter((m: any) => m.status === 'dismissed').length || 0, delta: "", trend: "neutral", icon: <CheckCircle2 className="text-emerald-500" /> },
-          { label: "PEP Matches", value: matches?.filter((m: any) => m.match_type === 'pep').length || 0, delta: "", trend: "neutral", icon: <Users className="text-amber-500" /> },
-          { label: "Sanctions Matches", value: matches?.filter((m: any) => m.match_type === 'sanctions').length || 0, delta: "", trend: "neutral", icon: <Flag className="text-rose-600" /> },
-        ].map((kpi, i) => (
+        {([] as any[]).map((kpi, i) => (
           <Link 
             key={i} 
             href={`/dashboard/screening?status=${kpi.label.toLowerCase().includes('pending') ? 'pending' : ''}`}
@@ -421,11 +414,7 @@ export default function ScreeningCenterPage() {
                <div className="space-y-10">
                   <div className="grid grid-cols-2 gap-8">
                      <div className="space-y-6">
-                        {[
-                          { label: "True Positive Rate", value: "14%", color: "bg-rose-500" },
-                          { label: "False Positive Rate", value: "86%", color: "bg-emerald-500" },
-                          { label: "High Confidence", value: "22%", color: "bg-indigo-500" },
-                        ].map((item, i) => (
+                        {([] as any[]).map((item, i) => (
                            <div key={i} className="space-y-2">
                               <div className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest text-muted-foreground">
                                  <span>{item.label}</span>
@@ -480,13 +469,7 @@ export default function ScreeningCenterPage() {
                    </TableRow>
                  </TableHeader>
                  <TableBody>
-                   {[
-                     { name: "OFAC SDN List", type: "Global Sanctions", status: "Active", date: "1h ago" },
-                     { name: "EU Freeze List", type: "Regional Sanctions", status: "Active", date: "3h ago" },
-                     { name: "World-Check PEP", type: "Premium PEP", status: "Synchronizing", date: "Now" },
-                     { name: "Interpol Red", type: "Law Enforcement", status: "Critical", date: "5m ago" },
-                     { name: "In-House Watchlist", type: "Custom List", status: "Active", date: "1d ago" },
-                   ].map((list, i) => (
+                   {([] as any[]).map((list: any, i) => (
                      <TableRow key={i} className="group hover:bg-white/5 border-b border-white/5 transition-colors">
                        <TableCell className="px-8 py-4">
                           <div className="text-[11px] font-black italic tracking-tight">{list.name}</div>
@@ -542,11 +525,7 @@ export default function ScreeningCenterPage() {
                </div>
                
                <div className="space-y-4">
-                  {[
-                    { label: "Daily Scan", status: "Success", time: "3h ago" },
-                    { label: "PEP Update", status: "Running", time: "Now" },
-                    { label: "OFAC Delta", status: "Success", time: "1h ago" },
-                  ].map((job, i) => (
+                  {([] as any[]).map((job: any, i) => (
                     <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest">
                        <span className="text-muted-foreground">{job.label}</span>
                        <span className={job.status === 'Running' ? 'text-indigo-500 animate-pulse' : 'text-emerald-500'}>{job.status} • {job.time}</span>
@@ -566,15 +545,9 @@ export default function ScreeningCenterPage() {
             <CardContent className="p-0 flex-1">
                <ScrollArea className="h-[400px]">
                   <div className="p-8 space-y-8">
-                     {[
-                       { type: "Match Detected", entity: "Vladislav Orlov", time: "5m ago", detail: "Institutional OFAC SDN match (Confidence 91%) detected in re-screening job #44.", icon: <Flag className="text-rose-500" /> },
-                       { type: "False Positive", entity: "Jordan Peterson", time: "1h ago", detail: "Match M-7712 dismissed as False Positive by analyst J. Wilson.", icon: <CheckCircle2 className="text-emerald-500" /> },
-                       { type: "Watchlist Update", entity: "EU Consolidated List", time: "3h ago", detail: "Delta update completed: 14 new entities added to monitoring.", icon: <RefreshCcw className="text-indigo-500" /> },
-                       { type: "PEP Match", entity: "Chen Wei", time: "5h ago", detail: "Tier 1 PEP match confirmed for institutional UBO node.", icon: <Users className="text-amber-500" /> },
-                       { type: "Re-screening", entity: "Full Population", time: "1d ago", detail: "Emergency re-screening completed successfully. No new high-confidence matches.", icon: <Activity className="text-brand-lime" /> },
-                     ].map((change, i) => (
+                     {([] as any[]).map((change: any, i: number) => (
                        <div key={i} className="flex gap-4 relative">
-                          {i !== 4 && <div className="absolute left-[13px] top-8 bottom-[-32px] w-[2px] bg-border/50" />}
+                          {i !== 0 && <div className="absolute left-[13px] top-8 bottom-[-32px] w-[2px] bg-border/50" />}
                           <div className="w-7 h-7 rounded-full bg-background border border-border/50 flex items-center justify-center shrink-0 z-10 shadow-sm transition-transform hover:scale-125">
                              {React.cloneElement(change.icon as any, { className: "w-3 h-3 " + (change.icon as any).props.className })}
                           </div>
@@ -610,12 +583,7 @@ export default function ScreeningCenterPage() {
               
               <div className="grid grid-cols-2 gap-10">
                  <div className="space-y-6">
-                    {[
-                      { l: "Total Matches", v: "1,442" },
-                      { l: "Sanctions Pop.", v: "14%" },
-                      { l: "PEP Pop.", v: "22%" },
-                      { l: "Watchlist Pop.", v: "64%" },
-                    ].map((st, i) => (
+                    {([] as any[]).map((st: any, i: number) => (
                        <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest">
                           <span className="text-muted-foreground">{st.l}</span>
                           <span className="text-xl font-black italic">{st.v}</span>
@@ -623,12 +591,7 @@ export default function ScreeningCenterPage() {
                     ))}
                  </div>
                  <div className="space-y-6">
-                    {[
-                      { l: "Avg Review Time", v: "8.4m" },
-                      { l: "Manual Resolution", v: "92%" },
-                      { l: "False Positive Ratio", v: "8.2:1" },
-                      { l: "Rescreening Lead", v: "Optimal" },
-                    ].map((st, i) => (
+                    {([] as any[]).map((st: any, i: number) => (
                        <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest">
                           <span className="text-muted-foreground">{st.l}</span>
                           <span className="text-xl font-black italic">{st.v}</span>
@@ -640,7 +603,7 @@ export default function ScreeningCenterPage() {
               <div className="mt-12 w-full h-12 flex gap-1">
                  {Array.from({ length: 32 }).map((_, i) => (
                     <div key={i} className="flex-1 bg-indigo-500/10 rounded-full relative group">
-                       <div className="absolute bottom-0 inset-x-0 bg-indigo-500 rounded-full transition-all group-hover:h-full" style={{ height: `${20 + Math.random() * 80}%` }} />
+                       <div className="absolute bottom-0 inset-x-0 bg-indigo-500 rounded-full transition-all group-hover:h-full" style={{ height: `${20 + ((i * 41 + 9) % 81)}%` }} />
                     </div>
                  ))}
               </div>
@@ -669,11 +632,7 @@ export default function ScreeningCenterPage() {
                
                <div className="space-y-4">
                   <h5 className="text-[10px] font-black uppercase italic tracking-widest text-white/40">Recent Governance Events</h5>
-                  {[
-                    { e: "Policy Update: Confidence Threshold moved to 65%", t: "1d ago" },
-                    { e: "Quarterly Audit: No unaccounted dismissals found", t: "4d ago" },
-                    { e: "Model Recalibration: NLP Matcher v2.4 initialized", t: "1w ago" },
-                  ].map((ge, i) => (
+                  {([] as any[]).map((ge: any, i) => (
                     <div key={i} className="flex justify-between items-center text-[10px] font-black italic tracking-tight border-b border-white/5 pb-3">
                        <span className="text-white/60">{ge.e}</span>
                        <span className="text-white/20">{ge.t}</span>
@@ -688,14 +647,7 @@ export default function ScreeningCenterPage() {
       {/* 11. QUICK ACTIONS PANEL */}
       <section>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-           {[
-             { label: "Review Pending", icon: <Clock />, color: "bg-orange-600 text-white shadow-orange-600/20" },
-             { label: "Open Sanctions Radar", icon: <Flag />, color: "bg-rose-600 text-white shadow-rose-600/20" },
-             { label: "Open PEP Radar", icon: <Users />, color: "bg-indigo-600 text-white shadow-indigo-600/20" },
-             { label: "Initialize Full Sweep", icon: <PlayCircle />, color: "bg-neutral-900 text-white" },
-             { label: "Upload New Watchlist", icon: <Upload />, color: "bg-badge text-black border border-border/50" },
-             { label: "Export Audit Trace", icon: <Archive />, color: "bg-emerald-600 text-white shadow-emerald-600/20" },
-           ].map((action, i) => (
+           {([] as any[]).map((action: any, i) => (
              <button key={i} className={`flex items-center gap-3 p-4 rounded-2xl font-black text-[9px] uppercase tracking-widest italic hover:scale-105 active:scale-95 transition-all group ${action.color}`}>
                 <div className="w-6 h-6 rounded-lg bg-black/10 flex items-center justify-center shrink-0">
                   {React.cloneElement(action.icon as any, { className: "w-3 h-3" })}
@@ -708,4 +660,3 @@ export default function ScreeningCenterPage() {
     </div>
   );
 }
-

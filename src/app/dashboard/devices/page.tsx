@@ -87,11 +87,7 @@ export default function DevicesRegistry() {
 
       {/* KPI Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { label: "High-Risk Devices", value: devicesData?.total || 0, subtext: "Active threat fingerprints", icon: <ShieldAlert className="text-red-500" />, color: "border-red-100 bg-red-50/20" },
-          { label: "Emulator Detection", value: "0", subtext: "Blocked simulation nodes", icon: <Zap className="text-amber-500" />, color: "border-amber-100 bg-amber-50/20" },
-          { label: "Trusted Mobile Fleet", value: "0", subtext: "Whitelisted institutional devices", icon: <ShieldCheck className="text-emerald-500" />, color: "border-emerald-100 bg-emerald-50/20" },
-        ].map((kpi, i) => (
+        {([] as any[]).map((kpi, i) => (
           <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
             <CardContent className="p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">

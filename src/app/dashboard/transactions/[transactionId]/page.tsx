@@ -193,14 +193,7 @@ export default function TransactionDetailPage() {
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-         {[
-           { label: "Final Risk Score", value: txn.scores.final, delta: "75+ Review", icon: <Zap className="text-rose-500" />, color: "text-rose-500" },
-           { label: "Transaction Amount", value: `$${txn.amount}`, delta: txn.currency, icon: <CreditCard className="text-muted-foreground" /> },
-           { label: "Rule Violations", value: txn.rules.length, delta: "Critical: 01", icon: <ShieldAlert className="text-orange-500" /> },
-           { label: "Network Risk", value: txn.network.vpn ? "High" : "Low", delta: "VPN Active", icon: <Globe className="text-indigo-500" /> },
-           { label: "Confidence", value: "92%", delta: "Model 4.2", icon: <ShieldCheck className="text-brand-lime" /> },
-           { label: "Decision SLA", value: "14m", delta: "Normal", icon: <Clock className="text-muted-foreground" /> },
-         ].map((kpi, i) => (
+         {([] as any[]).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
@@ -250,12 +243,7 @@ export default function TransactionDetailPage() {
                            </div>
                         </CardHeader>
                         <CardContent className="p-0 space-y-8">
-                           {[
-                             { label: "ML Inference Score", value: txn.scores.ml, icon: <Cpu className="w-4 h-4" /> },
-                             { label: "Deterministic Rules", value: txn.scores.rules, icon: <ShieldAlert className="w-4 h-4" /> },
-                             { label: "Behavioral Anomaly", value: txn.scores.anomaly, icon: <Zap className="text-indigo-500 w-4 h-4" /> },
-                             { label: "Device Integrity", value: txn.scores.device, icon: <Fingerprint className="w-4 h-4" /> },
-                           ].map((score, i) => (
+                           {([] as any[]).map((score, i) => (
                              <div key={i} className="space-y-2">
                                 <div className="flex justify-between items-baseline mb-1">
                                    <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground flex items-center gap-2">
@@ -349,13 +337,7 @@ export default function TransactionDetailPage() {
                   </div>
                </CardHeader>
                <CardContent className="p-0 space-y-6">
-                  {[
-                    { l: "IP Address", v: txn.network.ip },
-                    { l: "ISP Context", v: txn.network.isp },
-                    { l: "VPN Ingress", v: txn.network.vpn ? "Detected" : "Clear", c: txn.network.vpn ? "text-rose-500" : "text-brand-lime" },
-                    { l: "Device OS", v: txn.device.name },
-                    { l: "Device Integrity", v: txn.device.integrity, c: "text-brand-lime" }
-                  ].map((it, i) => (
+                  {([] as any[]).map((it, i) => (
                     <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic">
                        <span className="text-neutral-400">{it.l}</span>
                        <span className={it.c || "text-neutral-900"}>{it.v}</span>

@@ -256,12 +256,7 @@ export default function AlertsCenter() {
           <Card className="rounded-xl shadow-sm border bg-white p-6 space-y-4">
             <h4 className="text-sm font-bold text-slate-900">Severity Distribution</h4>
             <div className="space-y-4">
-              {[
-                { label: "Critical", value: alerts?.filter((a: any) => a.severity === 'critical').length || 0, color: "bg-red-500" },
-                { label: "High", value: alerts?.filter((a: any) => a.severity === 'high').length || 0, color: "bg-red-400" },
-                { label: "Medium", value: alerts?.filter((a: any) => a.severity === 'medium').length || 0, color: "bg-amber-400" },
-                { label: "Low", value: alerts?.filter((a: any) => a.severity === 'low').length || 0, color: "bg-emerald-400" },
-              ].map((sev, i) => {
+              {([] as any[]).map((sev, i) => {
                 const total = alerts?.length || 1;
                 const percentage = (sev.value / total) * 100;
                 return (

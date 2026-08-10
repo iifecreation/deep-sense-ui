@@ -34,6 +34,7 @@ const legalLinks = [
 
 export default function LegalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [searchQuery, setSearchQuery] = useState("");
   
   if (
     pathname === "/legal/terms" || 
@@ -60,8 +61,6 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
       </div>
     );
   }
-
-  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredLinks = legalLinks.filter(link => 
     link.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

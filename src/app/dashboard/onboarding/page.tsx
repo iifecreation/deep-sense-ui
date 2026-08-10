@@ -150,12 +150,7 @@ export default function OnboardingReviewsPage() {
             />
           </div>
           
-          {[
-            { label: "Date Range", value: "All Time" },
-            { label: "Status", value: "Pending" },
-            { label: "Risk Tier", value: "High Only" },
-            { label: "Reviewer", value: "Any" },
-          ].map((filter, i) => (
+          {([] as any[]).map((filter, i) => (
             <div key={i} className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group border border-transparent hover:border-border">
               <span className="text-[10px] font-black uppercase tracking-widest italic text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                 {filter.label}: {filter.value}
@@ -172,14 +167,7 @@ export default function OnboardingReviewsPage() {
 
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {[
-          { label: "Total Reviews", value: reviewsData?.total || 0, delta: "+12", icon: <Clock className="text-neutral-400" /> },
-          { label: "High-Risk Apps", value: "0", delta: "+0", icon: <AlertTriangle className="text-rose-500 animate-pulse" /> },
-          { label: "Approved Today", value: "0", delta: "+0", icon: <CheckCircle2 className="text-brand-lime" /> },
-          { label: "Rejected Apps", value: "0", delta: "+0", icon: <XCircle className="text-rose-600" /> },
-          { label: "PEP/Sanct Matches", value: "0", delta: "+0", icon: <ShieldAlert className="text-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.3)] font-bold" /> },
-          { label: "Escalated EDD", value: "0", delta: "+0", icon: <Briefcase className="text-indigo-500" /> },
-        ].map((kpi, i) => (
+        {([] as any[]).map((kpi, i) => (
           <div 
             key={i} 
             className="flex flex-col gap-4 p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-xl shadow-black/5 hover:border-brand-lime hover:translate-y-[-4px] transition-all group cursor-pointer"
@@ -379,11 +367,7 @@ export default function OnboardingReviewsPage() {
             </CardHeader>
             <CardContent className="p-0 space-y-12 flex-1 font-bold italic">
                <div className="space-y-6">
-                  {[
-                    { label: "Identity Pass Rate", value: 88, color: "bg-brand-lime shadow-[0_0_8px_#D1F701]" },
-                    { label: "Screening Match Rate", value: 4.2, color: "bg-orange-500" },
-                    { label: "Avg Review Time", value: 62, color: "bg-neutral-900" },
-                  ].map((stat, i) => (
+                  {([] as any[]).map((stat, i) => (
                     <div key={i} className="space-y-2">
                        <div className="flex justify-between items-baseline">
                           <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground">{stat.label}</span>
@@ -464,13 +448,7 @@ export default function OnboardingReviewsPage() {
         {/* 12. QUICK ACTIONS */}
         <section className="lg:col-span-1 h-full">
            <div className="flex flex-col gap-4 h-full font-black italic font-bold">
-              {[
-                { label: "Review Pending Pool", icon: <Clock />, color: "bg-neutral-900 text-white shadow-2xl shadow-black/20" },
-                { label: "Export Case Files", icon: <FileText />, color: "bg-indigo-600 text-white shadow-2xl shadow-indigo-600/20" },
-                { label: "Identity Match Audit", icon: <ShieldCheck />, color: "bg-white border border-border shadow-sm" },
-                { label: "Configure Risk Rules", icon: <Settings />, color: "bg-white border border-border shadow-sm" },
-                { label: "Run Batch Screening", icon: <Zap />, color: "bg-brand-lime text-black font-black" },
-              ].map((action, i) => (
+              {([] as any[]).map((action, i) => (
                 <button key={i} className={`flex-1 p-6 rounded-3xl font-black text-[10px] uppercase tracking-widest italic hover:scale-[1.03] active:scale-95 transition-all group flex items-center justify-between min-h-[80px] ${action.color}`}>
                    <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center shrink-0 group-hover:scale-110 transition-all">
