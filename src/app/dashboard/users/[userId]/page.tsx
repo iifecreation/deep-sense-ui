@@ -53,6 +53,9 @@ import {
 import { useCustomer } from "@/hooks/use-customers";
 
 export default function UserDetailPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const params = useParams();
   const userId = params.userId as string;
 
@@ -152,7 +155,7 @@ export default function UserDetailPage() {
 
        {/* KPI GRID */}
        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {([] as any[]).map((kpi, i) => (
+          {(apiData || []).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
@@ -186,7 +189,7 @@ export default function UserDetailPage() {
                            </div>
                         </CardHeader>
                         <CardContent className="p-0 space-y-6">
-                           {([] as any[]).map((item, i) => (
+                           {(apiData || []).map((item, i) => (
                              <div key={i} className="flex justify-between items-center text-[11px] font-black uppercase italic tracking-widest border-b border-border/50 pb-4 last:border-0">
                                 <span className="text-muted-foreground flex items-center gap-2">{item.icon} {item.label}</span>
                                 <span className="text-neutral-900">{item.value}</span>

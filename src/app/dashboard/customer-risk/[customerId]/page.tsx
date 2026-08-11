@@ -37,6 +37,9 @@ type RiskFactor = {
 };
 
 export default function CustomerRiskProfile() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const params = useParams();
   const customerId = params.customerId as string;
   const { data: customer, isLoading, isError, error, refetch } = useCustomer(customerId);
@@ -227,7 +230,7 @@ export default function CustomerRiskProfile() {
                 <Card className="rounded-xl shadow-sm border bg-white p-6">
                   <h4 className="text-sm font-bold text-slate-900 mb-4">Core Metadata</h4>
                   <div className="space-y-4">
-                    {([] as any[]).map((item, i) => (
+                    {(apiData || []).map((item, i) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                         <span className="text-[11px] font-medium text-slate-400 flex items-center gap-2">{item.icon} {item.label}</span>
                         <span className="text-[11px] font-bold text-slate-900">{item.value}</span>
@@ -264,7 +267,7 @@ export default function CustomerRiskProfile() {
           <Card className="rounded-xl shadow-sm border bg-white p-6 space-y-6">
             <h4 className="text-sm font-bold text-slate-900">AML Screening Perimeter</h4>
             <div className="space-y-2">
-              {([] as any[]).map((check, i) => (
+              {(apiData || []).map((check, i) => (
                 <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 bg-slate-50/50">
                   <div className="flex items-center gap-3">
                     {check.icon}
@@ -297,7 +300,7 @@ export default function CustomerRiskProfile() {
           <Card className="rounded-xl shadow-sm border bg-white p-6 space-y-4">
             <h4 className="text-sm font-bold text-slate-900">Related Alerts</h4>
             <div className="space-y-3">
-              {([] as any[]).map((alt: any, i) => (
+              {(apiData || []).map((alt: any, i) => (
                 <div key={i} className="flex justify-between items-center p-3 rounded-lg border border-slate-50 bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer group">
                   <div className="space-y-0.5">
                     <p className="text-[10px] font-bold text-slate-900">{alt.id}</p>

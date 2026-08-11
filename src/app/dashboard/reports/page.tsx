@@ -59,6 +59,9 @@ import { Progress } from "@/components/ui/progress";
 import { useReports } from "@/hooks";
 
 export default function RegulatoryReportsPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const [searchQuery, setSearchQuery] = useState("");
   const { data: reports, isLoading, isError, error, refetch } = useReports({ 
     query: { page: 1, page_size: 50 }
@@ -169,7 +172,7 @@ export default function RegulatoryReportsPage() {
             />
           </div>
           
-          {([] as any[]).map((filter: any, i: number) => (
+          {(apiData || []).map((filter: any, i: number) => (
             <div key={i} className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group">
               <span className="text-[10px] font-black uppercase tracking-widest italic text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                 {filter.label}: {filter.value}
@@ -186,7 +189,7 @@ export default function RegulatoryReportsPage() {
 
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {([] as any[]).map((kpi: any, i: number) => (
+        {(apiData || []).map((kpi: any, i: number) => (
           <Link 
             key={i} 
             href={`/dashboard/reports?status=${kpi.label.toLowerCase().replace(/ /g, '-')}`}
@@ -242,7 +245,7 @@ export default function RegulatoryReportsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {([] as any[]).map((row: any, i) => (
+                {(apiData || []).map((row: any, i) => (
                   <TableRow key={i} className="group hover:bg-muted/30 transition-colors border-b border-border/50 cursor-pointer">
                     <TableCell className="px-8 py-5">
                       <Link href={`/dashboard/reports/${row.id}`} className="font-black italic text-xs underline underline-offset-4 decoration-border group-hover:decoration-neutral-900 transition-all">{row.id}</Link>
@@ -393,7 +396,7 @@ export default function RegulatoryReportsPage() {
                  <div className="p-8 bg-neutral-900 text-white rounded-[32px] space-y-6 shadow-2xl">
                     <h5 className="text-[10px] font-black uppercase italic tracking-widest text-white/40">Suggested for Reporting</h5>
                     <div className="space-y-4">
-                       {([] as any[]).map((item, i) => (
+                       {(apiData || []).map((item, i) => (
                          <div key={i} className="flex items-center justify-between group cursor-pointer border-b border-white/5 pb-4 last:border-0 hover:translate-x-1 transition-transform">
                             <div className="space-y-1">
                                <div className="text-[12px] font-black italic tracking-tight">{item.subject}</div>
@@ -478,7 +481,7 @@ export default function RegulatoryReportsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                   {([] as any[]).map((sub: any, i) => (
+                   {(apiData || []).map((sub: any, i) => (
                      <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                         <TableCell className="px-8 py-5 font-black italic text-[11px]">{sub.id}</TableCell>
                         <TableCell className="text-[10px] font-bold italic text-muted-foreground">{sub.reg}</TableCell>
@@ -525,7 +528,7 @@ export default function RegulatoryReportsPage() {
                </div>
                
                <div className="mt-12 grid grid-cols-3 gap-8">
-                  {([] as any[]).map((stat, i) => (
+                  {(apiData || []).map((stat, i) => (
                     <div key={i} className="space-y-1">
                        <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic">{stat.l}</div>
                        <div className="text-xl font-black italic">{stat.v}</div>
@@ -542,7 +545,7 @@ export default function RegulatoryReportsPage() {
                   <CardDescription className="text-white/40 text-[10px] font-black uppercase tracking-widest mt-1 italic">Disclosure lifecycle integrity logging</CardDescription>
                </CardHeader>
                <CardContent className="p-10 space-y-8 flex-1">
-                  {([] as any[]).map((log, i) => (
+                  {(apiData || []).map((log, i) => (
                     <div key={i} className="flex gap-4 group">
                        <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5 group-hover:border-white/20 transition-all">
                           {React.cloneElement(log.icon as any, { className: "w-3.5 h-3.5" })}
@@ -568,7 +571,7 @@ export default function RegulatoryReportsPage() {
                </CardHeader>
                <ScrollArea className="h-[300px]">
                   <div className="p-8 space-y-6">
-                     {([] as any[]).map((ac, i) => (
+                     {(apiData || []).map((ac, i) => (
                        <div key={i} className="flex justify-between items-center text-[10px] font-black italic tracking-tight border-b border-border/50 pb-3 last:border-0 last:pb-0">
                           <span className="text-muted-foreground">{ac.l} <span className="text-neutral-900 dark:text-white ml-2 text-[9px] uppercase tracking-widest">{ac.c}</span></span>
                           <span className="text-muted-foreground/40">{ac.t}</span>
@@ -581,7 +584,7 @@ export default function RegulatoryReportsPage() {
 
          <section className="xl:col-span-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 h-full">
-               {([] as any[]).map((action, i) => (
+               {(apiData || []).map((action, i) => (
                  <button key={i} className={`flex flex-col items-center justify-center gap-3 p-6 rounded-3xl font-black text-[9px] uppercase tracking-widest italic hover:scale-105 active:scale-95 transition-all group ${action.color}`}>
                     <div className="w-8 h-8 rounded-xl bg-black/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-all">
                       {React.cloneElement(action.icon as any, { className: "w-4 h-4" })}

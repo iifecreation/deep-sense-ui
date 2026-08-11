@@ -58,6 +58,9 @@ import {
 import { useOnboardingReviews } from "@/hooks";
 
 export default function OnboardingReviewsPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const [searchQuery, setSearchQuery] = useState("");
   const { data: reviewsData, isLoading, isError, refetch } = useOnboardingReviews({ search: searchQuery });
 
@@ -150,7 +153,7 @@ export default function OnboardingReviewsPage() {
             />
           </div>
           
-          {([] as any[]).map((filter, i) => (
+          {(apiData || []).map((filter, i) => (
             <div key={i} className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group border border-transparent hover:border-border">
               <span className="text-[10px] font-black uppercase tracking-widest italic text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                 {filter.label}: {filter.value}
@@ -167,7 +170,7 @@ export default function OnboardingReviewsPage() {
 
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {([] as any[]).map((kpi, i) => (
+        {(apiData || []).map((kpi, i) => (
           <div 
             key={i} 
             className="flex flex-col gap-4 p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-xl shadow-black/5 hover:border-brand-lime hover:translate-y-[-4px] transition-all group cursor-pointer"
@@ -367,7 +370,7 @@ export default function OnboardingReviewsPage() {
             </CardHeader>
             <CardContent className="p-0 space-y-12 flex-1 font-bold italic">
                <div className="space-y-6">
-                  {([] as any[]).map((stat, i) => (
+                  {(apiData || []).map((stat, i) => (
                     <div key={i} className="space-y-2">
                        <div className="flex justify-between items-baseline">
                           <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground">{stat.label}</span>
@@ -448,7 +451,7 @@ export default function OnboardingReviewsPage() {
         {/* 12. QUICK ACTIONS */}
         <section className="lg:col-span-1 h-full">
            <div className="flex flex-col gap-4 h-full font-black italic font-bold">
-              {([] as any[]).map((action, i) => (
+              {(apiData || []).map((action, i) => (
                 <button key={i} className={`flex-1 p-6 rounded-3xl font-black text-[10px] uppercase tracking-widest italic hover:scale-[1.03] active:scale-95 transition-all group flex items-center justify-between min-h-[80px] ${action.color}`}>
                    <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center shrink-0 group-hover:scale-110 transition-all">

@@ -25,6 +25,9 @@ import { useState } from "react";
 import Link from "next/link";
 
 export default function AlertsCenter() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const [searchQuery, setSearchQuery] = useState("");
   const [severityFilter, setSeverityFilter] = useState<string | null>(null);
   const { data: alerts, isLoading, isError, error, refetch } = useAlerts({ 
@@ -256,7 +259,7 @@ export default function AlertsCenter() {
           <Card className="rounded-xl shadow-sm border bg-white p-6 space-y-4">
             <h4 className="text-sm font-bold text-slate-900">Severity Distribution</h4>
             <div className="space-y-4">
-              {([] as any[]).map((sev, i) => {
+              {(apiData || []).map((sev, i) => {
                 const total = alerts?.length || 1;
                 const percentage = (sev.value / total) * 100;
                 return (

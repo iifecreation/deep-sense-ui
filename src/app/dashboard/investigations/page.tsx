@@ -97,6 +97,9 @@ function DecisionRow({ item }: { item: NormalizedRiskDecision }) {
 }
 
 export default function InvestigationsPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const [items, setItems] = useState<NormalizedRiskDecision[]>([]);
   const [service, setService] = useState("");
   const [subjectId, setSubjectId] = useState("");
@@ -152,7 +155,7 @@ export default function InvestigationsPage() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        {([] as any[]).map((workflow) => (
+        {(apiData || []).map((workflow) => (
           <Link
             key={workflow.href}
             href={workflow.href}

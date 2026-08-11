@@ -50,6 +50,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function ComplianceWorkspacePage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
   const [isFiltering, setIsFiltering] = React.useState(false);
@@ -121,7 +124,7 @@ export default function ComplianceWorkspacePage() {
             )}
           </div>
           
-          {([] as any[]).map((filter, i) => (
+          {(apiData || []).map((filter, i) => (
             <div key={i} className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group">
               <span className="text-[10px] font-black uppercase tracking-widest italic text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                 {filter.label}: {filter.value}
@@ -146,7 +149,7 @@ export default function ComplianceWorkspacePage() {
 
       {/* 2. EXECUTIVE KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {([] as any[]).map((kpi, i) => (
+        {(apiData || []).map((kpi, i) => (
           <Link 
             key={i} 
             href={kpi.href}
@@ -208,7 +211,7 @@ export default function ComplianceWorkspacePage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {([] as any[]).map((row: any, i) => (
+                {(apiData || []).map((row: any, i) => (
                   <TableRow key={i} className="group hover:bg-muted/30 transition-colors border-b border-border/50 cursor-pointer">
                     <TableCell className="px-8 py-5">
                       <Badge variant="outline" className="text-[9px] font-bold uppercase italic tracking-widest px-2 py-0.5 rounded-md">
@@ -295,7 +298,7 @@ export default function ComplianceWorkspacePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {([] as any[]).map((alert: any, i) => (
+                  {(apiData || []).map((alert: any, i) => (
                     <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-4 text-xs font-black italic text-neutral-400">{alert.id}</TableCell>
                       <TableCell>
@@ -349,7 +352,7 @@ export default function ComplianceWorkspacePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {([] as any[]).map((match: any, i) => (
+                  {(apiData || []).map((match: any, i) => (
                     <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-4">
                         <div className="text-[11px] font-black italic tracking-tight">{match.name}</div>
@@ -389,7 +392,7 @@ export default function ComplianceWorkspacePage() {
             <CardContent className="px-2">
               <ScrollArea className="h-[400px]">
                 <div className="space-y-1 px-4 pb-4">
-                  {([] as any[]).map((cust: any, i) => (
+                  {(apiData || []).map((cust: any, i) => (
                     <div key={i} className="flex items-center justify-between p-5 rounded-3xl hover:bg-muted/50 border border-transparent hover:border-border/50 transition-all cursor-pointer group">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-muted rounded-2xl flex items-center justify-center font-black italic text-sm group-hover:bg-brand-lime group-hover:text-black transition-colors">
@@ -434,7 +437,7 @@ export default function ComplianceWorkspacePage() {
             <CardContent className="px-2">
               <ScrollArea className="h-[400px]">
                 <div className="space-y-4 px-4 pb-4">
-                  {([] as any[]).map((caseItem: any, i) => (
+                  {(apiData || []).map((caseItem: any, i) => (
                     <div key={i} className="p-6 rounded-3xl border border-border/50 bg-muted/20 hover:bg-muted/40 transition-all cursor-pointer group">
                       <div className="flex justify-between items-start mb-4">
                         <div>
@@ -507,7 +510,7 @@ export default function ComplianceWorkspacePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                   {([] as any[]).map((report: any, i) => (
+                   {(apiData || []).map((report: any, i) => (
                     <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-5 text-xs font-black italic text-neutral-400">{report.id}</TableCell>
                       <TableCell>
@@ -541,7 +544,7 @@ export default function ComplianceWorkspacePage() {
             <CardContent className="p-0 overflow-hidden">
                <ScrollArea className="h-[400px]">
                   <div className="p-8 space-y-8">
-                     {([] as any[]).map((activity, i) => (
+                     {(apiData || []).map((activity, i) => (
                        <div key={i} className="flex gap-4 relative">
                           {i !== 4 && <div className="absolute left-[13px] top-8 bottom-[-32px] w-[2px] bg-border/50" />}
                           <div className="w-7 h-7 rounded-full bg-background border border-border/50 flex items-center justify-center shrink-0 z-10 shadow-sm">
@@ -607,7 +610,7 @@ export default function ComplianceWorkspacePage() {
              <h4 className="text-[10px] font-black uppercase tracking-widest italic">Team Workload Distribution</h4>
           </div>
           <div className="grid grid-cols-4 gap-4">
-             {([] as any[]).map((analyst, i) => (
+             {(apiData || []).map((analyst, i) => (
                <div key={i} className="space-y-2">
                   <div className="flex justify-between text-[8px] font-black uppercase italic">
                      <span className="truncate">{analyst.name}</span>
@@ -674,7 +677,7 @@ export default function ComplianceWorkspacePage() {
           <Card className="rounded-[40px] border-border/50 bg-neutral-900 text-white p-8 h-full shadow-3xl">
              <h4 className="text-xl font-black italic uppercase tracking-tighter mb-10">Quick Actions</h4>
              <div className="space-y-3">
-                {([] as any[]).map((action, i) => (
+                {(apiData || []).map((action, i) => (
                   <button key={i} className={`w-full p-4 rounded-2xl flex items-center gap-4 text-left transition-all group ${action.color}`}>
                      <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors">
                         {React.cloneElement(action.icon as any, { className: "w-4 h-4" })}

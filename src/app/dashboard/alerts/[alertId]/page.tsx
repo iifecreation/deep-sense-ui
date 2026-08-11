@@ -54,6 +54,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function AlertDetailView() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const params = useParams();
   const alertId = params.alertId as string;
 
@@ -119,7 +122,7 @@ export default function AlertDetailView() {
 
       {/* KPI Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {([] as any[]).map((kpi, i) => (
+        {(apiData || []).map((kpi, i) => (
           <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
             <CardContent className="p-4 flex gap-4 items-center">
               <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
@@ -170,7 +173,7 @@ export default function AlertDetailView() {
                  <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
                     <h4 className="text-sm font-bold text-slate-900 mb-6">Subject Identity</h4>
                     <div className="space-y-4">
-                       {([] as any[]).map((item, i) => (
+                       {(apiData || []).map((item, i) => (
                          <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest flex items-center gap-2">{item.icon} {item.label}</span>
                            <span className="text-[11px] font-bold text-slate-900">{item.value}</span>
@@ -182,7 +185,7 @@ export default function AlertDetailView() {
                  <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
                     <h4 className="text-sm font-bold text-slate-900 mb-6">Object Details</h4>
                     <div className="space-y-4">
-                       {([] as any[]).map((item, i) => (
+                       {(apiData || []).map((item, i) => (
                          <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest flex items-center gap-2">{item.icon} {item.label}</span>
                            <span className="text-[11px] font-bold text-slate-900">{item.value}</span>
@@ -233,7 +236,7 @@ export default function AlertDetailView() {
           <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
              <h4 className="text-sm font-bold text-slate-900 mb-6">Linked Intelligence</h4>
              <div className="space-y-3">
-                {([] as any[]).map((link, i) => (
+                {(apiData || []).map((link, i) => (
                   <Link key={i} href={link.href} className="flex justify-between items-center p-3 rounded-lg border border-slate-50 bg-slate-50/50 hover:bg-slate-50 transition-colors">
                      <span className="text-[11px] font-bold text-slate-600 flex items-center gap-2">{link.icon} {link.label}</span>
                      <ArrowUpRight className="w-3 h-3 text-slate-400" />

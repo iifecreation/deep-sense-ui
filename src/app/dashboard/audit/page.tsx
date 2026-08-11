@@ -58,6 +58,9 @@ import { Progress } from "@/components/ui/progress";
 import { useAuditEvents, useAuditSummary } from "@/hooks";
 
 export default function AuditTrailsPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const [searchQuery, setSearchQuery] = useState("");
   const { data: auditData, isLoading, isError, refetch } = useAuditEvents({ search: searchQuery });
   const { data: summaryData, isLoading: isSummaryLoading } = useAuditSummary();
@@ -148,7 +151,7 @@ export default function AuditTrailsPage() {
             />
           </div>
           
-          {([] as any[]).map((filter, i) => (
+          {(apiData || []).map((filter, i) => (
             <div key={i} className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group border border-transparent hover:border-border">
               <span className="text-[10px] font-black uppercase tracking-widest italic text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                 {filter.label}: {filter.value}
@@ -165,7 +168,7 @@ export default function AuditTrailsPage() {
 
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {([] as any[]).map((kpi, i) => (
+        {(apiData || []).map((kpi, i) => (
           <div 
             key={i} 
             className="flex flex-col gap-4 p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-xl shadow-black/5 hover:border-brand-lime hover:translate-y-[-4px] transition-all group cursor-pointer"
@@ -485,7 +488,7 @@ export default function AuditTrailsPage() {
                </div>
                
                <div className="grid grid-cols-4 gap-8 border-t border-border/50 pt-8 italic font-black">
-                  {([] as any[]).map((stat, i) => (
+                  {(apiData || []).map((stat, i) => (
                     <div key={i} className="space-y-1">
                        <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic leading-none">{stat.l}</div>
                        <div className="text-xl font-black italic">{stat.v}</div>
@@ -497,7 +500,7 @@ export default function AuditTrailsPage() {
 
          <section className="xl:col-span-1 h-full">
             <div className="flex flex-col gap-4 h-full">
-               {([] as any[]).map((action, i) => (
+               {(apiData || []).map((action, i) => (
                  <button key={i} className={`flex-1 p-6 rounded-3xl font-black text-[10px] uppercase tracking-widest italic hover:scale-[1.03] active:scale-95 transition-all group flex items-center justify-between min-h-[80px] ${action.color}`}>
                     <div className="flex items-center gap-4">
                        <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center shrink-0 group-hover:scale-110 transition-all">

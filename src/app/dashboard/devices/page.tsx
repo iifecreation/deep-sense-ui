@@ -23,6 +23,9 @@ import { useDevices } from "@/hooks";
 import { useState } from "react";
 
 export default function DevicesRegistry() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const [searchQuery, setSearchQuery] = useState("");
   const { data: devicesData, isLoading, isError, refetch } = useDevices({ search: searchQuery });
 
@@ -87,7 +90,7 @@ export default function DevicesRegistry() {
 
       {/* KPI Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {([] as any[]).map((kpi, i) => (
+        {(apiData || []).map((kpi, i) => (
           <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
             <CardContent className="p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">

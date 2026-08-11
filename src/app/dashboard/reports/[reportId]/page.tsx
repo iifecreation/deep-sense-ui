@@ -73,6 +73,9 @@ import {
 import { useReport } from "@/hooks/use-reports";
 
 export default function RegulatoryReportDetailPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const params = useParams();
   const reportId = params.reportId as string;
 
@@ -165,7 +168,7 @@ export default function RegulatoryReportDetailPage() {
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 font-black italic leading-none">
-         {([] as any[]).map((kpi, i) => (
+         {(apiData || []).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border shadow-sm flex flex-col gap-4 font-black italic leading-none">
               <div className="flex items-center justify-between font-black italic">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center font-black h-10 leading-none">{kpi.icon}</div>
