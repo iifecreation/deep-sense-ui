@@ -52,6 +52,9 @@ import {
 import { useDevice } from "@/hooks";
 
 export default function DeviceDetailView() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const params = useParams();
   const deviceId = params.deviceId as string;
 
@@ -151,7 +154,7 @@ export default function DeviceDetailView() {
 
       {/* KPI Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {([] as any[]).map((kpi, i) => (
+        {(apiData || []).map((kpi, i) => (
           <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
             <CardContent className="p-4 flex gap-4 items-center">
               <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
@@ -182,7 +185,7 @@ export default function DeviceDetailView() {
                 <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
                   <h4 className="text-sm font-bold text-slate-900 mb-6">Hardware & OS</h4>
                   <div className="space-y-4">
-                    {([] as any[]).map((item, i) => (
+                    {(apiData || []).map((item, i) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                         <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">{item.label}</span>
                         <span className="text-[11px] font-bold text-slate-900">{item.value}</span>
@@ -194,7 +197,7 @@ export default function DeviceDetailView() {
                 <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
                   <h4 className="text-sm font-bold text-slate-900 mb-6">Network Context</h4>
                   <div className="space-y-4">
-                    {([] as any[]).map((item, i) => (
+                    {(apiData || []).map((item, i) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                         <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">{item.label}</span>
                         <span className="text-[11px] font-bold text-slate-900">{item.value}</span>

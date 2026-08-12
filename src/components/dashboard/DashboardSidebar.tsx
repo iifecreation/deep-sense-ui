@@ -71,7 +71,7 @@ const navigation: NavGroup[] = [
   {
     name: "Intelligence",
     items: [
-      { name: "Rules Engine", icon: <BrainCircuit />, href: "/dashboard/rules", services: ["controls", "risk_orchestration"] },
+      { name: "Rules & Strategy", icon: <BrainCircuit />, href: "/dashboard/rules", services: ["controls", "risk_orchestration"] },
       { name: "Models", icon: <Binary />, href: "/dashboard/models", services: ["risk_orchestration"] },
       { name: "Graph Intelligence", icon: <Share2 />, href: "/dashboard/graph", services: ["graph"] },
       { name: "Devices", icon: <Smartphone />, href: "/dashboard/devices", services: ["device_fingerprinting"] },

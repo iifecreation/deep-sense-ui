@@ -25,6 +25,9 @@ import { useRuntimeEnvironment } from "@/hooks/use-runtime-environment";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const environment = useRuntimeEnvironment();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("Organization");
@@ -277,7 +280,7 @@ export default function SettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
         {/* Navigation Sidebar */}
         <div className="lg:col-span-3 flex overflow-x-auto no-scrollbar gap-4 lg:flex-col lg:space-y-4 lg:gap-0 pb-4 lg:pb-0">
-           {([] as any[]).map((nav, i) => (
+           {(apiData || []).map((nav, i) => (
              <button 
                key={i} 
                onClick={() => setActiveTab(nav.n)}
@@ -623,7 +626,7 @@ export default function SettingsPage() {
                     <div>
                       <h4 className="text-lg font-black tracking-tight uppercase mb-4 text-neutral-900">Go-Live Checklist</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {([] as any[]).map((item) => {
+                        {(apiData || []).map((item) => {
                           const isComplete = (promotionStatus as any)[item.key];
                           return (
                             <div key={item.key} className={`flex items-center gap-3 p-4 rounded-2xl border ${isComplete ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-white border-neutral-100'} transition-all`}>

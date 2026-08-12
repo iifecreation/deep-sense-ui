@@ -58,6 +58,9 @@ import { Progress } from "@/components/ui/progress";
 import { useScreeningMatches, useWatchlists } from "@/hooks/use-screening";
 
 export default function ScreeningCenterPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const { data: matches, isLoading, isError, error, refetch } = useScreeningMatches({ 
@@ -212,7 +215,7 @@ export default function ScreeningCenterPage() {
 
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {([] as any[]).map((kpi, i) => (
+        {(apiData || []).map((kpi, i) => (
           <Link 
             key={i} 
             href={`/dashboard/screening?status=${kpi.label.toLowerCase().includes('pending') ? 'pending' : ''}`}
@@ -414,7 +417,7 @@ export default function ScreeningCenterPage() {
                <div className="space-y-10">
                   <div className="grid grid-cols-2 gap-8">
                      <div className="space-y-6">
-                        {([] as any[]).map((item, i) => (
+                        {(apiData || []).map((item, i) => (
                            <div key={i} className="space-y-2">
                               <div className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest text-muted-foreground">
                                  <span>{item.label}</span>
@@ -469,7 +472,7 @@ export default function ScreeningCenterPage() {
                    </TableRow>
                  </TableHeader>
                  <TableBody>
-                   {([] as any[]).map((list: any, i) => (
+                   {(apiData || []).map((list: any, i) => (
                      <TableRow key={i} className="group hover:bg-white/5 border-b border-white/5 transition-colors">
                        <TableCell className="px-8 py-4">
                           <div className="text-[11px] font-black italic tracking-tight">{list.name}</div>
@@ -525,7 +528,7 @@ export default function ScreeningCenterPage() {
                </div>
                
                <div className="space-y-4">
-                  {([] as any[]).map((job: any, i) => (
+                  {(apiData || []).map((job: any, i) => (
                     <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest">
                        <span className="text-muted-foreground">{job.label}</span>
                        <span className={job.status === 'Running' ? 'text-indigo-500 animate-pulse' : 'text-emerald-500'}>{job.status} • {job.time}</span>
@@ -545,7 +548,7 @@ export default function ScreeningCenterPage() {
             <CardContent className="p-0 flex-1">
                <ScrollArea className="h-[400px]">
                   <div className="p-8 space-y-8">
-                     {([] as any[]).map((change: any, i: number) => (
+                     {(apiData || []).map((change: any, i: number) => (
                        <div key={i} className="flex gap-4 relative">
                           {i !== 0 && <div className="absolute left-[13px] top-8 bottom-[-32px] w-[2px] bg-border/50" />}
                           <div className="w-7 h-7 rounded-full bg-background border border-border/50 flex items-center justify-center shrink-0 z-10 shadow-sm transition-transform hover:scale-125">
@@ -583,7 +586,7 @@ export default function ScreeningCenterPage() {
               
               <div className="grid grid-cols-2 gap-10">
                  <div className="space-y-6">
-                    {([] as any[]).map((st: any, i: number) => (
+                    {(apiData || []).map((st: any, i: number) => (
                        <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest">
                           <span className="text-muted-foreground">{st.l}</span>
                           <span className="text-xl font-black italic">{st.v}</span>
@@ -591,7 +594,7 @@ export default function ScreeningCenterPage() {
                     ))}
                  </div>
                  <div className="space-y-6">
-                    {([] as any[]).map((st: any, i: number) => (
+                    {(apiData || []).map((st: any, i: number) => (
                        <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest">
                           <span className="text-muted-foreground">{st.l}</span>
                           <span className="text-xl font-black italic">{st.v}</span>
@@ -632,7 +635,7 @@ export default function ScreeningCenterPage() {
                
                <div className="space-y-4">
                   <h5 className="text-[10px] font-black uppercase italic tracking-widest text-white/40">Recent Governance Events</h5>
-                  {([] as any[]).map((ge: any, i) => (
+                  {(apiData || []).map((ge: any, i) => (
                     <div key={i} className="flex justify-between items-center text-[10px] font-black italic tracking-tight border-b border-white/5 pb-3">
                        <span className="text-white/60">{ge.e}</span>
                        <span className="text-white/20">{ge.t}</span>
@@ -647,7 +650,7 @@ export default function ScreeningCenterPage() {
       {/* 11. QUICK ACTIONS PANEL */}
       <section>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-           {([] as any[]).map((action: any, i) => (
+           {(apiData || []).map((action: any, i) => (
              <button key={i} className={`flex items-center gap-3 p-4 rounded-2xl font-black text-[9px] uppercase tracking-widest italic hover:scale-105 active:scale-95 transition-all group ${action.color}`}>
                 <div className="w-6 h-6 rounded-lg bg-black/10 flex items-center justify-center shrink-0">
                   {React.cloneElement(action.icon as any, { className: "w-3 h-3" })}

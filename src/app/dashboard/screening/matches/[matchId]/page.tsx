@@ -72,6 +72,9 @@ import {
 import { useScreeningMatch } from "@/hooks/use-screening";
 
 export default function ScreeningMatchDetailPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const params = useParams();
   const matchId = params.matchId as string;
 
@@ -158,7 +161,7 @@ export default function ScreeningMatchDetailPage() {
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-         {([] as any[]).map((kpi, i) => (
+         {(apiData || []).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
@@ -219,7 +222,7 @@ export default function ScreeningMatchDetailPage() {
                            <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Matched Entity Profile</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0 space-y-6">
-                           {([] as any[]).map((it, i) => (
+                           {(apiData || []).map((it, i) => (
                              <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic group h-10 border-b border-border last:border-0 font-black">
                                 <span className="text-muted-foreground flex items-center gap-2">{it.icon} {it.l}</span>
                                 <span className="text-neutral-900 group-hover:text-brand-lime transition-colors cursor-pointer">{it.v}</span>
@@ -292,7 +295,7 @@ export default function ScreeningMatchDetailPage() {
                      </Link>
                   </div>
                   <div className="space-y-4 font-black italic">
-                     {([] as any[]).map((it, i) => (
+                     {(apiData || []).map((it, i) => (
                        <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic border-b border-neutral-50 pb-4 last:border-0 font-black">
                           <span className="text-muted-foreground">{it.label}</span>
                           <span className="text-neutral-900 font-black italic uppercase">{it.value}</span>

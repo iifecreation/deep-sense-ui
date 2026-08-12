@@ -15,6 +15,9 @@ import {
 } from "lucide-react";
 
 export default function GraphIntelPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   return (
     <div className="h-[calc(100vh-160px)] flex flex-col gap-8">
       {/* 1. HEADER */}
@@ -68,7 +71,7 @@ export default function GraphIntelPage() {
                 <line x1="50%" y1="80%" x2="80%" y2="60%" />
               </g>
 
-              {([] as any[]).map((node, i) => (
+              {(apiData || []).map((node, i) => (
                 <g key={i} className="cursor-pointer group/node">
                    <circle 
                      cx={node.x} cy={node.y} r={node.s} 
@@ -146,7 +149,7 @@ export default function GraphIntelPage() {
               <div className="space-y-8">
                  <h5 className="text-[9px] font-black uppercase tracking-widest text-neutral-400 italic">Relational Affiliations</h5>
                  <div className="space-y-4">
-                    {([] as any[]).map((link, j) => (
+                    {(apiData || []).map((link, j) => (
                       <div key={j} className="p-6 bg-zinc-50 rounded-3xl border border-neutral-100 flex items-center justify-between group/link hover:bg-white hover:shadow-xl transition-all cursor-pointer">
                          <div className="flex items-center gap-4">
                             <div className={`w-10 h-10 rounded-xl bg-white border border-neutral-100 flex items-center justify-center shadow-sm ${link.r === 'RED' ? 'text-red-500' : link.r === 'LIME' ? 'text-brand-lime shadow-md' : 'text-neutral-300'}`}>

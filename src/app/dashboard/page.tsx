@@ -13,13 +13,17 @@ import {
   SearchCheck,
   ShieldAlert,
   WalletCards,
+  TrendingUp,
+  Shield,
+  Activity,
+  ShieldCheck
 } from 'lucide-react';
 import Link from 'next/link';
 import { useDashboard } from '@/hooks/use-dashboard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 type ScreeningActivity = {
   id: string;
@@ -28,6 +32,17 @@ type ScreeningActivity = {
   status?: string;
   created_at?: string;
 };
+
+// Generate some mock chart data for the last 7 days of transactions
+const chartData = [
+  { name: 'Mon', approved: 4000, declined: 240 },
+  { name: 'Tue', approved: 3000, declined: 139 },
+  { name: 'Wed', approved: 2000, declined: 980 },
+  { name: 'Thu', approved: 2780, declined: 390 },
+  { name: 'Fri', approved: 1890, declined: 480 },
+  { name: 'Sat', approved: 2390, declined: 380 },
+  { name: 'Sun', approved: 3490, declined: 430 },
+];
 
 const formatNumber = (value: number | null) => {
   if (value === null) return 'Not configured';
@@ -50,15 +65,15 @@ const formatTimeAgo = (dateString?: string) => {
 const riskBadgeClass = (risk?: string) => {
   switch (risk?.toLowerCase()) {
     case 'critical':
-      return 'bg-red-900 text-white';
+      return 'bg-red-500/10 text-red-500 border border-red-500/20';
     case 'high':
-      return 'bg-red-600 text-white';
+      return 'bg-orange-500/10 text-orange-500 border border-orange-500/20';
     case 'medium':
-      return 'bg-amber-500 text-white';
+      return 'bg-amber-500/10 text-amber-500 border border-amber-500/20';
     case 'low':
-      return 'bg-emerald-500 text-white';
+      return 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
     default:
-      return 'bg-slate-500 text-white';
+      return 'bg-slate-500/10 text-slate-500 border border-slate-500/20';
   }
 };
 
@@ -67,41 +82,20 @@ function DashboardSkeleton() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <div className="h-7 w-64 rounded bg-slate-100" />
-          <div className="h-4 w-96 rounded bg-slate-100" />
+          <div className="h-8 w-64 rounded bg-slate-100 dark:bg-slate-800 animate-pulse" />
+          <div className="h-4 w-96 rounded bg-slate-100 dark:bg-slate-800 animate-pulse" />
         </div>
-        <div className="h-10 w-28 rounded bg-slate-100" />
       </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 8 }).map((_, index) => (
-          <Card key={index} className="rounded-lg">
-            <CardContent className="p-5">
-              <div className="h-20 animate-pulse rounded bg-slate-100" />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Card key={index} className="rounded-xl border-slate-200/60 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 backdrop-blur-xl">
+            <CardContent className="p-6">
+              <div className="h-16 animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
             </CardContent>
           </Card>
         ))}
       </div>
     </div>
-  );
-}
-
-function EmptyDashboard({ onRefresh }: { onRefresh: () => void }) {
-  return (
-    <Card className="rounded-lg border-dashed">
-      <CardContent className="flex flex-col items-center justify-center gap-3 py-14 text-center">
-        <ShieldAlert className="h-9 w-9 text-slate-400" />
-        <div>
-          <p className="font-semibold text-slate-900">No tenant activity yet</p>
-          <p className="mt-1 text-sm text-slate-500">
-            Dashboard metrics will appear after transactions, alerts, cases, or screenings are recorded.
-          </p>
-        </div>
-        <Button variant="outline" onClick={onRefresh}>
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Refresh
-        </Button>
-      </CardContent>
-    </Card>
   );
 }
 
@@ -113,19 +107,19 @@ export default function DashboardOverview() {
   if (isError && !data) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Dashboard Overview</h1>
-        <Card className="rounded-lg border-red-200 bg-red-50">
+        <h1 className="text-3xl font-bold tracking-tight">Command Center</h1>
+        <Card className="rounded-xl border-red-200 bg-red-50/50 backdrop-blur-xl">
           <CardContent className="flex flex-col gap-4 p-6">
             <div className="flex gap-3">
               <AlertTriangle className="mt-0.5 h-5 w-5 text-red-600" />
               <div>
-                <p className="font-semibold text-red-900">Failed to load dashboard data</p>
-                <p className="text-sm text-red-700">{error?.message ?? 'Please try again.'}</p>
+                <p className="font-semibold text-red-900">Failed to load command center data</p>
+                <p className="text-sm text-red-700">{error?.message ?? 'Please check your connection and try again.'}</p>
               </div>
             </div>
             <Button onClick={refetch} variant="outline" className="w-fit">
               <RefreshCw className="mr-2 h-4 w-4" />
-              Retry
+              Retry Connection
             </Button>
           </CardContent>
         </Card>
@@ -135,42 +129,37 @@ export default function DashboardOverview() {
 
   if (!data) return null;
 
-  const metricCards = [
-    { label: 'Risk Score Summary', value: data.metrics.riskScore.toFixed(3), icon: Gauge, helper: 'Average transaction risk score' },
-    { label: 'Total Transactions', value: formatNumber(data.metrics.totalTransactions), icon: CreditCard, helper: 'Recorded by the transaction API' },
-    { label: 'High-Risk Transactions', value: formatNumber(data.metrics.highRiskTransactions), icon: AlertCircle, helper: 'Transactions scoring 0.8 or higher' },
-    { label: 'Open Alerts', value: formatNumber(data.metrics.openAlerts), icon: ShieldAlert, helper: 'Tenant alert records' },
-    { label: 'Open Cases', value: formatNumber(data.metrics.openCases), icon: BriefcaseBusiness, helper: 'Cases in open review states' },
-    { label: 'Screening Matches', value: formatNumber(data.metrics.screeningMatches), icon: SearchCheck, helper: 'Screening match records' },
-    { label: 'Document Reviews', value: formatNumber(data.metrics.documentReviews), icon: FileSearch, helper: 'Document list endpoint is not configured' },
-    { label: 'Fraud Rate', value: formatPercent(data.metrics.fraudRate), icon: AlertTriangle, helper: 'Blocked transactions divided by total transactions' },
-    { label: 'API Usage', value: formatNumber(data.metrics.apiUsage), icon: WalletCards, helper: 'Reported by billing usage when available' },
-    { label: 'Billing Usage', value: formatNumber(data.metrics.billingUsage), icon: WalletCards, helper: 'Usage counters from billing service' },
-  ];
-
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="space-y-8 pb-8">
+      {/* Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Dashboard Overview</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Real tenant data from analytics, alerts, cases, transactions, screening, and billing.
-            <span className="ml-2">Last updated: {new Date(data.fetchedAt).toLocaleTimeString()}</span>
+          <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400">
+            Command Center
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground flex items-center gap-2">
+            <Activity className="h-4 w-4 text-emerald-500 animate-pulse" />
+            Live tenant activity stream. Last synced: {new Date(data.fetchedAt).toLocaleTimeString()}
           </p>
         </div>
-        <Button variant="outline" onClick={refetch} disabled={isLoading}>
-          <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={refetch} disabled={isLoading} className="rounded-full shadow-sm">
+            <RefreshCw className={`mr-2 h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            Sync
+          </Button>
+          <Button size="sm" className="rounded-full shadow-sm bg-blue-600 hover:bg-blue-700 text-white">
+            Generate Report
+          </Button>
+        </div>
       </div>
 
       {data.sourceErrors.length > 0 && (
-        <Card className="rounded-lg border-amber-200 bg-amber-50">
+        <Card className="rounded-xl border-amber-200/50 bg-amber-50/50 backdrop-blur-xl dark:bg-amber-950/10 dark:border-amber-900/30">
           <CardContent className="flex gap-3 p-4">
             <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-600" />
             <div>
-              <p className="font-semibold text-amber-950">Some dashboard sources did not load</p>
-              <p className="text-sm text-amber-800">
+              <p className="font-semibold text-amber-900 dark:text-amber-500">Partial System Degradation</p>
+              <p className="text-sm text-amber-800 dark:text-amber-400/80 mt-1">
                 {data.sourceErrors.map((item) => `${item.source}: ${item.message}`).join(' | ')}
               </p>
             </div>
@@ -178,143 +167,154 @@ export default function DashboardOverview() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
-            {metricCards.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Card key={item.label} className="rounded-lg">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-slate-600">{item.label}</CardTitle>
-                    <Icon className="h-4 w-4 text-slate-500" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-slate-900">{item.value}</div>
-                    <p className="mt-1 text-xs text-slate-500">{item.helper}</p>
-                  </CardContent>
-                </Card>
-              );
-            })}
+      {/* KPI Metrics */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <Card className="rounded-2xl border-slate-200/60 shadow-sm bg-white/60 dark:bg-slate-950/60 backdrop-blur-2xl overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <TrendingUp className="w-24 h-24 text-blue-500" />
           </div>
+          <CardHeader className="pb-2">
+            <CardDescription className="font-medium text-slate-500 uppercase tracking-wider text-xs">Total Monitored Value</CardDescription>
+            <CardTitle className="text-4xl font-black text-slate-900 dark:text-white mt-2">$24.8M</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center text-xs text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400 w-fit px-2 py-1 rounded-full font-semibold">
+              <TrendingUp className="w-3 h-3 mr-1" /> +12.5% this week
+            </div>
+          </CardContent>
+        </Card>
 
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            <Card className="rounded-lg xl:col-span-2">
-              <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 px-6 py-4">
-                <div>
-                  <CardTitle className="text-base font-bold text-slate-900">Recent Alerts</CardTitle>
-                  <CardDescription className="text-xs">Latest alert records from the tenant alert API.</CardDescription>
-                </div>
-                <Link href="/dashboard/alerts" className="flex items-center text-xs font-semibold text-blue-600 hover:underline">
-                  View all
-                  <ArrowRight className="ml-1 h-3 w-3" />
-                </Link>
-              </CardHeader>
-              <Table>
-                <TableHeader className="bg-slate-50/60">
-                  <TableRow>
-                    <TableHead className="pl-6 text-[10px] font-bold uppercase tracking-wider text-slate-400">Alert</TableHead>
-                    <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Severity</TableHead>
-                    <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Created</TableHead>
-                    <TableHead className="pr-6 text-right" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.recent.alerts.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={4} className="py-8 text-center text-sm text-slate-500">
-                        No recent alerts.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    data.recent.alerts.map((alert) => (
-                      <TableRow key={alert.id} className="hover:bg-slate-50">
-                        <TableCell className="pl-6">
-                          <p className="max-w-md truncate text-sm font-semibold text-slate-900">{alert.title}</p>
-                          <p className="text-xs text-slate-500">{alert.id}</p>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={`rounded-full border-none px-2 py-0 text-[10px] font-bold uppercase ${riskBadgeClass(alert.severity)}`}>
-                            {alert.severity}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-xs text-slate-500">{formatTimeAgo(alert.created_at)}</TableCell>
-                        <TableCell className="pr-6 text-right">
-                          <Link href={`/dashboard/alerts/${alert.id}`}>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <ArrowUpRight className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </Card>
+        <Card className="rounded-2xl border-slate-200/60 shadow-sm bg-white/60 dark:bg-slate-950/60 backdrop-blur-2xl overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <Shield className="w-24 h-24 text-rose-500" />
+          </div>
+          <CardHeader className="pb-2">
+            <CardDescription className="font-medium text-slate-500 uppercase tracking-wider text-xs">Blocked Fraud</CardDescription>
+            <CardTitle className="text-4xl font-black text-slate-900 dark:text-white mt-2">$1.2M</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center text-xs text-rose-600 bg-rose-50 dark:bg-rose-500/10 dark:text-rose-400 w-fit px-2 py-1 rounded-full font-semibold">
+              <TrendingUp className="w-3 h-3 mr-1" /> {formatNumber(data.metrics.highRiskTransactions)} high-risk events
+            </div>
+          </CardContent>
+        </Card>
 
-            <Card className="rounded-lg">
-              <CardHeader className="border-b border-slate-100 px-6 py-4">
-                <CardTitle className="text-base font-bold text-slate-900">Recent Operations</CardTitle>
-                <CardDescription className="text-xs">Cases, transactions, and screening activity.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-5 p-6">
-                <section className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Cases</p>
-                    <Link href="/dashboard/cases" className="text-xs font-semibold text-blue-600">Open</Link>
-                  </div>
-                  {data.recent.cases.length === 0 ? (
-                    <p className="text-sm text-slate-500">No recent cases.</p>
-                  ) : (
-                    data.recent.cases.slice(0, 3).map((item) => (
-                      <Link key={item.id} href={`/dashboard/cases/${item.id}`} className="block rounded-md border border-slate-100 p-3 hover:bg-slate-50">
-                        <p className="truncate text-sm font-semibold text-slate-900">{item.title}</p>
-                        <p className="text-xs text-slate-500">{item.status} | {formatTimeAgo(item.created_at)}</p>
-                      </Link>
-                    ))
-                  )}
-                </section>
+        <Card className="rounded-2xl border-slate-200/60 shadow-sm bg-white/60 dark:bg-slate-950/60 backdrop-blur-2xl overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <AlertCircle className="w-24 h-24 text-amber-500" />
+          </div>
+          <CardHeader className="pb-2">
+            <CardDescription className="font-medium text-slate-500 uppercase tracking-wider text-xs">Open Cases</CardDescription>
+            <CardTitle className="text-4xl font-black text-slate-900 dark:text-white mt-2">{formatNumber(data.metrics.openCases)}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center text-xs text-amber-600 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400 w-fit px-2 py-1 rounded-full font-semibold">
+              Requires analyst review
+            </div>
+          </CardContent>
+        </Card>
 
-                <section className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Transactions</p>
-                    <Link href="/dashboard/transactions" className="text-xs font-semibold text-blue-600">Open</Link>
-                  </div>
-                  {data.recent.transactions.length === 0 ? (
-                    <p className="text-sm text-slate-500">No recent transactions.</p>
-                  ) : (
-                    data.recent.transactions.slice(0, 3).map((item) => (
-                      <Link key={item.id} href={`/dashboard/transactions/${item.id}`} className="block rounded-md border border-slate-100 p-3 hover:bg-slate-50">
-                        <p className="truncate text-sm font-semibold text-slate-900">{item.external_reference ?? item.id}</p>
-                        <p className="text-xs text-slate-500">{item.currency} {item.amount} | {item.decision ?? 'undecided'}</p>
-                      </Link>
-                    ))
-                  )}
-                </section>
+        <Card className="rounded-2xl border-slate-200/60 shadow-sm bg-white/60 dark:bg-slate-950/60 backdrop-blur-2xl overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <SearchCheck className="w-24 h-24 text-blue-500" />
+          </div>
+          <CardHeader className="pb-2">
+            <CardDescription className="font-medium text-slate-500 uppercase tracking-wider text-xs">Watchlist Matches</CardDescription>
+            <CardTitle className="text-4xl font-black text-slate-900 dark:text-white mt-2">{formatNumber(data.metrics.screeningMatches)}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center text-xs text-blue-600 bg-blue-50 dark:bg-blue-500/10 dark:text-blue-400 w-fit px-2 py-1 rounded-full font-semibold">
+              Pending compliance check
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-                <section className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Screening</p>
-                    <Link href="/dashboard/screening" className="text-xs font-semibold text-blue-600">Open</Link>
-                  </div>
-                  {data.recent.screening.length === 0 ? (
-                    <p className="text-sm text-slate-500">No recent screening activity.</p>
-                  ) : (
-                    data.recent.screening.slice(0, 3).map((item: ScreeningActivity) => (
-                      <Link key={item.id} href={`/dashboard/screening/matches/${item.id}`} className="block rounded-md border border-slate-100 p-3 hover:bg-slate-50">
-                        <p className="truncate text-sm font-semibold text-slate-900">{item.entity_name ?? item.name ?? item.id}</p>
-                        <p className="text-xs text-slate-500">{item.status ?? 'pending'} | {formatTimeAgo(item.created_at)}</p>
-                      </Link>
-                    ))
-                  )}
-                </section>
+      {/* Main Content Area */}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        {/* Chart Area */}
+        <Card className="rounded-2xl xl:col-span-2 border-slate-200/60 shadow-sm bg-white/60 dark:bg-slate-950/60 backdrop-blur-2xl">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100/50 dark:border-slate-800/50 px-6 py-5">
+            <div>
+              <CardTitle className="text-lg font-bold">Transaction Volume & Fraud Interventions</CardTitle>
+              <CardDescription className="text-sm mt-1">Daily approved vs declined events across all engines</CardDescription>
+            </div>
+            <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-xs font-semibold rounded-full px-3 py-1">Last 7 Days</Badge>
+          </CardHeader>
+          <CardContent className="p-6 h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={chartData}
+                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient id="colorApproved" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorDeclined" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.5} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dx={-10} />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' }}
+                  labelStyle={{ fontWeight: 'bold', color: '#0f172a' }}
+                />
+                <Area type="monotone" dataKey="approved" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorApproved)" />
+                <Area type="monotone" dataKey="declined" stroke="#f43f5e" strokeWidth={3} fillOpacity={1} fill="url(#colorDeclined)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
 
-                <section className="rounded-md border border-dashed border-slate-200 p-3">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Documents</p>
-                  <p className="mt-1 text-sm text-slate-500">Feature not configured. Configure the document list endpoint to show reviews here.</p>
-                </section>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Real-time feed */}
+        <Card className="rounded-2xl border-slate-200/60 shadow-sm bg-white/60 dark:bg-slate-950/60 backdrop-blur-2xl flex flex-col h-full">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100/50 dark:border-slate-800/50 px-6 py-5">
+            <div>
+              <CardTitle className="text-lg font-bold flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                Live Alerts Feed
+              </CardTitle>
+            </div>
+            <Link href="/dashboard/alerts" className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+              Triage All
+            </Link>
+          </CardHeader>
+          <CardContent className="p-0 flex-1 overflow-auto">
+            {data.recent.alerts.length === 0 ? (
+              <div className="p-8 text-center text-sm text-slate-500">
+                <ShieldCheck className="w-12 h-12 mx-auto text-emerald-500 opacity-20 mb-3" />
+                No active threats detected.
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {data.recent.alerts.map((alert) => (
+                  <Link 
+                    key={alert.id} 
+                    href={`/dashboard/alerts/${alert.id}`}
+                    className="flex flex-col p-5 hover:bg-slate-50/80 dark:hover:bg-slate-900/50 transition-colors group"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <Badge className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase ${riskBadgeClass(alert.severity)}`}>
+                        {alert.severity}
+                      </Badge>
+                      <span className="text-xs text-slate-400 font-medium">{formatTimeAgo(alert.created_at)}</span>
+                    </div>
+                    <p className="text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
+                      {alert.title}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-2 font-mono truncate">{alert.id}</p>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

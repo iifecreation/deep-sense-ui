@@ -55,6 +55,9 @@ import {
 import { useIntegration } from "@/hooks/use-integrations";
 
 export default function IntegrationDetailPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const params = useParams();
   const integrationId = params.integrationId as string;
 
@@ -151,7 +154,7 @@ export default function IntegrationDetailPage() {
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-         {([] as any[]).map((kpi, i) => (
+         {(apiData || []).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
@@ -186,7 +189,7 @@ export default function IntegrationDetailPage() {
                      <CardContent className="p-0 space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                            <div className="space-y-6">
-                              {([] as any[]).map((it, i) => (
+                              {(apiData || []).map((it, i) => (
                                 <div key={i} className="flex flex-col gap-1">
                                    <span className="text-[10px] font-black uppercase text-muted-foreground italic">{it.label}</span>
                                    <span className="text-[13px] font-black italic text-neutral-900 truncate">{it.value}</span>
@@ -210,7 +213,7 @@ export default function IntegrationDetailPage() {
                            <Activity className="w-6 h-6 text-brand-lime" />
                         </CardHeader>
                         <CardContent className="p-0 space-y-6">
-                           {([] as any[]).map((item, i) => (
+                           {(apiData || []).map((item, i) => (
                              <div key={i} className="flex justify-between items-center text-[11px] font-black uppercase italic tracking-widest border-b border-border/50 pb-4 last:border-0">
                                 <span className="text-muted-foreground">{item.label}</span>
                                 <span className="text-neutral-900">{item.value}</span>

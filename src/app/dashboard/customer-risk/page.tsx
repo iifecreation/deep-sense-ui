@@ -29,6 +29,9 @@ import { useCustomers } from "@/hooks/use-customers";
 import { useState } from "react";
 
 export default function CustomerRiskRegistry() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const [searchQuery, setSearchQuery] = useState("");
   const [riskTierFilter, setRiskTierFilter] = useState<string | null>(null);
   const { data: customers, isLoading, isError, error, refetch } = useCustomers({ 
@@ -255,7 +258,7 @@ export default function CustomerRiskRegistry() {
             <PieChart className="w-5 h-5 text-slate-200" />
           </div>
           <div className="space-y-3">
-            {([] as any[]).map((segment, i) => {
+            {(apiData || []).map((segment, i) => {
               const total = customers?.length || 1;
               const percentage = ((segment.value / total) * 100).toFixed(0);
               return (

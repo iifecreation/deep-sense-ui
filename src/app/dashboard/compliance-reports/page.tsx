@@ -46,6 +46,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useReports } from "@/hooks";
 
 export default function ComplianceReportsPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const { data: reports, isLoading, isError, error, refetch } = useReports();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("runs");
@@ -321,7 +324,7 @@ export default function ComplianceReportsPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {([] as any[]).map((framework, i) => (
+                {(apiData || []).map((framework, i) => (
                   <div key={i} className="p-4 border rounded-xl hover:bg-muted/50 transition-colors">
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="font-bold text-sm">{framework.name}</h4>

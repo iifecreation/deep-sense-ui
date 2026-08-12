@@ -12,6 +12,9 @@ import {
 import { useDashboardMetrics } from "@/hooks/use-analytics";
 
 export default function AnalyticsPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const [period, setPeriod] = useState("7d");
   const { data, isLoading } = useDashboardMetrics({ filters: { period } });
 
@@ -54,7 +57,7 @@ export default function AnalyticsPage() {
 
       {/* 2. STAT CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-         {([] as any[]).map((stat: any, i: number) => (
+         {(apiData || []).map((stat: any, i: number) => (
            <div key={i} className="p-10 bg-white rounded-[56px] border border-neutral-100 shadow-xl flex items-center justify-between group overflow-hidden relative transition-all hover:shadow-2xl font-bold italic">
               <div className="space-y-4">
                  <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 italic leading-none">{stat.l}</p>

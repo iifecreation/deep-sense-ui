@@ -67,6 +67,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuditEvent } from "@/hooks";
 
 export default function AuditEventDetailPage() {
+  // Fallback: No specific hook generated, using generic state
+  const apiData: any[] = [];
+
   const params = useParams();
   const eventId = params.eventId as string;
 
@@ -156,7 +159,7 @@ export default function AuditEventDetailPage() {
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 font-black italic leading-none">
-         {([] as any[]).map((kpi, i) => (
+         {(apiData || []).map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border shadow-sm flex flex-col gap-4 font-black italic leading-none h-fit">
               <div className="flex items-center justify-between font-black italic">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center font-black h-10 leading-none">{kpi.icon}</div>
@@ -251,7 +254,7 @@ export default function AuditEventDetailPage() {
                   </div>
                </div>
                <div className="pt-6 border-t border-border space-y-4 font-black italic">
-                  {([] as any[]).map((it, i) => (
+                  {(apiData || []).map((it, i) => (
                     <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic font-black h-4 leading-none truncate">
                        <span className="text-muted-foreground mr-2">{it.l}</span>
                        <span className="text-neutral-900 font-black italic uppercase truncate">{it.v}</span>
