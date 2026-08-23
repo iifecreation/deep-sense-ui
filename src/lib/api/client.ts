@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { getRuntimeApiUrl, tokenStorageKey } from '@/lib/runtime-environment';
+import { getControlApiUrl, getRuntimeApiUrl } from '@/lib/runtime-environment';
 
 // Environment configuration
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === 'production' ? 'https://app.deepsense.ai' : 'http://localhost:3000');
@@ -19,31 +19,46 @@ export class ApiError extends Error {
   }
 }
 
-// Auth token management
-export const getToken = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem(tokenStorageKey("access"));
-};
+// Auth token management.
+//
+// The refresh token never touches JS: it lives only in the httpOnly cookie
+// the control-plane identity issuer sets on its own origin, and is used
+// automatically (via `withCredentials`) whenever we call `/identity/refresh`
+// there. The access token DOES need to be readable by this app, because it
+// has to be forwarded as an `Authorization` header to a *different* host
+// (the sandbox/production runtime API) — so instead of persisting it to
+// localStorage (readable by any XSS on the page, forever), it's kept only in
+// this in-memory variable, which is wiped on tab close / full reload.
+let accessTokenMemory: string | null = null;
+
+export const getToken = (): string | null => accessTokenMemory;
 
 export const setToken = (token: string): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(tokenStorageKey("access"), token);
-};
-
-export const getRefreshToken = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem(tokenStorageKey("refresh"));
-};
-
-export const setRefreshToken = (token: string): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(tokenStorageKey("refresh"), token);
+  accessTokenMemory = token;
 };
 
 export const clearTokens = (): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(tokenStorageKey("access"));
-  localStorage.removeItem(tokenStorageKey("refresh"));
+  accessTokenMemory = null;
+};
+
+// Silently mint a fresh access token from the httpOnly refresh-token cookie.
+// Returns null (without throwing) if there's no valid session.
+export const silentRefresh = async (): Promise<string | null> => {
+  try {
+    const response = await axios.post(
+      `${getControlApiUrl()}/api/v1/identity/refresh`,
+      {},
+      { withCredentials: true },
+    );
+    const token = response.data?.access_token as string | undefined;
+    if (token) {
+      setToken(token);
+      return token;
+    }
+    return null;
+  } catch {
+    return null;
+  }
 };
 
 // Create axios instance
@@ -80,36 +95,22 @@ const createApiClient = (): AxiosInstance => {
     async (error: AxiosError) => {
       const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-      // Handle 401 errors - try to refresh token
+      // Handle 401 errors - try to silently refresh via the httpOnly cookie
       if (error.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
 
-        try {
-          const refreshToken = getRefreshToken();
-          if (refreshToken) {
-            const response = await axios.post(`${getRuntimeApiUrl()}/api/v1/auth/refresh`, {
-              refresh_token: refreshToken,
-            });
-
-            const { access_token, refresh_token: newRefreshToken } = response.data;
-            setToken(access_token);
-            if (newRefreshToken) {
-              setRefreshToken(newRefreshToken);
-            }
-
-            // Retry original request with new token
-            if (originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${access_token}`;
-            }
-            return client(originalRequest);
+        const freshToken = await silentRefresh();
+        if (freshToken) {
+          if (originalRequest.headers) {
+            originalRequest.headers.Authorization = `Bearer ${freshToken}`;
           }
-        } catch (refreshError) {
-          // Refresh failed - clear tokens and redirect to login
-          clearTokens();
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login';
-          }
-          return Promise.reject(refreshError);
+          return client(originalRequest);
+        }
+
+        // Refresh failed - clear the in-memory token and redirect to login
+        clearTokens();
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
         }
       }
 
