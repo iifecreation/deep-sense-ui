@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { getToken } from '@/lib/api/client';
+import { getToken, silentRefresh } from '@/lib/api/client';
 import type { UserPublic } from '@/types';
 
 /**
@@ -15,8 +15,18 @@ export function useAuth() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const checkAuth = () => {
-      const token = getToken();
+    let cancelled = false;
+
+    const checkAuth = async () => {
+      // The access token lives only in memory, so a fresh page load starts
+      // with none — fall back to the httpOnly refresh cookie before
+      // deciding the user is logged out.
+      let token = getToken();
+      if (!token) {
+        token = await silentRefresh();
+      }
+      if (cancelled) return;
+
       setIsAuthenticated(!!token);
       setIsLoading(false);
 
@@ -26,6 +36,10 @@ export function useAuth() {
       }
     };
     checkAuth();
+
+    return () => {
+      cancelled = true;
+    };
   }, [pathname, router]);
 
   return { isAuthenticated, isLoading };
@@ -43,7 +57,10 @@ export function useCurrentUser() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = getToken();
+        let token = getToken();
+        if (!token) {
+          token = await silentRefresh();
+        }
         if (!token) {
           router.push('/login');
           return;

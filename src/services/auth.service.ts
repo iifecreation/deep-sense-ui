@@ -11,7 +11,7 @@ import {
   AvailableService,
   AvailableCountry,
 } from '@/types';
-import { post, get, setToken, setRefreshToken, clearTokens, getToken } from '@/lib/api/client';
+import { post, get, setToken, clearTokens, getToken, silentRefresh } from '@/lib/api/client';
 import axios from 'axios';
 import { getControlApiUrl, getRuntimeEnvironment, setRuntimeEnvironment } from '@/lib/runtime-environment';
 
@@ -24,14 +24,16 @@ export const authService = {
       const response = await axios.post<TokenResponse>(
         `${getControlApiUrl()}/api/v1/identity/login`,
         { ...data, environment: getRuntimeEnvironment() },
+        { withCredentials: true },
       );
-      
-      // Store tokens only if 2FA is not required
+
+      // The refresh token is never handled here — the API set it as an
+      // httpOnly cookie on its own response. Only the access token (needed
+      // to call the separate runtime API host) is kept, and only in memory.
       if (!response.data.requires_2fa) {
         setToken(response.data.access_token);
-        setRefreshToken(response.data.refresh_token);
       }
-      
+
       return {
         ...response.data,
         challenge: response.headers['x-2fa-challenge']
@@ -54,33 +56,21 @@ export const authService = {
    */
   async verify2fa(code: string, challenge?: string): Promise<TokenResponse> {
     const headers = challenge ? { 'X-2FA-Challenge': challenge } : {};
-    const response = await post<TokenResponse>('/auth/verify-2fa', { code }, { headers });
-    
-    // Store tokens
+    const response = await post<TokenResponse>('/auth/verify-2fa', { code }, { headers, withCredentials: true });
+
     if (response.access_token) {
       setToken(response.access_token);
-      if (response.refresh_token) {
-        setRefreshToken(response.refresh_token);
-      }
     }
-    
+
     return response;
   },
 
   /**
-   * Refresh access token
+   * Silently mint a fresh access token from the httpOnly refresh cookie.
+   * Used on app load to restore a session without ever touching localStorage.
    */
-  async refreshToken(refreshToken: string): Promise<TokenResponse> {
-    const response = await post<TokenResponse>(
-      `${getControlApiUrl()}/api/v1/identity/refresh`,
-      { refresh_token: refreshToken },
-    );
-    
-    // Update tokens
-    setToken(response.access_token);
-    setRefreshToken(response.refresh_token);
-    
-    return response;
+  async refreshToken(): Promise<string | null> {
+    return silentRefresh();
   },
 
   /**
@@ -162,9 +152,15 @@ export const authService = {
   },
 
   /**
-   * Logout - clear tokens
+   * Logout - revoke the session server-side and clear the in-memory token
    */
-  logout(): void {
+  async logout(): Promise<void> {
+    try {
+      // Empty body — the refresh token cookie is sent automatically.
+      await axios.post(`${getControlApiUrl()}/api/v1/identity/logout`, {}, { withCredentials: true });
+    } catch {
+      // Best-effort: still clear local state even if the network call fails.
+    }
     clearTokens();
     if (typeof window !== 'undefined') {
       window.location.href = '/login';
@@ -172,10 +168,13 @@ export const authService = {
   },
 
   /**
-   * Check if user is authenticated
+   * Check if user is authenticated. Falls back to a silent refresh (via the
+   * httpOnly cookie) when there's no in-memory access token yet, e.g. right
+   * after a page reload.
    */
-  isAuthenticated(): boolean {
+  async isAuthenticated(): Promise<boolean> {
     if (typeof window === 'undefined') return false;
-    return Boolean(getToken());
+    if (getToken()) return true;
+    return Boolean(await silentRefresh());
   },
 };
