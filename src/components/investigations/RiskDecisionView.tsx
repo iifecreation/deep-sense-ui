@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Activity,
@@ -11,7 +12,9 @@ import {
   Gauge,
   Layers3,
   Link2,
+  ListChecks,
   Loader2,
+  NotebookText,
   Play,
   ShieldAlert,
   ShieldCheck,
@@ -21,6 +24,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ApiError } from "@/lib/api/client";
+import { type CaseNarrative, type CaseRecommendations, casesService } from "@/services/cases.service";
 import type { NormalizedRiskDecision } from "@/services/risk-decisions.service";
 
 const RISK_STYLE: Record<NormalizedRiskDecision["risk_level"], string> = {
@@ -122,6 +127,188 @@ export function DecisionLinks({ decision }: { decision: NormalizedRiskDecision }
         ) : (
           <p className="text-sm text-slate-500">No alert, case, or customer-risk link was created.</p>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+export function CaseNarrativePanel({ caseId }: { caseId: string }) {
+  const [narrative, setNarrative] = useState<CaseNarrative | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      setNarrative(await casesService.getCaseNarrative(caseId));
+    } catch (cause) {
+      setError(
+        cause instanceof ApiError && cause.statusCode === 403
+          ? "Your role cannot view this case."
+          : cause instanceof Error
+            ? cause.message
+            : "The case narrative could not be generated.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [caseId]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <Card className="border-slate-200">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <NotebookText className="h-4 w-4 text-indigo-600" /> Case narrative
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {isLoading && !narrative ? (
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <Loader2 className="h-4 w-4 animate-spin" /> Summarizing this case&apos;s decision history…
+          </div>
+        ) : error ? (
+          <div className="flex items-start gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-800">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> {error}
+          </div>
+        ) : narrative ? (
+          <>
+            <p className="font-semibold text-slate-900">{narrative.headline}</p>
+            {narrative.decision_count > 0 ? (
+              <>
+                <div className="flex flex-wrap gap-2">
+                  {narrative.domains_involved.map((domain) => (
+                    <Badge key={domain} variant="secondary">
+                      {label(domain)}
+                    </Badge>
+                  ))}
+                  <Badge variant="outline">
+                    {narrative.decision_count} linked decision{narrative.decision_count === 1 ? "" : "s"}
+                  </Badge>
+                </div>
+                {expanded ? (
+                  <div className="space-y-3">
+                    {narrative.paragraphs.map((paragraph, index) => (
+                      <p key={index} className="text-sm leading-6 text-slate-600">
+                        {paragraph}
+                      </p>
+                    ))}
+                    {narrative.key_reason_codes.length ? (
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                          Key risk drivers
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {narrative.key_reason_codes.map((reason) => (
+                            <Badge key={reason.code} variant="outline">
+                              {reason.label} · {reason.occurrences}x
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+                <Button variant="outline" size="sm" onClick={() => setExpanded((v) => !v)}>
+                  {expanded ? "Show less" : "Read full summary"}
+                </Button>
+              </>
+            ) : (
+              <p className="text-sm text-slate-500">{narrative.paragraphs[0]}</p>
+            )}
+          </>
+        ) : null}
+      </CardContent>
+    </Card>
+  );
+}
+
+const CATEGORY_STYLE: Record<string, string> = {
+  escalation: "border-red-200 bg-red-50 text-red-800",
+  customer_facing: "border-amber-200 bg-amber-50 text-amber-800",
+  investigative: "border-blue-200 bg-blue-50 text-blue-800",
+  compliance: "border-purple-200 bg-purple-50 text-purple-800",
+  disposition: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  monitoring: "border-slate-200 bg-slate-50 text-slate-700",
+};
+
+export function CaseRecommendationsPanel({ caseId }: { caseId: string }) {
+  const [data, setData] = useState<CaseRecommendations | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      setData(await casesService.getCaseRecommendations(caseId));
+    } catch (cause) {
+      setError(
+        cause instanceof ApiError && cause.statusCode === 403
+          ? "Your role cannot view this case."
+          : cause instanceof Error
+            ? cause.message
+            : "Recommendations could not be generated.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [caseId]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <Card className="border-slate-200">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <ListChecks className="h-4 w-4 text-indigo-600" /> Recommended next actions
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {isLoading && !data ? (
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <Loader2 className="h-4 w-4 animate-spin" /> Ranking next-best actions…
+          </div>
+        ) : error ? (
+          <div className="flex items-start gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-800">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> {error}
+          </div>
+        ) : data ? (
+          <div className="space-y-3">
+            {data.recommendations.map((rec) => (
+              <div
+                key={rec.action_type}
+                className="rounded-lg border border-slate-200 p-3"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="outline" className={CATEGORY_STYLE[rec.category] ?? CATEGORY_STYLE.monitoring}>
+                    {label(rec.category)}
+                  </Badge>
+                  <p className="font-semibold text-slate-900">{rec.label}</p>
+                  {rec.already_taken ? (
+                    <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-700">
+                      <CheckCircle2 className="mr-1 h-3 w-3" /> Already recorded
+                    </Badge>
+                  ) : null}
+                </div>
+                {rec.rationale.length ? (
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-slate-500">
+                    {rec.rationale.map((line, index) => (
+                      <li key={index}>{line}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   );
