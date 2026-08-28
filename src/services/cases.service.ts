@@ -14,6 +14,65 @@ import {
 } from '@/types';
 import { get, post, patch, del as deleteFn } from '@/lib/api/client';
 
+export interface CaseNarrativeReasonCode {
+  code: string;
+  label: string;
+  occurrences: number;
+}
+
+export interface CaseNarrativeTrajectoryPoint {
+  decision_id: string;
+  service_key: string;
+  subject_type: string;
+  subject_id: string;
+  score: number;
+  risk_level: string;
+  decision: string;
+  recommended_action: string;
+  created_at: string;
+}
+
+export interface CaseNarrativeEvidenceItem {
+  evidence_type: string;
+  label: string;
+  source_record_type: string;
+}
+
+export interface CaseNarrative {
+  case_id: string;
+  status: string;
+  priority: number;
+  title: string | null;
+  assignee_user_id: string | null;
+  headline: string;
+  paragraphs: string[];
+  decision_count: number;
+  domains_involved: string[];
+  key_reason_codes: CaseNarrativeReasonCode[];
+  risk_trajectory: CaseNarrativeTrajectoryPoint[];
+  notable_evidence: CaseNarrativeEvidenceItem[];
+  analyst_note_count: number;
+  analyst_action_count: number;
+  generated_at: string;
+}
+
+export interface RecommendedAction {
+  action_type: string;
+  label: string;
+  category: string;
+  priority: number;
+  rationale: string[];
+  already_taken: boolean;
+}
+
+export interface CaseRecommendations {
+  case_id: string;
+  status: string;
+  generated_at: string;
+  decision_count: number;
+  recommendations: RecommendedAction[];
+}
+
 export const casesService = {
   /**
    * List fraud cases with pagination and filters
@@ -83,6 +142,22 @@ export const casesService = {
    */
   async getCaseExplanation(caseId: string): Promise<any> {
     return await get<any>(`/cases/${caseId}/explanation`);
+  },
+
+  /**
+   * Generate a plain-language investigation summary for a case, built from
+   * every normalized risk decision linked to it.
+   */
+  async getCaseNarrative(caseId: string): Promise<CaseNarrative> {
+    return await get<CaseNarrative>(`/cases/${caseId}/narrative`);
+  },
+
+  /**
+   * Get ranked next-best-action recommendations for a case, computed from
+   * its linked normalized risk decisions, status, age, and recorded actions.
+   */
+  async getCaseRecommendations(caseId: string): Promise<CaseRecommendations> {
+    return await get<CaseRecommendations>(`/cases/${caseId}/recommendations`);
   },
 
   /**

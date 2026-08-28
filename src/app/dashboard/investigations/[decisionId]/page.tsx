@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import { ArrowLeft, Loader2, RefreshCw, ShieldOff } from "lucide-react";
 
 import {
+  CaseNarrativePanel,
+  CaseRecommendationsPanel,
   DecisionLinks,
   DecisionTimeline,
   EngineContributions,
@@ -150,6 +152,8 @@ export default function InvestigationDetailPage() {
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
         <div className="space-y-5">
+          {decision.case_id ? <CaseNarrativePanel caseId={decision.case_id} /> : null}
+          {decision.case_id ? <CaseRecommendationsPanel caseId={decision.case_id} /> : null}
           <EngineContributions decision={decision} />
           <EvidenceList decision={decision} />
           <DecisionTimeline decision={decision} />

@@ -80,6 +80,131 @@ export interface RiskDecisionFilters {
   offset?: number;
 }
 
+export interface SimulationResult {
+  simulation_key: string;
+  simulated: boolean;
+  note: string;
+  decision: NormalizedRiskDecision;
+}
+
+export interface PolicyBacktestTransition {
+  decision_id: string;
+  subject_type: string;
+  subject_id: string;
+  score: number;
+  current_decision: string;
+  current_recommended_action: string;
+  candidate_decision: string;
+  candidate_recommended_action: string;
+  created_at: string;
+}
+
+export interface DriftRiskLevelBucket {
+  risk_level: string;
+  baseline_count: number;
+  baseline_share: number;
+  current_count: number;
+  current_share: number;
+  share_delta: number;
+}
+
+export interface DriftReasonCodeShift {
+  code: string;
+  baseline_occurrences: number;
+  current_occurrences: number;
+  baseline_rate: number;
+  current_rate: number;
+  rate_delta: number;
+}
+
+export type DriftLevel = "insufficient_data" | "none" | "watch" | "alert";
+
+export interface DriftReport {
+  service_key: string;
+  generated_at: string;
+  baseline_window_days: number;
+  current_window_days: number;
+  baseline_decision_count: number;
+  current_decision_count: number;
+  psi: number | null;
+  drift_level: DriftLevel;
+  risk_level_buckets: DriftRiskLevelBucket[];
+  outcome_distribution_baseline: Record<string, number>;
+  outcome_distribution_current: Record<string, number>;
+  emerging_reason_codes: DriftReasonCodeShift[];
+  fading_reason_codes: DriftReasonCodeShift[];
+}
+
+export interface FeedbackConfusionMatrix {
+  true_positives: number;
+  false_positives: number;
+  false_negatives: number;
+  true_negatives: number;
+  precision: number | null;
+  recall: number | null;
+}
+
+export interface ThresholdTuningRecommendation {
+  service_key: string;
+  generated_at: string;
+  lookback_days: number;
+  feedback_count: number;
+  candidates_evaluated: number;
+  false_negative_cost_weight: number;
+  false_positive_cost_weight: number;
+  current_review_threshold: number;
+  current_confusion_matrix: FeedbackConfusionMatrix;
+  current_cost: number;
+  recommended_review_threshold: number;
+  recommended_confusion_matrix: FeedbackConfusionMatrix;
+  recommended_cost: number;
+  cost_improvement_pct: number | null;
+  note: string;
+}
+
+export interface ProviderErrorCodeCount {
+  error_code: string;
+  count: number;
+}
+
+export interface ProviderScorecardEntry {
+  provider: string;
+  action: string;
+  total_executions: number;
+  completed_count: number;
+  failed_count: number;
+  timed_out_count: number;
+  cancelled_count: number;
+  pending_count: number;
+  success_rate: number;
+  failure_rate: number;
+  timeout_rate: number;
+  avg_latency_seconds: number | null;
+  p50_latency_seconds: number | null;
+  p95_latency_seconds: number | null;
+  top_error_codes: ProviderErrorCodeCount[];
+}
+
+export interface ProviderScorecardReport {
+  window_days: number;
+  generated_at: string;
+  entries: ProviderScorecardEntry[];
+}
+
+export interface PolicyBacktestResult {
+  service_key: string;
+  decisions_evaluated: number;
+  lookback_days: number;
+  current_policy_version: number;
+  current_configuration: Record<string, unknown>;
+  candidate_configuration: Record<string, unknown>;
+  outcome_distribution_current: Record<string, number>;
+  outcome_distribution_candidate: Record<string, number>;
+  transition_matrix: Record<string, Record<string, number>>;
+  changed_count: number;
+  changed_examples: PolicyBacktestTransition[];
+}
+
 export interface BeneficiarySummary {
   id: string;
   identifier_hash: string;
@@ -384,4 +509,97 @@ export const riskDecisionsService = {
       },
       { headers: { "Idempotency-Key": crypto.randomUUID() } },
     ),
+  assessPromoRisk: (userId: string, promotionId?: string, trigger = "enrollment") =>
+    post<NormalizedRiskDecision>(
+      "/risk-decisions/promo/risk/assess",
+      { event_id: crypto.randomUUID(), user_id: userId, promotion_id: promotionId || null, trigger },
+      { headers: { "Idempotency-Key": crypto.randomUUID() } },
+    ),
+  assessProcurementInvoice: (invoiceId: string) =>
+    post<NormalizedRiskDecision>(
+      "/risk-decisions/procurement/invoices/assess",
+      { event_id: crypto.randomUUID(), invoice_id: invoiceId },
+      { headers: { "Idempotency-Key": crypto.randomUUID() } },
+    ),
+  assessDocumentVerificationRun: (runId: string) =>
+    post<NormalizedRiskDecision>(
+      "/risk-decisions/documents/verification-runs/assess",
+      { event_id: crypto.randomUUID(), run_id: runId },
+      { headers: { "Idempotency-Key": crypto.randomUUID() } },
+    ),
+  assessDeepfakeCheck: (checkId: string) =>
+    post<NormalizedRiskDecision>(
+      "/risk-decisions/deepfake/checks/assess",
+      { event_id: crypto.randomUUID(), check_id: checkId },
+      { headers: { "Idempotency-Key": crypto.randomUUID() } },
+    ),
+  assessDisputeFraud: (customerId: string, disputeCaseId?: string) =>
+    post<NormalizedRiskDecision>(
+      "/risk-decisions/disputes/fraud/assess",
+      { event_id: crypto.randomUUID(), customer_id: customerId, dispute_case_id: disputeCaseId || null },
+      { headers: { "Idempotency-Key": crypto.randomUUID() } },
+    ),
+  /**
+   * Run any wired scoring engine against a hypothetical payload. Nothing is
+   * persisted — safe to call as many times as needed for policy design or
+   * dispute defense.
+   */
+  simulate: (simulationKey: string, payload: Record<string, unknown>) =>
+    post<SimulationResult>("/risk-decisions/simulate", {
+      simulation_key: simulationKey,
+      payload,
+    }),
+  listSimulationEngines: () =>
+    get<Record<string, unknown>>("/risk-decisions/simulate/engines"),
+  /**
+   * Champion/challenger: re-classify recent decisions under a candidate
+   * threshold configuration. Read-only — no policy version is created.
+   */
+  backtestPolicy: (
+    serviceKey: string,
+    candidateConfiguration: Record<string, unknown>,
+    lookbackDays = 30,
+    limit = 500,
+  ) =>
+    post<PolicyBacktestResult>(`/risk-decisions/policies/${serviceKey}/backtest`, {
+      candidate_configuration: candidateConfiguration,
+      lookback_days: lookbackDays,
+      limit,
+    }),
+  /**
+   * Detect score/outcome drift for a domain: compares a recent window against
+   * an earlier baseline window using PSI over the risk-level distribution,
+   * plus emerging/fading reason codes. Read-only.
+   */
+  getDriftReport: (serviceKey: string, baselineWindowDays = 60, currentWindowDays = 14) =>
+    get<DriftReport>(`/risk-decisions/drift/${serviceKey}`, {
+      params: { baseline_window_days: baselineWindowDays, current_window_days: currentWindowDays },
+    }),
+  /**
+   * Per-(provider, action) success/failure/timeout rates and latency
+   * percentiles, computed from this organization's intervention provider
+   * execution history. Read-only.
+   */
+  getProviderScorecard: (windowDays = 30) =>
+    get<ProviderScorecardReport>("/risk-decisions/provider-scorecard", {
+      params: { window_days: windowDays },
+    }),
+  /**
+   * Recommend a review_threshold from analyst-labeled ground truth
+   * (DetectionFeedback) rather than a hand-picked guess. Read-only — validate
+   * the recommendation with backtestPolicy before activating it.
+   */
+  getThresholdTuningRecommendation: (
+    serviceKey: string,
+    lookbackDays = 90,
+    falseNegativeCostWeight = 5.0,
+    falsePositiveCostWeight = 1.0,
+  ) =>
+    get<ThresholdTuningRecommendation>(`/risk-decisions/policies/${serviceKey}/tuning-recommendation`, {
+      params: {
+        lookback_days: lookbackDays,
+        false_negative_cost_weight: falseNegativeCostWeight,
+        false_positive_cost_weight: falsePositiveCostWeight,
+      },
+    }),
 };

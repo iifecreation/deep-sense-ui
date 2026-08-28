@@ -338,18 +338,12 @@ export interface AlertSuppressionRuleUpdate {
 // Case types
 export interface FraudCaseRead {
   id: string;
-  case_number: string;
-  title: string;
-  description?: string;
-  status: string;
-  priority: string;
+  organization_id: string;
   transaction_id?: string;
-  customer_id?: string;
-  customer_name?: string;
-  assigned_user_id?: string;
-  assigned_user_name?: string;
-  created_by_user_id: string;
-  created_by_user_name?: string;
+  status: string;
+  priority: number;
+  assignee_user_id?: string;
+  title?: string;
   created_at: string;
   updated_at: string;
 }
@@ -758,27 +752,23 @@ export interface ScreeningJobFilters {
 // Report types
 export interface ReportRead {
   id: string;
-  report_number: string;
+  organization_id: string;
   report_type: string;
+  status: string;
   title: string;
   summary?: string;
-  narrative?: string;
-  status: string;
+  version: number;
   linked_case_id?: string;
   linked_customer_id?: string;
-  linked_customer_name?: string;
-  linked_transaction_ids: string[];
-  assigned_to_user_id?: string;
-  assigned_to_user_name?: string;
-  reviewer_user_id?: string;
-  reviewer_user_name?: string;
-  due_at?: string;
-  external_reference?: string;
   created_by_user_id: string;
-  created_by_user_name?: string;
+  assigned_to_user_id?: string;
+  reviewer_user_id?: string;
+  approved_by_user_id?: string;
+  due_at?: string;
+  submitted_at?: string;
+  external_reference?: string;
   created_at: string;
   updated_at: string;
-  submitted_at?: string;
 }
 
 export interface ReportCreateRequest {
@@ -807,12 +797,48 @@ export interface ReportUpdateRequest {
   metadata?: Record<string, any>;
 }
 
+export interface ReportReviewRead {
+  id: string;
+  report_id: string;
+  reviewer_user_id: string;
+  action: string;
+  comments?: string;
+  previous_status: string;
+  new_status: string;
+  created_at: string;
+}
+
+export interface ReportSubmissionRead {
+  id: string;
+  report_id: string;
+  submitted_by_user_id: string;
+  destination: string;
+  status: string;
+  submitted_at: string;
+  response_json?: Record<string, any>;
+  external_reference?: string;
+  request_id?: string;
+  created_at: string;
+}
+
 export interface ReportDetail {
   report: ReportRead;
-  linked_case?: FraudCaseRead;
-  linked_customer?: CustomerDetail;
-  review_history: any[];
-  submission_records: any[];
+  narrative?: string;
+  linked_case_summary?: {
+    id: string;
+    title?: string;
+    status: string;
+    priority: number;
+  };
+  linked_customer_summary?: {
+    id: string;
+    external_id?: string;
+    label?: string;
+    status?: string;
+  };
+  linked_transaction_ids?: string[];
+  reviews: ReportReviewRead[];
+  submissions: ReportSubmissionRead[];
   attachments: ReportAttachmentRead[];
   metadata?: Record<string, any>;
 }

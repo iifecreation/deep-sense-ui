@@ -7,9 +7,15 @@ import {
   ArrowRight,
   FileSearch,
   Filter,
+  FlaskConical,
+  GitCompareArrows,
   Loader2,
   RefreshCw,
+  Router,
   ShieldOff,
+  SlidersHorizontal,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -27,7 +33,15 @@ const SERVICES = [
   ["ato", "Account Takeover"],
   ["cnp_advanced", "CNP Fraud"],
   ["interventions", "Interventions"],
+  ["customer_risk", "Customer Risk"],
   ["unified_risk", "Unified Risk"],
+  ["promo", "Promo & Bonus Abuse"],
+  ["procurement", "Procurement Fraud"],
+  ["document_intelligence", "Document Intelligence"],
+  ["deepfake", "Deepfake & Biometrics"],
+  ["dispute_intelligence", "Dispute Intelligence"],
+  ["nfc", "NFC / Contactless"],
+  ["voice_auth", "Voice Authentication"],
 ] as const;
 
 function label(value: string): string {
@@ -144,14 +158,46 @@ export default function InvestigationsPage() {
             customer risk, and unified risk. No dashboard-only synthetic facts.
           </p>
         </div>
-        <Button variant="outline" onClick={() => void load()} disabled={isLoading}>
-          {isLoading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <RefreshCw className="mr-2 h-4 w-4" />
-          )}
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline">
+            <Link href="/dashboard/investigations/simulate">
+              <FlaskConical className="mr-2 h-4 w-4" /> Risk simulator
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/dashboard/investigations/policy-backtest">
+              <GitCompareArrows className="mr-2 h-4 w-4" /> Policy backtest
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/dashboard/investigations/drift">
+              <TrendingUp className="mr-2 h-4 w-4" /> Drift detection
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/dashboard/investigations/provider-scorecard">
+              <Router className="mr-2 h-4 w-4" /> Provider scorecard
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/dashboard/investigations/threshold-tuning">
+              <SlidersHorizontal className="mr-2 h-4 w-4" /> Threshold tuning
+            </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/dashboard/investigations/workload">
+              <Users className="mr-2 h-4 w-4" /> Analyst workload
+            </Link>
+          </Button>
+          <Button variant="outline" onClick={() => void load()} disabled={isLoading}>
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Refresh
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">

@@ -1,121 +1,151 @@
 "use client";
 
-import React from "react";
-import { 
-  ArrowLeft, 
-  ShieldCheck, 
-  ShieldAlert, 
-  AlertTriangle, 
-  Clock, 
-  User, 
-  Zap, 
-  MoreHorizontal, 
-  ChevronRight, 
-  Download, 
-  Briefcase, 
-  MessageSquare,
-  FileText,
-  Activity,
-  BarChart3,
-  Search,
-  Plus,
-  ArrowUpRight,
-  LayoutGrid,
-  CheckCircle2,
-  XCircle,
-  Eye,
-  Info,
-  History,
-  TrendingUp,
-  Link as LinkIcon,
-  Fingerprint,
-  Globe,
-  MoreVertical,
-  CheckSquare,
-  Slash,
-  GanttChart,
-  FileCheck,
-  Flag,
-  Calendar,
-  Layers,
-  Archive,
-  Star,
-  Paperclip,
-  Share2,
-  Lock,
-  MessageCircle,
-  Hash,
-  Send,
-  Printer,
-  Copy,
-  Trash2,
-  CreditCard,
-  MapPin,
+import { useCallback, useEffect, useState } from "react";
+import {
+  ArrowLeft,
+  User,
+  ChevronRight,
+  Briefcase,
   FileSearch,
+  Send,
+  Archive,
+  Plus,
+  Printer,
   Terminal,
-  Cpu
+  Loader2,
+  RefreshCw,
+  ShieldOff,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useReport } from "@/hooks/use-reports";
+import { ApiError } from "@/lib/api/client";
+import { reportsService } from "@/services/reports.service";
+import type { ReportDetail } from "@/types";
+
+function describeError(error: unknown): string {
+  if (error instanceof ApiError && error.statusCode === 403) {
+    return error.code === "service_not_enabled"
+      ? "Regulatory reporting is disabled for this organization."
+      : "Your role cannot view this report.";
+  }
+  if (error instanceof ApiError && error.statusCode === 404) {
+    return "This report does not exist in your organization.";
+  }
+  return error instanceof Error ? error.message : "The reports API is unavailable.";
+}
+
+function formatDateTime(value: string | null | undefined): string {
+  if (!value) return "Unknown";
+  return new Date(value).toLocaleString();
+}
+
+const FILING_COMPLETENESS_STATUSES = new Set([
+  "ready_for_submission",
+  "submitted",
+  "accepted",
+  "approved",
+  "amended",
+  "closed",
+  "archived",
+]);
 
 export default function RegulatoryReportDetailPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
+  const params = useParams<{ reportId: string }>();
+  const reportId = params.reportId;
 
-  const params = useParams();
-  const reportId = params.reportId as string;
+  const [detail, setDetail] = useState<ReportDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const { data: reportData, isLoading, isError, refetch } = useReport(reportId);
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      setDetail(await reportsService.getReport(reportId));
+    } catch (cause) {
+      setError(describeError(cause));
+    } finally {
+      setIsLoading(false);
+    }
+  }, [reportId]);
 
-  if (isLoading) {
+  useEffect(() => {
+    const timer = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(timer);
+  }, [load]);
+
+  if (isLoading && !detail) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-lime"></div>
+      <div className="flex min-h-96 items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-brand-lime" />
       </div>
     );
   }
 
-  if (isError || !reportData) {
+  if (error && !detail) {
     return (
-      <div className="p-6 bg-red-50 text-red-700 rounded-lg flex flex-col items-center">
-        <AlertTriangle className="w-8 h-8 mb-2" />
-        <h2 className="font-bold">Failed to load report</h2>
-        <Button onClick={refetch} className="mt-4" variant="outline">Retry</Button>
+      <div className="mx-auto max-w-3xl py-10">
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-6 text-red-800">
+            <ShieldOff className="h-6 w-6" />
+            <p className="mt-3 font-bold">Report cannot be loaded</p>
+            <p className="mt-1 text-sm">{error}</p>
+            <div className="mt-5 flex gap-2">
+              <Button variant="outline" onClick={() => void load()}>
+                <RefreshCw className="mr-2 h-4 w-4" /> Retry
+              </Button>
+              <Button asChild variant="ghost">
+                <Link href="/dashboard/reports">Back to reports</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  const report = {
-    id: reportData.id,
-    type: reportData.report_type || "Generic Report",
-    status: reportData.status || "Draft",
-    caseId: reportData.case_id || "Unlinked",
-    owner: reportData.created_by_user_name || "System",
-    classification: reportData.metadata?.classification || "Unknown",
-    subject: reportData.metadata?.subject_name ? `${reportData.metadata.subject_name} (${reportData.customer_id || 'Unknown'})` : "Unknown Entity",
-    description: reportData.metadata?.description || "No description provided.",
-    suspicionReason: reportData.metadata?.suspicion_reason || "Suspicion details not recorded.",
-    amount: reportData.metadata?.amount || "0.00",
-    currency: reportData.metadata?.currency || "USD",
-    transactions: [],
-    timeline: [
-      { event: "Report Created", time: new Date(reportData.created_at).toLocaleString(), actor: reportData.created_by_user_name || "System" }
-    ]
-  };
+  if (!detail) return null;
+
+  const { report, narrative, linked_case_summary, metadata, reviews, submissions, attachments } = detail;
+
+  const subjectNames: string[] = Array.isArray(metadata?.subjects) ? metadata.subjects : [];
+  const subjectLabel = subjectNames.length ? subjectNames.join(", ") : "Unknown Entity";
+  const suspicionReason =
+    report.summary || "Suspicion details not recorded.";
+
+  const timeline = [
+    { event: "Report Created", time: report.created_at, actor: "System" },
+    ...reviews
+      .slice()
+      .reverse()
+      .map((r) => ({
+        event: `Review: ${r.action.replaceAll("_", " ")}`,
+        time: r.created_at,
+        actor: r.reviewer_user_id,
+      })),
+    ...submissions
+      .slice()
+      .reverse()
+      .map((s) => ({
+        event: `Submitted to ${s.destination}`,
+        time: s.submitted_at,
+        actor: s.submitted_by_user_id,
+      })),
+  ].sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+
+  const completeness = FILING_COMPLETENESS_STATUSES.has(report.status) ? 100 : narrative ? 65 : 25;
 
   return (
     <div className="flex flex-col gap-8 pb-20 font-black italic">
@@ -127,18 +157,18 @@ export default function RegulatoryReportDetailPage() {
                <ArrowLeft className="w-3 h-3" /> Regulatory Document Vault
             </Link>
             <div className="flex items-center gap-4 font-black italic">
-              <h1 className="text-3xl font-black italic tracking-tighter uppercase leading-none">{report.id}</h1>
+              <h1 className="text-3xl font-black italic tracking-tighter uppercase leading-none">{report.title || report.id}</h1>
               <Badge className={`h-6 px-4 text-[9px] font-black uppercase italic tracking-widest border-none bg-indigo-500 text-white`}>
-                {report.type.split('(')[0]}
+                {report.report_type}
               </Badge>
               <div className="flex items-center gap-2 px-3 py-1 bg-muted rounded-lg border border-border italic font-black">
                  <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
-                 <span className="text-[9px] font-black uppercase italic tracking-widest text-neutral-900 h-4 leading-none">{report.status}</span>
+                 <span className="text-[9px] font-black uppercase italic tracking-widest text-neutral-900 h-4 leading-none">{report.status.replaceAll("_", " ")}</span>
               </div>
             </div>
           </div>
           <div className="flex gap-3 font-black italic">
-             <Button variant="outline" className="h-10 px-4 text-[9px] font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800 font-bold font-black">
+             <Button variant="outline" className="h-10 px-4 text-[9px] font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800 font-bold font-black" onClick={() => window.print()}>
                 <Printer className="w-3.5 h-3.5 mr-2" />
                 Print Dossier
              </Button>
@@ -166,21 +196,11 @@ export default function RegulatoryReportDetailPage() {
         </div>
       </section>
 
-      {/* KPI GRID */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 font-black italic leading-none">
-         {(apiData || []).map((kpi, i) => (
-           <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border shadow-sm flex flex-col gap-4 font-black italic leading-none">
-              <div className="flex items-center justify-between font-black italic">
-                 <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center font-black h-10 leading-none">{kpi.icon}</div>
-                 <Badge variant="outline" className="text-[8px] font-black uppercase tracking-widest italic border-none px-0 h-3 leading-none">{kpi.delta}</Badge>
-              </div>
-              <div className="font-black italic">
-                 <div className={`text-2xl font-black italic tracking-tighter leading-none h-6 uppercase ${kpi.color || 'text-neutral-900 dark:text-white'}`}>{kpi.value}</div>
-                 <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1 h-3 leading-none uppercase">{kpi.label}</div>
-              </div>
-           </div>
-         ))}
-      </section>
+      {error ? (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 not-italic font-normal">
+          {error}
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 font-black italic">
          <div className="xl:col-span-2 space-y-8 font-black italic">
@@ -189,7 +209,7 @@ export default function RegulatoryReportDetailPage() {
                   <h4 className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground underline underline-offset-8 decoration-border">Official Suspicion Rationale</h4>
                   <div className="p-8 bg-zinc-50 border border-neutral-100 rounded-[40px] font-black italic">
                      <p className="text-[15px] text-neutral-800 leading-relaxed font-medium italic font-black uppercase italic italic">
-                        {report.suspicionReason}
+                        {suspicionReason}
                      </p>
                   </div>
                </div>
@@ -210,13 +230,52 @@ export default function RegulatoryReportDetailPage() {
                            <div className="absolute top-0 right-0 p-10 opacity-5 font-black">
                               <Terminal className="w-48 h-48" />
                            </div>
-                           <div className="relative z-10 font-black italic h-fit leading-none uppercase">
+                           <div className="relative z-10 font-black italic h-fit leading-none uppercase whitespace-pre-wrap">
                               <span className="text-brand-lime">[[NARRATIVE_START]]</span><br />
-                              {report.description}<br /><br />
+                              {narrative || "No narrative has been composed for this report yet."}<br /><br />
                               <span className="text-brand-lime">[[NARRATIVE_END]]</span>
                            </div>
                         </div>
                      </div>
+                  </TabsContent>
+
+                  <TabsContent value="subjects" className="m-0 space-y-4 font-black italic">
+                     {subjectNames.length ? (
+                        <div className="flex flex-wrap gap-3 font-black italic">
+                           {subjectNames.map((subject) => (
+                              <Badge key={subject} variant="outline" className="h-8 px-4 text-[10px] font-black uppercase italic tracking-widest border-border">{subject}</Badge>
+                           ))}
+                        </div>
+                     ) : (
+                        <p className="text-sm font-medium text-slate-500 not-italic">No subjects recorded on this report.</p>
+                     )}
+                     {metadata?.domains_involved?.length ? (
+                        <div className="pt-4 font-black italic">
+                           <h5 className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground mb-3">Domains Involved</h5>
+                           <div className="flex flex-wrap gap-2 font-black italic">
+                              {(metadata.domains_involved as string[]).map((d) => (
+                                 <Badge key={d} variant="secondary" className="h-7 px-3 text-[9px] font-black uppercase italic tracking-widest">{d.replaceAll("_", " ")}</Badge>
+                              ))}
+                           </div>
+                        </div>
+                     ) : null}
+                  </TabsContent>
+
+                  <TabsContent value="transactions" className="m-0 space-y-4 font-black italic">
+                     {detail.linked_transaction_ids?.length ? (
+                        <div className="space-y-2 font-black italic">
+                           {detail.linked_transaction_ids.map((txId) => (
+                              <div key={txId} className="p-4 bg-zinc-50 border border-neutral-100 rounded-2xl font-mono text-[12px] not-italic font-medium text-neutral-700">{txId}</div>
+                           ))}
+                        </div>
+                     ) : (
+                        <p className="text-sm font-medium text-slate-500 not-italic">No transactions attached to this report.</p>
+                     )}
+                     {metadata?.total_amount ? (
+                        <p className="text-[11px] font-black uppercase italic tracking-widest text-neutral-600 pt-2">
+                           Aggregate value: {Number(metadata.total_amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {metadata.currency || ""}
+                        </p>
+                     ) : null}
                   </TabsContent>
                </Tabs>
             </Card>
@@ -233,10 +292,9 @@ export default function RegulatoryReportDetailPage() {
                            <User className="w-8 h-8 text-rose-500" />
                         </div>
                         <div className="font-black italic">
-                           <h5 className="text-[14px] font-black italic uppercase italic uppercase font-black">{report.subject}</h5>
+                           <h5 className="text-[14px] font-black italic uppercase italic uppercase font-black">{subjectLabel}</h5>
                         </div>
                      </div>
-                     <Button variant="outline" className="w-full text-[9px] font-black uppercase italic border-border rounded-2xl h-12 shadow-sm italic font-bold font-black">View Full Subject DNA</Button>
                   </CardContent>
                </Card>
 
@@ -245,18 +303,24 @@ export default function RegulatoryReportDetailPage() {
                      <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Case Reference</CardTitle>
                   </CardHeader>
                   <CardContent className="p-0 space-y-6 font-black italic">
-                     <div className="flex gap-6 items-center p-6 bg-brand-lime/5 border border-brand-lime/10 rounded-[32px] font-black italic">
-                        <div className="w-16 h-16 bg-white rounded-[20px] flex items-center justify-center shadow-sm border border-brand-lime/20">
-                           <Briefcase className="w-8 h-8 text-brand-lime" />
-                        </div>
-                        <div className="font-black italic">
-                           <h5 className="text-[14px] font-black italic uppercase italic uppercase font-black">{report.caseId}</h5>
-                           <p className="text-[10px] font-black text-brand-lime tracking-widest uppercase italic font-black">Investigation Active</p>
-                        </div>
-                     </div>
-                     <Link href={`/dashboard/cases/${report.caseId}`}>
-                        <Button className="w-full bg-neutral-900 text-white text-[9px] font-black uppercase italic rounded-2xl h-12 shadow-md italic font-bold font-black">Institutional Case Link</Button>
-                     </Link>
+                     {linked_case_summary ? (
+                        <>
+                           <div className="flex gap-6 items-center p-6 bg-brand-lime/5 border border-brand-lime/10 rounded-[32px] font-black italic">
+                              <div className="w-16 h-16 bg-white rounded-[20px] flex items-center justify-center shadow-sm border border-brand-lime/20">
+                                 <Briefcase className="w-8 h-8 text-brand-lime" />
+                              </div>
+                              <div className="font-black italic">
+                                 <h5 className="text-[14px] font-black italic uppercase italic uppercase font-black">{linked_case_summary.title || linked_case_summary.id}</h5>
+                                 <p className="text-[10px] font-black text-brand-lime tracking-widest uppercase italic font-black">{linked_case_summary.status.replaceAll("_", " ")}</p>
+                              </div>
+                           </div>
+                           <Link href={`/dashboard/cases/${linked_case_summary.id}`}>
+                              <Button className="w-full bg-neutral-900 text-white text-[9px] font-black uppercase italic rounded-2xl h-12 shadow-md italic font-bold font-black">Institutional Case Link</Button>
+                           </Link>
+                        </>
+                     ) : (
+                        <p className="text-sm font-medium text-slate-500 not-italic">No case is linked to this report.</p>
+                     )}
                   </CardContent>
                </Card>
             </div>
@@ -267,15 +331,15 @@ export default function RegulatoryReportDetailPage() {
             <Card className="rounded-[40px] border border-neutral-900 bg-neutral-900 text-white p-10 space-y-10 shadow-3xl h-fit font-black italic">
                <div className="space-y-4 font-black italic">
                   <h4 className="text-xl font-black italic uppercase tracking-tighter text-brand-lime">Submission Protocol</h4>
-                  <p className="text-white/30 text-[10px] uppercase italic tracking-widest leading-relaxed">This document is currently in DRAFT. Submission to regulator is IRREVERSIBLE.</p>
+                  <p className="text-white/30 text-[10px] uppercase italic tracking-widest leading-relaxed">This document is currently {report.status.replaceAll("_", " ").toUpperCase()}. Submission to regulator is IRREVERSIBLE.</p>
                </div>
                <div className="space-y-6 font-black italic">
                   <div className="p-6 bg-white/5 border border-white/10 rounded-[32px] space-y-4 font-black italic">
                      <div className="flex justify-between items-center text-[9px] font-black uppercase italic text-white/40 font-black italic h-4 leading-none">
                         <span>Filing Completeness</span>
-                        <span className="text-brand-lime">92%</span>
+                        <span className="text-brand-lime">{completeness}%</span>
                      </div>
-                     <Progress value={92} className="h-1 bg-white/10 rounded-full" indicatorClassName="bg-brand-lime h-full shadow-[0_0_8px_#D1F701]" />
+                     <Progress value={completeness} className="h-1 bg-white/10 rounded-full" indicatorClassName="bg-brand-lime h-full shadow-[0_0_8px_#D1F701]" />
                   </div>
                   <div className="space-y-3 font-black italic">
                      <Button className="w-full h-14 bg-brand-lime text-black rounded-3xl text-[10px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-brand-lime/10 font-black italic font-bold h-14 leading-none">
@@ -297,7 +361,16 @@ export default function RegulatoryReportDetailPage() {
                   <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full border border-border italic font-black italic font-bold"><Plus className="w-4 h-4" /></Button>
                </CardHeader>
                <div className="space-y-4 font-black italic">
-                  <p className="text-sm font-medium text-slate-500">No attachments provided.</p>
+                  {attachments.length ? (
+                     attachments.map((a) => (
+                        <div key={a.id} className="flex items-center justify-between p-4 bg-zinc-50 border border-neutral-100 rounded-2xl font-black italic">
+                           <span className="text-[12px] not-italic font-semibold text-neutral-800 truncate">{a.filename}</span>
+                           <span className="text-[9px] not-italic font-medium text-muted-foreground uppercase">{a.content_type || "file"}</span>
+                        </div>
+                     ))
+                  ) : (
+                     <p className="text-sm font-medium text-slate-500 not-italic">No attachments provided.</p>
+                  )}
                </div>
             </Card>
 
@@ -305,17 +378,16 @@ export default function RegulatoryReportDetailPage() {
             <div className="p-10 bg-muted/20 border border-border rounded-[40px] space-y-8 font-black italic h-fit">
                <h5 className="text-[11px] font-black uppercase italic tracking-widest text-muted-foreground px-4 underline underline-offset-8 decoration-border">Asset Lifecycle Audit</h5>
                <div className="px-4 space-y-6 font-black italic h-fit leading-none mb-10 overflow-hidden">
-                  {report.timeline.map((it, i) => (
+                  {timeline.map((it, i) => (
                     <div key={i} className="flex gap-4 items-start font-black italic h-12 leading-none">
                        <div className="w-1.5 h-1.5 bg-neutral-200 rounded-full mt-2 font-black h-2 w-2" />
                        <div className="font-black italic h-12 leading-none uppercase">
                           <div className="text-[10px] font-black italic text-neutral-900 h-4 leading-none uppercase">{it.event}</div>
-                          <div className="text-[8px] font-black text-muted-foreground uppercase h-3 leading-none italic mt-1 uppercase">{it.time.split('•')[1].trim()}</div>
+                          <div className="text-[8px] font-black text-muted-foreground uppercase h-3 leading-none italic mt-1 uppercase">{formatDateTime(it.time)}</div>
                        </div>
                     </div>
                   ))}
                </div>
-               <Button variant="ghost" className="w-full text-[9px] font-black uppercase italic text-indigo-500 border-none font-black italic font-bold h-10 leading-none">Full Resource Lineage</Button>
             </div>
          </div>
       </div>
