@@ -11,7 +11,7 @@ export function useOnboardingReviews(params?: Record<string, any>) {
       setIsLoading(true);
       setIsError(false);
       const res = await onboardingService.listReviews(params);
-      setData(res.data);
+      setData(res);
     } catch (err) {
       console.error('Failed to fetch reviews:', err);
       setIsError(true);
@@ -38,7 +38,7 @@ export function useOnboardingReview(reviewId: string) {
       setIsLoading(true);
       setIsError(false);
       const res = await onboardingService.getReviewDetail(reviewId);
-      setData(res.data);
+      setData(res);
     } catch (err) {
       console.error('Failed to fetch review details:', err);
       setIsError(true);

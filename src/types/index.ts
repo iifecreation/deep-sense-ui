@@ -382,10 +382,10 @@ export interface CaseNoteRead {
 
 export interface CaseActionRead {
   id: string;
+  fraud_case_id: string;
   action_type: string;
-  description: string;
-  actor_user_id: string;
-  actor_user_name?: string;
+  payload_json?: Record<string, any> | null;
+  actor_user_id?: string;
   created_at: string;
 }
 

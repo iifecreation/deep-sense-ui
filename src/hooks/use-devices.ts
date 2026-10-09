@@ -11,7 +11,7 @@ export function useDevices(params?: Record<string, any>) {
       setIsLoading(true);
       setIsError(false);
       const res = await devicesService.listDevices(params);
-      setData(res.data);
+      setData(res);
     } catch (err) {
       console.error('Failed to fetch devices:', err);
       setIsError(true);
@@ -38,7 +38,7 @@ export function useDevice(deviceId: string) {
       setIsLoading(true);
       setIsError(false);
       const res = await devicesService.getDeviceDetail(deviceId);
-      setData(res.data);
+      setData(res);
     } catch (err) {
       console.error('Failed to fetch device details:', err);
       setIsError(true);

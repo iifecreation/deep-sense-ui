@@ -11,7 +11,7 @@ export function usePricingPlans() {
       setIsLoading(true);
       setIsError(false);
       const res = await pricingService.getPlans();
-      setData(res.data || []);
+      setData(res?.plans || []);
     } catch (err) {
       console.error('Failed to fetch pricing plans:', err);
       setIsError(true);

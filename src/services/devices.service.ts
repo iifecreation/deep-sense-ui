@@ -41,7 +41,7 @@ export interface DeviceDetail {
 
 export const devicesService = {
   listDevices: async (params?: Record<string, any>) => {
-    return get<any>('/devices', params);
+    return get<any>('/devices', { params });
   },
 
   getDeviceDetail: async (deviceId: string) => {
@@ -49,7 +49,7 @@ export const devicesService = {
   },
 
   getDeviceTimeline: async (deviceId: string, params?: Record<string, any>) => {
-    return get<any>(`/devices/${deviceId}/timeline`, params);
+    return get<any>(`/devices/${deviceId}/timeline`, { params });
   },
 
   trustDevice: async (deviceId: string, reason: string) => {
@@ -59,8 +59,8 @@ export const devicesService = {
   blockDevice: async (deviceId: string, reason: string) => {
     return post<any>(`/devices/${deviceId}/block`, { reason });
   },
-  
+
   getLinkedCustomers: async (deviceId: string, params?: Record<string, any>) => {
-    return get<any>(`/devices/${deviceId}/customers`, params);
+    return get<any>(`/devices/${deviceId}/customers`, { params });
   },
 };
