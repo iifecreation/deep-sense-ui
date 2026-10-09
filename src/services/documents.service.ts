@@ -5,9 +5,16 @@ import {
   FaceMatchRequest,
   LivenessRequest,
   BiometricCheckRead,
+  IdentityDocumentRead,
+  KYCVerifyRequest,
+  KYCCheckRead,
+  KYBVerifyRequest,
+  KYBCheckRead,
 } from '@/types';
 import { get, getToken, post, patch } from '@/lib/api/client';
 import { getRuntimeApiUrl } from '@/lib/runtime-environment';
+
+export type PortraitDocumentType = 'passport' | 'national_id' | 'drivers_license';
 
 export const documentsService = {
   /**
@@ -55,24 +62,57 @@ export const documentsService = {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${getToken()}`,
+        'Idempotency-Key': crypto.randomUUID(),
       },
       body: formData,
     });
+    if (!response.ok) {
+      throw new Error(`Selfie upload failed (${response.status})`);
+    }
+    return await response.json();
+  },
+
+  /**
+   * Upload the identity document (passport/ID card/etc.) a face-match check compares against
+   */
+  async uploadSessionDocument(
+    sessionId: string,
+    file: File,
+    documentType: PortraitDocumentType = 'passport',
+  ): Promise<IdentityDocumentRead> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('document_type', documentType);
+    const response = await fetch(`${getRuntimeApiUrl()}/api/v1/documents/sessions/${sessionId}/document`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        'Idempotency-Key': crypto.randomUUID(),
+      },
+      body: formData,
+    });
+    if (!response.ok) {
+      throw new Error(`Document upload failed (${response.status})`);
+    }
     return await response.json();
   },
 
   /**
    * Run session face match
    */
-  async runSessionFaceMatch(sessionId: string, data: FaceMatchRequest): Promise<BiometricCheckRead> {
-    return await post<BiometricCheckRead>(`/documents/sessions/${sessionId}/face-match`, data);
+  async runSessionFaceMatch(sessionId: string, data: FaceMatchRequest = {}): Promise<BiometricCheckRead> {
+    return await post<BiometricCheckRead>(`/documents/sessions/${sessionId}/face-match`, data, {
+      headers: { 'Idempotency-Key': crypto.randomUUID() },
+    });
   },
 
   /**
    * Run session liveness check
    */
-  async runSessionLiveness(sessionId: string, data: LivenessRequest): Promise<BiometricCheckRead> {
-    return await post<BiometricCheckRead>(`/documents/sessions/${sessionId}/liveness`, data);
+  async runSessionLiveness(sessionId: string, data: LivenessRequest = {}): Promise<BiometricCheckRead> {
+    return await post<BiometricCheckRead>(`/documents/sessions/${sessionId}/liveness`, data, {
+      headers: { 'Idempotency-Key': crypto.randomUUID() },
+    });
   },
 
   /**
@@ -85,8 +125,56 @@ export const documentsService = {
   /**
    * Run session deepfake check
    */
-  async runSessionDeepfake(sessionId: string, data: LivenessRequest): Promise<BiometricCheckRead> {
-    return await post<BiometricCheckRead>(`/documents/sessions/${sessionId}/deepfake`, data);
+  async runSessionDeepfake(sessionId: string, data: LivenessRequest = {}): Promise<BiometricCheckRead> {
+    return await post<BiometricCheckRead>(`/documents/sessions/${sessionId}/deepfake`, data, {
+      headers: { 'Idempotency-Key': crypto.randomUUID() },
+    });
+  },
+
+  /**
+   * List countries with a registered KYC provider (empty array is not an error)
+   */
+  async listKycSupportedCountries(): Promise<string[]> {
+    return await get<string[]>('/documents/kyc/countries');
+  },
+
+  /**
+   * List countries with a registered KYB provider (empty array is not an error)
+   */
+  async listKybSupportedCountries(): Promise<string[]> {
+    return await get<string[]>('/documents/kyb/countries');
+  },
+
+  /**
+   * Run a KYC (individual identity) check against a country's ID registry
+   */
+  async runSessionKyc(sessionId: string, data: KYCVerifyRequest): Promise<KYCCheckRead> {
+    return await post<KYCCheckRead>(`/documents/sessions/${sessionId}/kyc`, data, {
+      headers: { 'Idempotency-Key': crypto.randomUUID() },
+    });
+  },
+
+  /**
+   * List KYC checks run for a session
+   */
+  async listSessionKycChecks(sessionId: string): Promise<KYCCheckRead[]> {
+    return await get<KYCCheckRead[]>(`/documents/sessions/${sessionId}/kyc`);
+  },
+
+  /**
+   * Run a KYB (business) check against a country's business registry
+   */
+  async runSessionKyb(sessionId: string, data: KYBVerifyRequest): Promise<KYBCheckRead> {
+    return await post<KYBCheckRead>(`/documents/sessions/${sessionId}/kyb`, data, {
+      headers: { 'Idempotency-Key': crypto.randomUUID() },
+    });
+  },
+
+  /**
+   * List KYB checks run for a session
+   */
+  async listSessionKybChecks(sessionId: string): Promise<KYBCheckRead[]> {
+    return await get<KYBCheckRead[]>(`/documents/sessions/${sessionId}/kyb`);
   },
 
   /**

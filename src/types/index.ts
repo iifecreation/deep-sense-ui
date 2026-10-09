@@ -541,19 +541,76 @@ export interface IdentityVerificationSessionRead {
 }
 
 export interface FaceMatchRequest {
-  document_id: string;
-  selfie_document_id: string;
+  document_id?: string;
+  selfie_document_id?: string;
 }
 
 export interface LivenessRequest {
-  selfie_document_id: string;
+  selfie_document_id?: string;
 }
 
 export interface BiometricCheckRead {
   id: string;
+  session_id: string;
+  document_id?: string;
+  selfie_document_id?: string;
+  provider: string;
   check_type: string;
-  result: string;
-  confidence_score?: number;
+  status: string;
+  score: number;
+  confidence: number;
+  result_json?: Record<string, any>;
+  error_message?: string;
+  created_at: string;
+}
+
+export interface IdentityDocumentRead {
+  id: string;
+  session_id: string;
+  document_type: string;
+  status: string;
+  file_name: string;
+  created_at: string;
+}
+
+export interface KYCVerifyRequest {
+  country_code: string;
+  id_type: string;
+  id_number: string;
+  full_name?: string;
+}
+
+export interface KYCCheckRead {
+  id: string;
+  session_id: string;
+  country_code: string;
+  id_type: string;
+  provider: string;
+  status: string;
+  score: number;
+  confidence: number;
+  result_json?: Record<string, any>;
+  error_message?: string;
+  created_at: string;
+}
+
+export interface KYBVerifyRequest {
+  country_code: string;
+  registration_number: string;
+  business_name?: string;
+}
+
+export interface KYBCheckRead {
+  id: string;
+  session_id: string;
+  country_code: string;
+  business_name?: string;
+  provider: string;
+  status: string;
+  score: number;
+  confidence: number;
+  result_json?: Record<string, any>;
+  error_message?: string;
   created_at: string;
 }
 
