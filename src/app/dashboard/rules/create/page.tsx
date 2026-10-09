@@ -17,7 +17,9 @@ import {
   Zap,
   Activity,
   CheckCircle2,
-  ListFilter
+  ListFilter,
+  PenTool,
+  RefreshCw
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

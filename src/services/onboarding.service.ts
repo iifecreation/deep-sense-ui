@@ -2,7 +2,7 @@ import { get, post } from "@/lib/api/client";
 
 export const onboardingService = {
   listReviews: async (params?: Record<string, any>) => {
-    return get<any>('/onboarding/reviews', params);
+    return get<any>('/onboarding/reviews', { params });
   },
 
   getReviewDetail: async (reviewId: string) => {
@@ -38,7 +38,7 @@ export const onboardingService = {
   },
 
   getAuditTrail: async (reviewId: string, params?: Record<string, any>) => {
-    return get<any>(`/onboarding/reviews/${reviewId}/audit`, params);
+    return get<any>(`/onboarding/reviews/${reviewId}/audit`, { params });
   },
 
   getRiskHistory: async (reviewId: string) => {

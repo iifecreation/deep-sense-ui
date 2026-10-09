@@ -360,7 +360,7 @@ export default function CustomerRiskProfile() {
                       </div>
                       <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">{check.label}</span>
                     </div>
-                    <Badge variant="outline" className={\`text-[10px] font-bold uppercase tracking-wide \${check.status === 'Clear' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400'}\`}>
+                    <Badge variant="outline" className={`text-[10px] font-bold uppercase tracking-wide ${check.status === 'Clear' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400'}`}>
                       {check.status}
                     </Badge>
                   </div>

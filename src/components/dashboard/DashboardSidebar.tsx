@@ -24,7 +24,14 @@ import {
   CheckCircle2,
   Plug,
   HelpCircle,
-  Bell
+  Bell,
+  Brain,
+  Bot,
+  Fingerprint,
+  Network,
+  FileCheck,
+  Zap,
+  ScanFace
 } from "lucide-react";
 import { organizationService } from "@/services/organization.service";
 
@@ -75,7 +82,21 @@ const navigation: NavGroup[] = [
       { name: "Models", icon: <Binary />, href: "/dashboard/models", services: ["risk_orchestration"] },
       { name: "Graph Intelligence", icon: <Share2 />, href: "/dashboard/graph", services: ["graph"] },
       { name: "Devices", icon: <Smartphone />, href: "/dashboard/devices", services: ["device_fingerprinting"] },
+      { name: "Liveness & Face Match", icon: <ScanFace />, href: "/dashboard/document-fraud/liveness-check", services: ["document_intelligence"] },
+      { name: "KYC & KYB Check", icon: <Fingerprint />, href: "/dashboard/document-fraud/kyc-kyb-check", services: ["document_intelligence"] },
       { name: "Users", icon: <Users />, href: "/dashboard/users" }
+    ]
+  },
+  {
+    name: "TrustBridge NG",
+    items: [
+      { name: "Advanced ML", icon: <Brain />, href: "/dashboard/advanced-ml", services: ["advanced_ml"] },
+      { name: "Agent Co-Pilot", icon: <Bot />, href: "/dashboard/agent-copilot", services: ["agent_copilot"] },
+      { name: "Identity Frontier", icon: <Fingerprint />, href: "/dashboard/identity-frontier", services: ["identity_frontier"] },
+      { name: "Consortium", icon: <Network />, href: "/dashboard/consortium-network", services: ["consortium"] },
+      { name: "Explainability", icon: <FileCheck />, href: "/dashboard/explainability", services: ["explainability"] },
+      { name: "Regulator Tooling", icon: <ShieldCheck />, href: "/dashboard/regulator", services: ["regulatory"] },
+      { name: "Adaptive Access", icon: <Zap />, href: "/dashboard/adaptive-access", services: ["adaptive_access"] }
     ]
   },
   {

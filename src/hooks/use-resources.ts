@@ -11,7 +11,7 @@ export function useWhitepapers() {
       setIsLoading(true);
       setIsError(false);
       const res = await resourcesService.getWhitepapers();
-      setData(res.data || []);
+      setData(res || []);
     } catch (err) {
       console.error('Failed to fetch whitepapers:', err);
       setIsError(true);
@@ -37,7 +37,7 @@ export function useCaseStudies() {
       setIsLoading(true);
       setIsError(false);
       const res = await resourcesService.getCaseStudies();
-      setData(res.data || []);
+      setData(res || []);
     } catch (err) {
       console.error('Failed to fetch case studies:', err);
       setIsError(true);
@@ -63,7 +63,7 @@ export function useGuides() {
       setIsLoading(true);
       setIsError(false);
       const res = await resourcesService.getGuides();
-      setData(res.data || []);
+      setData(res || []);
     } catch (err) {
       console.error('Failed to fetch guides:', err);
       setIsError(true);

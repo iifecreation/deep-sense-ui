@@ -220,20 +220,20 @@ export default function AuditTrailsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {items.filter((i: any) => i.severity === 'CRITICAL' || i.severity === 'HIGH').slice(0, 4).map((row: any, i: number) => (
+                {items.filter((i: any) => i.severity === 'critical' || i.severity === 'warning').slice(0, 4).map((row: any, i: number) => (
                   <TableRow key={row.id} className="group hover:bg-rose-500/10 border-b border-rose-500/10 transition-colors cursor-pointer">
                     <TableCell className="px-8 py-5 font-black italic text-xs text-rose-500">{row.id.split('-')[0]}</TableCell>
-                    <TableCell className="text-[11px] font-black italic">{row.entity_type} {row.entity_id}</TableCell>
+                    <TableCell className="text-[11px] font-black italic">{row.resource_type} {row.resource_id}</TableCell>
                     <TableCell>
                        <Badge className="bg-rose-500 text-white text-[9px] font-black uppercase italic tracking-widest">
                          {row.action}
                        </Badge>
                     </TableCell>
-                    <TableCell className="text-[10px] font-bold text-muted-foreground italic uppercase">{row.actor_id}</TableCell>
+                    <TableCell className="text-[10px] font-bold text-muted-foreground italic uppercase">{row.user_id}</TableCell>
                     <TableCell className="px-8 text-right text-[10px] font-black text-rose-500 italic">{new Date(row.created_at).toLocaleString()}</TableCell>
                   </TableRow>
                 ))}
-                {items.filter((i: any) => i.severity === 'CRITICAL' || i.severity === 'HIGH').length === 0 && (
+                {items.filter((i: any) => i.severity === 'critical' || i.severity === 'warning').length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-10 text-rose-500/50">
                       No critical events found.
@@ -292,17 +292,17 @@ export default function AuditTrailsPage() {
                       </TableCell>
                       <TableCell>
                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-[9px] font-black italic border border-border/50">{row.actor_id.substring(0,2).toUpperCase()}</div>
-                            <span className="text-[10px] font-black italic uppercase tracking-widest">{row.actor_id}</span>
+                            <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-[9px] font-black italic border border-border/50">{(row.user_id ?? "SYS").substring(0,2).toUpperCase()}</div>
+                            <span className="text-[10px] font-black italic uppercase tracking-widest">{row.user_id ?? "System"}</span>
                          </div>
                       </TableCell>
                       <TableCell className="text-center">
-                         <Badge variant="outline" className={`text-[9px] font-black uppercase italic tracking-widest border-border/50 group-hover:border-brand-lime transition-colors ${row.severity === 'CRITICAL' ? 'text-rose-500 border-rose-500' : ''}`}>
+                         <Badge variant="outline" className={`text-[9px] font-black uppercase italic tracking-widest border-border/50 group-hover:border-brand-lime transition-colors ${row.severity === 'critical' ? 'text-rose-500 border-rose-500' : ''}`}>
                             {row.action}
                          </Badge>
                       </TableCell>
                       <TableCell>
-                         <Link href={`/dashboard/audit/${row.id}`} className="text-[11px] font-black italic underline underline-offset-4 decoration-border/50 group-hover:decoration-neutral-900 transition-all">{row.entity_type} {row.entity_id}</Link>
+                         <Link href={`/dashboard/audit/${row.id}`} className="text-[11px] font-black italic underline underline-offset-4 decoration-border/50 group-hover:decoration-neutral-900 transition-all">{row.resource_type} {row.resource_id}</Link>
                       </TableCell>
                       <TableCell>
                          <div className="flex flex-col">
@@ -345,12 +345,12 @@ export default function AuditTrailsPage() {
               </div>
               
               <div className="space-y-6 flex-1">
-                 {items.filter((i: any) => i.event_type === 'SYSTEM' || i.event_type === 'CONFIG').slice(0, 3).map((change: any, i: number) => (
+                 {items.filter((i: any) => i.category === 'system_event' || i.category === 'config_change').slice(0, 3).map((change: any, i: number) => (
                    <div key={i} className="p-6 bg-muted/20 border border-border/50 rounded-3xl space-y-4 hover:border-orange-500/30 transition-all group">
                       <div className="flex justify-between items-start">
                          <div className="space-y-1">
                             <div className="text-[10px] font-black uppercase italic tracking-widest text-orange-500 leading-none">{change.action}</div>
-                            <div className="text-[13px] font-black italic">{change.entity_type} {change.entity_id}</div>
+                            <div className="text-[13px] font-black italic">{change.resource_type} {change.resource_id}</div>
                          </div>
                          <span className="text-[9px] font-black text-muted-foreground/40 italic uppercase">{new Date(change.created_at).toLocaleTimeString()}</span>
                       </div>
@@ -373,12 +373,12 @@ export default function AuditTrailsPage() {
               </div>
               
               <div className="space-y-6 flex-1 relative z-10">
-                 {items.filter((i: any) => i.event_type === 'SECURITY').slice(0, 4).map((ev: any, i: number) => (
+                 {items.filter((i: any) => i.category === 'security_event').slice(0, 4).map((ev: any, i: number) => (
                    <div key={i} className="flex gap-6 items-center border-b border-white/5 pb-6 last:border-0 last:pb-0 font-bold italic">
                       <div className={`w-12 h-12 rounded-[20px] flex items-center justify-center shrink-0 border ${
-                        ev.severity === 'HIGH' || ev.severity === 'CRITICAL' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-white/5 border-white/10 text-white/40'
+                        ev.severity === 'warning' || ev.severity === 'critical' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-white/5 border-white/10 text-white/40'
                       }`}>
-                         {ev.severity === 'HIGH' || ev.severity === 'CRITICAL' ? <ShieldAlert className="w-6 h-6" /> : <Lock className="w-5 h-5" />}
+                         {ev.severity === 'warning' || ev.severity === 'critical' ? <ShieldAlert className="w-6 h-6" /> : <Lock className="w-5 h-5" />}
                       </div>
                       <div className="flex-1 space-y-1">
                          <div className="flex justify-between items-baseline">
@@ -386,7 +386,7 @@ export default function AuditTrailsPage() {
                             <span className="text-[8px] font-black uppercase italic text-white/40">{new Date(ev.created_at).toLocaleTimeString()}</span>
                          </div>
                          <div className="flex items-center gap-4 text-[9px] font-bold text-white/40 uppercase italic tracking-widest">
-                            <span className="text-white/60">{ev.actor_id}</span>
+                            <span className="text-white/60">{ev.user_id}</span>
                             <span>{ev.ip_address}</span>
                          </div>
                       </div>
@@ -422,16 +422,16 @@ export default function AuditTrailsPage() {
                
                <div className="flex-1 space-y-1 relative">
                   <div className="absolute left-[39px] top-4 bottom-4 w-px bg-muted/60 z-0" />
-                  {items.filter((i: any) => i.event_type === 'COMPLIANCE').slice(0, 4).map((trace: any, i: number) => (
+                  {items.filter((i: any) => i.category === 'compliance_action').slice(0, 4).map((trace: any, i: number) => (
                     <div key={i} className="flex gap-8 relative z-10 pb-10 last:pb-0 group font-bold italic">
                        <div className="w-20 text-[9px] font-black uppercase text-muted-foreground italic pt-2 shrink-0">{new Date(trace.created_at).toLocaleTimeString()}</div>
                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-3.5 shrink-0 shadow-[0_0_8px_#6366f1] group-hover:scale-150 transition-transform" />
                        <div className="flex-1 p-6 bg-muted/20 border border-border/50 rounded-3xl group-hover:border-indigo-500/30 transition-all transition-transform hover:scale-[1.01]">
                           <div className="flex justify-between items-baseline mb-2">
                              <h6 className="text-[13px] font-black italic underline underline-offset-4 decoration-border/50">{trace.action}</h6>
-                             <span className="text-[10px] font-black uppercase italic text-muted-foreground">{trace.actor_id}</span>
+                             <span className="text-[10px] font-black uppercase italic text-muted-foreground">{trace.user_id}</span>
                           </div>
-                          <p className="text-[11px] text-muted-foreground/80 leading-relaxed font-bold italic">{trace.entity_type} {trace.entity_id}</p>
+                          <p className="text-[11px] text-muted-foreground/80 leading-relaxed font-bold italic">{trace.resource_type} {trace.resource_id}</p>
                        </div>
                     </div>
                   ))}
@@ -446,13 +446,13 @@ export default function AuditTrailsPage() {
                   <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-1 italic italic text-muted-foreground">Disclosure submission and regulator lifecycle trace</CardDescription>
                </CardHeader>
                <CardContent className="p-10 space-y-12 flex-1 italic font-bold">
-                  {items.filter((i: any) => i.event_type === 'COMPLIANCE' && i.entity_type === 'REPORT').slice(0, 4).map((rep: any, i: number) => (
+                  {items.filter((i: any) => i.category === 'compliance_action' && i.resource_type === 'regulatory_report').slice(0, 4).map((rep: any, i: number) => (
                     <div key={i} className="flex gap-4 items-center group">
                        <div className="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center shrink-0 border border-border/50 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/30 transition-all">
                           <FileText className="w-5 h-5 text-muted-foreground group-hover:text-indigo-500" />
                        </div>
                        <div className="flex-1">
-                          <div className="text-[11px] font-black italic tracking-tight">{rep.action} <span className="text-muted-foreground ml-2 text-[9px] uppercase tracking-widest italic">{rep.entity_id}</span></div>
+                          <div className="text-[11px] font-black italic tracking-tight">{rep.action} <span className="text-muted-foreground ml-2 text-[9px] uppercase tracking-widest italic">{rep.resource_id}</span></div>
                           <div className="flex justify-between mt-1 items-baseline">
                              <span className="text-[8px] font-black text-muted-foreground/40 uppercase">{new Date(rep.created_at).toLocaleTimeString()}</span>
                              <span className={`text-[8px] font-black uppercase italic text-brand-lime`}>Success</span>

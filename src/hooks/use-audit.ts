@@ -11,7 +11,7 @@ export function useAuditEvents(params?: Record<string, any>) {
       setIsLoading(true);
       setIsError(false);
       const res = await auditService.listEvents(params);
-      setData(res.data);
+      setData(res);
     } catch (err) {
       console.error('Failed to fetch audit events:', err);
       setIsError(true);
@@ -38,7 +38,7 @@ export function useAuditEvent(eventId: string) {
       setIsLoading(true);
       setIsError(false);
       const res = await auditService.getEventDetail(eventId);
-      setData(res.data);
+      setData(res);
     } catch (err) {
       console.error('Failed to fetch audit event details:', err);
       setIsError(true);
@@ -64,7 +64,7 @@ export function useAuditSummary() {
       setIsLoading(true);
       setIsError(false);
       const res = await auditService.getSummary();
-      setData(res.data);
+      setData(res);
     } catch (err) {
       console.error('Failed to fetch audit summary:', err);
       setIsError(true);

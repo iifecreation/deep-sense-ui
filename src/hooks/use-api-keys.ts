@@ -11,7 +11,7 @@ export function useApiKeys() {
       setIsLoading(true);
       setIsError(false);
       const res = await apiKeysService.listKeys();
-      setData(res.data);
+      setData(res?.items ?? []);
     } catch (err) {
       console.error('Failed to fetch api keys:', err);
       setIsError(true);
