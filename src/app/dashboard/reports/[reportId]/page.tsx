@@ -30,6 +30,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ApiError } from "@/lib/api/client";
 import { reportsService } from "@/services/reports.service";
 import type { ReportDetail } from "@/types";
@@ -68,6 +76,10 @@ export default function RegulatoryReportDetailPage() {
   const [detail, setDetail] = useState<ReportDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionBusy, setActionBusy] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [showSubmitDialog, setShowSubmitDialog] = useState(false);
+  const [destination, setDestination] = useState("");
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -146,6 +158,35 @@ export default function RegulatoryReportDetailPage() {
   ].sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
 
   const completeness = FILING_COMPLETENESS_STATUSES.has(report.status) ? 100 : narrative ? 65 : 25;
+
+  const handleMoveToReview = async () => {
+    setActionBusy(true);
+    setActionError(null);
+    try {
+      await reportsService.reviewReport(reportId, "review_submitted");
+      await load();
+    } catch (cause) {
+      setActionError(describeError(cause));
+    } finally {
+      setActionBusy(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!destination.trim()) return;
+    setActionBusy(true);
+    setActionError(null);
+    try {
+      await reportsService.submitReport(reportId, destination.trim());
+      setShowSubmitDialog(false);
+      setDestination("");
+      await load();
+    } catch (cause) {
+      setActionError(describeError(cause));
+    } finally {
+      setActionBusy(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-8 pb-20 font-black italic">
@@ -342,14 +383,24 @@ export default function RegulatoryReportDetailPage() {
                      <Progress value={completeness} className="h-1 bg-white/10 rounded-full" indicatorClassName="bg-brand-lime h-full shadow-[0_0_8px_#D1F701]" />
                   </div>
                   <div className="space-y-3 font-black italic">
-                     <Button className="w-full h-14 bg-brand-lime text-black rounded-3xl text-[10px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-brand-lime/10 font-black italic font-bold h-14 leading-none">
+                     <Button
+                       disabled={actionBusy || report.status === "submitted"}
+                       onClick={() => setShowSubmitDialog(true)}
+                       className="w-full h-14 bg-brand-lime text-black rounded-3xl text-[10px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-brand-lime/10 font-black italic font-bold h-14 leading-none disabled:opacity-50"
+                     >
                         <Send className="w-4 h-4 mr-2" />
                         Execute Submission
                      </Button>
-                     <Button variant="outline" className="w-full h-14 border-white/10 bg-white/5 text-white text-[10px] font-black uppercase italic hover:bg-white/10 transition-all font-black italic font-bold h-14 leading-none">
+                     <Button
+                       disabled={actionBusy || report.status !== "draft"}
+                       onClick={() => void handleMoveToReview()}
+                       variant="outline"
+                       className="w-full h-14 border-white/10 bg-white/5 text-white text-[10px] font-black uppercase italic hover:bg-white/10 transition-all font-black italic font-bold h-14 leading-none disabled:opacity-50"
+                     >
                         <Archive className="w-4 h-4 mr-2" />
                         Move to Compliance Review
                      </Button>
+                     {actionError && <p className="text-[9px] font-bold uppercase tracking-widest text-rose-400 italic">{actionError}</p>}
                   </div>
                </div>
             </Card>
@@ -391,6 +442,31 @@ export default function RegulatoryReportDetailPage() {
             </div>
          </div>
       </div>
+
+      <Dialog open={showSubmitDialog} onOpenChange={(open) => { setShowSubmitDialog(open); if (!open) setDestination(""); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Execute Submission</DialogTitle>
+            <DialogDescription>
+              This submits the report to an external regulator/filing system and is irreversible. Enter the destination to confirm.
+            </DialogDescription>
+          </DialogHeader>
+          <input
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+            placeholder="e.g. FinCEN, FIU-NG"
+            autoFocus
+            className="w-full h-10 rounded-md border border-neutral-200 px-3 text-sm"
+          />
+          {actionError && <p className="text-xs text-red-600">{actionError}</p>}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSubmitDialog(false)}>Cancel</Button>
+            <Button disabled={actionBusy || !destination.trim()} onClick={() => void handleSubmit()} className="bg-brand-lime text-black hover:bg-brand-lime/90">
+              {actionBusy ? "Submitting..." : "Confirm Submission"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

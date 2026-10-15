@@ -1,94 +1,75 @@
 "use client";
 
-import React from "react";
-import { 
-  ArrowLeft, 
-  ShieldCheck, 
-  ShieldAlert, 
-  AlertTriangle, 
-  Clock, 
-  User, 
-  Users, 
-  Zap, 
-  MoreHorizontal, 
-  ChevronRight, 
-  Download, 
-  Briefcase, 
-  MessageSquare,
-  FileText,
-  Activity,
-  BarChart3,
-  Search,
-  Plus,
-  ArrowUpRight,
-  LayoutGrid,
+import React, { useState } from "react";
+import {
+  ArrowLeft,
+  AlertTriangle,
   CheckCircle2,
   XCircle,
-  Eye,
-  Info,
   History,
-  TrendingUp,
-  Link as LinkIcon,
-  Fingerprint,
-  Globe,
-  MoreVertical,
-  CheckSquare,
-  Slash,
-  GanttChart,
-  FileCheck,
-  Flag,
-  Settings,
-  Calendar,
-  Layers,
-  Archive,
-  Star,
-  Paperclip,
-  Share2,
-  Lock,
-  MessageCircle,
-  Hash,
-  Database,
-  ExternalLink,
   ShieldQuestion,
-  UserPlus
+  ExternalLink,
+  UserPlus,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useScreeningMatch } from "@/hooks/use-screening";
+import { screeningService } from "@/services/screening.service";
+
+function formatDate(value?: string | null): string {
+  if (!value) return "Unknown";
+  return new Date(value).toLocaleString();
+}
 
 export default function ScreeningMatchDetailPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
-
   const params = useParams();
   const matchId = params.matchId as string;
 
-  const { data: matchData, isLoading, isError, refetch } = useScreeningMatch(matchId);
+  const { data: detail, isLoading, isError, refetch } = useScreeningMatch(matchId);
+
+  const [pendingAction, setPendingAction] = useState<"confirm" | "dismiss" | "escalate" | null>(null);
+  const [actionReason, setActionReason] = useState("");
+  const [actionBusy, setActionBusy] = useState(false);
+
+  const handleConfirmAction = async () => {
+    if (!pendingAction) return;
+    setActionBusy(true);
+    try {
+      const body = { reason: actionReason.trim() || undefined };
+      if (pendingAction === "confirm") await screeningService.confirmMatch(matchId, body);
+      else if (pendingAction === "dismiss") await screeningService.dismissMatch(matchId, body);
+      else await screeningService.escalateMatch(matchId, body);
+      setPendingAction(null);
+      setActionReason("");
+      await refetch();
+    } finally {
+      setActionBusy(false);
+    }
+  };
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-lime"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-brand-lime" />
       </div>
     );
   }
 
-  if (isError || !matchData) {
+  if (isError || !detail) {
     return (
       <div className="p-6 bg-red-50 text-red-700 rounded-lg flex flex-col items-center">
         <AlertTriangle className="w-8 h-8 mb-2" />
@@ -98,27 +79,24 @@ export default function ScreeningMatchDetailPage() {
     );
   }
 
-  const match = {
-    id: matchData.id,
-    entityName: matchData.watchlist_entity_name || "Unknown Entity",
-    type: matchData.watchlist_name || "Sanctions / PEP",
-    confidence: `${(matchData.match_score * 100).toFixed(1)}%`,
-    riskLevel: matchData.match_score > 0.9 ? "Critical" : matchData.match_score > 0.7 ? "High" : "Medium",
-    status: matchData.status || "Review Required",
-    source: matchData.watchlist_name || "Global Watchlist",
-    matchedFields: matchData.matched_fields ? Object.entries(matchData.matched_fields).map(([k, v]) => ({
-      field: k,
-      score: 100,
-      detail: String(v)
-    })) : [],
-    customer: {
-      name: "Unknown Customer",
-      id: matchData.customer_id || "Unlinked",
-      riskTier: "Unknown"
-    },
-    rationale: matchData.match_summary || "Automated engine detected a similarity index from global watchlists.",
-    lastScreened: new Date(matchData.created_at).toLocaleString()
-  };
+  const match = (detail as any).match;
+  const riskLevel = match.risk_level || "medium";
+  const matchedFields: Record<string, any> = (detail as any).matched_fields || {};
+  const linkedCustomer = (detail as any).linked_customer || {};
+
+  const kpis = [
+    { label: "Confidence", value: match.confidence_score != null ? `${(match.confidence_score * 100).toFixed(1)}%` : "N/A", icon: <ShieldQuestion className="w-5 h-5" /> },
+    { label: "Risk Level", value: riskLevel, icon: <AlertTriangle className="w-5 h-5 text-rose-500" /> },
+    { label: "Status", value: match.status, icon: <History className="w-5 h-5" /> },
+    { label: "Created", value: formatDate(match.created_at).split(",")[0], icon: <History className="w-5 h-5" /> },
+  ];
+
+  const sourceInfo = [
+    { label: "Match Type", value: match.match_type },
+    { label: "Matched Via", value: match.matched_via || "Unknown" },
+    { label: "Assigned To", value: match.assigned_user_name || "Unassigned" },
+    { label: "Last Updated", value: formatDate(match.updated_at) },
+  ];
 
   return (
     <div className="flex flex-col gap-8 pb-20">
@@ -130,11 +108,11 @@ export default function ScreeningMatchDetailPage() {
                <ArrowLeft className="w-3 h-3" /> Global Screening Hub
             </Link>
             <div className="flex items-center gap-4">
-              <h1 className="text-3xl font-black italic tracking-tighter uppercase leading-none">{match.id}</h1>
+              <h1 className="text-3xl font-black italic tracking-tighter uppercase leading-none">{match.matched_name}</h1>
               <Badge className={`h-6 px-4 text-[9px] font-black uppercase italic tracking-widest border-none ${
-                match.riskLevel === 'Critical' ? 'bg-rose-500 text-white shadow-xl shadow-rose-500/20' : 'bg-orange-500 text-white'
+                riskLevel === 'critical' ? 'bg-rose-500 text-white shadow-xl shadow-rose-500/20' : riskLevel === 'high' ? 'bg-orange-500 text-white' : 'bg-slate-400 text-white'
               }`}>
-                {match.riskLevel} Alert
+                {riskLevel} Risk
               </Badge>
               <div className="flex items-center gap-2 px-3 py-1 bg-muted rounded-lg border border-border">
                  <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
@@ -143,15 +121,15 @@ export default function ScreeningMatchDetailPage() {
             </div>
           </div>
           <div className="flex gap-3">
-             <Button variant="outline" className="h-10 px-4 text-[9px] font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800">
+             <Button disabled={actionBusy || match.status !== 'pending'} onClick={() => setPendingAction("escalate")} variant="outline" className="h-10 px-4 text-[9px] font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800">
                 <AlertTriangle className="w-3.5 h-3.5 mr-2" />
                 Escalate Match
              </Button>
              <div className="flex gap-2">
-                <Button className="h-10 px-10 bg-rose-600 text-white hover:bg-rose-700 transition-all font-black uppercase tracking-widest italic shadow-xl">
+                <Button disabled={actionBusy || match.status !== 'pending'} onClick={() => setPendingAction("confirm")} className="h-10 px-10 bg-rose-600 text-white hover:bg-rose-700 transition-all font-black uppercase tracking-widest italic shadow-xl disabled:opacity-50">
                    Confirm Match
                 </Button>
-                <Button variant="outline" className="h-10 px-10 border-neutral-200 dark:border-neutral-800 text-neutral-400 hover:text-neutral-900 transition-all font-black uppercase tracking-widest italic">
+                <Button disabled={actionBusy || match.status !== 'pending'} onClick={() => setPendingAction("dismiss")} variant="outline" className="h-10 px-10 border-neutral-200 dark:border-neutral-800 text-neutral-400 hover:text-neutral-900 transition-all font-black uppercase tracking-widest italic disabled:opacity-50">
                    Dismiss FP
                 </Button>
              </div>
@@ -160,15 +138,14 @@ export default function ScreeningMatchDetailPage() {
       </section>
 
       {/* KPI GRID */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-         {(apiData || []).map((kpi, i) => (
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+         {kpis.map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
-                 <Badge variant="outline" className="text-[8px] font-black uppercase tracking-widest italic border-none px-0">{kpi.delta}</Badge>
               </div>
               <div>
-                 <div className={`text-2xl font-black italic tracking-tighter leading-none ${kpi.color || 'text-neutral-900 dark:text-white'}`}>{kpi.value}</div>
+                 <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white capitalize">{kpi.value}</div>
                  <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1">{kpi.label}</div>
               </div>
            </div>
@@ -186,46 +163,43 @@ export default function ScreeningMatchDetailPage() {
                         <ShieldQuestion className="w-8 h-8 text-brand-lime" />
                      </div>
                      <div className="space-y-1">
-                        <h3 className="text-[10px] font-black uppercase italic tracking-widest opacity-40">Forensic Identity Resolution</h3>
-                        <h4 className="text-2xl font-black italic uppercase tracking-tighter">SDN Entity Collision: {match.entityName}</h4>
+                        <h3 className="text-[10px] font-black uppercase italic tracking-widest opacity-40">Match Rationale</h3>
+                        <h4 className="text-2xl font-black italic uppercase tracking-tighter">Matched against {match.source_list}</h4>
                      </div>
                   </div>
                   <p className="text-[14px] text-white/70 italic leading-relaxed font-medium">
-                     {match.rationale}
+                     {(detail as any).confidence_explanation || "No explanation provided by the matching engine."}
                   </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     {match.matchedFields.map((field, i) => (
-                        <div key={i} className="p-6 bg-white/5 border border-white/10 rounded-[32px] font-black italic">
-                           <div className="flex justify-between items-center mb-2">
-                              <span className="text-[9px] font-black uppercase text-white/40 italic">{field.field} Resolution</span>
-                              <span className="text-[11px] font-black text-brand-lime italic">{field.score}%</span>
-                           </div>
-                           <div className="text-sm font-black italic text-white uppercase truncate">{field.detail}</div>
-                           <Progress value={field.score} className="h-1 bg-white/10 mt-3 rounded-full" indicatorClassName="bg-brand-lime h-full" />
-                        </div>
-                     ))}
-                  </div>
+                  {Object.keys(matchedFields).length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       {Object.entries(matchedFields).map(([field, value], i) => (
+                          <div key={i} className="p-6 bg-white/5 border border-white/10 rounded-[32px] font-black italic">
+                             <span className="text-[9px] font-black uppercase text-white/40 italic">{field}</span>
+                             <div className="text-sm font-black italic text-white uppercase truncate mt-1">{String(value)}</div>
+                          </div>
+                       ))}
+                    </div>
+                  )}
                </div>
             </div>
 
             <Tabs defaultValue="forensics" className="w-full">
                <TabsList className="bg-muted p-1 rounded-2xl border border-border/50 h-12 mb-8">
                   <TabsTrigger value="forensics" className="rounded-xl px-8 text-[10px] font-black uppercase italic tracking-widest data-[state=active]:bg-neutral-900 data-[state=active]:text-white uppercase">Profile Forensic</TabsTrigger>
-                  <TabsTrigger value="sources" className="rounded-xl px-8 text-[10px] font-black uppercase italic tracking-widest data-[state=active]:bg-neutral-900 data-[state=active]:text-white uppercase">Source Data</TabsTrigger>
-                  <TabsTrigger value="history" className="rounded-xl px-8 text-[10px] font-black uppercase italic tracking-widest data-[state=active]:bg-neutral-900 data-[state=active]:text-white uppercase">Screening Trail</TabsTrigger>
+                  <TabsTrigger value="history" className="rounded-xl px-8 text-[10px] font-black uppercase italic tracking-widest data-[state=active]:bg-neutral-900 data-[state=active]:text-white uppercase">Prior Screenings</TabsTrigger>
                </TabsList>
 
                <TabsContent value="forensics" className="m-0 space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                      <Card className="rounded-[40px] border-border shadow-md p-10 bg-white">
                         <CardHeader className="p-0 mb-8">
-                           <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Matched Entity Profile</CardTitle>
+                           <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Match Metadata</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0 space-y-6">
-                           {(apiData || []).map((it, i) => (
+                           {sourceInfo.map((it, i) => (
                              <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic group h-10 border-b border-border last:border-0 font-black">
-                                <span className="text-muted-foreground flex items-center gap-2">{it.icon} {it.l}</span>
-                                <span className="text-neutral-900 group-hover:text-brand-lime transition-colors cursor-pointer">{it.v}</span>
+                                <span className="text-muted-foreground">{it.label}</span>
+                                <span className="text-neutral-900">{it.value}</span>
                              </div>
                            ))}
                         </CardContent>
@@ -236,45 +210,41 @@ export default function ScreeningMatchDetailPage() {
                            <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Linked System User</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0 flex flex-col items-center gap-6">
-                           <div className="w-20 h-20 rounded-[28px] bg-zinc-50 border border-border flex items-center justify-center relative shadow-inner group cursor-pointer overflow-hidden">
-                              <UserPlus className="w-8 h-8 text-neutral-300 transition-transform group-hover:scale-110" />
+                           <div className="w-20 h-20 rounded-[28px] bg-zinc-50 border border-border flex items-center justify-center relative shadow-inner">
+                              <UserPlus className="w-8 h-8 text-neutral-300" />
                            </div>
                            <div className="text-center font-black italic">
-                              <h4 className="text-xl font-black italic tracking-tighter text-neutral-900">{match.customer.name}</h4>
-                              <p className="text-[10px] font-black uppercase text-muted-foreground italic mt-1">{match.customer.id} • {match.customer.riskTier} Risk Profile</p>
+                              <h4 className="text-xl font-black italic tracking-tighter text-neutral-900">{match.customer_name || "Unlinked"}</h4>
+                              <p className="text-[10px] font-black uppercase text-muted-foreground italic mt-1">{match.customer_id || "No customer linked"}</p>
                            </div>
-                           <Button variant="outline" className="w-full text-[9px] font-black uppercase italic border-border rounded-2xl h-11 italic shadow-sm">View Risk DNA Profile</Button>
+                           {match.customer_id && (
+                             <Link href={`/dashboard/users/${match.customer_id}`} className="w-full">
+                               <Button variant="outline" className="w-full text-[9px] font-black uppercase italic border-border rounded-2xl h-11 shadow-sm">View Customer Profile</Button>
+                             </Link>
+                           )}
                         </CardContent>
                      </Card>
                   </div>
-
-                  {/* ALIAS LIST */}
-                  <Card className="rounded-[40px] border-border shadow-md overflow-hidden bg-white">
-                     <CardHeader className="p-10 border-b border-border/50">
-                        <CardTitle className="text-xl font-black italic uppercase tracking-tighter">Entity Aliases & Variations</CardTitle>
-                     </CardHeader>
-                     <CardContent className="p-10 text-center text-muted-foreground italic text-sm font-bold">
-                        No aliases available.
-                     </CardContent>
-                  </Card>
                </TabsContent>
 
                <TabsContent value="history" className="m-0">
                   <Card className="rounded-[40px] border-border shadow-md p-12 bg-white font-black italic">
-                     <div className="space-y-12">
-                        <div className="flex gap-10 items-start relative group">
-                           <div className={`w-16 h-16 rounded-[24px] bg-zinc-50 border border-neutral-100 flex flex-col items-center justify-center shrink-0 shadow-sm transition-all group-hover:bg-neutral-900 group-hover:text-white`}>
-                              <span className="text-[11px] font-black italic">SYS</span>
-                           </div>
-                           <div className="flex-1 pt-2 space-y-1">
-                              <div className="flex items-center gap-3">
-                                 <h5 className="text-xl font-black italic uppercase tracking-tighter text-neutral-900">Match Identified</h5>
-                                 <span className="text-[9px] font-black uppercase text-muted-foreground italic underline underline-offset-4 decoration-border">system</span>
+                     {((detail as any).prior_screenings || []).length === 0 ? (
+                       <p className="text-center text-muted-foreground italic text-sm">No prior screening history for this entity.</p>
+                     ) : (
+                       <div className="space-y-8">
+                         {(detail as any).prior_screenings.map((ps: any, i: number) => (
+                           <div key={i} className="flex gap-6 items-start border-b border-border/50 pb-6 last:border-0">
+                              <div className="w-12 h-12 rounded-2xl bg-zinc-50 border border-neutral-100 flex items-center justify-center shrink-0">
+                                 <History className="w-5 h-5 text-neutral-400" />
                               </div>
-                              <p className="text-[12px] text-muted-foreground italic font-medium">Automatic screening protocol execution.</p>
+                              <div className="flex-1">
+                                 <p className="text-sm font-black italic">{ps.summary || JSON.stringify(ps)}</p>
+                              </div>
                            </div>
-                        </div>
-                     </div>
+                         ))}
+                       </div>
+                     )}
                   </Card>
                </TabsContent>
             </Tabs>
@@ -288,20 +258,15 @@ export default function ScreeningMatchDetailPage() {
                </CardHeader>
                <div className="space-y-6">
                   <div className="p-6 bg-zinc-50 border border-border rounded-[32px] space-y-3 font-black">
-                     <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic opacity-40">OFAC Official Entry ID</span>
-                     <div className="text-[13px] font-black italic tracking-widest text-neutral-900">SDN_0x9921_VOLKOV</div>
-                     <Link href="#" className="flex items-center gap-2 text-[9px] font-black uppercase text-indigo-500 italic mt-2 hover:underline">
-                        View Official Registry <ExternalLink className="w-3 h-3" />
-                     </Link>
+                     <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic opacity-40">Source List</span>
+                     <div className="text-[13px] font-black italic tracking-widest text-neutral-900">{match.source_list}</div>
                   </div>
-                  <div className="space-y-4 font-black italic">
-                     {(apiData || []).map((it, i) => (
-                       <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic border-b border-neutral-50 pb-4 last:border-0 font-black">
-                          <span className="text-muted-foreground">{it.label}</span>
-                          <span className="text-neutral-900 font-black italic uppercase">{it.value}</span>
-                       </div>
-                     ))}
-                  </div>
+                  {match.assigned_user_name && (
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic border-b border-neutral-50 pb-4 last:border-0">
+                       <span className="text-muted-foreground">Assigned To</span>
+                       <span className="text-neutral-900">{match.assigned_user_name}</span>
+                    </div>
+                  )}
                </div>
             </Card>
 
@@ -309,40 +274,48 @@ export default function ScreeningMatchDetailPage() {
             <Card className="rounded-[40px] border border-neutral-900 bg-neutral-900 text-white p-10 space-y-10 shadow-3xl h-fit font-black italic">
                <div className="space-y-4">
                   <h4 className="text-xl font-black italic uppercase tracking-tighter text-brand-lime">Identity Resolution</h4>
-                  <p className="text-white/30 text-[10px] uppercase italic tracking-widest leading-relaxed">Decision will be audited and broadcasted to institutional gateways.</p>
+                  <p className="text-white/30 text-[10px] uppercase italic tracking-widest leading-relaxed">Decision will be audited.</p>
                </div>
                <div className="space-y-3 font-black italic">
-                  <Button className="w-full h-14 bg-rose-600 text-white rounded-3xl text-[11px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-rose-600/20">
+                  <Button disabled={actionBusy || match.status !== 'pending'} onClick={() => setPendingAction("confirm")} className="w-full h-14 bg-rose-600 text-white rounded-3xl text-[11px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-rose-600/20 disabled:opacity-50">
                      <XCircle className="w-4 h-4 mr-2" />
                      Confirm & Restrict
                   </Button>
-                  <Button variant="outline" className="w-full h-14 border-white/10 bg-white/5 text-white text-[11px] font-black uppercase italic hover:bg-white/10 transition-all font-bold">
+                  <Button disabled={actionBusy || match.status !== 'pending'} onClick={() => setPendingAction("dismiss")} variant="outline" className="w-full h-14 border-white/10 bg-white/5 text-white text-[11px] font-black uppercase italic hover:bg-white/10 transition-all font-bold disabled:opacity-50">
                      <CheckCircle2 className="w-4 h-4 mr-2" />
                      Dismiss False Positive
                   </Button>
-                  <Button variant="outline" className="w-full h-14 border-indigo-500/50 text-indigo-400 rounded-3xl text-[10px] font-black uppercase italic hover:bg-indigo-500/5 transition-all font-bold">
+                  <Button disabled={actionBusy || match.status !== 'pending'} onClick={() => setPendingAction("escalate")} variant="outline" className="w-full h-14 border-indigo-500/50 text-indigo-400 rounded-3xl text-[10px] font-black uppercase italic hover:bg-indigo-500/5 transition-all font-bold disabled:opacity-50">
                      <History className="w-4 h-4 mr-2" />
                      Request Senior Review
                   </Button>
                </div>
             </Card>
-
-            {/* SCREENING METRICS MINI */}
-            <div className="p-10 bg-muted/20 border border-border rounded-[40px] space-y-8 font-black italic h-fit">
-               <h5 className="text-[11px] font-black uppercase italic tracking-widest text-muted-foreground px-4 underline underline-offset-8 decoration-border">Detection Velocity</h5>
-               <Card className="p-8 bg-white border border-border rounded-[32px] space-y-6 shadow-sm font-black italic">
-                  <div className="flex justify-between items-center mb-2 font-black italic h-4 leading-none">
-                     <span className="text-[10px] font-black uppercase italic text-muted-foreground">Detection Lag</span>
-                     <span className="text-[10px] font-black text-brand-lime italic">0.42s</span>
-                  </div>
-                  <div className="space-y-2 h-1 leading-none uppercase">
-                     <Progress value={92} className="h-1 bg-muted rounded-full" indicatorClassName="bg-brand-lime h-full" />
-                  </div>
-                  <p className="text-[9px] text-muted-foreground/60 italic leading-relaxed uppercase">Collision occurred immediately following OFAC delta update at 19:32 GMT.</p>
-               </Card>
-            </div>
          </div>
       </div>
+
+      <Dialog open={pendingAction !== null} onOpenChange={(open) => { if (!open) { setPendingAction(null); setActionReason(""); } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {pendingAction === "confirm" ? "Confirm Match" : pendingAction === "dismiss" ? "Dismiss False Positive" : "Escalate Match"}
+            </DialogTitle>
+            <DialogDescription>This decision is audited. Provide a reason (optional).</DialogDescription>
+          </DialogHeader>
+          <textarea
+            value={actionReason}
+            onChange={(e) => setActionReason(e.target.value)}
+            placeholder="Reason for this decision"
+            className="w-full min-h-20 rounded-md border border-slate-200 p-3 text-sm"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setPendingAction(null); setActionReason(""); }}>Cancel</Button>
+            <Button disabled={actionBusy} onClick={() => void handleConfirmAction()} className="bg-neutral-900 hover:bg-neutral-800">
+              {actionBusy ? "Submitting..." : "Confirm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

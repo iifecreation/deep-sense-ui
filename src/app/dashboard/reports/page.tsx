@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { 
   FileText, 
   Search, 
@@ -56,16 +56,67 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useReports } from "@/hooks";
+import { reportsService } from "@/services/reports.service";
+import { ReportSubmissionRead } from "@/types";
+
+const REPORT_TYPES = ["CTR", "STR", "INTERNAL"];
+
+function daysBetween(a: string, b: string): number {
+  return (new Date(b).getTime() - new Date(a).getTime()) / (1000 * 60 * 60 * 24);
+}
+
+function formatDeadline(dueAt?: string): string {
+  if (!dueAt) return "No deadline";
+  const diffDays = Math.ceil(daysBetween(new Date().toISOString(), dueAt));
+  if (diffDays < 0) return "EXPIRED";
+  if (diffDays === 0) return "Due today";
+  return `${diffDays}d left`;
+}
 
 export default function RegulatoryReportsPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
-
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: reports, isLoading, isError, error, refetch } = useReports({ 
+  const { data: reports, isLoading, isError, error, refetch } = useReports({
     query: { page: 1, page_size: 50 }
   });
+
+  const [showCreate, setShowCreate] = useState(false);
+  const [newReportType, setNewReportType] = useState(REPORT_TYPES[0]);
+  const [newTitle, setNewTitle] = useState("");
+  const [newSummary, setNewSummary] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+
+  const [submissions, setSubmissions] = useState<ReportSubmissionRead[]>([]);
+  useEffect(() => {
+    reportsService.listSubmissions().then(setSubmissions).catch(() => setSubmissions([]));
+  }, []);
+
+  const handleCreateReport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTitle.trim()) return;
+    setCreating(true);
+    setCreateError(null);
+    try {
+      await reportsService.createReport({ report_type: newReportType, title: newTitle.trim(), summary: newSummary.trim() || undefined });
+      setShowCreate(false);
+      setNewTitle("");
+      setNewSummary("");
+      await refetch();
+    } catch (err) {
+      setCreateError(err instanceof Error ? err.message : "Failed to create report.");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -87,6 +138,51 @@ export default function RegulatoryReportsPage() {
       r.case_id?.toLowerCase().includes(query)
     );
   }) || [];
+
+  const allReports: any[] = reports || [];
+
+  const kpiCards = useMemo(() => {
+    const total = allReports.length;
+    const byStatus = (s: string) => allReports.filter((r) => r.status?.toLowerCase() === s).length;
+    const overdue = allReports.filter((r) => r.due_at && !r.submitted_at && new Date(r.due_at) < new Date()).length;
+    return [
+      { label: "Total Reports", value: String(total), icon: <FileText className="w-4 h-4" /> },
+      { label: "Draft", value: String(byStatus("draft")), icon: <FileX className="w-4 h-4 text-slate-400" /> },
+      { label: "Under Review", value: String(byStatus("under_review")), icon: <Clock className="w-4 h-4 text-amber-500" /> },
+      { label: "Submitted", value: String(byStatus("submitted")), icon: <Send className="w-4 h-4 text-indigo-500" /> },
+      { label: "Rejected", value: String(byStatus("rejected")), icon: <XCircle className="w-4 h-4 text-rose-500" /> },
+      { label: "Overdue", value: String(overdue), icon: <AlertTriangle className="w-4 h-4 text-rose-500" /> },
+    ];
+  }, [allReports]);
+
+  const immediateActionQueue = useMemo(() => {
+    return allReports
+      .filter((r) => r.due_at && !r.submitted_at)
+      .sort((a, b) => new Date(a.due_at).getTime() - new Date(b.due_at).getTime())
+      .slice(0, 8);
+  }, [allReports]);
+
+  const reviewAnalytics = useMemo(() => {
+    const submitted = allReports.filter((r) => r.submitted_at);
+    const leadTimes = submitted.map((r) => daysBetween(r.created_at, r.submitted_at));
+    const avgLeadTime = leadTimes.length > 0 ? (leadTimes.reduce((a, b) => a + b, 0) / leadTimes.length) : null;
+    const rejected = allReports.filter((r) => r.status?.toLowerCase() === "rejected").length;
+    const reworkRatio = allReports.length > 0 ? (rejected / allReports.length) * 100 : null;
+    const pendingReview = allReports.filter((r) => r.status?.toLowerCase() === "under_review");
+    return { avgLeadTime, reworkRatio, pendingReview };
+  }, [allReports]);
+
+  const filingTrend = useMemo(() => {
+    const buckets = new Array(12).fill(0);
+    const now = new Date();
+    for (const r of allReports) {
+      if (!r.created_at) continue;
+      const days = Math.floor(daysBetween(r.created_at, now.toISOString()));
+      const bucket = 11 - Math.min(11, Math.floor(days / 7));
+      if (bucket >= 0) buckets[bucket]++;
+    }
+    return buckets;
+  }, [allReports]);
 
   if (isLoading) {
     return (
@@ -152,7 +248,7 @@ export default function RegulatoryReportsPage() {
                <Download className="w-3.5 h-3.5 mr-2" />
                Export Reports
             </Button>
-            <Button className="h-10 px-6 bg-brand-lime text-neutral-900 hover:scale-105 transition-all font-bold text-xs uppercase tracking-widest italic shadow-xl shadow-brand-lime/20">
+            <Button onClick={() => setShowCreate(true)} className="h-10 px-6 bg-brand-lime text-neutral-900 hover:scale-105 transition-all font-bold text-xs uppercase tracking-widest italic shadow-xl shadow-brand-lime/20">
                <Plus className="w-3.5 h-3.5 mr-2" />
                Create Report
             </Button>
@@ -172,7 +268,7 @@ export default function RegulatoryReportsPage() {
             />
           </div>
           
-          {(apiData || []).map((filter: any, i: number) => (
+          {([] as any[]).map((filter: any, i: number) => (
             <div key={i} className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group">
               <span className="text-[10px] font-black uppercase tracking-widest italic text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                 {filter.label}: {filter.value}
@@ -189,21 +285,15 @@ export default function RegulatoryReportsPage() {
 
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {(apiData || []).map((kpi: any, i: number) => (
-          <Link 
-            key={i} 
-            href={`/dashboard/reports?status=${kpi.label.toLowerCase().replace(/ /g, '-')}`}
-            className="flex flex-col gap-4 p-5 bg-white dark:bg-neutral-900 rounded-3xl border border-border/50 shadow-xl shadow-black/5 hover:border-brand-lime hover:scale-[1.02] transition-all text-left group"
+        {kpiCards.map((kpi, i) => (
+          <div
+            key={i}
+            className="flex flex-col gap-4 p-5 bg-white dark:bg-neutral-900 rounded-3xl border border-border/50 shadow-xl shadow-black/5 text-left"
           >
             <div className="flex items-center justify-between">
-              <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">
                 {kpi.icon}
               </div>
-              <Badge variant="outline" className={`text-[9px] font-black italic tracking-widest uppercase border-none px-0 ${
-                kpi.trend === 'up' ? (kpi.label.includes('Rejected') || kpi.label.includes('Overdue') ? 'text-rose-500' : 'text-emerald-500 text-brand-lime') : 'text-emerald-500'
-              }`}>
-                {kpi.delta}
-              </Badge>
             </div>
             <div>
               <div className="text-2xl font-black italic tracking-tighter text-neutral-900 dark:text-white leading-none">
@@ -213,7 +303,7 @@ export default function RegulatoryReportsPage() {
                 {kpi.label}
               </div>
             </div>
-          </Link>
+          </div>
         ))}
       </section>
 
@@ -245,54 +335,47 @@ export default function RegulatoryReportsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {(apiData || []).map((row: any, i) => (
-                  <TableRow key={i} className="group hover:bg-muted/30 transition-colors border-b border-border/50 cursor-pointer">
+                {immediateActionQueue.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-10 text-slate-500">No reports with an approaching deadline.</TableCell>
+                  </TableRow>
+                ) : immediateActionQueue.map((row: any) => {
+                  const dead = formatDeadline(row.due_at);
+                  return (
+                  <TableRow key={row.id} className="group hover:bg-muted/30 transition-colors border-b border-border/50 cursor-pointer">
                     <TableCell className="px-8 py-5">
                       <Link href={`/dashboard/reports/${row.id}`} className="font-black italic text-xs underline underline-offset-4 decoration-border group-hover:decoration-neutral-900 transition-all">{row.id}</Link>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="text-[9px] font-black italic tracking-widest uppercase">{row.type}</Badge>
+                      <Badge variant="outline" className="text-[9px] font-black italic tracking-widest uppercase">{row.report_type}</Badge>
                     </TableCell>
                     <TableCell>
-                      <span className="text-[10px] font-medium text-muted-foreground italic">{row.case}</span>
+                      <span className="text-[10px] font-medium text-muted-foreground italic">{row.linked_case_id || "—"}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-[11px] font-black italic">{row.subject}</span>
+                      <span className="text-[11px] font-black italic">{row.title}</span>
                     </TableCell>
                     <TableCell className="text-center">
                        <Badge className={`text-[9px] font-black italic tracking-widest uppercase ${
-                         row.status === 'Ready' ? 'bg-brand-lime text-black' : 
-                         row.status === 'Review' ? 'bg-indigo-500 text-white' : 
+                         row.status === 'ready' ? 'bg-brand-lime text-black' :
+                         row.status === 'under_review' ? 'bg-indigo-500 text-white' :
                          'bg-neutral-100 text-neutral-400'
                        }`}>
                          {row.status}
                        </Badge>
                     </TableCell>
                     <TableCell className="text-center">
-                       <span className={`text-[10px] font-black uppercase italic ${row.dead.includes('left') ? 'text-orange-500' : row.dead === 'EXPIRED' ? 'text-rose-500 animate-pulse' : 'text-muted-foreground'}`}>
-                         {row.dead}
+                       <span className={`text-[10px] font-black uppercase italic ${dead.includes('left') ? 'text-orange-500' : dead === 'EXPIRED' ? 'text-rose-500 animate-pulse' : 'text-muted-foreground'}`}>
+                         {dead}
                        </span>
                     </TableCell>
                     <TableCell className="px-8 text-right">
-                       <div className="flex items-center justify-end gap-2">
-                          <Button size="sm" className="h-7 text-[8px] font-black uppercase italic tracking-widest px-4 bg-neutral-900 dark:bg-white dark:text-black rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">Open Report</Button>
-                          <DropdownMenu>
-                             <DropdownMenuTrigger asChild>
-                                <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg">
-                                   <MoreVertical className="w-3.5 h-3.5" />
-                                </Button>
-                             </DropdownMenuTrigger>
-                             <DropdownMenuContent align="end" className="w-48">
-                                <DropdownMenuItem className="text-[10px] font-bold uppercase italic tracking-widest">Review & Sign</DropdownMenuItem>
-                                <DropdownMenuItem className="text-[10px] font-bold uppercase italic tracking-widest">Submit to Regulator</DropdownMenuItem>
-                                <DropdownMenuItem className="text-[10px] font-bold uppercase italic tracking-widest">Assign Reviewer</DropdownMenuItem>
-                                <DropdownMenuItem className="text-[10px] font-bold uppercase italic tracking-widest text-rose-500">Escalate Issue</DropdownMenuItem>
-                             </DropdownMenuContent>
-                          </DropdownMenu>
-                       </div>
+                       <Link href={`/dashboard/reports/${row.id}`}>
+                         <Button size="sm" className="h-7 text-[8px] font-black uppercase italic tracking-widest px-4 bg-neutral-900 dark:bg-white dark:text-black rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">Open Report</Button>
+                       </Link>
                     </TableCell>
                   </TableRow>
-                ))}
+                );})}
               </TableBody>
             </Table>
           </CardContent>
@@ -396,7 +479,7 @@ export default function RegulatoryReportsPage() {
                  <div className="p-8 bg-neutral-900 text-white rounded-[32px] space-y-6 shadow-2xl">
                     <h5 className="text-[10px] font-black uppercase italic tracking-widest text-white/40">Suggested for Reporting</h5>
                     <div className="space-y-4">
-                       {(apiData || []).map((item, i) => (
+                       {([] as any[]).map((item, i) => (
                          <div key={i} className="flex items-center justify-between group cursor-pointer border-b border-white/5 pb-4 last:border-0 hover:translate-x-1 transition-transform">
                             <div className="space-y-1">
                                <div className="text-[12px] font-black italic tracking-tight">{item.subject}</div>
@@ -429,28 +512,30 @@ export default function RegulatoryReportsPage() {
                   <div className="space-y-2">
                      <div className="flex justify-between items-baseline">
                         <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground">Lead Time to Submit</span>
-                        <span className="text-2xl font-black italic tracking-tighter text-neutral-900 dark:text-white">4.2d</span>
+                        <span className="text-2xl font-black italic tracking-tighter text-neutral-900 dark:text-white">
+                          {reviewAnalytics.avgLeadTime != null ? `${reviewAnalytics.avgLeadTime.toFixed(1)}d` : "N/A"}
+                        </span>
                      </div>
-                     <Progress value={78} className="h-1 bg-muted" />
+                     <Progress value={reviewAnalytics.avgLeadTime != null ? Math.min(100, (reviewAnalytics.avgLeadTime / 14) * 100) : 0} className="h-1 bg-muted" />
                   </div>
                   <div className="space-y-2">
                      <div className="flex justify-between items-baseline">
-                        <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground">Rework Ratio</span>
-                        <span className="text-2xl font-black italic tracking-tighter text-rose-500">12%</span>
+                        <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground">Rejection Ratio</span>
+                        <span className="text-2xl font-black italic tracking-tighter text-rose-500">
+                          {reviewAnalytics.reworkRatio != null ? `${reviewAnalytics.reworkRatio.toFixed(0)}%` : "N/A"}
+                        </span>
                      </div>
-                     <Progress value={12} className="h-1 bg-muted" />
+                     <Progress value={reviewAnalytics.reworkRatio ?? 0} className="h-1 bg-muted" />
                   </div>
                </div>
-               
+
                <div className="p-6 bg-white dark:bg-neutral-900 rounded-3xl border border-border/50 space-y-4">
                   <h6 className="text-[9px] font-black uppercase tracking-widest italic text-muted-foreground">Pending Approval Workload</h6>
-                  <div className="flex items-center -space-x-3">
-                     {[1, 2, 3, 4, 5].map(i => (
-                        <div key={i} className="w-10 h-10 rounded-full border-2 border-white dark:border-neutral-900 bg-muted/20 flex items-center justify-center font-black italic text-[10px] bg-neutral-900 text-white">JW</div>
-                     ))}
-                     <div className="w-10 h-10 rounded-full border-2 border-white dark:border-neutral-900 bg-muted flex items-center justify-center text-[10px] font-bold">+8</div>
-                  </div>
-                  <Button className="w-full h-8 text-[9px] font-black uppercase bg-neutral-900 dark:bg-white dark:text-black">Assign Next Review Packet</Button>
+                  {reviewAnalytics.pendingReview.length > 0 ? (
+                    <div className="text-xl font-black italic text-neutral-900 dark:text-white">{reviewAnalytics.pendingReview.length} report{reviewAnalytics.pendingReview.length === 1 ? "" : "s"} awaiting review</div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">No reports pending review.</p>
+                  )}
                </div>
             </CardContent>
           </Card>
@@ -481,22 +566,26 @@ export default function RegulatoryReportsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                   {(apiData || []).map((sub: any, i) => (
-                     <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
-                        <TableCell className="px-8 py-5 font-black italic text-[11px]">{sub.id}</TableCell>
-                        <TableCell className="text-[10px] font-bold italic text-muted-foreground">{sub.reg}</TableCell>
+                   {submissions.length === 0 ? (
+                     <TableRow>
+                       <TableCell colSpan={5} className="text-center py-10 text-white/40">No submissions recorded yet.</TableCell>
+                     </TableRow>
+                   ) : submissions.map((sub) => (
+                     <TableRow key={sub.id} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
+                        <TableCell className="px-8 py-5 font-black italic text-[11px]">
+                          <Link href={`/dashboard/reports/${sub.report_id}`} className="underline underline-offset-4 decoration-white/20">{sub.report_id}</Link>
+                        </TableCell>
+                        <TableCell className="text-[10px] font-bold italic text-muted-foreground">{sub.destination}</TableCell>
                         <TableCell className="text-center">
                            <Badge variant="outline" className={`text-[8px] font-black italic tracking-widest uppercase border-none px-0 ${
-                             sub.st === 'Accepted' ? 'text-emerald-500' : sub.st === 'Rejected' ? 'text-rose-500' : 'text-indigo-500'
+                             sub.status === 'accepted' ? 'text-emerald-500' : sub.status === 'rejected' ? 'text-rose-500' : 'text-indigo-500'
                            }`}>
-                             {sub.st}
+                             {sub.status}
                            </Badge>
                         </TableCell>
-                        <TableCell className="text-center text-[10px] font-black text-muted-foreground uppercase">{sub.ref}</TableCell>
-                        <TableCell className="px-8 text-right">
-                           <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Download className="w-3.5 h-3.5" />
-                           </Button>
+                        <TableCell className="text-center text-[10px] font-black text-muted-foreground uppercase">{sub.external_reference || "—"}</TableCell>
+                        <TableCell className="px-8 text-right text-[9px] font-bold text-muted-foreground uppercase">
+                          {new Date(sub.submitted_at).toLocaleDateString()}
                         </TableCell>
                      </TableRow>
                    ))}
@@ -519,21 +608,31 @@ export default function RegulatoryReportsPage() {
                </div>
                
                <div className="flex-1 min-h-[300px] flex items-end gap-1 px-4">
-                  {Array.from({ length: 24 }).map((_, i) => (
+                  {filingTrend.every((c) => c === 0) ? (
+                    <p className="w-full text-center text-sm text-neutral-400 italic self-center">No report history yet to chart.</p>
+                  ) : filingTrend.map((count, i) => {
+                    const max = Math.max(...filingTrend, 1);
+                    return (
                     <div key={i} className="flex-1 bg-indigo-500/10 rounded-full relative group">
-                       <div className="absolute bottom-0 inset-x-0 bg-brand-lime transition-all group-hover:h-full rounded-full" style={{ height: `${30 + ((i * 19 + 3) % 71)}%` }} />
-                       <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{(i * 13 + 5) % 50} Reports</div>
+                       <div className="absolute bottom-0 inset-x-0 bg-brand-lime transition-all rounded-full" style={{ height: `${Math.max(4, (count / max) * 100)}%` }} />
+                       <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{count} Reports</div>
                     </div>
-                  ))}
+                  );})}
                </div>
-               
+
                <div className="mt-12 grid grid-cols-3 gap-8">
-                  {(apiData || []).map((stat, i) => (
-                    <div key={i} className="space-y-1">
-                       <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic">{stat.l}</div>
-                       <div className="text-xl font-black italic">{stat.v}</div>
-                    </div>
-                  ))}
+                  <div className="space-y-1">
+                     <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic">Total Reports</div>
+                     <div className="text-xl font-black italic">{allReports.length}</div>
+                  </div>
+                  <div className="space-y-1">
+                     <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic">Submitted</div>
+                     <div className="text-xl font-black italic">{allReports.filter((r) => r.submitted_at).length}</div>
+                  </div>
+                  <div className="space-y-1">
+                     <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic">Submissions Logged</div>
+                     <div className="text-xl font-black italic">{submissions.length}</div>
+                  </div>
                </div>
             </Card>
          </section>
@@ -545,7 +644,7 @@ export default function RegulatoryReportsPage() {
                   <CardDescription className="text-white/40 text-[10px] font-black uppercase tracking-widest mt-1 italic">Disclosure lifecycle integrity logging</CardDescription>
                </CardHeader>
                <CardContent className="p-10 space-y-8 flex-1">
-                  {(apiData || []).map((log, i) => (
+                  {([] as any[]).map((log, i) => (
                     <div key={i} className="flex gap-4 group">
                        <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5 group-hover:border-white/20 transition-all">
                           {React.cloneElement(log.icon as any, { className: "w-3.5 h-3.5" })}
@@ -571,7 +670,7 @@ export default function RegulatoryReportsPage() {
                </CardHeader>
                <ScrollArea className="h-[300px]">
                   <div className="p-8 space-y-6">
-                     {(apiData || []).map((ac, i) => (
+                     {([] as any[]).map((ac, i) => (
                        <div key={i} className="flex justify-between items-center text-[10px] font-black italic tracking-tight border-b border-border/50 pb-3 last:border-0 last:pb-0">
                           <span className="text-muted-foreground">{ac.l} <span className="text-neutral-900 dark:text-white ml-2 text-[9px] uppercase tracking-widest">{ac.c}</span></span>
                           <span className="text-muted-foreground/40">{ac.t}</span>
@@ -584,7 +683,7 @@ export default function RegulatoryReportsPage() {
 
          <section className="xl:col-span-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 h-full">
-               {(apiData || []).map((action, i) => (
+               {([] as any[]).map((action, i) => (
                  <button key={i} className={`flex flex-col items-center justify-center gap-3 p-6 rounded-3xl font-black text-[9px] uppercase tracking-widest italic hover:scale-105 active:scale-95 transition-all group ${action.color}`}>
                     <div className="w-8 h-8 rounded-xl bg-black/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-all">
                       {React.cloneElement(action.icon as any, { className: "w-4 h-4" })}
@@ -595,6 +694,54 @@ export default function RegulatoryReportsPage() {
             </div>
          </section>
       </div>
+
+      <Dialog open={showCreate} onOpenChange={setShowCreate}>
+        <DialogContent className="sm:max-w-md">
+          <form onSubmit={handleCreateReport}>
+            <DialogHeader>
+              <DialogTitle>Create Report</DialogTitle>
+              <DialogDescription>Start a new regulatory disclosure report.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <label className="space-y-1 text-xs font-semibold text-neutral-600 block">
+                Report Type
+                <select
+                  value={newReportType}
+                  onChange={(e) => setNewReportType(e.target.value)}
+                  className="w-full h-10 rounded-md border border-neutral-200 px-3 text-sm"
+                >
+                  {REPORT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </label>
+              <label className="space-y-1 text-xs font-semibold text-neutral-600 block">
+                Title
+                <input
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  required
+                  placeholder="e.g. Suspicious wire pattern — Acme Corp"
+                  className="w-full h-10 rounded-md border border-neutral-200 px-3 text-sm"
+                />
+              </label>
+              <label className="space-y-1 text-xs font-semibold text-neutral-600 block">
+                Summary (optional)
+                <textarea
+                  value={newSummary}
+                  onChange={(e) => setNewSummary(e.target.value)}
+                  className="w-full min-h-16 rounded-md border border-neutral-200 p-3 text-sm"
+                />
+              </label>
+              {createError && <p className="text-xs text-red-600">{createError}</p>}
+            </div>
+            <DialogFooter>
+              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-neutral-400 hover:text-neutral-900 transition-all">Cancel</button>
+              <button type="submit" disabled={creating || !newTitle.trim()} className="px-6 py-2 bg-neutral-900 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-brand-lime hover:text-neutral-900 transition-all shadow-lg disabled:opacity-50">
+                {creating ? "Creating..." : "Create"}
+              </button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

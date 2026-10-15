@@ -55,19 +55,94 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { useScreeningMatches, useWatchlists } from "@/hooks/use-screening";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useScreeningMatches, useWatchlists, useScreeningJobs } from "@/hooks/use-screening";
+import { screeningService } from "@/services/screening.service";
+
+function timeAgo(value?: string | null): string {
+  if (!value) return "Unknown";
+  const diffMs = Date.now() - new Date(value).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
 
 export default function ScreeningCenterPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
-
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const { data: matches, isLoading, isError, error, refetch } = useScreeningMatches({ 
+  const { data: matches, isLoading, isError, error, refetch } = useScreeningMatches({
     query: { page: 1, page_size: 50 },
     filters: statusFilter ? { status: statusFilter } : {}
   });
   const { data: watchlists } = useWatchlists();
+  const { data: screeningJobs } = useScreeningJobs();
+
+  const [rescreening, setRescreening] = useState(false);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [uploadName, setUploadName] = useState("");
+  const [uploadCsv, setUploadCsv] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const [decisionTarget, setDecisionTarget] = useState<{ id: string; action: "confirm" | "dismiss" | "escalate" } | null>(null);
+  const [decisionReason, setDecisionReason] = useState("");
+  const [decisionSubmitting, setDecisionSubmitting] = useState(false);
+  const [decisionError, setDecisionError] = useState<string | null>(null);
+
+  const handleRescreen = async () => {
+    setRescreening(true);
+    try {
+      await screeningService.createRescreenJob({ scope: "all" });
+      await refetch();
+    } catch (cause) {
+      console.error("Failed to trigger re-screening:", cause);
+    } finally {
+      setRescreening(false);
+    }
+  };
+
+  const handleUploadWatchlist = async () => {
+    if (!uploadName.trim() || !uploadCsv.trim()) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      await screeningService.uploadInternalWatchlist(uploadCsv, uploadName.trim(), false);
+      setShowUploadDialog(false);
+      setUploadName("");
+      setUploadCsv("");
+    } catch (cause) {
+      setUploadError(cause instanceof Error ? cause.message : "Upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const submitDecision = async () => {
+    if (!decisionTarget) return;
+    setDecisionSubmitting(true);
+    setDecisionError(null);
+    try {
+      const body = { reason: decisionReason.trim() || undefined, create_case: decisionTarget.action === "escalate" };
+      if (decisionTarget.action === "confirm") await screeningService.confirmMatch(decisionTarget.id, body);
+      else if (decisionTarget.action === "dismiss") await screeningService.dismissMatch(decisionTarget.id, body);
+      else await screeningService.escalateMatch(decisionTarget.id, body);
+      setDecisionTarget(null);
+      setDecisionReason("");
+      await refetch();
+    } catch (cause) {
+      setDecisionError(cause instanceof Error ? cause.message : "Action failed.");
+    } finally {
+      setDecisionSubmitting(false);
+    }
+  };
 
   const getMatchTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
@@ -81,9 +156,9 @@ export default function ScreeningCenterPage() {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'confirmed': return 'text-rose-500';
-      case 'cleared': return 'text-emerald-500';
-      case 'under_review': return 'text-amber-500';
-      case 'pending': return 'text-orange-500';
+      case 'dismissed': return 'text-emerald-500';
+      case 'escalated': return 'text-amber-500';
+      case 'pending_review': return 'text-orange-500';
       default: return 'text-slate-400';
     }
   };
@@ -93,10 +168,55 @@ export default function ScreeningCenterPage() {
     const query = searchQuery.toLowerCase();
     return (
       m.id?.toLowerCase().includes(query) ||
-      m.customer_name?.toLowerCase().includes(query) ||
+      m.customer_id?.toLowerCase().includes(query) ||
       m.match_type?.toLowerCase().includes(query)
     );
   }) || [];
+
+  const allMatches = matches || [];
+  const pendingCount = allMatches.filter((m: any) => m.status === "pending_review").length;
+  const confirmedCount = allMatches.filter((m: any) => m.status === "confirmed").length;
+  const dismissedCount = allMatches.filter((m: any) => m.status === "dismissed").length;
+  const sanctionsCount = allMatches.filter((m: any) => m.match_type === "sanctions").length;
+  const pepCount = allMatches.filter((m: any) => m.match_type === "pep").length;
+  const efficiencyRate = allMatches.length > 0 ? Math.round(((confirmedCount + dismissedCount) / allMatches.length) * 100) : 0;
+
+  const kpis = [
+    { label: "Total Matches", value: allMatches.length, icon: <Target className="w-5 h-5" /> },
+    { label: "Pending Review", value: pendingCount, icon: <Clock className="w-5 h-5 text-amber-500" /> },
+    { label: "Confirmed", value: confirmedCount, icon: <CheckCircle2 className="w-5 h-5 text-rose-500" /> },
+    { label: "Dismissed", value: dismissedCount, icon: <XCircle className="w-5 h-5 text-slate-400" /> },
+    { label: "Sanctions Hits", value: sanctionsCount, icon: <ShieldCheck className="w-5 h-5 text-rose-500" /> },
+    { label: "PEP Hits", value: pepCount, icon: <Users className="w-5 h-5 text-amber-500" /> },
+  ];
+
+  const matchQualityStats = [
+    { label: "Total Reviewed", value: String(confirmedCount + dismissedCount) },
+    { label: "Confirmed Rate", value: allMatches.length > 0 ? `${Math.round((confirmedCount / allMatches.length) * 100)}%` : "0%" },
+  ];
+
+  const analyticsStatsLeft = [
+    { l: "Total Matches", v: String(allMatches.length) },
+    { l: "Sanctions", v: String(sanctionsCount) },
+  ];
+  const analyticsStatsRight = [
+    { l: "PEP", v: String(pepCount) },
+    { l: "Watchlist", v: String(allMatches.filter((m: any) => m.match_type === "watchlist").length) },
+  ];
+
+  const matchVolumeByDay = (() => {
+    const buckets = new Array(32).fill(0);
+    const now = new Date();
+    for (const m of allMatches) {
+      const days = Math.floor((now.getTime() - new Date(m.created_at).getTime()) / 86400000);
+      const bucket = 31 - Math.min(31, days);
+      if (bucket >= 0) buckets[bucket]++;
+    }
+    return buckets;
+  })();
+
+  const activeJobs = (screeningJobs || []).filter((j: any) => j.status === "running" || j.status === "pending");
+  const latestJob = (screeningJobs || [])[0];
 
   if (isLoading) {
     return (
@@ -159,17 +279,21 @@ export default function ScreeningCenterPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" className="h-10 px-4 text-xs font-bold uppercase tracking-widest italic group border-indigo-200 dark:border-indigo-900/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/20">
+            <Button
+              variant="outline"
+              className="h-10 px-4 text-xs font-bold uppercase tracking-widest italic group border-indigo-200 dark:border-indigo-900/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+              onClick={() => setShowUploadDialog(true)}
+            >
               <Upload className="w-3.5 h-3.5 mr-2" />
               Upload Watchlist
             </Button>
-            <Button variant="outline" className="h-10 px-4 text-xs font-bold uppercase tracking-widest italic">
-              <PlayCircle className="w-3.5 h-3.5 mr-2" />
-              Run Re-screening
+            <Button variant="outline" className="h-10 px-4 text-xs font-bold uppercase tracking-widest italic" onClick={() => void handleRescreen()} disabled={rescreening}>
+              {rescreening ? <RefreshCw className="w-3.5 h-3.5 mr-2 animate-spin" /> : <PlayCircle className="w-3.5 h-3.5 mr-2" />}
+              {rescreening ? "Starting..." : "Run Re-screening"}
             </Button>
-            <Button variant="outline" className="h-10 px-4 text-xs font-bold uppercase tracking-widest italic">
+            <Button disabled variant="outline" className="h-10 px-4 text-xs font-bold uppercase tracking-widest italic opacity-50">
               <Download className="w-3.5 h-3.5 mr-2" />
-              Export Matches
+              Export Matches (not yet available)
             </Button>
             <Button className="h-10 px-6 bg-indigo-600 text-white hover:bg-indigo-700 font-bold text-xs uppercase tracking-widest italic shadow-lg shadow-indigo-600/20" onClick={() => refetch()}>
               <RefreshCcw className="w-3.5 h-3.5 mr-2" />
@@ -190,11 +314,11 @@ export default function ScreeningCenterPage() {
             />
           </div>
           
-          <Button 
-            variant={statusFilter === 'pending' ? 'default' : 'outline'} 
-            size="sm" 
+          <Button
+            variant={statusFilter === 'pending_review' ? 'default' : 'outline'}
+            size="sm"
             className="h-8 px-3 text-[10px] font-bold uppercase italic tracking-widest"
-            onClick={() => setStatusFilter(statusFilter === 'pending' ? null : 'pending')}
+            onClick={() => setStatusFilter(statusFilter === 'pending_review' ? null : 'pending_review')}
           >
             Pending
           </Button>
@@ -215,14 +339,13 @@ export default function ScreeningCenterPage() {
 
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {(apiData || []).map((kpi, i) => (
-          <Link 
-            key={i} 
-            href={`/dashboard/screening?status=${kpi.label.toLowerCase().includes('pending') ? 'pending' : ''}`}
-            className="flex flex-col gap-4 p-5 bg-white dark:bg-neutral-900 rounded-3xl border border-border/50 shadow-xl shadow-black/5 hover:border-indigo-500 hover:scale-[1.02] transition-all text-left group"
+        {kpis.map((kpi, i) => (
+          <div
+            key={i}
+            className="flex flex-col gap-4 p-5 bg-white dark:bg-neutral-900 rounded-3xl border border-border/50 shadow-xl shadow-black/5 text-left"
           >
             <div className="flex items-center justify-between">
-              <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">
                 {kpi.icon}
               </div>
             </div>
@@ -234,7 +357,7 @@ export default function ScreeningCenterPage() {
                 {kpi.label}
               </div>
             </div>
-          </Link>
+          </div>
         ))}
       </section>
 
@@ -252,7 +375,7 @@ export default function ScreeningCenterPage() {
               </CardDescription>
             </div>
             <div className="flex gap-2">
-               <Button variant="outline" className="bg-white/10 border-white/20 text-white text-[9px] font-black uppercase italic h-8">Batch Actions</Button>
+               <Button disabled variant="outline" className="bg-white/10 border-white/20 text-white text-[9px] font-black uppercase italic h-8 opacity-50">Batch Actions (not yet available)</Button>
             </div>
           </CardHeader>
           <CardContent className="p-0">
@@ -278,7 +401,7 @@ export default function ScreeningCenterPage() {
                   <TableRow key={i} className="group hover:bg-orange-50/30 dark:hover:bg-orange-950/20 transition-colors border-b border-border/50 cursor-pointer">
                     <TableCell className="px-8 py-5">
                       <Link href={`/dashboard/screening/matches/${row.id}`} className="flex flex-col">
-                        <span className="text-xs font-black italic tracking-tight">{row.customer_name || 'Unknown'}</span>
+                        <span className="text-xs font-black italic tracking-tight">{row.customer_id ? row.customer_id.split('-')[0] : 'Unknown'}</span>
                         <span className="text-[8px] font-black text-neutral-400 uppercase italic mt-1">{row.id}</span>
                       </Link>
                     </TableCell>
@@ -291,14 +414,19 @@ export default function ScreeningCenterPage() {
                       <span className="text-[10px] font-medium text-muted-foreground italic">{row.source_list || 'Unknown'}</span>
                     </TableCell>
                     <TableCell className="text-center">
-                       <div className="flex flex-col items-center gap-1">
-                          <span className={`text-sm font-black italic ${row.confidence_score > 80 ? 'text-rose-500' : 'text-neutral-900 dark:text-white'}`}>
-                            {row.confidence_score || 0}%
-                          </span>
-                          <div className="w-12 h-1 bg-muted rounded-full overflow-hidden">
-                             <div className={`h-full ${row.confidence_score > 80 ? 'bg-rose-500' : 'bg-brand-lime'}`} style={{ width: `${row.confidence_score || 0}%` }} />
-                          </div>
-                       </div>
+                       {(() => {
+                         const pct = Math.round((row.confidence_score || 0) * 100);
+                         return (
+                           <div className="flex flex-col items-center gap-1">
+                              <span className={`text-sm font-black italic ${pct > 80 ? 'text-rose-500' : 'text-neutral-900 dark:text-white'}`}>
+                                {pct}%
+                              </span>
+                              <div className="w-12 h-1 bg-muted rounded-full overflow-hidden">
+                                 <div className={`h-full ${pct > 80 ? 'bg-rose-500' : 'bg-brand-lime'}`} style={{ width: `${pct}%` }} />
+                              </div>
+                           </div>
+                         );
+                       })()}
                     </TableCell>
                     <TableCell className="text-center px-8">
                        <Badge className={`text-[9px] font-black italic tracking-widest uppercase ${
@@ -309,7 +437,9 @@ export default function ScreeningCenterPage() {
                     </TableCell>
                     <TableCell className="px-8 text-right">
                        <div className="flex items-center justify-end gap-2">
-                          <Button size="sm" className="h-7 text-[8px] font-black uppercase italic tracking-widest px-4 bg-orange-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">Review Match</Button>
+                          <Link href={`/dashboard/screening/matches/${row.id}`}>
+                            <Button size="sm" className="h-7 text-[8px] font-black uppercase italic tracking-widest px-4 bg-orange-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">Review Match</Button>
+                          </Link>
                           <DropdownMenu>
                              <DropdownMenuTrigger asChild>
                                 <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg">
@@ -317,10 +447,10 @@ export default function ScreeningCenterPage() {
                                 </Button>
                              </DropdownMenuTrigger>
                              <DropdownMenuContent align="end" className="w-48">
-                                <DropdownMenuItem className="text-[10px] font-bold uppercase italic tracking-widest">Confirm Match</DropdownMenuItem>
-                                <DropdownMenuItem className="text-[10px] font-bold uppercase italic tracking-widest">Dismiss False Positive</DropdownMenuItem>
-                                <DropdownMenuItem className="text-[10px] font-bold uppercase italic tracking-widest">Escalate to Case</DropdownMenuItem>
-                                <DropdownMenuItem className="text-[10px] font-bold uppercase italic tracking-widest">Start EDD</DropdownMenuItem>
+                                <DropdownMenuItem className="text-[10px] font-bold uppercase italic tracking-widest" onClick={() => { setDecisionTarget({ id: row.id, action: "confirm" }); setDecisionReason(""); }}>Confirm Match</DropdownMenuItem>
+                                <DropdownMenuItem className="text-[10px] font-bold uppercase italic tracking-widest" onClick={() => { setDecisionTarget({ id: row.id, action: "dismiss" }); setDecisionReason(""); }}>Dismiss False Positive</DropdownMenuItem>
+                                <DropdownMenuItem className="text-[10px] font-bold uppercase italic tracking-widest" onClick={() => { setDecisionTarget({ id: row.id, action: "escalate" }); setDecisionReason(""); }}>Escalate to Case</DropdownMenuItem>
+                                <DropdownMenuItem disabled className="text-[10px] font-bold uppercase italic tracking-widest opacity-50">Start EDD (not yet available)</DropdownMenuItem>
                              </DropdownMenuContent>
                           </DropdownMenu>
                        </div>
@@ -343,8 +473,8 @@ export default function ScreeningCenterPage() {
                 <CardDescription className="text-white/40 text-[10px] font-black uppercase tracking-widest mt-1 italic">Historical and active match registry</CardDescription>
               </div>
               <div className="flex gap-2">
-                 <Button variant="outline" className="bg-white/5 border-white/10 text-white text-[9px] font-black uppercase italic h-8">Bulk Dismiss</Button>
-                 <Button variant="outline" className="bg-white/5 border-white/10 text-white text-[9px] font-black uppercase italic h-8">Bulk Confirm</Button>
+                 <Button disabled variant="outline" className="bg-white/5 border-white/10 text-white text-[9px] font-black uppercase italic h-8 opacity-50">Bulk Dismiss (not yet available)</Button>
+                 <Button disabled variant="outline" className="bg-white/5 border-white/10 text-white text-[9px] font-black uppercase italic h-8 opacity-50">Bulk Confirm (not yet available)</Button>
               </div>
             </div>
           </CardHeader>
@@ -382,9 +512,9 @@ export default function ScreeningCenterPage() {
                   ) : filteredMatches.map((row: any, i: number) => (
                     <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-4 font-black italic text-[11px] text-muted-foreground">{row.id}</TableCell>
-                      <TableCell className="text-[11px] font-black italic">{row.customer_name || 'Unknown'}</TableCell>
+                      <TableCell className="text-[11px] font-black italic">{row.customer_id ? row.customer_id.split('-')[0] : 'Unknown'}</TableCell>
                       <TableCell className="text-[10px] font-medium text-muted-foreground italic">{row.source_list || 'Unknown'}</TableCell>
-                      <TableCell className="text-center font-black italic text-[13px]">{row.confidence_score || 0}%</TableCell>
+                      <TableCell className="text-center font-black italic text-[13px]">{Math.round((row.confidence_score || 0) * 100)}%</TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline" className={`text-[8px] font-black uppercase italic tracking-widest border-none px-0 ${getStatusColor(row.status || 'unknown')}`}>
                           {row.status || 'Unknown'}
@@ -417,22 +547,22 @@ export default function ScreeningCenterPage() {
                <div className="space-y-10">
                   <div className="grid grid-cols-2 gap-8">
                      <div className="space-y-6">
-                        {(apiData || []).map((item, i) => (
+                        {matchQualityStats.map((item, i) => (
                            <div key={i} className="space-y-2">
                               <div className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest text-muted-foreground">
                                  <span>{item.label}</span>
                                  <span className="text-neutral-900 dark:text-white">{item.value}</span>
                               </div>
-                              <Progress value={parseInt(item.value)} className="h-1 bg-muted" />
+                              <Progress value={parseInt(item.value) || 0} className="h-1 bg-muted" />
                            </div>
                         ))}
                      </div>
                      <div className="relative aspect-square flex items-center justify-center">
                         <div className="absolute inset-0 border-[16px] border-emerald-500/10 rounded-full" />
-                        <div className="absolute inset-0 border-[16px] border-rose-500 rounded-full" style={{ clipPath: 'inset(0 86% 0 0)' }} />
+                        <div className="absolute inset-0 border-[16px] border-rose-500 rounded-full" style={{ clipPath: `inset(0 ${100 - efficiencyRate}% 0 0)` }} />
                         <div className="z-10 text-center">
-                           <div className="text-3xl font-black italic tracking-tighter">86%</div>
-                           <div className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground italic">Efficiency Rate</div>
+                           <div className="text-3xl font-black italic tracking-tighter">{efficiencyRate}%</div>
+                           <div className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground italic">Resolution Rate</div>
                         </div>
                      </div>
                   </div>
@@ -442,7 +572,7 @@ export default function ScreeningCenterPage() {
                         <PlayCircle className="w-4 h-4 text-indigo-500" />
                         <span className="text-[10px] font-black uppercase italic tracking-widest">Confidence Threshold: 65%</span>
                      </div>
-                     <span className="text-[10px] font-black text-indigo-500 italic underline cursor-pointer">Optimize Tuning</span>
+                     <Link href="/dashboard/investigations/threshold-tuning" className="text-[10px] font-black text-indigo-500 italic underline cursor-pointer">Optimize Tuning</Link>
                   </div>
                </div>
             </CardContent>
@@ -457,7 +587,7 @@ export default function ScreeningCenterPage() {
                     <CardTitle className="text-xl font-black italic uppercase tracking-tighter">Watchlist Management</CardTitle>
                     <CardDescription className="text-white/40 text-[10px] font-black uppercase tracking-widest mt-1 italic">Active list sources and sync state</CardDescription>
                   </div>
-                  <Button variant="outline" className="bg-white/5 border-white/10 text-white text-[9px] font-black uppercase italic h-8">
+                  <Button variant="outline" className="bg-white/5 border-white/10 text-white text-[9px] font-black uppercase italic h-8" onClick={() => setShowUploadDialog(true)}>
                     <Upload className="w-3.5 h-3.5 mr-2" /> Upload Custom
                   </Button>
                </div>
@@ -472,21 +602,23 @@ export default function ScreeningCenterPage() {
                    </TableRow>
                  </TableHeader>
                  <TableBody>
-                   {(apiData || []).map((list: any, i) => (
-                     <TableRow key={i} className="group hover:bg-white/5 border-b border-white/5 transition-colors">
+                   {(watchlists || []).length === 0 ? (
+                     <TableRow><TableCell colSpan={3} className="text-center py-10 text-white/40">No watchlists configured.</TableCell></TableRow>
+                   ) : (watchlists || []).map((list: any) => (
+                     <TableRow key={list.id} className="group hover:bg-white/5 border-b border-white/5 transition-colors">
                        <TableCell className="px-8 py-4">
                           <div className="text-[11px] font-black italic tracking-tight">{list.name}</div>
-                          <div className="text-[8px] font-bold text-white/40 uppercase mt-0.5">{list.type}</div>
+                          <div className="text-[8px] font-bold text-white/40 uppercase mt-0.5">{list.watchlist_type}</div>
                        </TableCell>
                        <TableCell>
                           <Badge variant="outline" className={`text-[8px] font-black uppercase italic tracking-widest border-none px-0 ${
-                            list.status === 'Synchronizing' ? 'text-indigo-400' : 'text-emerald-500'
+                            list.is_active ? 'text-emerald-500' : 'text-white/40'
                           }`}>
-                            {list.status}
+                            {list.is_active ? 'Active' : 'Inactive'}
                           </Badge>
                        </TableCell>
                        <TableCell className="px-8 text-right text-[10px] font-black italic text-white/40">
-                          {list.date}
+                          {new Date(list.updated_at).toLocaleDateString()}
                        </TableCell>
                      </TableRow>
                    ))}
@@ -509,29 +641,32 @@ export default function ScreeningCenterPage() {
                <div className="space-y-6">
                   <div className="flex items-center justify-between">
                      <div className="space-y-1">
-                        <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic">Population Scan Status</div>
-                        <div className="text-[13px] font-black italic">In Progress (Daily Cycle)</div>
+                        <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic">Latest Job Status</div>
+                        <div className="text-[13px] font-black italic">{latestJob ? latestJob.status.replace("_", " ") : "No jobs recorded"}</div>
                      </div>
-                     <Progress value={42} className="w-24 h-1.5" />
+                     {latestJob && latestJob.total_customers > 0 && (
+                       <Progress value={(latestJob.processed_customers / latestJob.total_customers) * 100} className="w-24 h-1.5" />
+                     )}
                   </div>
                   <div className="p-6 bg-white dark:bg-neutral-900 rounded-3xl border border-border/50 shadow-sm relative overflow-hidden group">
                      <div className="absolute right-[-10%] top-[-10%] w-24 h-24 bg-brand-lime/10 blur-xl rounded-full" />
                      <div className="flex flex-col gap-4 relative z-10 text-center">
                         <div className="flex items-baseline justify-center gap-1">
-                           <span className="text-4xl font-black italic tracking-tighter leading-none">1.2M</span>
-                           <span className="text-[10px] font-black uppercase italic text-muted-foreground">Entities</span>
+                           <span className="text-4xl font-black italic tracking-tighter leading-none">{latestJob?.total_customers ?? 0}</span>
+                           <span className="text-[10px] font-black uppercase italic text-muted-foreground">Entities (Last Job)</span>
                         </div>
-                        <div className="text-[8px] font-black uppercase tracking-widest text-neutral-400 italic">Continuous coverage active</div>
-                        <Button className="w-full h-8 text-[9px] font-black uppercase bg-neutral-900 dark:bg-white dark:text-black">Run Emergency Sweep</Button>
+                        <div className="text-[8px] font-black uppercase tracking-widest text-neutral-400 italic">{activeJobs.length} job{activeJobs.length === 1 ? "" : "s"} currently running</div>
                      </div>
                   </div>
                </div>
-               
+
                <div className="space-y-4">
-                  {(apiData || []).map((job: any, i) => (
-                    <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest">
-                       <span className="text-muted-foreground">{job.label}</span>
-                       <span className={job.status === 'Running' ? 'text-indigo-500 animate-pulse' : 'text-emerald-500'}>{job.status} • {job.time}</span>
+                  {(screeningJobs || []).length === 0 ? (
+                    <p className="text-xs text-muted-foreground italic text-center">No re-screening jobs recorded.</p>
+                  ) : (screeningJobs || []).slice(0, 5).map((job: any) => (
+                    <div key={job.id} className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest">
+                       <span className="text-muted-foreground">{job.scope}</span>
+                       <span className={job.status === 'running' ? 'text-indigo-500 animate-pulse' : 'text-emerald-500'}>{job.status} • {timeAgo(job.started_at)}</span>
                     </div>
                   ))}
                </div>
@@ -548,19 +683,20 @@ export default function ScreeningCenterPage() {
             <CardContent className="p-0 flex-1">
                <ScrollArea className="h-[400px]">
                   <div className="p-8 space-y-8">
-                     {(apiData || []).map((change: any, i: number) => (
-                       <div key={i} className="flex gap-4 relative">
-                          {i !== 0 && <div className="absolute left-[13px] top-8 bottom-[-32px] w-[2px] bg-border/50" />}
-                          <div className="w-7 h-7 rounded-full bg-background border border-border/50 flex items-center justify-center shrink-0 z-10 shadow-sm transition-transform hover:scale-125">
-                             {React.cloneElement(change.icon as any, { className: "w-3 h-3 " + (change.icon as any).props.className })}
+                     {allMatches.length === 0 ? (
+                       <p className="text-sm text-muted-foreground italic text-center">No recent screening activity.</p>
+                     ) : allMatches.slice(0, 10).map((m: any) => (
+                       <div key={m.id} className="flex gap-4 relative">
+                          <div className="w-7 h-7 rounded-full bg-background border border-border/50 flex items-center justify-center shrink-0 z-10 shadow-sm">
+                             <Target className="w-3 h-3 text-indigo-500" />
                           </div>
                           <div className="space-y-1">
                              <div className="flex items-center gap-2">
-                                <span className="text-[11px] font-black uppercase tracking-tighter italic">{change.entity}</span>
-                                <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">{change.time}</span>
+                                <span className="text-[11px] font-black uppercase tracking-tighter italic">{m.customer_id ? m.customer_id.split('-')[0] : "Unknown"}</span>
+                                <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">{timeAgo(m.created_at)}</span>
                              </div>
-                             <div className="text-[9px] font-black uppercase italic tracking-widest text-indigo-500 mb-1 leading-none">{change.type}</div>
-                             <p className="text-[10px] text-muted-foreground italic leading-relaxed">{change.detail}</p>
+                             <div className="text-[9px] font-black uppercase italic tracking-widest text-indigo-500 mb-1 leading-none">{m.match_type}</div>
+                             <p className="text-[10px] text-muted-foreground italic leading-relaxed">Matched against {m.source_list} • {m.status}</p>
                           </div>
                        </div>
                      ))}
@@ -586,7 +722,7 @@ export default function ScreeningCenterPage() {
               
               <div className="grid grid-cols-2 gap-10">
                  <div className="space-y-6">
-                    {(apiData || []).map((st: any, i: number) => (
+                    {analyticsStatsLeft.map((st, i) => (
                        <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest">
                           <span className="text-muted-foreground">{st.l}</span>
                           <span className="text-xl font-black italic">{st.v}</span>
@@ -594,7 +730,7 @@ export default function ScreeningCenterPage() {
                     ))}
                  </div>
                  <div className="space-y-6">
-                    {(apiData || []).map((st: any, i: number) => (
+                    {analyticsStatsRight.map((st, i) => (
                        <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest">
                           <span className="text-muted-foreground">{st.l}</span>
                           <span className="text-xl font-black italic">{st.v}</span>
@@ -602,13 +738,18 @@ export default function ScreeningCenterPage() {
                     ))}
                  </div>
               </div>
-              
+
               <div className="mt-12 w-full h-12 flex gap-1">
-                 {Array.from({ length: 32 }).map((_, i) => (
+                 {matchVolumeByDay.every((c) => c === 0) ? (
+                   <p className="w-full text-center text-xs text-muted-foreground italic self-center">No match history yet.</p>
+                 ) : matchVolumeByDay.map((count, i) => {
+                   const max = Math.max(...matchVolumeByDay, 1);
+                   return (
                     <div key={i} className="flex-1 bg-indigo-500/10 rounded-full relative group">
-                       <div className="absolute bottom-0 inset-x-0 bg-indigo-500 rounded-full transition-all group-hover:h-full" style={{ height: `${20 + ((i * 41 + 9) % 81)}%` }} />
+                       <div className="absolute bottom-0 inset-x-0 bg-indigo-500 rounded-full transition-all" style={{ height: `${Math.max(4, (count / max) * 100)}%` }} />
                     </div>
-                 ))}
+                   );
+                 })}
               </div>
           </Card>
         </section>
@@ -635,12 +776,7 @@ export default function ScreeningCenterPage() {
                
                <div className="space-y-4">
                   <h5 className="text-[10px] font-black uppercase italic tracking-widest text-white/40">Recent Governance Events</h5>
-                  {(apiData || []).map((ge: any, i) => (
-                    <div key={i} className="flex justify-between items-center text-[10px] font-black italic tracking-tight border-b border-white/5 pb-3">
-                       <span className="text-white/60">{ge.e}</span>
-                       <span className="text-white/20">{ge.t}</span>
-                    </div>
-                  ))}
+                  <p className="text-xs text-white/40 italic">Governance event logging not yet available.</p>
                </div>
             </CardContent>
           </Card>
@@ -650,16 +786,85 @@ export default function ScreeningCenterPage() {
       {/* 11. QUICK ACTIONS PANEL */}
       <section>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-           {(apiData || []).map((action: any, i) => (
-             <button key={i} className={`flex items-center gap-3 p-4 rounded-2xl font-black text-[9px] uppercase tracking-widest italic hover:scale-105 active:scale-95 transition-all group ${action.color}`}>
+           {[
+             { label: "View Alerts", href: "/dashboard/alerts", icon: <AlertTriangle className="w-3 h-3" />, color: "bg-rose-50 text-rose-600 hover:bg-rose-100" },
+             { label: "View Cases", href: "/dashboard/cases", icon: <Flag className="w-3 h-3" />, color: "bg-indigo-50 text-indigo-600 hover:bg-indigo-100" },
+             { label: "Compliance Workspace", href: "/dashboard/compliance", icon: <ShieldCheck className="w-3 h-3" />, color: "bg-emerald-50 text-emerald-600 hover:bg-emerald-100" },
+           ].map((action, i) => (
+             <Link key={i} href={action.href} className={`flex items-center gap-3 p-4 rounded-2xl font-black text-[9px] uppercase tracking-widest italic hover:scale-105 active:scale-95 transition-all group ${action.color}`}>
                 <div className="w-6 h-6 rounded-lg bg-black/10 flex items-center justify-center shrink-0">
-                  {React.cloneElement(action.icon as any, { className: "w-3 h-3" })}
+                  {action.icon}
                 </div>
                 {action.label}
-             </button>
+             </Link>
            ))}
         </div>
       </section>
+
+      <Dialog open={showUploadDialog} onOpenChange={(open) => { if (!open) { setShowUploadDialog(false); setUploadError(null); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Upload Internal Watchlist</DialogTitle>
+          </DialogHeader>
+          {uploadError ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800">{uploadError}</div>
+          ) : null}
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs font-semibold text-slate-600 mb-1 block">Watchlist name</label>
+              <Input value={uploadName} onChange={(e) => setUploadName(e.target.value)} placeholder="Internal denylist" />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-slate-600 mb-1 block">CSV content</label>
+              <textarea
+                value={uploadCsv}
+                onChange={(e) => setUploadCsv(e.target.value)}
+                placeholder="name,identifier,reason&#10;John Doe,ID-1234,prior fraud case"
+                className="min-h-32 w-full rounded-md border border-slate-200 p-3 text-xs font-mono"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowUploadDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => void handleUploadWatchlist()} disabled={uploading || !uploadName.trim() || !uploadCsv.trim()}>
+              {uploading ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Upload
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!decisionTarget} onOpenChange={(open) => { if (!open) { setDecisionTarget(null); setDecisionError(null); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {decisionTarget?.action === "confirm" && "Confirm Match"}
+              {decisionTarget?.action === "dismiss" && "Dismiss as False Positive"}
+              {decisionTarget?.action === "escalate" && "Escalate to Case"}
+            </DialogTitle>
+          </DialogHeader>
+          {decisionError ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800">{decisionError}</div>
+          ) : null}
+          <textarea
+            value={decisionReason}
+            onChange={(e) => setDecisionReason(e.target.value)}
+            placeholder="Reason (optional)"
+            className="min-h-24 w-full rounded-md border border-slate-200 p-3 text-sm"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDecisionTarget(null)}>
+              Cancel
+            </Button>
+            <Button onClick={() => void submitDecision()} disabled={decisionSubmitting}>
+              {decisionSubmitting ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

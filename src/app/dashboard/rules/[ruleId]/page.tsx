@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { 
   ArrowLeft, 
   Settings, 
@@ -46,15 +46,55 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { useFraudRule } from "@/hooks/use-fraud-rules";
+import { fraudRulesService } from "@/services/fraud-rules.service";
+
+function formatDate(value?: string | null): string {
+  if (!value) return "Unknown";
+  return new Date(value).toLocaleString();
+}
 
 export default function RuleDetailPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
-
   const params = useParams();
   const ruleId = params.ruleId as string;
 
   const { data: ruleData, isLoading, isError, refetch } = useFraudRule(ruleId);
+  const [metrics, setMetrics] = useState<any[]>([]);
+  const [actionBusy, setActionBusy] = useState(false);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!ruleId) return;
+    fraudRulesService.getRuleMetrics(ruleId, 30).then(setMetrics).catch(() => setMetrics([]));
+  }, [ruleId]);
+
+  const handleDuplicate = async () => {
+    setActionBusy(true);
+    try {
+      await fraudRulesService.duplicateRule(ruleId);
+      setActionMessage("Rule duplicated successfully.");
+    } catch (err) {
+      setActionMessage(err instanceof Error ? err.message : "Failed to duplicate rule.");
+    } finally {
+      setActionBusy(false);
+    }
+  };
+
+  const handleToggle = async () => {
+    if (!ruleData) return;
+    setActionBusy(true);
+    try {
+      if (ruleData.enabled) {
+        await fraudRulesService.disableRule(ruleId);
+      } else {
+        await fraudRulesService.enableRule(ruleId);
+      }
+      await refetch();
+    } catch (err) {
+      setActionMessage(err instanceof Error ? err.message : "Failed to toggle rule.");
+    } finally {
+      setActionBusy(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -77,28 +117,34 @@ export default function RuleDetailPage() {
   const rule = {
     id: ruleData.id,
     name: ruleData.name || "Unnamed Rule",
-    status: ruleData.is_active ? "Active" : "Disabled",
-    severity: ruleData.action === "FLAG" ? "Medium" : ruleData.action === "BLOCK" ? "High" : "Low",
+    status: ruleData.enabled ? "Active" : "Disabled",
+    severity: ruleData.severity || "medium",
     description: ruleData.description || "No description provided.",
     logic: {
-      dsl: JSON.stringify(ruleData.conditions, null, 2),
-      conditions: []
+      dsl: JSON.stringify(ruleData.conditions_json, null, 2),
     },
-    metrics: {
-      totalHits: 0,
-      precision: "N/A",
-      recall: "N/A",
-      falsePositiveRate: "N/A",
-      avgExecutionTime: "N/A"
-    },
-    lastTriggered: "N/A",
-    author: ruleData.created_by_user_name || "System",
-    version: `v1.${ruleData.version || 0}`,
+    version: `v${ruleData.version || 1}`,
     history: [
-      { version: `v1.${ruleData.version || 0}`, date: new Date(ruleData.updated_at).toLocaleDateString(), author: ruleData.created_by_user_name || "System", change: "Latest rule deployment" }
+      { version: `v${ruleData.version || 1}`, date: formatDate(ruleData.updated_at), author: "System", change: "Latest rule deployment" }
     ],
-    linkedAlerts: []
   };
+
+  const kpis = [
+    { label: "Trigger Count", value: ruleData.trigger_count ?? 0, icon: <Activity className="w-5 h-5" /> },
+    { label: "Weight", value: ruleData.weight?.toFixed(2) ?? "N/A", icon: <BarChart3 className="w-5 h-5" /> },
+    { label: "Priority", value: ruleData.priority ?? 0, icon: <ShieldAlert className="w-5 h-5" /> },
+    { label: "Last Triggered", value: ruleData.last_triggered_at ? formatDate(ruleData.last_triggered_at).split(",")[0] : "Never", icon: <Clock className="w-5 h-5" /> },
+  ];
+
+  const diagnostics = [
+    { l: "Category", v: ruleData.category || "Uncategorized" },
+    { l: "Dry Run Only", v: ruleData.dry_run_only ? "Yes" : "No" },
+    { l: "Built-in", v: ruleData.is_builtin ? "Yes" : "No" },
+    { l: "Version", v: ruleData.version ?? 1 },
+    { l: "Created", v: formatDate(ruleData.created_at) },
+  ];
+
+  const totalTriggersFromMetrics = metrics.reduce((sum, m) => sum + (m.trigger_count || 0), 0);
 
   return (
     <div className="flex flex-col gap-8 pb-20">
@@ -120,44 +166,46 @@ export default function RuleDetailPage() {
               </div>
             </div>
           </div>
-          <div className="flex gap-3">
-             <Button variant="outline" className="h-10 px-4 text-[9px] font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800">
-                <Copy className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
-                Duplicate
-             </Button>
-             <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                   <Button className="h-10 px-6 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:scale-[1.03] transition-all font-black uppercase tracking-widest italic shadow-xl">
-                      Rule Actions
-                      <ChevronRight className="w-4 h-4 ml-2" />
-                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-white rounded-2xl border-border shadow-2xl font-bold">
-                   <DropdownMenuItem className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4">
-                      Edit Definition
-                   </DropdownMenuItem>
-                   <DropdownMenuItem className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 text-rose-500">
-                      Disable Rule
-                   </DropdownMenuItem>
-                   <DropdownMenuItem className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4">
-                      Run Diagnostic Test
-                   </DropdownMenuItem>
-                </DropdownMenuContent>
-             </DropdownMenu>
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex gap-3">
+               <Button disabled={actionBusy} onClick={() => void handleDuplicate()} variant="outline" className="h-10 px-4 text-[9px] font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800">
+                  <Copy className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                  Duplicate
+               </Button>
+               <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                     <Button className="h-10 px-6 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:scale-[1.03] transition-all font-black uppercase tracking-widest italic shadow-xl">
+                        Rule Actions
+                        <ChevronRight className="w-4 h-4 ml-2" />
+                     </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 bg-white rounded-2xl border-border shadow-2xl font-bold">
+                     <DropdownMenuItem disabled className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 opacity-40">
+                        Edit Definition (not yet available)
+                     </DropdownMenuItem>
+                     <DropdownMenuItem onClick={() => void handleToggle()} className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 text-rose-500">
+                        {ruleData.enabled ? "Disable Rule" : "Enable Rule"}
+                     </DropdownMenuItem>
+                     <DropdownMenuItem disabled className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 opacity-40">
+                        Run Diagnostic Test (not yet available)
+                     </DropdownMenuItem>
+                  </DropdownMenuContent>
+               </DropdownMenu>
+            </div>
+            {actionMessage && <p className="text-[9px] font-bold uppercase tracking-widest text-neutral-500 italic">{actionMessage}</p>}
           </div>
         </div>
       </section>
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-         {(apiData || []).map((kpi, i) => (
+         {kpis.map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
-                 <Badge variant="outline" className="text-[8px] font-black uppercase tracking-widest italic border-none px-0">{kpi.delta}</Badge>
               </div>
               <div>
-                 <div className={`text-2xl font-black italic tracking-tighter leading-none ${kpi.color || 'text-neutral-900 dark:text-white'}`}>{kpi.value}</div>
+                 <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white">{kpi.value}</div>
                  <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1">{kpi.label}</div>
               </div>
            </div>
@@ -209,26 +257,32 @@ export default function RuleDetailPage() {
                            <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Statistical Efficacy</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0 space-y-8">
-                           {(apiData || []).map((score, i) => (
-                             <div key={i} className="space-y-2">
-                                <div className="flex justify-between items-baseline mb-1">
-                                   <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground flex items-center gap-2">
-                                      {score.icon} {score.label}
-                                   </span>
-                                   <span className="text-lg font-black italic text-neutral-900">{score.value}</span>
-                                </div>
-                                <Progress value={parseFloat(score.value)} className="h-1 bg-muted" indicatorClassName="bg-brand-lime shadow-[0_0_8px_currentColor]" />
-                             </div>
-                           ))}
+                           <div className="flex justify-between items-baseline mb-1">
+                              <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground">Triggers (30d)</span>
+                              <span className="text-lg font-black italic text-neutral-900">{totalTriggersFromMetrics}</span>
+                           </div>
+                           <div className="flex justify-between items-baseline mb-1">
+                              <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground">Weight</span>
+                              <span className="text-lg font-black italic text-neutral-900">{ruleData.weight?.toFixed(2) ?? "N/A"}</span>
+                           </div>
                         </CardContent>
                      </Card>
 
                      <Card className="rounded-[40px] border-border/50 shadow-md p-10 bg-white">
                         <CardHeader className="p-0 mb-10">
-                           <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Hits Over Time</CardTitle>
+                           <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Hits Over Time (30d)</CardTitle>
                         </CardHeader>
-                        <CardContent className="p-0 h-48 bg-zinc-50 rounded-[32px] border border-dashed border-neutral-100 flex items-center justify-center">
-                           <BarChart3 className="w-10 h-10 text-neutral-200" />
+                        <CardContent className="p-0 h-48 bg-zinc-50 rounded-[32px] border border-dashed border-neutral-100 flex items-end gap-1 p-4">
+                           {metrics.length === 0 ? (
+                             <p className="w-full text-center text-xs text-neutral-400 italic self-center">No metrics recorded yet.</p>
+                           ) : metrics.map((m, i) => {
+                             const max = Math.max(...metrics.map((x) => x.trigger_count || 0), 1);
+                             return (
+                               <div key={i} className="flex-1 bg-brand-lime/10 rounded-full relative group h-full">
+                                  <div className="absolute bottom-0 inset-x-0 bg-brand-lime rounded-full" style={{ height: `${Math.max(4, ((m.trigger_count || 0) / max) * 100)}%` }} />
+                               </div>
+                             );
+                           })}
                         </CardContent>
                      </Card>
                   </div>
@@ -280,17 +334,17 @@ export default function RuleDetailPage() {
                   <p className="text-white/30 text-[10px] uppercase italic tracking-widest leading-relaxed">System-wide command over business logic lifecycle.</p>
                </div>
                <div className="space-y-3">
-                  <Button className="w-full h-14 bg-brand-lime text-black rounded-3xl text-[10px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-brand-lime/10">
+                  <Button disabled className="w-full h-14 bg-brand-lime/40 text-black rounded-3xl text-[10px] font-black uppercase italic opacity-60">
                      <Play className="w-4 h-4 mr-2" />
-                     Test Against Baseline
+                     Test Against Baseline (not yet available)
                   </Button>
-                  <Button variant="outline" className="w-full h-14 border-white/10 text-white rounded-3xl text-[10px] font-black uppercase italic hover:bg-white/5 transition-all">
+                  <Button disabled={actionBusy} onClick={() => void handleToggle()} variant="outline" className="w-full h-14 border-white/10 text-white rounded-3xl text-[10px] font-black uppercase italic hover:bg-white/5 transition-all disabled:opacity-50">
                      <ToggleLeft className="w-4 h-4 mr-2" />
-                     Toggle Rule State
+                     {ruleData.enabled ? "Disable Rule" : "Enable Rule"}
                   </Button>
-                  <Button variant="outline" className="w-full h-14 border-rose-500/50 text-rose-500 rounded-3xl text-[10px] font-black uppercase italic hover:bg-rose-500/5 transition-all">
+                  <Button disabled variant="outline" className="w-full h-14 border-rose-500/30 text-rose-500/50 rounded-3xl text-[10px] font-black uppercase italic opacity-60">
                      <History className="w-4 h-4 mr-2" />
-                     Rollback Version
+                     Rollback Version (not yet available)
                   </Button>
                </div>
             </Card>
@@ -301,7 +355,7 @@ export default function RuleDetailPage() {
                   <CardTitle className="text-xl font-black italic uppercase tracking-tighter">Diagnostics</CardTitle>
                </CardHeader>
                <CardContent className="p-0 space-y-6">
-                  {(apiData || []).map((it, i) => (
+                  {diagnostics.map((it, i) => (
                     <div key={i} className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest italic border-b border-border/50 pb-4 last:border-0">
                        <span className="text-muted-foreground">{it.l}</span>
                        <span className="text-neutral-900">{it.v}</span>

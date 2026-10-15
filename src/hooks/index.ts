@@ -9,7 +9,7 @@ export { useFraudRules, useFraudRule, useFraudRuleMetrics } from './use-fraud-ru
 export { useDecisionPolicies, useDecisionPolicy } from './use-decision-policies';
 export { useInterventions } from './use-interventions';
 export { useIntegrations, useIntegration } from './use-integrations';
-export { useWebhooks, useWebhook } from './use-webhooks';
+export { useWebhooks, useWebhook, useWebhookDeliveries } from './use-webhooks';
 export * from './use-promotion';
 export { useReports, useReport } from './use-reports';
 export { 

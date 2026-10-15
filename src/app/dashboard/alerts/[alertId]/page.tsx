@@ -53,10 +53,12 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-export default function AlertDetailView() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
+function formatDateTime(value?: string | null): string {
+  if (!value) return "Unknown";
+  return new Date(value).toLocaleString();
+}
 
+export default function AlertDetailView() {
   const params = useParams();
   const alertId = params.alertId as string;
 
@@ -82,6 +84,30 @@ export default function AlertDetailView() {
 
   const { alert } = data;
 
+  const kpis = [
+    { label: "Risk Score", value: alert.risk_score != null ? alert.risk_score.toFixed(2) : "N/A", subtext: "Model-assigned score", icon: <ShieldAlert className="w-5 h-5 text-red-500" />, color: "border-red-100" },
+    { label: "Created", value: formatDateTime(alert.created_at).split(",")[0], subtext: formatDateTime(alert.created_at).split(",")[1] || "", icon: <Clock className="w-5 h-5 text-blue-500" />, color: "border-blue-100" },
+    { label: "Customer", value: alert.customer_name || "Unknown", subtext: alert.customer_id ? alert.customer_id.slice(0, 8) : "No linked customer", icon: <User className="w-5 h-5 text-slate-500" />, color: "border-slate-100" },
+  ];
+
+  const subjectIdentity = [
+    { label: "Customer Name", value: alert.customer_name || "Unknown", icon: <User className="w-3.5 h-3.5" /> },
+    { label: "Customer ID", value: alert.customer_id || "Not linked", icon: <Fingerprint className="w-3.5 h-3.5" /> },
+    { label: "Assigned To", value: alert.assigned_user_name || "Unassigned", icon: <BadgeCheck className="w-3.5 h-3.5" /> },
+  ];
+
+  const objectDetails = [
+    { label: "Alert Type", value: alert.alert_type, icon: <Activity className="w-3.5 h-3.5" /> },
+    { label: "Transaction ID", value: alert.transaction_id || "Not linked", icon: <CreditCard className="w-3.5 h-3.5" /> },
+    { label: "Created At", value: formatDateTime(alert.created_at), icon: <Calendar className="w-3.5 h-3.5" /> },
+    { label: "Updated At", value: formatDateTime(alert.updated_at), icon: <History className="w-3.5 h-3.5" /> },
+  ];
+
+  const linkedIntelligence = [
+    ...(alert.customer_id ? [{ label: "Customer Profile", href: `/dashboard/users/${alert.customer_id}`, icon: <User className="w-3.5 h-3.5" /> }] : []),
+    ...(alert.transaction_id ? [{ label: "Transaction Detail", href: `/dashboard/transactions/${alert.transaction_id}`, icon: <CreditCard className="w-3.5 h-3.5" /> }] : []),
+  ];
+
   return (
     <div className="space-y-6">
       {/* Detail Header */}
@@ -102,8 +128,8 @@ export default function AlertDetailView() {
           <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">{alert.alert_type} • Assigned to {alert.assigned_user_name || "Unassigned"}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="font-semibold">
-            <Plus className="w-4 h-4 mr-2" /> Convert to Case
+          <Button disabled variant="outline" size="sm" className="font-semibold opacity-40">
+            <Plus className="w-4 h-4 mr-2" /> Convert to Case (not yet available)
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -112,9 +138,9 @@ export default function AlertDetailView() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 font-semibold">
-              <DropdownMenuItem className="text-emerald-600">Mark False Positive</DropdownMenuItem>
-              <DropdownMenuItem className="text-rose-600">Confirm Suspicious</DropdownMenuItem>
-              <DropdownMenuItem>Escalate to Compliance</DropdownMenuItem>
+              <DropdownMenuItem disabled className="opacity-40">Mark False Positive (not yet available)</DropdownMenuItem>
+              <DropdownMenuItem disabled className="opacity-40">Confirm Suspicious (not yet available)</DropdownMenuItem>
+              <DropdownMenuItem disabled className="opacity-40">Escalate to Compliance (not yet available)</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -122,7 +148,7 @@ export default function AlertDetailView() {
 
       {/* KPI Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {(apiData || []).map((kpi, i) => (
+        {kpis.map((kpi, i) => (
           <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
             <CardContent className="p-4 flex gap-4 items-center">
               <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
@@ -173,10 +199,10 @@ export default function AlertDetailView() {
                  <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
                     <h4 className="text-sm font-bold text-slate-900 mb-6">Subject Identity</h4>
                     <div className="space-y-4">
-                       {(apiData || []).map((item, i) => (
+                       {subjectIdentity.map((item, i) => (
                          <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest flex items-center gap-2">{item.icon} {item.label}</span>
-                           <span className="text-[11px] font-bold text-slate-900">{item.value}</span>
+                           <span className="text-[11px] font-bold text-slate-900 truncate max-w-[160px]">{item.value}</span>
                          </div>
                        ))}
                     </div>
@@ -185,10 +211,10 @@ export default function AlertDetailView() {
                  <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
                     <h4 className="text-sm font-bold text-slate-900 mb-6">Object Details</h4>
                     <div className="space-y-4">
-                       {(apiData || []).map((item, i) => (
+                       {objectDetails.map((item, i) => (
                          <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest flex items-center gap-2">{item.icon} {item.label}</span>
-                           <span className="text-[11px] font-bold text-slate-900">{item.value}</span>
+                           <span className="text-[11px] font-bold text-slate-900 truncate max-w-[160px]">{item.value}</span>
                          </div>
                        ))}
                     </div>
@@ -221,14 +247,14 @@ export default function AlertDetailView() {
                 <p className="text-[11px] text-slate-400 font-medium">Lifecycle management for this alert node.</p>
              </div>
              <div className="space-y-3">
-                <Button className="w-full h-10 bg-emerald-600 hover:bg-emerald-700 text-xs font-bold shadow-sm">
-                   <ShieldCheck className="w-4 h-4 mr-2" /> Mark False Positive
+                <Button disabled className="w-full h-10 bg-emerald-600/40 text-xs font-bold shadow-sm opacity-60">
+                   <ShieldCheck className="w-4 h-4 mr-2" /> Mark False Positive (not yet available)
                 </Button>
-                <Button variant="outline" className="w-full h-10 border-red-500/30 text-red-500 hover:bg-red-500/5 text-xs font-bold">
-                   <ShieldAlert className="w-4 h-4 mr-2" /> Confirm Risk
+                <Button disabled variant="outline" className="w-full h-10 border-red-500/30 text-red-500 text-xs font-bold opacity-60">
+                   <ShieldAlert className="w-4 h-4 mr-2" /> Confirm Risk (not yet available)
                 </Button>
-                <Button variant="outline" className="w-full h-10 border-white/10 bg-white/5 text-white hover:bg-white/10 text-xs font-bold">
-                   <History className="w-4 h-4 mr-2" /> Assign Analyst
+                <Button disabled variant="outline" className="w-full h-10 border-white/10 bg-white/5 text-white text-xs font-bold opacity-60">
+                   <History className="w-4 h-4 mr-2" /> Assign Analyst (not yet available)
                 </Button>
              </div>
           </Card>
@@ -236,7 +262,9 @@ export default function AlertDetailView() {
           <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
              <h4 className="text-sm font-bold text-slate-900 mb-6">Linked Intelligence</h4>
              <div className="space-y-3">
-                {(apiData || []).map((link, i) => (
+                {linkedIntelligence.length === 0 ? (
+                  <p className="text-xs text-slate-400 italic">No linked records.</p>
+                ) : linkedIntelligence.map((link, i) => (
                   <Link key={i} href={link.href} className="flex justify-between items-center p-3 rounded-lg border border-slate-50 bg-slate-50/50 hover:bg-slate-50 transition-colors">
                      <span className="text-[11px] font-bold text-slate-600 flex items-center gap-2">{link.icon} {link.label}</span>
                      <ArrowUpRight className="w-3 h-3 text-slate-400" />

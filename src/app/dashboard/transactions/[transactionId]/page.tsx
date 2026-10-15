@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { 
   ArrowLeft, 
   ShieldCheck, 
@@ -65,15 +65,19 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { useTransaction } from "@/hooks/use-transactions";
+import { transactionsService } from "@/services/transactions.service";
 
 export default function TransactionDetailPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
-
   const params = useParams();
   const transactionId = params.transactionId as string;
 
   const { data, isLoading, isError, refetch } = useTransaction(transactionId);
+  const [breakdown, setBreakdown] = useState<any>(null);
+
+  useEffect(() => {
+    if (!transactionId) return;
+    transactionsService.getTransactionScoreBreakdown(transactionId).then(setBreakdown).catch(() => setBreakdown(null));
+  }, [transactionId]);
 
   if (isLoading) {
     return (
@@ -94,55 +98,43 @@ export default function TransactionDetailPage() {
   }
 
   const txnData = data;
-  
-  // Safe mapping of transaction data
+
   const txn = {
     id: txnData.id,
-    decision: txnData.decision || "PENDING",
-    status: txnData.status || "Unknown",
-    riskScore: txnData.final_score || 0,
+    decision: (txnData.decision || "pending").toLowerCase(),
+    status: txnData.status || "unknown",
+    riskScore: txnData.final_score ?? null,
     amount: txnData.amount,
     currency: txnData.currency,
     timestamp: new Date(txnData.occurred_at || txnData.created_at).toLocaleString(),
     customer: {
-      name: txnData.customer_name || "Unknown",
-      id: txnData.customer_id || txnData.account_id || "Unknown",
-      risk: txnData.risk_level || "Unknown",
-      joined: "N/A"
+      id: txnData.account_id || "Unknown",
     },
     merchant: {
-      name: txnData.merchant_id || "Unknown",
-      id: txnData.merchant_id || "Unknown",
-      location: "Unknown"
+      id: txnData.merchant_id || null,
     },
-    network: {
-      ip: "N/A",
-      isp: "N/A",
-      proxy: false,
-      vpn: false,
-      tor: false
-    },
-    device: {
-      name: "N/A",
-      id: "N/A",
-      integrity: "N/A",
-      browser: "N/A"
-    },
-    scores: {
-      ml: txnData.final_score || 0,
-      rules: 0,
-      anomaly: 0,
-      device: 0,
-      graph: 0,
-      behavioral: 0,
-      final: txnData.final_score || 0
-    },
-    rules: [],
-    alerts: [],
     timeline: [
-      { event: "Transaction Received", time: new Date(txnData.created_at).toLocaleTimeString(), detail: "Logged in system" }
+      { event: "Transaction Received", time: new Date(txnData.created_at).toLocaleTimeString(), detail: `Channel: ${txnData.transaction_type}/${txnData.channel}` }
     ]
   };
+
+  const ruleEvaluations: any[] = breakdown?.rule_evaluations || [];
+  const compositeScores: Record<string, any> = breakdown?.composite || {};
+  const anomalyScores: Record<string, any> = breakdown?.anomaly || {};
+  const graphSummary = breakdown?.graph_link_summary;
+
+  const fusedScores = [
+    ...(txn.riskScore != null ? [{ label: "Final Score", value: (txn.riskScore * 100).toFixed(1) }] : []),
+    ...Object.entries(compositeScores).filter(([, v]) => typeof v === 'number').map(([k, v]) => ({ label: k.replace(/_/g, ' '), value: ((v as number) * 100).toFixed(1) })),
+    ...Object.entries(anomalyScores).filter(([, v]) => typeof v === 'number').map(([k, v]) => ({ label: k.replace(/_/g, ' '), value: ((v as number) * 100).toFixed(1) })),
+  ];
+
+  const kpis = [
+    { label: "Final Score", value: txn.riskScore != null ? txn.riskScore.toFixed(2) : "N/A" },
+    { label: "Amount", value: `${txn.currency} ${txn.amount}` },
+    { label: "Rules Triggered", value: ruleEvaluations.filter((r) => r.triggered).length },
+    { label: "Transaction Type", value: txnData.transaction_type },
+  ];
 
   return (
     <div className="flex flex-col gap-8 pb-20">
@@ -156,7 +148,7 @@ export default function TransactionDetailPage() {
             <div className="flex items-center gap-4">
               <h1 className="text-3xl font-black italic tracking-tighter uppercase leading-none">{txn.id}</h1>
               <Badge className={`h-6 px-4 text-[9px] font-black uppercase italic tracking-widest border-none ${
-                txn.decision === 'BLOCK' ? 'bg-rose-500 text-white' : 'bg-orange-500 text-white'
+                txn.decision === 'block' ? 'bg-rose-500 text-white' : txn.decision === 'allow' ? 'bg-emerald-500 text-white' : 'bg-orange-500 text-white'
               }`}>
                 {txn.decision}
               </Badge>
@@ -179,14 +171,14 @@ export default function TransactionDetailPage() {
                    </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 bg-white rounded-2xl border-border shadow-2xl font-bold">
-                   <DropdownMenuItem className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 text-emerald-500">
-                      Approve & Release
+                   <DropdownMenuItem disabled className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 opacity-40">
+                      Approve & Release (not yet available)
                    </DropdownMenuItem>
-                   <DropdownMenuItem className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 text-rose-500">
-                      Block & Terminate
+                   <DropdownMenuItem disabled className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 opacity-40">
+                      Block & Terminate (not yet available)
                    </DropdownMenuItem>
-                   <DropdownMenuItem className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4">
-                      Create Investigation
+                   <DropdownMenuItem asChild className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4">
+                      <Link href="/dashboard/cases">Create Investigation</Link>
                    </DropdownMenuItem>
                 </DropdownMenuContent>
              </DropdownMenu>
@@ -195,15 +187,11 @@ export default function TransactionDetailPage() {
       </section>
 
       {/* KPI GRID */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-         {(apiData || []).map((kpi, i) => (
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+         {kpis.map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                 <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
-                 <Badge variant="outline" className="text-[8px] font-black uppercase tracking-widest italic border-none px-0">{kpi.delta}</Badge>
-              </div>
               <div>
-                 <div className={`text-2xl font-black italic tracking-tighter leading-none ${kpi.color || 'text-neutral-900 dark:text-white'}`}>{kpi.value}</div>
+                 <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white">{kpi.value}</div>
                  <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1">{kpi.label}</div>
               </div>
            </div>
@@ -231,7 +219,7 @@ export default function TransactionDetailPage() {
                         <div className="space-y-2">
                            <h3 className="text-xl font-black italic uppercase tracking-tighter">Decision Logic Resolution</h3>
                            <p className="text-[13px] text-white/80 leading-relaxed font-medium italic italic">
-                              This transaction scored <span className="text-white font-black underline underline-offset-4 decoration-white/30">{txn.scores.final}</span>.
+                              This transaction scored <span className="text-white font-black underline underline-offset-4 decoration-white/30">{txn.riskScore != null ? txn.riskScore.toFixed(2) : "N/A"}</span>, resulting in decision <span className="text-white font-black underline underline-offset-4 decoration-white/30">{txn.decision}</span>.
                            </p>
                         </div>
                      </div>
@@ -246,15 +234,17 @@ export default function TransactionDetailPage() {
                            </div>
                         </CardHeader>
                         <CardContent className="p-0 space-y-8">
-                           {(apiData || []).map((score, i) => (
+                           {fusedScores.length === 0 ? (
+                             <p className="text-sm text-muted-foreground italic">No score breakdown available.</p>
+                           ) : fusedScores.map((score, i) => (
                              <div key={i} className="space-y-2">
                                 <div className="flex justify-between items-baseline mb-1">
-                                   <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground flex items-center gap-2">
-                                      {score.icon} {score.label}
+                                   <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground capitalize">
+                                      {score.label}
                                    </span>
                                    <span className="text-lg font-black italic text-neutral-900">{score.value}</span>
                                 </div>
-                                <Progress value={score.value} className="h-1 bg-muted" indicatorClassName="bg-rose-500 shadow-[0_0_8px_currentColor]" />
+                                <Progress value={parseFloat(score.value)} className="h-1 bg-muted" indicatorClassName="bg-rose-500 shadow-[0_0_8px_currentColor]" />
                              </div>
                            ))}
                         </CardContent>
@@ -268,27 +258,25 @@ export default function TransactionDetailPage() {
                            </div>
                         </CardHeader>
                         <CardContent className="p-0 flex flex-col items-center gap-8">
-                           <div className="w-24 h-24 rounded-[32px] bg-zinc-50 border border-border flex items-center justify-center relative shadow-inner overflow-hidden group cursor-pointer">
-                              <User className="w-10 h-10 text-muted-foreground transition-transform group-hover:scale-110" />
-                              <div className="absolute inset-0 bg-neutral-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                 <Plus className="w-8 h-8 text-white" />
-                              </div>
+                           <div className="w-24 h-24 rounded-[32px] bg-zinc-50 border border-border flex items-center justify-center relative shadow-inner overflow-hidden">
+                              <User className="w-10 h-10 text-muted-foreground" />
                            </div>
                            <div className="text-center">
-                              <h4 className="text-xl font-black italic tracking-tighter text-neutral-900">{txn.customer.name}</h4>
-                              <p className="text-[10px] font-black uppercase text-muted-foreground italic mt-1">{txn.customer.id} • {txn.customer.risk} Risk</p>
+                              <p className="text-[10px] font-black uppercase text-muted-foreground italic mt-1">Account {txn.customer.id}</p>
                            </div>
-                           <div className="grid grid-cols-2 gap-4 w-full pt-4 border-t border-border">
-                              <div className="text-center">
-                                 <div className="text-[9px] font-black uppercase text-muted-foreground italic mb-1">Last Match</div>
-                                 <div className="text-[13px] font-black italic text-neutral-900">None</div>
-                              </div>
-                              <div className="text-center">
-                                 <div className="text-[9px] font-black uppercase text-muted-foreground italic mb-1">Linked Devices</div>
-                                 <div className="text-[13px] font-black italic text-neutral-900">03 Verified</div>
-                              </div>
-                           </div>
-                           <Button variant="outline" className="w-full text-[9px] font-black uppercase italic tracking-widest border-border rounded-2xl h-12 shadow-sm">Audit Entity Profile</Button>
+                           {graphSummary && (
+                             <div className="grid grid-cols-2 gap-4 w-full pt-4 border-t border-border">
+                                {Object.entries(graphSummary).filter(([, v]) => typeof v !== 'object').map(([k, v]) => (
+                                  <div key={k} className="text-center">
+                                     <div className="text-[9px] font-black uppercase text-muted-foreground italic mb-1">{k.replace(/_/g, ' ')}</div>
+                                     <div className="text-[13px] font-black italic text-neutral-900">{String(v)}</div>
+                                  </div>
+                                ))}
+                             </div>
+                           )}
+                           <Link href={`/dashboard/users/${txn.customer.id}`} className="w-full">
+                             <Button variant="outline" className="w-full text-[9px] font-black uppercase italic tracking-widest border-border rounded-2xl h-12 shadow-sm">View Entity Profile</Button>
+                           </Link>
                         </CardContent>
                      </Card>
                   </div>
@@ -297,10 +285,21 @@ export default function TransactionDetailPage() {
                   <Card className="rounded-[40px] border-border/50 shadow-md overflow-hidden bg-white">
                      <CardHeader className="p-10 border-b border-border/50 flex flex-row items-center justify-between">
                         <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Triggered Logic Nodes</CardTitle>
-                        <Badge className="bg-muted text-muted-foreground border-none text-[8px] font-black italic">{txn.rules.length}</Badge>
+                        <Badge className="bg-muted text-muted-foreground border-none text-[8px] font-black italic">{ruleEvaluations.length}</Badge>
                      </CardHeader>
-                     <CardContent className="p-10 text-center text-muted-foreground italic text-sm font-bold">
-                        No rules triggered.
+                     <CardContent className="p-0">
+                        {ruleEvaluations.length === 0 ? (
+                          <p className="p-10 text-center text-muted-foreground italic text-sm font-bold">No rule evaluations recorded.</p>
+                        ) : (
+                          <div className="divide-y divide-border/50">
+                            {ruleEvaluations.map((r, i) => (
+                              <div key={i} className="p-6 flex justify-between items-center">
+                                 <span className="text-xs font-black italic">{r.rule_name || r.rule_slug || `Rule ${i + 1}`}</span>
+                                 <Badge className={r.triggered ? "bg-rose-500 text-white" : "bg-muted text-muted-foreground"}>{r.triggered ? "Triggered" : "Not Triggered"}</Badge>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                      </CardContent>
                   </Card>
                </TabsContent>
@@ -340,20 +339,21 @@ export default function TransactionDetailPage() {
                   </div>
                </CardHeader>
                <CardContent className="p-0 space-y-6">
-                  {(apiData || []).map((it, i) => (
-                    <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic">
-                       <span className="text-neutral-400">{it.l}</span>
-                       <span className={it.c || "text-neutral-900"}>{it.v}</span>
-                    </div>
-                  ))}
-                  <Separator className="bg-border/50" />
-                  <div className="flex justify-between items-center p-4 bg-muted/20 border border-border rounded-2xl">
-                     <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-[10px] font-black uppercase italic italic">{txn.merchant.location}</span>
-                     </div>
-                     <LinkIcon className="w-3 h-3 text-muted-foreground" />
+                  <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic">
+                     <span className="text-neutral-400">Channel</span>
+                     <span className="text-neutral-900">{txnData.channel}</span>
                   </div>
+                  <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic">
+                     <span className="text-neutral-400">External Reference</span>
+                     <span className="text-neutral-900">{txnData.external_reference || "None"}</span>
+                  </div>
+                  {txn.merchant.id && (
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic">
+                       <span className="text-neutral-400">Merchant</span>
+                       <span className="text-neutral-900">{txn.merchant.id}</span>
+                    </div>
+                  )}
+                  <p className="text-[9px] text-muted-foreground italic">Network/device enrichment not available for this transaction.</p>
                </CardContent>
             </Card>
 
@@ -364,30 +364,21 @@ export default function TransactionDetailPage() {
                   <p className="text-white/30 text-[10px] uppercase italic tracking-widest leading-relaxed">System-wide command over transaction lifecycle state.</p>
                </div>
                <div className="space-y-3">
-                  <Button className="w-full h-14 bg-brand-lime text-black rounded-3xl text-[10px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-brand-lime/10">
-                     <Briefcase className="w-4 h-4 mr-2" />
-                     Escalate to Case
-                  </Button>
-                  <Button variant="outline" className="w-full h-14 border-white/10 text-white rounded-3xl text-[10px] font-black uppercase italic hover:bg-white/5 transition-all">
+                  <Link href="/dashboard/cases" className="block">
+                    <Button className="w-full h-14 bg-brand-lime text-black rounded-3xl text-[10px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-brand-lime/10">
+                       <Briefcase className="w-4 h-4 mr-2" />
+                       Escalate to Case
+                    </Button>
+                  </Link>
+                  <Button disabled variant="outline" className="w-full h-14 border-white/10 text-white/50 rounded-3xl text-[10px] font-black uppercase italic opacity-60">
                      <MessageSquare className="w-4 h-4 mr-2" />
-                     Add Analyst Note
+                     Add Analyst Note (not yet available)
                   </Button>
-                  <Button variant="outline" className="w-full h-14 border-rose-500/50 text-rose-500 rounded-3xl text-[10px] font-black uppercase italic hover:bg-rose-500/5 transition-all">
+                  <Button disabled variant="outline" className="w-full h-14 border-rose-500/30 text-rose-500/50 rounded-3xl text-[10px] font-black uppercase italic opacity-60">
                      <ShieldAlert className="w-4 h-4 mr-2" />
-                     Force Block Root
+                     Force Block Root (not yet available)
                   </Button>
                </div>
-            </Card>
-
-            {/* LINKED OBJECT FEED */}
-            <Card className="rounded-[40px] border-border/50 shadow-md p-10 bg-white">
-               <CardHeader className="p-0 mb-8 flex flex-row items-center justify-between">
-                  <CardTitle className="text-xl font-black italic uppercase tracking-tighter">Linked Objects</CardTitle>
-                  <Badge className="bg-muted text-muted-foreground border-none text-[8px] font-black uppercase italic">{txn.alerts.length} Total</Badge>
-               </CardHeader>
-               <CardContent className="p-4 text-center text-muted-foreground italic text-sm font-bold">
-                  No linked alerts.
-               </CardContent>
             </Card>
          </div>
       </div>

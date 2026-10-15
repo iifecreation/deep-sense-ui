@@ -359,7 +359,7 @@ export interface FraudCaseCreate {
 export interface FraudCaseUpdate {
   title?: string;
   description?: string;
-  priority?: string;
+  priority?: number;
 }
 
 export interface FraudCaseDetail {
@@ -457,14 +457,14 @@ export interface TeamListResponse {
 }
 
 export interface TeamMember {
-  id: string;
-  full_name: string;
+  user_id: string;
+  full_name: string | null;
   email: string;
   role: string;
-  is_active: boolean;
+  status: string;
   is_invite: boolean;
-  created_at: string;
-  last_active_at?: string;
+  invited_at: string | null;
+  last_active_at?: string | null;
 }
 
 export interface TeamInviteRequest {

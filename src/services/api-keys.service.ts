@@ -1,4 +1,4 @@
-import { get, post, del } from '@/lib/api/client';
+import { get, post } from '@/lib/api/client';
 
 export const apiKeysService = {
   listKeys: async () => {
@@ -10,7 +10,7 @@ export const apiKeysService = {
   },
 
   revokeKey: async (keyId: string) => {
-    return del<any>(`/integrations/api-keys/${keyId}`);
+    return post<any>(`/integrations/api-keys/${keyId}/revoke`, {});
   },
 
   rotateKey: async (keyId: string) => {

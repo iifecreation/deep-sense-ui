@@ -16,6 +16,26 @@ export interface WebhookCreate {
   event_types: string[];
   secret?: string;
   environment?: string;
+  signing_enabled?: boolean;
+  integration_id?: string | null;
+  description?: string;
+}
+
+export interface WebhookDeliveryDetail {
+  id: string;
+  organization_id: string;
+  endpoint_id: string;
+  event_type: string;
+  payload_json: Record<string, unknown> | null;
+  status: string;
+  attempt_count: number;
+  next_attempt_at: string | null;
+  last_attempt_at: string | null;
+  response_status: number | null;
+  response_body: string | null;
+  idempotency_key: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface WebhookUpdate {
@@ -60,7 +80,20 @@ export const webhooksService = {
     return await post<any>(`/integrations/webhooks/${webhookId}/test`);
   },
 
+  async disable(webhookId: string) {
+    return await post<any>(`/integrations/webhooks/${webhookId}/disable`);
+  },
+
   async listDeliveries(webhookId: string, params?: { page?: number; page_size?: number }) {
     return await get<any>(`/integrations/webhooks/${webhookId}/deliveries`, { params });
+  },
+
+  // Org-wide delivery log, across all webhook endpoints, with replay support.
+  async listAllDeliveries(params?: { page?: number; page_size?: number }) {
+    return await get<any>('/webhooks/deliveries', { params });
+  },
+
+  async replayDelivery(deliveryId: string) {
+    return await post<any>(`/webhooks/deliveries/${deliveryId}/replay`);
   },
 };

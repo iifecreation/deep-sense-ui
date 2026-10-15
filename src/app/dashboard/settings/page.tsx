@@ -24,9 +24,33 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { useRuntimeEnvironment } from "@/hooks/use-runtime-environment";
 import { toast } from "sonner";
 
+const SETTINGS_NAV = [
+  { n: "Organization", i: <Globe className="w-4 h-4" /> },
+  { n: "API Keys", i: <Key className="w-4 h-4" /> },
+  { n: "Webhooks", i: <LinkIcon className="w-4 h-4" /> },
+  { n: "Team & Roles", i: <Users className="w-4 h-4" /> },
+  { n: "Services", i: <MoreHorizontal className="w-4 h-4" /> },
+  { n: "Production Access", i: <Rocket className="w-4 h-4" /> },
+  { n: "Security & Access", i: <Lock className="w-4 h-4" /> },
+  { n: "Retention Policies", i: <History className="w-4 h-4" /> },
+  { n: "Screening Settings", i: <ShieldCheck className="w-4 h-4" /> },
+  { n: "Reporting Settings", i: <FileText className="w-4 h-4" /> },
+  { n: "Notifications", i: <Bell className="w-4 h-4" /> },
+];
+
+const GO_LIVE_CHECKLIST = [
+  { key: "sandbox_tests_passed", label: "Sandbox Tests Passed" },
+  { key: "webhook_test_passed", label: "Webhook Test Passed" },
+  { key: "scopes_approved", label: "Scopes Approved" },
+  { key: "allowed_ips_configured", label: "Allowed IPs Configured" },
+  { key: "security_contact_added", label: "Security Contact Added" },
+  { key: "billing_plan_active", label: "Billing Plan Active" },
+  { key: "agreement_accepted", label: "Agreement Accepted" },
+  { key: "mfa_enabled", label: "MFA Enabled" },
+];
+
 export default function SettingsPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
+  const apiData = SETTINGS_NAV;
 
   const environment = useRuntimeEnvironment();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -325,13 +349,13 @@ export default function SettingsPage() {
                              </div>
                              <div className="flex items-center gap-3 overflow-hidden">
                                 <code className="text-xl font-mono text-neutral-300 transition-all group-hover/key:text-neutral-900 truncate">
-                                  {key.key_value || `${key.prefix}...`}
+                                  {key.key_prefix}...
                                 </code>
-                                <button 
-                                  onClick={() => copyToClipboard(key.key_value || `${key.prefix}...`)}
+                                <button
+                                  onClick={() => copyToClipboard(`${key.key_prefix}...`)}
                                   className="p-2 text-neutral-200 hover:text-brand-lime transition-all shrink-0"
                                 >
-                                   {copiedKey === (key.key_value || `${key.prefix}...`) ? <CheckCircle2 className="w-4 h-4 shadow-[0_0_8px_#D1F701]" /> : <Copy className="w-4 h-4" />}
+                                   {copiedKey === `${key.key_prefix}...` ? <CheckCircle2 className="w-4 h-4 shadow-[0_0_8px_#D1F701]" /> : <Copy className="w-4 h-4" />}
                                 </button>
                              </div>
                           </div>
@@ -413,7 +437,7 @@ export default function SettingsPage() {
                      <div className="text-center p-8 text-neutral-400"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>
                    ) : team && team.members?.length > 0 ? (
                      team.members.map((tm: any, i: number) => (
-                       <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-6 hover:bg-zinc-50 rounded-3xl transition-all cursor-crosshair border border-transparent hover:border-neutral-100 gap-4">
+                       <div key={tm.user_id || i} className="flex flex-col sm:flex-row sm:items-center justify-between p-6 hover:bg-zinc-50 rounded-3xl transition-all cursor-crosshair border border-transparent hover:border-neutral-100 gap-4">
                           <div className="flex items-center gap-6">
                              <div className="w-14 h-14 rounded-2xl bg-zinc-50 border border-neutral-100 flex items-center justify-center font-black italic text-neutral-400 group-hover:bg-white transition-all shadow-sm uppercase">
                                 {tm.full_name ? tm.full_name.substring(0, 2) : tm.email.substring(0, 2)}
@@ -421,11 +445,11 @@ export default function SettingsPage() {
                              <div>
                                 <div className="text-[14px] font-black italic tracking-tight text-neutral-900 leading-none mb-1">{tm.full_name || tm.email}</div>
                                 <div className="text-[10px] text-neutral-300 uppercase tracking-widest mb-1">{tm.role}</div>
-                                {tm.last_login_at && <div className="text-[10px] text-neutral-400 italic font-medium">Last Login: {new Date(tm.last_login_at).toLocaleDateString()}</div>}
+                                {tm.last_active_at && <div className="text-[10px] text-neutral-400 italic font-medium">Last Active: {new Date(tm.last_active_at).toLocaleDateString()}</div>}
                              </div>
                           </div>
                           <div className="flex items-center gap-4">
-                             <div className={`px-3 py-1 rounded-full text-[8px] font-black uppercase shadow-sm ${tm.is_active ? 'bg-emerald-500/5 border border-emerald-500/10 text-emerald-600' : 'bg-red-500/5 border border-red-500/10 text-red-600'}`}>{tm.is_active ? 'Active' : 'Inactive'}</div>
+                             {!tm.is_invite && <div className={`px-3 py-1 rounded-full text-[8px] font-black uppercase shadow-sm ${tm.status === 'active' ? 'bg-emerald-500/5 border border-emerald-500/10 text-emerald-600' : 'bg-red-500/5 border border-red-500/10 text-red-600'}`}>{tm.status === 'active' ? 'Active' : 'Inactive'}</div>}
                              {tm.is_invite && <div className="px-3 py-1 rounded-full text-[8px] font-black uppercase shadow-sm bg-amber-500/5 border border-amber-500/10 text-amber-600">Pending Invite</div>}
                              <button className="w-10 h-10 bg-zinc-50 border border-neutral-100 rounded-xl flex items-center justify-center text-neutral-300 hover:text-neutral-900 transition-all shadow-sm italic font-bold">
                                 <MoreHorizontal className="w-4 h-4" />
@@ -626,7 +650,7 @@ export default function SettingsPage() {
                     <div>
                       <h4 className="text-lg font-black tracking-tight uppercase mb-4 text-neutral-900">Go-Live Checklist</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {(apiData || []).map((item) => {
+                        {GO_LIVE_CHECKLIST.map((item) => {
                           const isComplete = (promotionStatus as any)[item.key];
                           return (
                             <div key={item.key} className={`flex items-center gap-3 p-4 rounded-2xl border ${isComplete ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-white border-neutral-100'} transition-all`}>

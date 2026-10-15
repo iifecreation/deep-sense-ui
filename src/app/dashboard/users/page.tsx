@@ -22,32 +22,47 @@ import Link from "next/link";
 import { useCustomers } from "@/hooks/use-customers";
 import { useState } from "react";
 
-export default function CustomerRegistry() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
+const RISK_TIERS = ["critical", "high", "medium", "low"] as const;
 
+export default function CustomerRegistry() {
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: customers, isLoading, isError, refetch } = useCustomers({ query: { search: searchQuery } });
+  const [riskTierFilter, setRiskTierFilter] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 25;
+  const { data: customers, isLoading, isError, refetch } = useCustomers({
+    query: { search: searchQuery, page, page_size: pageSize },
+    filters: riskTierFilter ? { risk_tier: riskTierFilter } : {},
+  });
+
+  const allCustomers = customers || [];
+  const highRiskCount = allCustomers.filter((c: any) => c.risk_tier === "high" || c.risk_tier === "critical").length;
+  const flaggedCount = allCustomers.filter((c: any) => ["under_review", "watchlisted", "restricted"].includes((c.status || "").toLowerCase())).length;
+
+  const kpis = [
+    { label: "Total Customers", value: allCustomers.length, subtext: "Managed entities", icon: <UserCheck className="w-5 h-5 text-blue-500" />, color: "border-slate-100" },
+    { label: "High Risk", value: highRiskCount, subtext: "Risk tier high/critical", icon: <AlertCircle className="w-5 h-5 text-red-500" />, color: "border-red-100" },
+    { label: "Flagged / Review", value: flaggedCount, subtext: "Requires attention", icon: <UserMinus className="w-5 h-5 text-amber-500" />, color: "border-amber-100" },
+  ];
 
   const getStatusColor = (status: string) => {
     switch ((status || '').toLowerCase()) {
-      case 'trusted':
-      case 'verified':
+      case 'active':
         return 'bg-emerald-100 text-emerald-700 border-none';
-      case 'flagged':
-      case 'review':
+      case 'under_review':
+      case 'watchlisted':
         return 'bg-amber-100 text-amber-700 border-none';
-      case 'suspended':
-      case 'rejected':
+      case 'restricted':
+      case 'blocked':
         return 'bg-red-100 text-red-700 border-none';
       default:
         return 'bg-slate-100 text-slate-700 border-none';
     }
   };
 
+  // risk_score is a 0-1 float; convert to a percentage for display/thresholds.
   const getRiskColor = (score: number) => {
-    if (score > 80) return 'bg-red-500 text-white border-none';
-    if (score > 40) return 'bg-amber-500 text-white border-none';
+    if (score > 0.8) return 'bg-red-500 text-white border-none';
+    if (score > 0.4) return 'bg-amber-500 text-white border-none';
     return 'bg-emerald-500 text-white border-none';
   };
 
@@ -75,18 +90,18 @@ export default function CustomerRegistry() {
           <p className="text-neutral-400 text-xs font-bold uppercase tracking-widest italic font-black">Managed entities, identity trust scores, and risk profiles</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="font-semibold">
-            <Download className="w-4 h-4 mr-2" /> Export
+          <Button disabled variant="outline" size="sm" className="font-semibold opacity-50">
+            <Download className="w-4 h-4 mr-2" /> Export (not yet available)
           </Button>
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 font-semibold shadow-sm">
-            <Plus className="w-4 h-4 mr-2" /> Add Customer
+          <Button disabled size="sm" className="font-semibold shadow-sm opacity-50">
+            <Plus className="w-4 h-4 mr-2" /> Add Customer (not yet available)
           </Button>
         </div>
       </div>
 
       {/* KPI Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {(apiData || []).map((kpi, i) => (
+        {kpis.map((kpi, i) => (
           <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
             <CardContent className="p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
@@ -115,9 +130,19 @@ export default function CustomerRegistry() {
             />
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold">
-              <Filter className="w-4 h-4 mr-2" /> All Risk Tiers
-            </Button>
+            <div className="flex items-center gap-2 h-9 px-3 text-xs font-semibold border rounded-md">
+              <Filter className="w-4 h-4 text-slate-400" />
+              <select
+                value={riskTierFilter || ''}
+                onChange={(e) => { setRiskTierFilter(e.target.value || null); setPage(1); }}
+                className="bg-transparent outline-none text-xs font-semibold capitalize"
+              >
+                <option value="">All Risk Tiers</option>
+                {RISK_TIERS.map((tier) => (
+                  <option key={tier} value={tier}>{tier}</option>
+                ))}
+              </select>
+            </div>
             <Button variant="outline" size="sm" className="h-9 px-3 text-xs font-semibold" onClick={refetch}>
                <RefreshCcw className="w-4 h-4 mr-2" /> Refresh
             </Button>
@@ -146,14 +171,16 @@ export default function CustomerRegistry() {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-900">{row.first_name} {row.last_name}</span>
+                      <span className="text-sm font-bold text-slate-900">
+                        {row.first_name || row.last_name ? `${row.first_name || ''} ${row.last_name || ''}`.trim() : (row.label || 'Unknown')}
+                      </span>
                       <span className="text-[10px] font-medium text-slate-400 lowercase">{row.id}</span>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell className="text-center">
                   <Badge variant="outline" className={`rounded-full px-2 py-0 uppercase text-[10px] font-bold ${getRiskColor(row.risk_score || 0)}`}>
-                    {row.risk_score || 0}
+                    {row.risk_score != null ? `${Math.round(row.risk_score * 100)}%` : 'N/A'}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-center">

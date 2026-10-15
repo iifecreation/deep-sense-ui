@@ -1,30 +1,30 @@
-import { useState, useEffect } from 'react';
-import { modelsService, MLModel, ModelMetrics } from '../services/models.service';
+import { useState, useEffect, useCallback } from 'react';
+import { modelsService, MLModel, MLModelDetail, ModelMetrics } from '../services/models.service';
 
 export function useModels() {
   const [data, setData] = useState<MLModel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
-  useEffect(() => {
-    let mounted = true;
-    modelsService.getModels()
+  const fetchModels = () => {
+    setIsLoading(true);
+    setIsError(false);
+    return modelsService.getModels()
       .then(res => {
-        if (mounted) {
-          setData(res.items || []);
-          setIsLoading(false);
-        }
+        setData(res.items || []);
+        setIsLoading(false);
       })
       .catch(() => {
-        if (mounted) {
-          setIsError(true);
-          setIsLoading(false);
-        }
+        setIsError(true);
+        setIsLoading(false);
       });
-    return () => { mounted = false; };
+  };
+
+  useEffect(() => {
+    fetchModels();
   }, []);
 
-  return { data, isLoading, isError };
+  return { data, isLoading, isError, refetch: fetchModels };
 }
 
 export function useModelMetrics(modelId?: string) {
@@ -41,7 +41,7 @@ export function useModelMetrics(modelId?: string) {
     modelsService.getModelMetrics(modelId)
       .then(res => {
         if (mounted) {
-          setResult({ modelId, data: res, isError: false });
+          setResult({ modelId, data: res.latest_metrics, isError: false });
         }
       })
       .catch(() => {
@@ -58,4 +58,31 @@ export function useModelMetrics(modelId?: string) {
     isLoading: Boolean(modelId && currentResult === null),
     isError: currentResult?.isError ?? false,
   };
+}
+
+export function useModelDetail(modelId?: string) {
+  const [data, setData] = useState<MLModelDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+
+  const fetchDetail = useCallback(() => {
+    if (!modelId) return;
+    setIsLoading(true);
+    setIsError(false);
+    return modelsService.getModelDetail(modelId)
+      .then(res => {
+        setData(res);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsError(true);
+        setIsLoading(false);
+      });
+  }, [modelId]);
+
+  useEffect(() => {
+    fetchDetail();
+  }, [fetchDetail]);
+
+  return { data, isLoading, isError, refetch: fetchDetail };
 }

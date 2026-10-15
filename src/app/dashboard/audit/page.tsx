@@ -34,6 +34,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,14 +57,32 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useAuditEvents, useAuditSummary } from "@/hooks";
+import { auditService } from "@/services/audit.service";
 
 export default function AuditTrailsPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
-
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
   const { data: auditData, isLoading, isError, refetch } = useAuditEvents({ search: searchQuery });
   const { data: summaryData, isLoading: isSummaryLoading } = useAuditSummary();
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const csv = await auditService.exportEvents("csv", { search: searchQuery || undefined });
+      const blob = new Blob([csv as string], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "audit_export.csv";
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to export audit log:", err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   if (isLoading || isSummaryLoading) {
     return (
@@ -109,7 +128,55 @@ export default function AuditTrailsPage() {
   }
 
   const items = auditData?.items || [];
-  const summary = summaryData || {};
+  const summary: Record<string, any> = summaryData || {};
+
+  const kpiCards = [
+    { icon: <Activity className="w-5 h-5 text-neutral-400" />, label: "Total Events", value: summary.total_events ?? 0 },
+    { icon: <AlertTriangle className="w-5 h-5 text-rose-500" />, label: "Critical Events", value: summary.critical_events ?? 0 },
+    { icon: <ShieldAlert className="w-5 h-5 text-indigo-500" />, label: "Security Events", value: summary.security_events ?? 0 },
+    { icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />, label: "Compliance Events", value: summary.compliance_events ?? 0 },
+    { icon: <Settings className="w-5 h-5 text-orange-500" />, label: "Config Changes", value: summary.config_changes ?? 0 },
+    { icon: <FileText className="w-5 h-5 text-neutral-400" />, label: "Reporting Events", value: summary.reporting_events ?? 0 },
+  ];
+
+  const severityBreakdown: Record<string, number> = summary.severity_breakdown || {};
+  const categoryBreakdown: Record<string, number> = summary.category_breakdown || {};
+  const categoryEntries = Object.entries(categoryBreakdown);
+  const maxCategoryCount = Math.max(...categoryEntries.map(([, c]) => c), 1);
+
+  const pulseStats = [
+    { l: "Total Logged", v: summary.total_events ?? 0 },
+    { l: "Critical", v: severityBreakdown.critical ?? 0 },
+    { l: "Warning", v: severityBreakdown.warning ?? 0 },
+    { l: "Info", v: severityBreakdown.info ?? 0 },
+  ];
+
+  const quickActions = [
+    {
+      label: "Refresh Feed",
+      icon: <RefreshCcw className="w-5 h-5" />,
+      color: "bg-brand-lime text-neutral-900",
+      onClick: () => { void refetch(); },
+    },
+    {
+      label: isExporting ? "Exporting..." : "Export CSV",
+      icon: <Download className="w-5 h-5" />,
+      color: "bg-neutral-900 text-white",
+      onClick: () => { void handleExport(); },
+    },
+    {
+      label: "Compliance Reports",
+      icon: <FileText className="w-5 h-5" />,
+      color: "bg-indigo-50 text-indigo-700",
+      onClick: () => router.push("/dashboard/compliance-reports"),
+    },
+    {
+      label: "Screening Center",
+      icon: <SearchCode className="w-5 h-5" />,
+      color: "bg-rose-50 text-rose-700",
+      onClick: () => router.push("/dashboard/screening"),
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-10 pb-20">
@@ -125,13 +192,22 @@ export default function AuditTrailsPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" className="h-10 px-4 text-xs font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800">
+            <Button
+              variant="outline"
+              className="h-10 px-4 text-xs font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800"
+              onClick={handleExport}
+              disabled={isExporting}
+            >
                <Download className="w-3.5 h-3.5 mr-2" />
-               Download Report
+               {isExporting ? "Exporting..." : "Download Report"}
             </Button>
-            <Button className="h-10 px-6 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:scale-[1.03] transition-all font-black uppercase tracking-widest italic shadow-xl">
+            <Button
+              className="h-10 px-6 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:scale-[1.03] transition-all font-black uppercase tracking-widest italic shadow-xl"
+              onClick={handleExport}
+              disabled={isExporting}
+            >
                <Database className="w-3.5 h-3.5 mr-2" />
-               Export Logs
+               {isExporting ? "Exporting..." : "Export Logs"}
             </Button>
             <Button size="icon" variant="ghost" className="h-10 w-10" onClick={refetch}>
                <RefreshCcw className="w-3.5 h-3.5" />
@@ -151,14 +227,18 @@ export default function AuditTrailsPage() {
             />
           </div>
           
-          {(apiData || []).map((filter, i) => (
-            <div key={i} className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group border border-transparent hover:border-border">
+          {searchQuery ? (
+            <div
+              onClick={() => setSearchQuery("")}
+              className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group border border-transparent hover:border-border"
+              title="Click to clear"
+            >
               <span className="text-[10px] font-black uppercase tracking-widest italic text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
-                {filter.label}: {filter.value}
+                Search: {searchQuery}
               </span>
-              <ChevronDown className="w-2.5 h-2.5 text-muted-foreground/50" />
+              <XCircle className="w-2.5 h-2.5 text-muted-foreground/50" />
             </div>
-          ))}
+          ) : null}
           
           <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg ml-auto mr-2">
             <Filter className="w-3.5 h-3.5" />
@@ -168,18 +248,15 @@ export default function AuditTrailsPage() {
 
       {/* 2. KPI CARDS */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {(apiData || []).map((kpi, i) => (
-          <div 
-            key={i} 
+        {kpiCards.map((kpi, i) => (
+          <div
+            key={i}
             className="flex flex-col gap-4 p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-xl shadow-black/5 hover:border-brand-lime hover:translate-y-[-4px] transition-all group cursor-pointer"
           >
             <div className="flex items-center justify-between">
               <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center group-hover:bg-brand-lime/10 transition-colors">
                 {kpi.icon}
               </div>
-              <Badge variant="outline" className="text-[9px] font-black italic tracking-widest uppercase border-none px-0 text-emerald-500">
-                {kpi.delta}
-              </Badge>
             </div>
             <div>
               <div className="text-2xl font-black italic tracking-tighter text-neutral-900 dark:text-white leading-none">
@@ -396,12 +473,14 @@ export default function AuditTrailsPage() {
               </div>
               <div className="mt-auto grid grid-cols-2 gap-4 relative z-10 font-black italic">
                  <div className="p-5 bg-white/5 border border-white/10 rounded-3xl text-center">
-                    <div className="text-[8px] font-black uppercase text-white/40 italic mb-1">Failures (24h)</div>
-                    <div className="text-2xl font-black italic text-rose-500">242</div>
+                    <div className="text-[8px] font-black uppercase text-white/40 italic mb-1">Security Events</div>
+                    <div className="text-2xl font-black italic text-rose-500">{summary.security_events ?? 0}</div>
                  </div>
                  <div className="p-5 bg-white/5 border border-white/10 rounded-3xl text-center">
-                    <div className="text-[8px] font-black uppercase text-white/40 italic mb-1">MFA Bypass Traces</div>
-                    <div className="text-2xl font-black italic">00</div>
+                    <div className="text-[8px] font-black uppercase text-white/40 italic mb-1">Critical Security Events</div>
+                    <div className="text-2xl font-black italic">
+                      {items.filter((i: any) => i.category === 'security_event' && i.severity === 'critical').length}
+                    </div>
                  </div>
               </div>
            </Card>
@@ -446,7 +525,7 @@ export default function AuditTrailsPage() {
                   <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-1 italic italic text-muted-foreground">Disclosure submission and regulator lifecycle trace</CardDescription>
                </CardHeader>
                <CardContent className="p-10 space-y-12 flex-1 italic font-bold">
-                  {items.filter((i: any) => i.category === 'compliance_action' && i.resource_type === 'regulatory_report').slice(0, 4).map((rep: any, i: number) => (
+                  {items.filter((i: any) => i.resource_type === 'regulatory_report').slice(0, 4).map((rep: any, i: number) => (
                     <div key={i} className="flex gap-4 items-center group">
                        <div className="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center shrink-0 border border-border/50 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/30 transition-all">
                           <FileText className="w-5 h-5 text-muted-foreground group-hover:text-indigo-500" />
@@ -478,17 +557,26 @@ export default function AuditTrailsPage() {
                   <BarChart3 className="w-10 h-10 text-brand-lime" />
                </div>
                
-               <div className="flex-1 min-h-[240px] flex items-end gap-1 px-4 mb-8">
-                  {Array.from({ length: 30 }).map((_, i) => (
-                    <div key={i} className="flex-1 bg-muted/30 rounded-full relative group">
-                       <div className="absolute bottom-0 inset-x-0 bg-neutral-900 dark:bg-white transition-all group-hover:bg-brand-lime rounded-full" style={{ height: `${20 + ((i * 37 + 11) % 81)}%` }} />
-                       <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{(i * 733 + 911) % 5000} Logs</div>
-                    </div>
-                  ))}
+               <div className="flex-1 min-h-[240px] flex items-end gap-2 px-4 mb-8">
+                  {categoryEntries.length > 0 ? (
+                    categoryEntries.map(([cat, count]) => (
+                      <div key={cat} className="flex-1 bg-muted/30 rounded-full relative group h-full flex items-end">
+                         <div
+                           className="w-full bg-neutral-900 dark:bg-white transition-all group-hover:bg-brand-lime rounded-full"
+                           style={{ height: `${Math.max((count / maxCategoryCount) * 100, 4)}%` }}
+                         />
+                         <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-900 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                           {count} {cat.replace(/_/g, ' ')}
+                         </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">No category data available yet.</p>
+                  )}
                </div>
                
                <div className="grid grid-cols-4 gap-8 border-t border-border/50 pt-8 italic font-black">
-                  {(apiData || []).map((stat, i) => (
+                  {pulseStats.map((stat, i) => (
                     <div key={i} className="space-y-1">
                        <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic leading-none">{stat.l}</div>
                        <div className="text-xl font-black italic">{stat.v}</div>
@@ -500,8 +588,8 @@ export default function AuditTrailsPage() {
 
          <section className="xl:col-span-1 h-full">
             <div className="flex flex-col gap-4 h-full">
-               {(apiData || []).map((action, i) => (
-                 <button key={i} className={`flex-1 p-6 rounded-3xl font-black text-[10px] uppercase tracking-widest italic hover:scale-[1.03] active:scale-95 transition-all group flex items-center justify-between min-h-[80px] ${action.color}`}>
+               {quickActions.map((action, i) => (
+                 <button key={i} onClick={action.onClick} className={`flex-1 p-6 rounded-3xl font-black text-[10px] uppercase tracking-widest italic hover:scale-[1.03] active:scale-95 transition-all group flex items-center justify-between min-h-[80px] ${action.color}`}>
                     <div className="flex items-center gap-4">
                        <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center shrink-0 group-hover:scale-110 transition-all">
                           {React.cloneElement(action.icon as any, { className: "w-5 h-5" })}
