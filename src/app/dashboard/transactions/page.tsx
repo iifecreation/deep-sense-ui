@@ -27,9 +27,11 @@ import Link from "next/link";
 export default function TransactionsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const { data: transactions, isLoading, isError, error, refetch } = useTransactions({ 
+  // The real /transactions endpoint only supports a `search` filter
+  // server-side (see app/schemas/list_filters.py), so decision filtering
+  // is applied client-side below against the fetched page.
+  const { data: transactions, isLoading, isError, error, refetch } = useTransactions({
     query: { page: 1, page_size: 50 },
-    filters: statusFilter ? { status: statusFilter } : {}
   });
 
   const formatTimeAgo = (dateString: string) => {
@@ -48,28 +50,30 @@ export default function TransactionsPage() {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(num);
   };
 
+  // final_score is a 0-1 fusion score; thresholds mirror the real decision
+  // bands from app/services/scoring/fusion.py (block >= 0.65, review >= 0.3).
   const getScoreColor = (score: number) => {
-    if (score > 80) return 'text-red-600';
-    if (score > 40) return 'text-amber-500';
+    if (score >= 0.65) return 'text-red-600';
+    if (score >= 0.3) return 'text-amber-500';
     return 'text-emerald-500';
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'approved': return 'bg-emerald-100 text-emerald-700';
-      case 'rejected': return 'bg-red-100 text-red-700';
-      case 'pending': return 'bg-blue-100 text-blue-700';
-      case 'under_review': return 'bg-amber-100 text-amber-700';
+  const getStatusColor = (decision: string) => {
+    switch (decision.toLowerCase()) {
+      case 'allow': return 'bg-emerald-100 text-emerald-700';
+      case 'block': return 'bg-red-100 text-red-700';
+      case 'review': return 'bg-amber-100 text-amber-700';
       default: return 'bg-slate-100 text-slate-700';
     }
   };
 
   const filteredTransactions = transactions?.filter((t: any) => {
+    if (statusFilter && t.decision !== statusFilter) return false;
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
       t.id?.toLowerCase().includes(query) ||
-      t.customer_id?.toLowerCase().includes(query)
+      t.account_id?.toLowerCase().includes(query)
     );
   }) || [];
 
@@ -156,7 +160,7 @@ export default function TransactionsPage() {
             <div className="flex-1">
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">High Risk</p>
               <div className="text-xl font-bold text-slate-900">
-                {transactions?.filter((t: any) => t.final_score > 80).length || 0}
+                {transactions?.filter((t: any) => t.final_score >= 0.65).length || 0}
               </div>
             </div>
           </CardContent>
@@ -191,21 +195,29 @@ export default function TransactionsPage() {
             />
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <Button 
-              variant={statusFilter === 'approved' ? 'default' : 'outline'} 
-              size="sm" 
+            <Button
+              variant={statusFilter === 'allow' ? 'default' : 'outline'}
+              size="sm"
               className="h-9 px-3 text-xs font-semibold"
-              onClick={() => setStatusFilter(statusFilter === 'approved' ? null : 'approved')}
+              onClick={() => setStatusFilter(statusFilter === 'allow' ? null : 'allow')}
             >
-              <Filter className="w-4 h-4 mr-2" /> Approved
+              <Filter className="w-4 h-4 mr-2" /> Allowed
             </Button>
-            <Button 
-              variant={statusFilter === 'rejected' ? 'default' : 'outline'} 
-              size="sm" 
+            <Button
+              variant={statusFilter === 'review' ? 'default' : 'outline'}
+              size="sm"
               className="h-9 px-3 text-xs font-semibold"
-              onClick={() => setStatusFilter(statusFilter === 'rejected' ? null : 'rejected')}
+              onClick={() => setStatusFilter(statusFilter === 'review' ? null : 'review')}
             >
-              <Filter className="w-4 h-4 mr-2" /> Rejected
+              <Filter className="w-4 h-4 mr-2" /> Review
+            </Button>
+            <Button
+              variant={statusFilter === 'block' ? 'default' : 'outline'}
+              size="sm"
+              className="h-9 px-3 text-xs font-semibold"
+              onClick={() => setStatusFilter(statusFilter === 'block' ? null : 'block')}
+            >
+              <Filter className="w-4 h-4 mr-2" /> Blocked
             </Button>
           </div>
         </div>
@@ -233,7 +245,7 @@ export default function TransactionsPage() {
                 <TableCell className="pl-6">
                   <div className="flex flex-col">
                     <span className="text-[10px] font-medium text-slate-400">{tx.id}</span>
-                    <span className="text-xs font-bold text-slate-900">{tx.customer_id || 'Unknown'}</span>
+                    <span className="text-xs font-bold text-slate-900">{tx.account_id ? tx.account_id.split('-')[0] : 'Unknown'}</span>
                   </div>
                 </TableCell>
                 <TableCell className="text-xs font-bold text-slate-900">
@@ -241,7 +253,7 @@ export default function TransactionsPage() {
                 </TableCell>
                 <TableCell>
                   <span className={`text-sm font-bold ${getScoreColor(tx.final_score || 0)}`}>
-                    {tx.final_score || 0}
+                    {tx.final_score != null ? Math.round(tx.final_score * 100) : 0}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -250,7 +262,7 @@ export default function TransactionsPage() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-xs text-slate-500 font-medium">
-                  {tx.created_at ? formatTimeAgo(tx.created_at) : 'N/A'}
+                  {tx.occurred_at ? formatTimeAgo(tx.occurred_at) : 'N/A'}
                 </TableCell>
                 <TableCell className="text-right pr-6">
                   <Link href={`/dashboard/transactions/${tx.id}`}>

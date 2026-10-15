@@ -11,8 +11,147 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+type IntegratedModule = {
+  module: string;
+  routes: string[];
+};
+
+const INTEGRATED_MODULES: IntegratedModule[] = [
+  {
+    module: "APP Scams",
+    routes: [
+      "GET /api/v1/app-scams/signals",
+      "POST /api/v1/app-scams/score-payment",
+      "GET /api/v1/app-scams/beneficiaries/{identifier}/risk",
+      "POST /api/v1/app-scams/interventions",
+      "POST /api/v1/app-scams/interventions/{intervention_id}/complete",
+    ],
+  },
+  {
+    module: "Account Takeover",
+    routes: [
+      "POST /api/v1/ato/login-event",
+      "POST /api/v1/ato/session-event",
+      "POST /api/v1/ato/challenge",
+      "GET /api/v1/ato/risk/{account_id}",
+      "GET /api/v1/ato/signals",
+      "POST /api/v1/ato/sessions/{session_id}/revoke",
+    ],
+  },
+  {
+    module: "CNP Fraud",
+    routes: [
+      "POST /api/v1/cnp/score",
+      "POST /api/v1/cnp/checkout-events",
+      "GET /api/v1/cnp/signals",
+      "GET /api/v1/cnp/payment-instruments/{id}/risk",
+      "POST /api/v1/risk-decisions/cnp/transactions/assess",
+      "GET /api/v1/risk-decisions/cnp/checkouts/{checkout_id}/journey",
+      "GET /api/v1/risk-decisions/cnp/merchant-policies",
+    ],
+  },
+  {
+    module: "Interventions",
+    routes: [
+      "POST /api/v1/interventions/evaluate",
+      "POST /api/v1/interventions/execute",
+      "GET /api/v1/interventions/policies",
+      "POST /api/v1/interventions/policies",
+    ],
+  },
+  {
+    module: "Customer Risk",
+    routes: [
+      "GET /api/v1/customer-risk",
+      "GET /api/v1/customer-risk/{customer_id}",
+      "GET /api/v1/customer-risk/{customer_id}/timeline",
+      "POST /api/v1/customer-risk/{customer_id}/watchlist",
+      "PATCH /api/v1/customer-risk/{customer_id}/owner",
+      "GET /api/v1/risk-decisions/customer-risk/{profile_id}/contributions",
+    ],
+  },
+  {
+    module: "Unified Risk",
+    routes: [
+      "GET /api/v1/risk/dashboard",
+      "GET /api/v1/risk/signals",
+      "GET /api/v1/risk/entities/{entity_type}/{entity_id}",
+      "GET /api/v1/risk/entities/{entity_type}/{entity_id}/explain",
+      "GET /api/v1/risk/entities/{entity_type}/{entity_id}/timeline",
+      "POST /api/v1/risk/signals/{signal_id}/resolve",
+    ],
+  },
+  {
+    module: "Promo & Bonus Abuse",
+    routes: [
+      "GET /api/v1/promotions",
+      "POST /api/v1/promotions/bonus-award",
+      "POST /api/v1/promotions/redeem",
+      "GET /api/v1/promotions/abuse-signals",
+      "GET /api/v1/promotions/risk/{user_id}",
+      "GET /api/v1/promotions/graph/clusters",
+    ],
+  },
+  {
+    module: "Procurement Fraud",
+    routes: [
+      "POST /api/v1/procurement/vendors",
+      "GET /api/v1/procurement/vendors/{vendor_id}/risk",
+      "POST /api/v1/procurement/invoices",
+      "POST /api/v1/procurement/score-invoice",
+      "GET /api/v1/procurement/signals",
+      "GET /api/v1/procurement/graph/shared-accounts",
+    ],
+  },
+  {
+    module: "Document Intelligence",
+    routes: [
+      "POST /api/v1/document-intelligence/runs",
+      "GET /api/v1/document-intelligence/runs/{run_id}",
+      "POST /api/v1/document-intelligence/runs/{run_id}/review",
+    ],
+  },
+  {
+    module: "Deepfake & Biometrics",
+    routes: [
+      "POST /api/v1/biometrics/deepfake-check",
+      "POST /api/v1/biometrics/deepfake-check/upload",
+      "GET /api/v1/biometrics/deepfake-checks",
+      "GET /api/v1/biometrics/deepfake-checks/{check_id}",
+      "GET /api/v1/biometrics/deepfake-model/status",
+    ],
+  },
+  {
+    module: "Dispute Intelligence",
+    routes: [
+      "POST /api/v1/disputes",
+      "GET /api/v1/disputes/{id}",
+      "POST /api/v1/disputes/{id}/evidence",
+      "POST /api/v1/disputes/{id}/submit-representment",
+      "GET /api/v1/disputes/risk-score/{customer_id}",
+      "GET /api/v1/disputes/merchant-risk",
+    ],
+  },
+  {
+    module: "NFC / Contactless",
+    routes: [
+      "GET /api/v1/nfc/dashboard",
+      "POST /api/v1/nfc/relay/check",
+      "GET /api/v1/nfc/relay-signals",
+      "POST /api/v1/nfc/transactions",
+      "GET /api/v1/nfc/graph/rings",
+      "POST /api/v1/nfc/terminals/{terminal_id}/block",
+      "GET /api/v1/nfc/top-risk-wallets",
+    ],
+  },
+  {
+    module: "Voice Authentication",
+    routes: ["POST /api/v1/risk-decisions/voice/assess"],
+  },
+];
+
 export default function AdvancedFraudPage() {
-  const integratedModules: any[] = [];
+  const integratedModules: IntegratedModule[] = INTEGRATED_MODULES;
 
   return (
     <div className="flex flex-col gap-10 pb-20 max-w-5xl mx-auto mt-10">

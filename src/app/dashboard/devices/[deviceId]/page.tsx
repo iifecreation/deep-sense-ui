@@ -1,64 +1,81 @@
 "use client";
 
-import { 
-  ArrowLeft, 
-  Smartphone, 
-  ShieldCheck, 
+import React, { useState, useEffect } from "react";
+import {
+  ArrowLeft,
+  ShieldCheck,
   ShieldAlert,
-  Clock, 
-  MapPin, 
-  Cpu, 
-  Activity,
-  User,
-  MoreHorizontal,
   ChevronRight,
   Share2,
   Lock,
-  Globe,
-  Zap,
-  Fingerprint,
-  Users,
-  CreditCard,
-  Network,
-  History,
-  ExternalLink,
-  Table as TableIcon,
   AlertCircle,
-  FileText,
   RefreshCcw
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
 import { useDevice } from "@/hooks";
+import { devicesService } from "@/services/devices.service";
+
+function formatDate(value?: string | null): string {
+  if (!value) return "Never";
+  return new Date(value).toLocaleString();
+}
 
 export default function DeviceDetailView() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
-
   const params = useParams();
   const deviceId = params.deviceId as string;
 
   const { data: device, isLoading, isError, refetch } = useDevice(deviceId);
+
+  const [timeline, setTimeline] = useState<any[]>([]);
+  const [linkedCustomers, setLinkedCustomers] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!deviceId) return;
+    devicesService.getDeviceTimeline(deviceId).then((res) => setTimeline(res.items || [])).catch(() => setTimeline([]));
+    devicesService.getLinkedCustomers(deviceId).then((res) => setLinkedCustomers(res.items || [])).catch(() => setLinkedCustomers([]));
+  }, [deviceId]);
+
+  const [pendingAction, setPendingAction] = useState<"trust" | "block" | null>(null);
+  const [actionReason, setActionReason] = useState("");
+  const [actionBusy, setActionBusy] = useState(false);
+
+  const handleConfirmAction = async () => {
+    if (!pendingAction) return;
+    setActionBusy(true);
+    try {
+      if (pendingAction === "trust") {
+        await devicesService.trustDevice(deviceId, actionReason.trim());
+      } else {
+        await devicesService.blockDevice(deviceId, actionReason.trim());
+      }
+      setPendingAction(null);
+      setActionReason("");
+      await refetch();
+    } finally {
+      setActionBusy(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -104,13 +121,31 @@ export default function DeviceDetailView() {
     );
   }
 
-  const riskScore = device.risk_score || device.riskScore || 0;
-  const status = device.status || 'Unknown';
-  const info = device.info || {};
-  const signals = device.signals || [];
-  const customers = device.customers || [];
-  const transactions = device.transactions || [];
-  const timeline = device.timeline || [];
+  const risk = device.risk || {};
+  const riskScore = risk.risk_score != null ? risk.risk_score : null;
+  const status = device.status || "unknown";
+
+  const kpis = [
+    { label: "Risk Score", value: riskScore != null ? riskScore.toFixed(2) : "N/A", subtext: risk.risk_tier || "Unknown tier", icon: <ShieldAlert className="w-5 h-5 text-red-500" />, color: "border-red-100" },
+    { label: "Linked Customers", value: device.linked_customer_count ?? 0, subtext: "Accounts seen on this device", icon: <ShieldCheck className="w-5 h-5 text-blue-500" />, color: "border-blue-100" },
+    { label: "Alerts / Cases", value: `${device.alert_count ?? 0} / ${device.case_count ?? 0}`, subtext: "Linked investigations", icon: <AlertCircle className="w-5 h-5 text-amber-500" />, color: "border-amber-100" },
+  ];
+
+  const hardwareInfo = [
+    { label: "Fingerprint Hash", value: device.fingerprint_hash },
+    { label: "User Agent Hash", value: device.user_agent_hash || "Not recorded" },
+    { label: "First Seen", value: formatDate(device.first_seen_at) },
+    { label: "Last Seen", value: formatDate(device.last_seen_at) },
+  ];
+
+  const riskInfo = [
+    { label: "Risk Tier", value: risk.risk_tier || "Unknown" },
+    { label: "Last Risk Reason", value: risk.last_risk_reason || "Not recorded" },
+    { label: "Linked Transactions", value: String(device.linked_transaction_count ?? 0) },
+    { label: "Notes", value: String(device.note_count ?? 0) },
+  ];
+
+  const riskDrivers: string[] = risk.risk_drivers || [];
 
   return (
     <div className="space-y-6">
@@ -121,40 +156,27 @@ export default function DeviceDetailView() {
             <ArrowLeft className="w-3 h-3" /> Hardware Registry
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{device.id}</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{device.fingerprint_hash}</h1>
             <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide border-none ${
-              status === 'Blocked' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'
+              status === 'blocked' ? 'bg-red-500 text-white' : status === 'watchlisted' ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white'
             }`}>
               {status}
             </Badge>
-            <Badge variant="outline" className="rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide bg-blue-50 text-blue-700 border-none">
-              Active Node
-            </Badge>
           </div>
-          <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">{info.os || 'Unknown OS'} • {info.geo || 'Unknown Location'}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="font-semibold">
-            <Share2 className="w-4 h-4 mr-2" /> Export
+          <Button disabled={actionBusy} onClick={() => setPendingAction("trust")} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-sm" size="sm">
+            <ShieldCheck className="w-4 h-4 mr-2" /> Trust Hardware
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 font-semibold shadow-sm">
-                Management <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 font-semibold">
-              <DropdownMenuItem className="text-emerald-600">Trust Hardware</DropdownMenuItem>
-              <DropdownMenuItem className="text-rose-600">Block ID</DropdownMenuItem>
-              <DropdownMenuItem>Investigate Hub</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button disabled={actionBusy} onClick={() => setPendingAction("block")} variant="outline" className="border-rose-200 text-rose-600 font-semibold" size="sm">
+            <Lock className="w-4 h-4 mr-2" /> Block ID
+          </Button>
         </div>
       </div>
 
       {/* KPI Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {(apiData || []).map((kpi, i) => (
+        {kpis.map((kpi, i) => (
           <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
             <CardContent className="p-4 flex gap-4 items-center">
               <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
@@ -175,32 +197,32 @@ export default function DeviceDetailView() {
         <div className="xl:col-span-2 space-y-6">
           <Tabs defaultValue="info" className="w-full">
             <TabsList className="bg-slate-100/50 p-1 rounded-lg border border-slate-200">
-              <TabsTrigger value="info" className="rounded-md px-4 py-2 text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Technical Specs</TabsTrigger>
-              <TabsTrigger value="signals" className="rounded-md px-4 py-2 text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Risk Signals</TabsTrigger>
+              <TabsTrigger value="info" className="rounded-md px-4 py-2 text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Device Info</TabsTrigger>
+              <TabsTrigger value="signals" className="rounded-md px-4 py-2 text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Risk Drivers</TabsTrigger>
               <TabsTrigger value="history" className="rounded-md px-4 py-2 text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Device Timeline</TabsTrigger>
             </TabsList>
 
             <TabsContent value="info" className="mt-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
-                  <h4 className="text-sm font-bold text-slate-900 mb-6">Hardware & OS</h4>
+                  <h4 className="text-sm font-bold text-slate-900 mb-6">Hardware Identity</h4>
                   <div className="space-y-4">
-                    {(apiData || []).map((item, i) => (
+                    {hardwareInfo.map((item, i) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                         <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">{item.label}</span>
-                        <span className="text-[11px] font-bold text-slate-900">{item.value}</span>
+                        <span className="text-[11px] font-bold text-slate-900 truncate max-w-[180px]">{item.value}</span>
                       </div>
                     ))}
                   </div>
                 </Card>
 
                 <Card className="rounded-xl shadow-sm border bg-white p-6 leading-none">
-                  <h4 className="text-sm font-bold text-slate-900 mb-6">Network Context</h4>
+                  <h4 className="text-sm font-bold text-slate-900 mb-6">Risk Context</h4>
                   <div className="space-y-4">
-                    {(apiData || []).map((item, i) => (
+                    {riskInfo.map((item, i) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
                         <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">{item.label}</span>
-                        <span className="text-[11px] font-bold text-slate-900">{item.value}</span>
+                        <span className="text-[11px] font-bold text-slate-900 truncate max-w-[180px]">{item.value}</span>
                       </div>
                     ))}
                   </div>
@@ -213,29 +235,19 @@ export default function DeviceDetailView() {
                 <Table>
                   <TableHeader className="bg-slate-50/50">
                     <TableRow>
-                      <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-6 h-10">Forensic Signal</TableHead>
-                      <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 h-10">Resolution</TableHead>
-                      <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-right pr-6 h-10">Status</TableHead>
+                      <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-6 h-10">Risk Driver</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {signals.map((signal: any, i: number) => (
-                      <TableRow key={i} className="h-16">
-                        <TableCell className="pl-6 text-xs font-bold text-slate-900">{signal.name}</TableCell>
-                        <TableCell className="text-[11px] font-medium text-slate-500 italic">{signal.detail || signal.description}</TableCell>
-                        <TableCell className="text-right pr-6">
-                           <Badge variant="outline" className={`rounded-full px-2 py-0 text-[10px] font-bold border-none ${
-                             (signal.status === 'Clean' || signal.status === 'ok') ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-                           }`}>
-                             {signal.status}
-                           </Badge>
-                        </TableCell>
+                    {riskDrivers.map((driver, i) => (
+                      <TableRow key={i} className="h-12">
+                        <TableCell className="pl-6 text-xs font-bold text-slate-900">{driver}</TableCell>
                       </TableRow>
                     ))}
-                    {signals.length === 0 && (
+                    {riskDrivers.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={3} className="text-center py-8 text-slate-500 text-sm">
-                          No signals found for this device.
+                        <TableCell className="text-center py-8 text-slate-500 text-sm">
+                          No risk drivers recorded for this device.
                         </TableCell>
                       </TableRow>
                     )}
@@ -247,13 +259,13 @@ export default function DeviceDetailView() {
             <TabsContent value="history" className="mt-6">
               <Card className="rounded-xl shadow-sm border bg-white p-6">
                 <div className="space-y-6">
-                  {timeline.map((event: any, i: number) => (
-                    <div key={i} className="flex gap-4">
+                  {timeline.map((event: any) => (
+                    <div key={event.id} className="flex gap-4">
                       <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 shrink-0" />
                       <div>
-                        <div className="text-sm font-bold text-slate-900">{event.event || event.action}</div>
-                        <div className="text-xs text-slate-500 mt-1">{event.detail || event.description}</div>
-                        <div className="text-[10px] text-slate-400 mt-1 uppercase tracking-widest">{event.time || (event.timestamp && new Date(event.timestamp).toLocaleString())}</div>
+                        <div className="text-sm font-bold text-slate-900">{event.summary || event.event_type}</div>
+                        {event.reason && <div className="text-xs text-slate-500 mt-1">{event.reason}</div>}
+                        <div className="text-[10px] text-slate-400 mt-1 uppercase tracking-widest">{formatDate(event.created_at)}</div>
                       </div>
                     </div>
                   ))}
@@ -273,39 +285,47 @@ export default function DeviceDetailView() {
           <Card className="rounded-xl shadow-sm border bg-white p-6 space-y-4">
             <h4 className="text-sm font-bold text-slate-900">Linked Customers</h4>
             <div className="space-y-3">
-              {customers.map((cust: any, i: number) => (
-                <Link key={i} href={`/dashboard/customer-risk/${cust.id || cust.customer_id}`} className="block p-4 rounded-lg border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+              {linkedCustomers.map((cust: any) => (
+                <Link key={cust.id} href={`/dashboard/users/${cust.id}`} className="block p-4 rounded-lg border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors">
                   <div className="flex justify-between mb-1">
-                    <span className="text-xs font-bold text-slate-900">{cust.name || cust.customer_id}</span>
-                    <Badge variant="outline" className="text-[8px] font-bold bg-emerald-100 text-emerald-700 border-none">{cust.risk || 'Low'}</Badge>
+                    <span className="text-xs font-bold text-slate-900">{cust.display_name || cust.id}</span>
+                    <Badge variant="outline" className="text-[8px] font-bold bg-emerald-100 text-emerald-700 border-none">{cust.risk_tier || "Low"}</Badge>
                   </div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase">{cust.id || cust.customer_id} • Seen {cust.lastUsed || 'recently'}</p>
+                  <p className="text-[10px] font-medium text-slate-400 uppercase">{cust.transaction_count} txns • {cust.alert_count} alerts</p>
                 </Link>
               ))}
-              {customers.length === 0 && (
+              {linkedCustomers.length === 0 && (
                 <div className="text-center py-4 text-slate-500 text-xs">
                   No linked customers.
                 </div>
               )}
             </div>
           </Card>
-
-          <Card className="rounded-xl shadow-sm border bg-slate-900 text-white p-6 space-y-6">
-            <div className="space-y-1">
-              <h4 className="text-sm font-bold">Device Control</h4>
-              <p className="text-[11px] text-slate-400 font-medium">Executive commands for hardware identity.</p>
-            </div>
-            <div className="space-y-3">
-              <Button className="w-full h-10 bg-blue-600 hover:bg-blue-700 text-xs font-bold">
-                <ShieldCheck className="w-4 h-4 mr-2" /> Trust Hardware
-              </Button>
-              <Button variant="outline" className="w-full h-10 border-white/10 bg-white/5 hover:bg-white/10 text-xs font-bold text-white">
-                <Lock className="w-4 h-4 mr-2" /> Block ID
-              </Button>
-            </div>
-          </Card>
         </div>
       </div>
+
+      <Dialog open={pendingAction !== null} onOpenChange={(open) => { if (!open) { setPendingAction(null); setActionReason(""); } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{pendingAction === "trust" ? "Trust Hardware" : "Block Device"}</DialogTitle>
+            <DialogDescription>
+              {pendingAction === "trust" ? "Mark this device as trusted." : "Block this device from further transactions."} This action is audited.
+            </DialogDescription>
+          </DialogHeader>
+          <input
+            value={actionReason}
+            onChange={(e) => setActionReason(e.target.value)}
+            placeholder="Reason (optional)"
+            className="w-full h-10 rounded-md border border-slate-200 px-3 text-sm"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setPendingAction(null); setActionReason(""); }}>Cancel</Button>
+            <Button disabled={actionBusy} onClick={() => void handleConfirmAction()} className={pendingAction === "block" ? "bg-rose-600 hover:bg-rose-700" : "bg-emerald-600 hover:bg-emerald-700"}>
+              {actionBusy ? "Submitting..." : "Confirm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

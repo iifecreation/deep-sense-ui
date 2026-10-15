@@ -12,18 +12,21 @@ import {
 import { useDashboardMetrics } from "@/hooks/use-analytics";
 
 export default function AnalyticsPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
-
   const [period, setPeriod] = useState("7d");
   const { data, isLoading } = useDashboardMetrics({ filters: { period } });
 
   const metrics = data?.metrics || [];
-  
+
   // Safe fallbacks for the 3 main KPI cards
   const kpi1 = metrics[0] || { value: "$0", change: "0%", trend: "neutral" };
   const kpi2 = metrics[1] || { value: "0%", change: "0%", trend: "neutral" };
   const kpi3 = metrics[2] || { value: "0s", change: "0s", trend: "neutral" };
+
+  const statCards = [
+    { l: metrics[0]?.label || "Volume", v: kpi1.value, c: "text-neutral-900", i: <TrendingUp className="w-7 h-7" /> },
+    { l: metrics[1]?.label || "Fraud Rate", v: kpi2.value, c: "text-rose-600", i: <Activity className="w-7 h-7" /> },
+    { l: metrics[2]?.label || "Avg Response", v: kpi3.value, c: "text-neutral-900", i: <Zap className="w-7 h-7" /> },
+  ];
 
   const chartData = data?.transactions_trend?.map(t => t.value) || [40, 75, 45, 90, 65, 80, 55, 100, 75, 50, 85, 60];
 
@@ -57,7 +60,7 @@ export default function AnalyticsPage() {
 
       {/* 2. STAT CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-         {(apiData || []).map((stat: any, i: number) => (
+         {statCards.map((stat, i) => (
            <div key={i} className="p-10 bg-white rounded-[56px] border border-neutral-100 shadow-xl flex items-center justify-between group overflow-hidden relative transition-all hover:shadow-2xl font-bold italic">
               <div className="space-y-4">
                  <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 italic leading-none">{stat.l}</p>
@@ -109,7 +112,7 @@ export default function AnalyticsPage() {
                   </div>
                </div>
             </div>
-            <p className="text-[10px] text-neutral-300 font-inter italic leading-relaxed italic px-4">Automated pattern detection confirms botnet propagation across 12 sectors.</p>
+            <p className="text-[10px] text-neutral-300 font-inter italic leading-relaxed italic px-4">{data?.top_rules_triggered?.[0] ? "Top triggered rule for this period." : "No rule trigger data for this period."}</p>
          </div>
       </div>
     </div>

@@ -40,15 +40,49 @@ import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useOnboardingReview } from "@/hooks";
+import { onboardingService } from "@/services/onboarding.service";
 
 export default function OnboardingReviewDetailPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
-
   const params = useParams();
   const reviewId = params.reviewId as string;
   const { data: reviewData, isLoading, isError, refetch } = useOnboardingReview(reviewId);
+
+  const [pendingAction, setPendingAction] = useState<"approve" | "reject" | "escalate" | null>(null);
+  const [actionReason, setActionReason] = useState("");
+  const [actionBusy, setActionBusy] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const handleConfirmAction = async () => {
+    if (!pendingAction) return;
+    if ((pendingAction === "reject" || pendingAction === "escalate") && !actionReason.trim()) return;
+    setActionBusy(true);
+    setActionError(null);
+    try {
+      if (pendingAction === "approve") {
+        await onboardingService.approveReview(reviewId, { reason: actionReason.trim() || undefined });
+      } else if (pendingAction === "reject") {
+        await onboardingService.rejectReview(reviewId, { reason: actionReason.trim() });
+      } else {
+        await onboardingService.escalateReview(reviewId, { reason: actionReason.trim() });
+      }
+      setPendingAction(null);
+      setActionReason("");
+      await refetch();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Action failed.");
+    } finally {
+      setActionBusy(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -94,6 +128,14 @@ export default function OnboardingReviewDetailPage() {
   const review = reviewData.review || reviewData;
   const kycDocs = reviewData.documents || [];
   const notes = reviewData.notes || [];
+  const riskTier = review.risk_summary?.risk_tier || "low";
+  const riskScore = review.risk_summary?.risk_score;
+  const screening = review.screening_summary || {};
+  const screeningItems = [
+    { category: "Sanctions", result: screening.sanctions_status },
+    { category: "PEP", result: screening.pep_status },
+    { category: "Watchlist", result: screening.watchlist_status },
+  ].filter((s) => s.result && s.result !== "unknown");
 
   return (
     <div className="flex flex-col gap-8 pb-20 font-black italic">
@@ -134,7 +176,7 @@ export default function OnboardingReviewDetailPage() {
                </div>
                <div className="flex items-center gap-3">
                   <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-xl border text-[10px] font-black uppercase italic tracking-widest ${
-                    review.status === 'APPROVED' ? 'bg-brand-lime/10 border-brand-lime/20 text-brand-lime' : review.status === 'REJECTED' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-orange-500/10 border-orange-500/20 text-orange-500'
+                    review.status === 'approved' ? 'bg-brand-lime/10 border-brand-lime/20 text-brand-lime' : review.status === 'rejected' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-orange-500/10 border-orange-500/20 text-orange-500'
                   }`}>
                      <Clock className="w-3.5 h-3.5" /> {review.status}
                   </div>
@@ -183,9 +225,9 @@ export default function OnboardingReviewDetailPage() {
                                       <FileText className="w-5 h-5 shadow-sm" />
                                    </div>
                                    <Badge variant="outline" className={`text-[8px] font-black uppercase italic tracking-widest ${
-                                     doc.status === 'VERIFIED' ? 'text-brand-lime border-brand-lime/20' : doc.status === 'REJECTED' || doc.status === 'FAILED' ? 'text-rose-500 border-rose-500/20' : 'text-orange-500 border-orange-500/20'
+                                     doc.verification_status === 'verified' ? 'text-brand-lime border-brand-lime/20' : doc.verification_status === 'rejected' || doc.verification_status === 'failed' ? 'text-rose-500 border-rose-500/20' : 'text-orange-500 border-orange-500/20'
                                    }`}>
-                                      {doc.status || "Pending"}
+                                      {doc.verification_status || "Pending"}
                                    </Badge>
                                 </div>
                                 <div>
@@ -203,33 +245,31 @@ export default function OnboardingReviewDetailPage() {
                         </div>
                      </TabsContent>
                      <TabsContent value="screening" className="m-0 p-10 space-y-10 leading-none">
-                        {(apiData || []).map((scr, i) => (
+                        {screeningItems.length === 0 ? (
+                          <p className="text-center text-slate-500">No screening results recorded.</p>
+                        ) : screeningItems.map((scr, i) => {
+                          const isClear = scr.result === 'clear';
+                          const isMatch = scr.result === 'hit' || scr.result === 'match';
+                          return (
                            <div key={i} className="flex gap-8 items-start last:mb-0 group font-bold italic font-black">
                               <div className={`w-12 h-12 rounded-[20px] flex items-center justify-center shrink-0 border ${
-                                scr.result === 'Match Detected' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : scr.result === 'Warning' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' : 'bg-brand-lime/10 border-brand-lime/20 text-brand-lime'
+                                isMatch ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : isClear ? 'bg-brand-lime/10 border-brand-lime/20 text-brand-lime' : 'bg-orange-500/10 border-orange-500/20 text-orange-500'
                               }`}>
-                                 {scr.result === 'Match Detected' ? <ShieldAlert className="w-6 h-6" /> : scr.result === 'Warning' ? <AlertTriangle className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
+                                 {isMatch ? <ShieldAlert className="w-6 h-6" /> : isClear ? <ShieldCheck className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
                               </div>
                               <div className="flex-1 space-y-2">
                                  <div className="flex justify-between items-baseline">
                                     <div className="text-[15px] font-black italic tracking-tighter uppercase">{scr.category}</div>
                                     <Badge className={`${
-                                      scr.result === 'Match Detected' ? 'bg-rose-500' : scr.result === 'Warning' ? 'bg-orange-500' : 'bg-brand-lime text-black shadow-[0_0_8px_#D1F701]'
+                                      isMatch ? 'bg-rose-500' : isClear ? 'bg-brand-lime text-black shadow-[0_0_8px_#D1F701]' : 'bg-orange-500'
                                     } text-white text-[9px] font-black uppercase italic tracking-widest`}>
-                                       {scr.result === 'Match Detected' ? `${scr.score}% Confidence` : scr.result}
+                                       {scr.result}
                                     </Badge>
                                  </div>
-                                 <p className="text-[11px] text-muted-foreground leading-relaxed italic uppercase font-black">{scr.details}</p>
-                                 {scr.result !== 'Clear' && (
-                                   <div className="flex gap-3 pt-2">
-                                      <Link href="#" className="text-[9px] font-black uppercase italic tracking-widest text-indigo-500 hover:underline">Open Match Detail</Link>
-                                      <span className="text-muted-foreground/20 italic">|</span>
-                                      <Link href="#" className="text-[9px] font-black uppercase italic tracking-widest text-muted-foreground hover:text-neutral-900">Dismiss as False Positive</Link>
-                                   </div>
-                                 )}
                               </div>
                            </div>
-                        ))}
+                          );
+                        })}
                      </TabsContent>
                   </CardContent>
                </Tabs>
@@ -243,29 +283,33 @@ export default function OnboardingReviewDetailPage() {
                      <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-2 italic text-muted-foreground leading-none">Dynamic scoring engine result based on ingestion pattern</CardDescription>
                   </div>
                   <div className="text-right">
-                     <div className={`text-5xl font-black italic tracking-tighter leading-none ${review.risk_level === 'CRITICAL' || review.risk_level === 'HIGH' ? 'text-rose-500' : 'text-emerald-500'}`}>
-                       {review.risk_score || (review.risk_level === 'HIGH' ? 85 : 20)}<span className="text-lg text-muted-foreground/30">/100</span>
+                     <div className={`text-5xl font-black italic tracking-tighter leading-none ${riskTier === 'critical' || riskTier === 'high' ? 'text-rose-500' : 'text-emerald-500'}`}>
+                       {riskScore != null ? Math.round(riskScore * 100) : "N/A"}<span className="text-lg text-muted-foreground/30">/100</span>
                      </div>
-                     <Badge className={`${review.risk_level === 'CRITICAL' || review.risk_level === 'HIGH' ? 'bg-rose-500' : 'bg-emerald-500'} text-white text-[10px] font-black uppercase tracking-widest mt-2 italic shadow-lg`}>{review.risk_level || 'LOW'} RISK</Badge>
+                     <Badge className={`${riskTier === 'critical' || riskTier === 'high' ? 'bg-rose-500' : 'bg-emerald-500'} text-white text-[10px] font-black uppercase tracking-widest mt-2 italic shadow-lg`}>{riskTier} RISK</Badge>
                   </div>
                </div>
 
-               <div className="space-y-6 leading-none">
-                  <h5 className="text-[11px] font-black uppercase italic tracking-widest text-muted-foreground leading-none">Primary Risk Factors</h5>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     {(apiData || []).map((factor, i) => (
-                       <div key={i} className="flex items-center gap-4 p-5 bg-muted/20 border border-border/50 rounded-3xl group hover:bg-muted font-bold italic h-16 leading-none whitespace-nowrap">
-                          <div className="w-8 h-8 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center shrink-0">
-                             {React.cloneElement(factor.icon as any, { className: "w-3.5 h-3.5" })}
-                          </div>
-                          <div className="flex-1">
-                             <div className="text-[12px] font-black italic uppercase tracking-tighter">{factor.f}</div>
-                             <div className="text-[8px] font-black uppercase italic text-muted-foreground mt-1 opacity-40">{factor.s} Severity Influence</div>
-                          </div>
-                       </div>
-                     ))}
-                  </div>
-               </div>
+               {(() => {
+                 const factors = (reviewData.risk_results || []).flatMap((r: any) => r.risk_factors_json || []);
+                 return factors.length > 0 && (
+                   <div className="space-y-6 leading-none">
+                      <h5 className="text-[11px] font-black uppercase italic tracking-widest text-muted-foreground leading-none">Primary Risk Factors</h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                         {factors.map((factor: any, i: number) => (
+                           <div key={i} className="flex items-center gap-4 p-5 bg-muted/20 border border-border/50 rounded-3xl group hover:bg-muted font-bold italic h-16 leading-none whitespace-nowrap">
+                              <div className="w-8 h-8 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center shrink-0">
+                                 <ShieldAlert className="w-3.5 h-3.5" />
+                              </div>
+                              <div className="flex-1">
+                                 <div className="text-[12px] font-black italic uppercase tracking-tighter">{typeof factor === 'string' ? factor : JSON.stringify(factor)}</div>
+                              </div>
+                           </div>
+                         ))}
+                      </div>
+                   </div>
+                 );
+               })()}
             </Card>
 
             {/* 6. DECISION WORKFLOW / REVIEWS */}
@@ -301,7 +345,13 @@ export default function OnboardingReviewDetailPage() {
                </CardHeader>
                <CardContent className="p-0 space-y-8">
                   <div className="space-y-6">
-                     {(apiData || []).map((info, i) => (
+                     {[
+                       { l: "Email", v: review.applicant_email || "Not provided" },
+                       { l: "Phone", v: review.applicant_phone || "Not provided" },
+                       { l: "Onboarding Channel", v: review.onboarding_channel || "Unknown" },
+                       { l: "KYC Status", v: review.kyc_status },
+                       { l: "Auto-Review", v: review.auto_review ? "Yes" : "No" },
+                     ].map((info, i) => (
                        <div key={i} className="space-y-1">
                           <div className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground italic mb-1 h-3">{info.l}</div>
                           <div className="text-[13px] font-black italic tracking-tighter h-5">{info.v}</div>
@@ -328,29 +378,19 @@ export default function OnboardingReviewDetailPage() {
                </div>
                
                <div className="space-y-3 font-bold italic font-black uppercase">
-                  <Button className="w-full h-14 bg-brand-lime text-black rounded-3xl text-[11px] font-black uppercase italic hover:scale-[1.03] hover:bg-brand-lime/90 active:scale-95 transition-all shadow-xl shadow-brand-lime/10 font-bold font-black">
+                  <Button disabled={actionBusy || review.status !== 'pending'} onClick={() => setPendingAction("approve")} className="w-full h-14 bg-brand-lime text-black rounded-3xl text-[11px] font-black uppercase italic hover:scale-[1.03] hover:bg-brand-lime/90 active:scale-95 transition-all shadow-xl shadow-brand-lime/10 font-bold font-black disabled:opacity-50">
                      <ShieldCheck className="w-4 h-4 mr-2" />
                      Approve Onboarding
                   </Button>
-                  <Button className="w-full h-14 bg-rose-500 text-white rounded-3xl text-[11px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-rose-500/20 font-bold font-black">
+                  <Button disabled={actionBusy || review.status !== 'pending'} onClick={() => setPendingAction("reject")} className="w-full h-14 bg-rose-500 text-white rounded-3xl text-[11px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-rose-500/20 font-bold font-black disabled:opacity-50">
                      <XCircle className="w-4 h-4 mr-2" />
                      Reject Application
                   </Button>
-                  <Button variant="outline" className="w-full h-14 rounded-3xl border-white/10 bg-white/5 text-white text-[11px] font-black uppercase italic hover:bg-white/10 transition-all font-bold font-black h-14 font-bold">
+                  <Button disabled={actionBusy || review.status !== 'pending'} onClick={() => setPendingAction("escalate")} variant="outline" className="w-full h-14 rounded-3xl border-white/10 bg-white/5 text-white text-[11px] font-black uppercase italic hover:bg-white/10 transition-all font-bold font-black disabled:opacity-50">
                      <AlertTriangle className="w-4 h-4 mr-2 text-indigo-400" />
                      Escalate to EDD
                   </Button>
-               </div>
-               
-               <Separator className="bg-white/5 h-1 font-bold" />
-               
-               <div className="flex flex-col gap-3 font-bold italic font-black">
-                  <button className="flex items-center justify-between text-[10px] uppercase italic tracking-widest text-white/40 hover:text-white transition-colors h-10 px-4 rounded-xl hover:bg-white/5">
-                     Request Document Refresh <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                  <button className="flex items-center justify-between text-[10px] uppercase italic tracking-widest text-white/40 hover:text-white transition-colors h-10 px-4 rounded-xl hover:bg-white/5">
-                     Assign to New Reviewer <Users className="w-3.5 h-3.5" />
-                  </button>
+                  {actionError && <p className="text-[10px] text-rose-400 uppercase tracking-widest italic">{actionError}</p>}
                </div>
             </Card>
 
@@ -369,6 +409,36 @@ export default function OnboardingReviewDetailPage() {
             </div>
          </div>
       </div>
+
+      <Dialog open={pendingAction !== null} onOpenChange={(open) => { if (!open) { setPendingAction(null); setActionReason(""); setActionError(null); } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {pendingAction === "approve" ? "Approve Onboarding" : pendingAction === "reject" ? "Reject Application" : "Escalate to EDD"}
+            </DialogTitle>
+            <DialogDescription>
+              This decision is audited.{(pendingAction === "reject" || pendingAction === "escalate") ? " A reason is required." : " Reason is optional."}
+            </DialogDescription>
+          </DialogHeader>
+          <textarea
+            value={actionReason}
+            onChange={(e) => setActionReason(e.target.value)}
+            placeholder="Reason"
+            className="w-full min-h-20 rounded-md border border-slate-200 p-3 text-sm"
+          />
+          {actionError && <p className="text-xs text-red-600">{actionError}</p>}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setPendingAction(null); setActionReason(""); }}>Cancel</Button>
+            <Button
+              disabled={actionBusy || ((pendingAction === "reject" || pendingAction === "escalate") && !actionReason.trim())}
+              onClick={() => void handleConfirmAction()}
+              className="bg-neutral-900 hover:bg-neutral-800"
+            >
+              {actionBusy ? "Submitting..." : "Confirm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

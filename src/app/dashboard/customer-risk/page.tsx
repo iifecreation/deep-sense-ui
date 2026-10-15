@@ -29,9 +29,6 @@ import { useCustomers } from "@/hooks/use-customers";
 import { useState } from "react";
 
 export default function CustomerRiskRegistry() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
-
   const [searchQuery, setSearchQuery] = useState("");
   const [riskTierFilter, setRiskTierFilter] = useState<string | null>(null);
   const { data: customers, isLoading, isError, error, refetch } = useCustomers({ 
@@ -54,10 +51,16 @@ export default function CustomerRiskRegistry() {
     const query = searchQuery.toLowerCase();
     return (
       c.id?.toLowerCase().includes(query) ||
-      c.name?.toLowerCase().includes(query) ||
-      c.type?.toLowerCase().includes(query)
+      c.full_name?.toLowerCase().includes(query) ||
+      c.status?.toLowerCase().includes(query)
     );
   }) || [];
+
+  const segments = ["low", "medium", "high", "critical"].map((tier) => ({
+    label: tier,
+    value: (customers || []).filter((c: any) => (c.risk_tier || "low") === tier).length,
+    color: tier === "critical" ? "bg-red-900" : tier === "high" ? "bg-red-500" : tier === "medium" ? "bg-amber-500" : "bg-emerald-500",
+  })).filter((s) => s.value > 0);
 
   if (isLoading) {
     return (
@@ -205,8 +208,8 @@ export default function CustomerRiskRegistry() {
             <TableRow>
               <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-6">Customer / Entity</TableHead>
               <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Risk Tier</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Score</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Type</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Open Alerts</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Status</TableHead>
               <TableHead className="text-right pr-6"></TableHead>
             </TableRow>
           </TableHeader>
@@ -221,7 +224,7 @@ export default function CustomerRiskRegistry() {
               <TableRow key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer">
                 <TableCell className="pl-6">
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-slate-900">{customer.name || 'Unknown'}</span>
+                    <span className="text-xs font-bold text-slate-900">{customer.full_name || 'Unknown'}</span>
                     <div className="flex gap-2 text-[10px] font-medium text-slate-400 uppercase">
                       <span>{customer.id}</span>
                     </div>
@@ -232,8 +235,8 @@ export default function CustomerRiskRegistry() {
                     {customer.risk_tier || 'Unknown'}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-sm font-bold text-slate-900">{customer.risk_score || 0}</TableCell>
-                <TableCell className="text-[11px] font-semibold text-slate-500">{customer.type || 'Unknown'}</TableCell>
+                <TableCell className="text-sm font-bold text-slate-900">{customer.open_alerts_count ?? 0} alerts</TableCell>
+                <TableCell className="text-[11px] font-semibold text-slate-500">{customer.status || 'Unknown'}</TableCell>
                 <TableCell className="text-right pr-6">
                   <Link href={`/dashboard/customer-risk/${customer.id}`}>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 group-hover:text-blue-600">
@@ -258,14 +261,16 @@ export default function CustomerRiskRegistry() {
             <PieChart className="w-5 h-5 text-slate-200" />
           </div>
           <div className="space-y-3">
-            {(apiData || []).map((segment, i) => {
+            {segments.length === 0 ? (
+              <p className="text-xs text-slate-400 italic">No customers to segment.</p>
+            ) : segments.map((segment, i) => {
               const total = customers?.length || 1;
               const percentage = ((segment.value / total) * 100).toFixed(0);
               return (
                 <div key={i} className="flex justify-between items-center text-[11px] font-medium">
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${segment.color}`} />
-                    <span className="text-slate-500">{segment.label}</span>
+                    <span className="text-slate-500 capitalize">{segment.label}</span>
                   </div>
                   <span className="text-slate-900 font-bold">{segment.value} ({percentage}%)</span>
                 </div>

@@ -15,6 +15,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ApiError } from "@/lib/api/client";
 import {
   type CNPJourney,
@@ -54,6 +61,8 @@ export default function CNPJourneyPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [rollbackTarget, setRollbackTarget] = useState<MerchantPolicy | null>(null);
+  const [rollbackReason, setRollbackReason] = useState("");
 
   const loadJourney = async (event?: FormEvent) => {
     event?.preventDefault();
@@ -107,9 +116,9 @@ export default function CNPJourneyPage() {
     }
   };
 
-  const rollback = async (policy: MerchantPolicy) => {
-    const rollbackReason = window.prompt(`Reason for rolling back to version ${policy.version}`);
-    if (!rollbackReason || rollbackReason.trim().length < 3) return;
+  const confirmRollback = async () => {
+    if (!rollbackTarget || rollbackReason.trim().length < 3) return;
+    const policy = rollbackTarget;
     setSaving(true);
     setError(null);
     setSuccess(null);
@@ -121,6 +130,8 @@ export default function CNPJourneyPage() {
       );
       await loadPolicies();
       setSuccess(`Rollback created a new active version from v${policy.version}.`);
+      setRollbackTarget(null);
+      setRollbackReason("");
     } catch (cause) {
       setError(describeError(cause));
     } finally {
@@ -316,7 +327,7 @@ export default function CNPJourneyPage() {
                       variant="outline"
                       className="mt-3"
                       disabled={saving}
-                      onClick={() => void rollback(policy)}
+                      onClick={() => { setRollbackTarget(policy); setRollbackReason(""); }}
                     >
                       <RotateCcw className="mr-2 h-3.5 w-3.5" /> Roll back to this version
                     </Button>
@@ -331,6 +342,36 @@ export default function CNPJourneyPage() {
           </Card>
         </div>
       </div>
+
+      <Dialog open={!!rollbackTarget} onOpenChange={(open) => { if (!open) setRollbackTarget(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Roll back {rollbackTarget?.merchant_key} to version {rollbackTarget?.version}
+            </DialogTitle>
+          </DialogHeader>
+          <textarea
+            value={rollbackReason}
+            onChange={(event) => setRollbackReason(event.target.value)}
+            required
+            minLength={3}
+            placeholder="Reason for rolling back this policy version"
+            className="min-h-24 w-full rounded-md border border-slate-200 p-3 text-sm"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRollbackTarget(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => void confirmRollback()}
+              disabled={saving || rollbackReason.trim().length < 3}
+            >
+              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Confirm rollback
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -23,9 +23,6 @@ import { useDevices } from "@/hooks";
 import { useState } from "react";
 
 export default function DevicesRegistry() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
-
   const [searchQuery, setSearchQuery] = useState("");
   const { data: devicesData, isLoading, isError, refetch } = useDevices({ search: searchQuery });
 
@@ -69,6 +66,14 @@ export default function DevicesRegistry() {
   }
 
   const items = devicesData?.items || [];
+  const highRiskCount = items.filter((d: any) => (d.risk_score || 0) > 0.8).length;
+  const trustedCount = items.filter((d: any) => (d.risk_score || 0) <= 0.4).length;
+
+  const kpis = [
+    { label: "Total Devices", value: items.length, subtext: "Registered fingerprints", icon: <Smartphone className="w-5 h-5 text-blue-500" />, color: "border-slate-100" },
+    { label: "High Risk", value: highRiskCount, subtext: "Risk score > 0.8", icon: <ShieldAlert className="w-5 h-5 text-red-500" />, color: "border-red-100" },
+    { label: "Trusted", value: trustedCount, subtext: "Risk score <= 0.4", icon: <ShieldCheck className="w-5 h-5 text-emerald-500" />, color: "border-emerald-100" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -90,7 +95,7 @@ export default function DevicesRegistry() {
 
       {/* KPI Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {(apiData || []).map((kpi, i) => (
+        {kpis.map((kpi, i) => (
           <Card key={i} className={`rounded-xl shadow-sm border ${kpi.color}`}>
             <CardContent className="p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-lg bg-white border border-white/20 shadow-sm flex items-center justify-center">
@@ -130,10 +135,10 @@ export default function DevicesRegistry() {
         <Table>
           <TableHeader className="bg-slate-50/50">
             <TableRow>
-              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-6">Fingerprint / ID</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Model / Platform</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pl-6">Fingerprint / Status</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Risk Tier</TableHead>
               <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">Risk Score</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">Accounts</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">Linked Customers</TableHead>
               <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Last Seen</TableHead>
               <TableHead className="text-right pr-6"></TableHead>
             </TableRow>
@@ -142,29 +147,27 @@ export default function DevicesRegistry() {
             {items.map((device: any) => (
               <TableRow key={device.id} className="group hover:bg-slate-50 transition-colors cursor-pointer">
                 <TableCell className="pl-6 py-4">
-                  <code className="text-[10px] font-mono font-bold text-slate-900">{device.id}</code>
-                </TableCell>
-                <TableCell>
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
                       <Smartphone className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-slate-900">{device.model || 'Unknown Model'}</div>
-                      <div className="text-[10px] text-slate-400 font-medium uppercase">{device.platform || device.info?.os || 'Unknown OS'}</div>
+                      <code className="text-[10px] font-mono font-bold text-slate-900">{device.fingerprint_hash?.slice(0, 16) || device.id}</code>
+                      <div className="text-[10px] text-slate-400 font-medium uppercase">{device.status || 'active'}</div>
                     </div>
                   </div>
                 </TableCell>
+                <TableCell className="text-xs font-bold text-slate-900 capitalize">{device.risk_tier || 'Unknown'}</TableCell>
                 <TableCell className="text-center font-bold text-slate-900">
                   <Badge variant="outline" className={`rounded-full px-2 py-0 border-none ${
-                    (device.risk_score || device.riskScore || 0) > 80 ? 'bg-red-500 text-white' : (device.risk_score || device.riskScore || 0) > 40 ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white'
+                    (device.risk_score || 0) > 0.8 ? 'bg-red-500 text-white' : (device.risk_score || 0) > 0.4 ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white'
                   }`}>
-                    {device.risk_score || device.riskScore || 0}
+                    {device.risk_score != null ? device.risk_score.toFixed(2) : "N/A"}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-center text-xs font-bold text-slate-900">{device.linked_customers_count || device.accounts || 0}</TableCell>
+                <TableCell className="text-center text-xs font-bold text-slate-900">{device.linked_customer_count ?? 0}</TableCell>
                 <TableCell className="text-xs font-medium text-slate-500">
-                  {device.last_seen_at ? new Date(device.last_seen_at).toLocaleDateString() : (device.lastSeen || 'Unknown')}
+                  {device.last_seen_at ? new Date(device.last_seen_at).toLocaleDateString() : 'Unknown'}
                 </TableCell>
                 <TableCell className="text-right pr-6">
                   <Link href={`/dashboard/devices/${device.id}`}>

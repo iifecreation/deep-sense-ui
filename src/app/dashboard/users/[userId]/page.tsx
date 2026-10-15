@@ -53,9 +53,6 @@ import {
 import { useCustomer } from "@/hooks/use-customers";
 
 export default function UserDetailPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
-
   const params = useParams();
   const userId = params.userId as string;
 
@@ -101,6 +98,21 @@ export default function UserDetailPage() {
       { event: "Entity Created", time: new Date(customerData.created_at).toLocaleDateString(), detail: "System ingestion" }
     ]
   };
+
+  const kpis = [
+    { label: "Risk Score", value: customerData.risk_score != null ? customerData.risk_score.toFixed(2) : "N/A", icon: <ShieldAlert className="w-5 h-5" /> },
+    { label: "Linked Alerts", value: customerData.linked_alerts_count ?? 0, icon: <Activity className="w-5 h-5" /> },
+    { label: "Linked Cases", value: customerData.linked_cases_count ?? 0, icon: <FileText className="w-5 h-5" /> },
+    { label: "Linked Transactions", value: customerData.linked_transactions_count ?? 0, icon: <CreditCard className="w-5 h-5" /> },
+  ];
+
+  const personalInfo = [
+    { label: "Email", value: user.profile.email, icon: <Mail className="w-3.5 h-3.5" /> },
+    { label: "Phone", value: user.profile.phone, icon: <Phone className="w-3.5 h-3.5" /> },
+    { label: "Address", value: user.profile.location, icon: <MapPin className="w-3.5 h-3.5" /> },
+    { label: "Date of Birth", value: user.profile.dob, icon: <Calendar className="w-3.5 h-3.5" /> },
+    { label: "Nationality", value: customerData.nationality || "N/A", icon: <Globe className="w-3.5 h-3.5" /> },
+  ];
 
   return (
     <div className="flex flex-col gap-8 pb-20">
@@ -155,14 +167,13 @@ export default function UserDetailPage() {
 
        {/* KPI GRID */}
        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {(apiData || []).map((kpi, i) => (
+          {kpis.map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
-                 <Badge variant="outline" className="text-[8px] font-black uppercase tracking-widest italic border-none px-0">{kpi.delta}</Badge>
               </div>
               <div>
-                 <div className={`text-2xl font-black italic tracking-tighter leading-none ${kpi.color || 'text-neutral-900 dark:text-white'}`}>{kpi.value}</div>
+                 <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white">{kpi.value}</div>
                  <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1">{kpi.label}</div>
               </div>
            </div>
@@ -189,7 +200,7 @@ export default function UserDetailPage() {
                            </div>
                         </CardHeader>
                         <CardContent className="p-0 space-y-6">
-                           {(apiData || []).map((item, i) => (
+                           {personalInfo.map((item, i) => (
                              <div key={i} className="flex justify-between items-center text-[11px] font-black uppercase italic tracking-widest border-b border-border/50 pb-4 last:border-0">
                                 <span className="text-muted-foreground flex items-center gap-2">{item.icon} {item.label}</span>
                                 <span className="text-neutral-900">{item.value}</span>

@@ -1,25 +1,37 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Binary, 
-  Activity, 
-  TrendingUp, 
+import { useRouter } from "next/navigation";
+import {
+  Binary,
+  Activity,
+  TrendingUp,
   ArrowRight,
-  Cpu, 
+  Cpu,
   RotateCcw,
   Loader2,
   AlertCircle
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useModels, useModelMetrics } from "@/hooks/use-models";
-import { MLModel } from "@/services/models.service";
+import { MLModel, modelsService } from "@/services/models.service";
 
 function ModelCard({ model }: { model: MLModel }) {
   const { data: metrics, isLoading } = useModelMetrics(model.id);
+  const router = useRouter();
 
   return (
-    <div className="group p-10 bg-white rounded-[56px] border border-neutral-100 hover:shadow-2xl transition-all shadow-xl cursor-pointer relative overflow-hidden flex flex-col justify-between font-bold italic">
+    <div
+      onClick={() => router.push(`/dashboard/models/${model.id}`)}
+      className="group p-10 bg-white rounded-[56px] border border-neutral-100 hover:shadow-2xl transition-all shadow-xl cursor-pointer relative overflow-hidden flex flex-col justify-between font-bold italic">
       <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-110 transition-transform">
          <Binary className="w-32 h-32 text-neutral-900" />
       </div>
@@ -44,13 +56,13 @@ function ModelCard({ model }: { model: MLModel }) {
             <div>
                <p className="text-[8px] font-black uppercase tracking-widest text-neutral-300 mb-2 italic">Precision</p>
                <div className="text-2xl font-black text-neutral-900 italic leading-none">
-                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-300" /> : metrics ? `${(metrics.precision * 100).toFixed(1)}%` : 'N/A'}
+                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-300" /> : typeof metrics?.precision === 'number' ? `${(metrics.precision * 100).toFixed(1)}%` : 'N/A'}
                </div>
             </div>
             <div>
                <p className="text-[8px] font-black uppercase tracking-widest text-neutral-300 mb-2 italic">Latency</p>
                <div className="text-2xl font-black text-emerald-600 italic leading-none">
-                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin text-emerald-200" /> : metrics ? `${metrics.average_latency_ms}ms` : 'N/A'}
+                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin text-emerald-200" /> : typeof metrics?.average_latency_ms === 'number' ? `${metrics.average_latency_ms}ms` : 'N/A'}
                </div>
             </div>
          </div>
@@ -67,8 +79,38 @@ function ModelCard({ model }: { model: MLModel }) {
 }
 
 export default function ModelsPage() {
-  const { data: models, isLoading, isError } = useModels();
-  
+  const { data: models, isLoading, isError, refetch } = useModels();
+  const [showCreate, setShowCreate] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newModelType, setNewModelType] = useState("fraud_classifier");
+  const [newDescription, setNewDescription] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+
+  const handleCreateModel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName.trim()) return;
+    setCreating(true);
+    setCreateError(null);
+    try {
+      const slug = newName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      await modelsService.registerModel({
+        name: newName.trim(),
+        slug,
+        model_type: newModelType,
+        description: newDescription.trim() || undefined,
+      });
+      setShowCreate(false);
+      setNewName("");
+      setNewDescription("");
+      await refetch();
+    } catch (err) {
+      setCreateError(err instanceof Error ? err.message : "Failed to register model.");
+    } finally {
+      setCreating(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center pt-48 pb-24">
@@ -100,7 +142,10 @@ export default function ModelsPage() {
            <p className="text-neutral-400 text-xs font-bold uppercase tracking-widest italic font-black">Core ML Intelligence • {activeCount} Active Variants</p>
         </div>
         <div className="flex gap-4">
-           <button className="px-10 py-4 bg-brand-lime text-neutral-900 rounded-2xl font-bold text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl active:scale-95 flex items-center gap-3 italic">
+           <button
+             onClick={() => setShowCreate(true)}
+             className="px-10 py-4 bg-brand-lime text-neutral-900 rounded-2xl font-bold text-xs uppercase tracking-widest hover:scale-105 transition-all shadow-xl active:scale-95 flex items-center gap-3 italic"
+           >
               Train New Variant <Cpu className="w-4 h-4" />
            </button>
         </div>
@@ -169,6 +214,57 @@ export default function ModelsPage() {
            </div>
         </div>
       )}
+
+      <Dialog open={showCreate} onOpenChange={setShowCreate}>
+        <DialogContent className="sm:max-w-md">
+          <form onSubmit={handleCreateModel}>
+            <DialogHeader>
+              <DialogTitle>Register Model</DialogTitle>
+              <DialogDescription>Add a new model variant to the registry.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <label className="space-y-1 text-xs font-semibold text-neutral-600 block">
+                Name
+                <input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  required
+                  placeholder="e.g. Transaction Risk v2"
+                  className="w-full h-10 rounded-md border border-neutral-200 px-3 text-sm"
+                />
+              </label>
+              <label className="space-y-1 text-xs font-semibold text-neutral-600 block">
+                Model Type
+                <select
+                  value={newModelType}
+                  onChange={(e) => setNewModelType(e.target.value)}
+                  className="w-full h-10 rounded-md border border-neutral-200 px-3 text-sm"
+                >
+                  <option value="fraud_classifier">Fraud Classifier</option>
+                  <option value="anomaly_detector">Anomaly Detector</option>
+                  <option value="risk_scoring">Risk Scoring</option>
+                  <option value="other">Other</option>
+                </select>
+              </label>
+              <label className="space-y-1 text-xs font-semibold text-neutral-600 block">
+                Description (optional)
+                <textarea
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  className="w-full min-h-16 rounded-md border border-neutral-200 p-3 text-sm"
+                />
+              </label>
+              {createError && <p className="text-xs text-red-600">{createError}</p>}
+            </div>
+            <DialogFooter>
+              <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-neutral-400 hover:text-neutral-900 transition-all">Cancel</button>
+              <button type="submit" disabled={creating || !newName.trim()} className="px-6 py-2 bg-neutral-900 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-brand-lime hover:text-neutral-900 transition-all shadow-lg disabled:opacity-50">
+                {creating ? "Registering..." : "Register"}
+              </button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

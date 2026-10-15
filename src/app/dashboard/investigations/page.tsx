@@ -110,10 +110,25 @@ function DecisionRow({ item }: { item: NormalizedRiskDecision }) {
   );
 }
 
-export default function InvestigationsPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
+const WORKFLOWS = [
+  {
+    href: "/dashboard/investigations/cnp-journey",
+    title: "CNP checkout journey",
+    detail: "Checkout journey and merchant policy evidence for card-not-present fraud.",
+  },
+  {
+    href: "/dashboard/investigations/customer-risk",
+    title: "Customer risk contributions",
+    detail: "Contribution history and freshness behind a customer's risk score.",
+  },
+  {
+    href: "/dashboard/investigations/unified-risk",
+    title: "Unified risk lineage",
+    detail: "Discovery, conflicts, and lineage across unified risk signals.",
+  },
+] as const;
 
+export default function InvestigationsPage() {
   const [items, setItems] = useState<NormalizedRiskDecision[]>([]);
   const [service, setService] = useState("");
   const [subjectId, setSubjectId] = useState("");
@@ -201,7 +216,7 @@ export default function InvestigationsPage() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        {(apiData || []).map((workflow) => (
+        {WORKFLOWS.map((workflow) => (
           <Link
             key={workflow.href}
             href={workflow.href}

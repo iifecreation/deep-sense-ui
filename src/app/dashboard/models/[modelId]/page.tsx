@@ -28,6 +28,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useState } from "react";
+import { useModelDetail, useModelMetrics } from "@/hooks/use-models";
+import { modelsService } from "@/services/models.service";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,50 +52,70 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 
-export default function ModelDetailPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
+function formatDate(value?: string | null): string {
+  if (!value) return "Not recorded";
+  return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(value));
+}
 
+export default function ModelDetailPage() {
   const params = useParams();
   const modelId = params.modelId as string;
 
-  // Mock data for high-fidelity view
-  const model = {
-    id: modelId,
-    name: "DeepSense Ensemble XL",
-    version: "v4.2.0-beta",
-    status: "Active",
-    type: "Ensemble XGBoost + LSTM",
-    trainingData: {
-      records: "14.2M",
-      features: 842,
-      lastTrained: "Oct 1, 2026",
-      coverage: "99.8%"
-    },
-    performance: {
-      accuracy: "98.4%",
-      precision: "97.1%",
-      recall: "96.5%",
-      auc: "0.992"
-    },
-    features: [
-      { name: "Velocity_24h", importance: 88, correlation: "High" },
-      { name: "Device_Fingerprint_Age", importance: 74, correlation: "Medium" },
-      { name: "Geo_Inconsistency_Score", importance: 62, correlation: "High" },
-      { name: "IP_Reputation_Index", importance: 45, correlation: "Low" }
-    ],
-    drift: {
-      score: "0.04",
-      status: "Stable",
-      trend: "Neutral"
-    },
-    distribution: [
-      { bucket: "0.0-0.2", count: "85%" },
-      { bucket: "0.2-0.5", count: "10%" },
-      { bucket: "0.5-0.8", count: "3%" },
-      { bucket: "0.8-1.0", count: "2%" }
-    ]
+  const { data: model, isLoading, refetch: refetchDetail } = useModelDetail(modelId);
+  const { data: metrics } = useModelMetrics(modelId);
+  const [retraining, setRetraining] = useState(false);
+  const [retrainMessage, setRetrainMessage] = useState<string | null>(null);
+
+  const handleRetrain = async () => {
+    setRetraining(true);
+    setRetrainMessage(null);
+    try {
+      await modelsService.requestRetrain(modelId);
+      setRetrainMessage("Retraining job queued.");
+      await refetchDetail();
+    } catch (err) {
+      setRetrainMessage(err instanceof Error ? err.message : "Failed to queue retraining job.");
+    } finally {
+      setRetraining(false);
+    }
   };
+
+  const efficacyScores = metrics
+    ? [
+        { label: "Precision", value: metrics.precision, icon: <Target className="w-3.5 h-3.5" /> },
+        { label: "Recall", value: metrics.recall, icon: <Activity className="w-3.5 h-3.5" /> },
+        { label: "F1 Score", value: metrics.f1_score, icon: <Zap className="w-3.5 h-3.5" /> },
+        { label: "AUC-ROC", value: metrics.auc_roc, icon: <TrendingUp className="w-3.5 h-3.5" /> },
+      ].filter((s) => typeof s.value === "number")
+    : [];
+
+  const lineage = model
+    ? [
+        { l: "Slug", v: model.slug },
+        { l: "Model Type", v: model.model_type },
+        { l: "Active Version", v: model.active_version_label || "None" },
+        { l: "Total Versions", v: String(model.total_versions) },
+        { l: "Created", v: formatDate(model.created_at) },
+        { l: "Last Trained", v: formatDate(model.last_trained_at) },
+      ]
+    : [];
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center pt-48 pb-24">
+        <Activity className="w-10 h-10 animate-pulse text-neutral-300" />
+      </div>
+    );
+  }
+
+  if (!model) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center pt-48 pb-24 text-center">
+        <h2 className="text-2xl font-black italic tracking-tighter uppercase text-neutral-900">Model not found</h2>
+        <Link href="/dashboard/models" className="mt-4 text-sm text-brand-lime font-bold uppercase">Back to Models</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-8 pb-20">
@@ -109,53 +132,74 @@ export default function ModelDetailPage() {
                 {model.id}
               </Badge>
               <div className="flex items-center gap-2 px-3 py-1 bg-muted rounded-lg border border-border">
-                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                 <span className="text-[9px] font-black uppercase italic tracking-widest text-neutral-900">{model.version} • {model.status}</span>
+                 <div className={`w-1.5 h-1.5 rounded-full ${model.status.toLowerCase() === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-neutral-400'}`} />
+                 <span className="text-[9px] font-black uppercase italic tracking-widest text-neutral-900">{model.active_version_label || "No version"} • {model.status}</span>
               </div>
             </div>
           </div>
-          <div className="flex gap-3">
-             <Button variant="outline" className="h-10 px-4 text-[9px] font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800">
-                <RefreshCw className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
-                Retrain
-             </Button>
-             <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                   <Button className="h-10 px-6 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:scale-[1.03] transition-all font-black uppercase tracking-widest italic shadow-xl">
-                      Model Actions
-                      <ChevronRight className="w-4 h-4 ml-2" />
-                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-white rounded-2xl border-border shadow-2xl font-bold">
-                   <DropdownMenuItem className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4">
-                      Compare Versions
-                   </DropdownMenuItem>
-                   <DropdownMenuItem className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 text-rose-500">
-                      Deactivate Inference
-                   </DropdownMenuItem>
-                   <DropdownMenuItem className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4">
-                      Export Weights
-                   </DropdownMenuItem>
-                </DropdownMenuContent>
-             </DropdownMenu>
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex gap-3">
+               <Button variant="outline" disabled={retraining} onClick={() => void handleRetrain()} className="h-10 px-4 text-[9px] font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800">
+                  <RefreshCw className={`w-3.5 h-3.5 mr-2 text-muted-foreground ${retraining ? 'animate-spin' : ''}`} />
+                  {retraining ? "Queuing..." : "Retrain"}
+               </Button>
+               <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                     <Button className="h-10 px-6 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:scale-[1.03] transition-all font-black uppercase tracking-widest italic shadow-xl">
+                        Model Actions
+                        <ChevronRight className="w-4 h-4 ml-2" />
+                     </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 bg-white rounded-2xl border-border shadow-2xl font-bold">
+                     <DropdownMenuItem disabled className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 opacity-40">
+                        Compare Versions (not yet available)
+                     </DropdownMenuItem>
+                     <DropdownMenuItem disabled className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 text-rose-500 opacity-40">
+                        Deactivate Inference (not yet available)
+                     </DropdownMenuItem>
+                     <DropdownMenuItem disabled className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 opacity-40">
+                        Export Weights (not yet available)
+                     </DropdownMenuItem>
+                  </DropdownMenuContent>
+               </DropdownMenu>
+            </div>
+            {retrainMessage && <p className="text-[9px] font-bold uppercase tracking-widest text-neutral-500 italic">{retrainMessage}</p>}
           </div>
         </div>
       </section>
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-         {(apiData || []).map((kpi, i) => (
-           <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                 <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center">{kpi.icon}</div>
-                 <Badge variant="outline" className="text-[8px] font-black uppercase tracking-widest italic border-none px-0">{kpi.delta}</Badge>
-              </div>
-              <div>
-                 <div className={`text-2xl font-black italic tracking-tighter leading-none ${kpi.color || 'text-neutral-900 dark:text-white'}`}>{kpi.value}</div>
-                 <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1">{kpi.label}</div>
-              </div>
-           </div>
-         ))}
+         <div className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
+            <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center"><Binary className="w-5 h-5" /></div>
+            <div>
+               <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white">{model.model_type}</div>
+               <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1">Model Type</div>
+            </div>
+         </div>
+         <div className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
+            <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center"><History className="w-5 h-5" /></div>
+            <div>
+               <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white">{model.total_versions}</div>
+               <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1">Total Versions</div>
+            </div>
+         </div>
+         <div className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
+            <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center"><Target className="w-5 h-5" /></div>
+            <div>
+               <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white">
+                 {model.primary_metric_value != null ? `${(model.primary_metric_value * 100).toFixed(1)}%` : "N/A"}
+               </div>
+               <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1">{model.primary_metric_name || "Primary Metric"}</div>
+            </div>
+         </div>
+         <div className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
+            <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center"><Clock className="w-5 h-5" /></div>
+            <div>
+               <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white">{formatDate(model.last_trained_at)}</div>
+               <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1">Last Trained</div>
+            </div>
+         </div>
       </section>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -175,17 +219,19 @@ export default function ModelDetailPage() {
                            <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Model Efficacy Matrix</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0 space-y-8">
-                           {(apiData || []).map((score, i) => (
+                           {efficacyScores.length > 0 ? efficacyScores.map((score, i) => (
                              <div key={i} className="space-y-2">
                                 <div className="flex justify-between items-baseline mb-1">
                                    <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground flex items-center gap-2">
                                       {score.icon} {score.label}
                                    </span>
-                                   <span className="text-lg font-black italic text-neutral-900">{score.value}%</span>
+                                   <span className="text-lg font-black italic text-neutral-900">{((score.value as number) * 100).toFixed(1)}%</span>
                                 </div>
-                                <Progress value={score.value} className="h-1 bg-muted" indicatorClassName="bg-brand-lime shadow-[0_0_8px_currentColor]" />
+                                <Progress value={(score.value as number) * 100} className="h-1 bg-muted" indicatorClassName="bg-brand-lime shadow-[0_0_8px_currentColor]" />
                              </div>
-                           ))}
+                           )) : (
+                             <p className="text-sm text-neutral-400 italic">No recorded metrics yet. Train this model to populate efficacy scores.</p>
+                           )}
                         </CardContent>
                      </Card>
 
@@ -205,54 +251,21 @@ export default function ModelDetailPage() {
                      <CardHeader className="p-10 border-b border-border/50">
                         <CardTitle className="text-2xl font-black italic uppercase tracking-tighter">Neural Feature Ranking</CardTitle>
                      </CardHeader>
-                     <CardContent className="p-0">
-                        <Table>
-                           <TableHeader className="bg-muted px-10">
-                              <TableRow className="hover:bg-transparent border-none">
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 px-10 text-neutral-400">Feature Identity</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-neutral-400">Correlation</TableHead>
-                                 <TableHead className="text-[10px] font-black uppercase tracking-widest italic h-12 text-right px-10 text-neutral-400">Importance Weight</TableHead>
-                              </TableRow>
-                           </TableHeader>
-                           <TableBody>
-                              {model.features.map((feature, i) => (
-                                <TableRow key={i} className="group hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0 h-20">
-                                   <TableCell className="px-10 py-5">
-                                      <span className="text-[13px] font-black italic tracking-tighter uppercase text-neutral-900">{feature.name}</span>
-                                   </TableCell>
-                                   <TableCell className="text-[11px] font-black italic text-neutral-400 uppercase">{feature.correlation}</TableCell>
-                                   <TableCell className="px-10 text-right">
-                                      <div className="flex items-center justify-end gap-3">
-                                         <span className="text-[13px] font-black italic text-neutral-900">{feature.importance}%</span>
-                                         <div className="w-24 h-1.5 bg-muted rounded-full">
-                                            <div className="h-full bg-neutral-900 rounded-full" style={{ width: `${feature.importance}%` }} />
-                                         </div>
-                                      </div>
-                                   </TableCell>
-                                </TableRow>
-                              ))}
-                           </TableBody>
-                        </Table>
+                     <CardContent className="p-12 flex flex-col items-center text-center gap-4">
+                        <BarChart3 className="w-10 h-10 text-neutral-200" />
+                        <p className="text-neutral-400 text-sm italic max-w-sm">Feature importance is not yet computed for this model. This requires a trained version with SHAP or equivalent attribution data.</p>
                      </CardContent>
                   </Card>
                </TabsContent>
 
                <TabsContent value="distribution" className="m-0 space-y-8">
                   <div className="bg-white rounded-[40px] border border-border/50 p-24 shadow-inner flex flex-col items-center justify-center text-center gap-8 min-h-[500px]">
-                     <div className="w-24 h-24 bg-zinc-50 rounded-full flex items-center justify-center text-neutral-200 border-2 border-dashed border-neutral-100 animate-pulse">
+                     <div className="w-24 h-24 bg-zinc-50 rounded-full flex items-center justify-center text-neutral-200 border-2 border-dashed border-neutral-100">
                         <PieChart className="w-10 h-10" />
                      </div>
                      <div className="space-y-4">
                         <h3 className="text-2xl font-black italic uppercase tracking-tighter">Prediction Distribution</h3>
-                        <div className="flex gap-4 items-center">
-                           {model.distribution.map((d, i) => (
-                              <div key={i} className="px-6 py-4 bg-muted rounded-2xl border border-border">
-                                 <div className="text-[10px] font-black uppercase text-neutral-400 italic">{d.bucket}</div>
-                                 <div className="text-xl font-black italic text-neutral-900">{d.count}</div>
-                              </div>
-                           ))}
-                        </div>
-                        <p className="text-neutral-400 text-sm max-w-sm italic mt-8 mx-auto">Concentration in low-risk buckets matches standard institutional policy expectations for this model tier.</p>
+                        <p className="text-neutral-400 text-sm max-w-sm italic mx-auto">No prediction score distribution recorded yet for this model.</p>
                      </div>
                   </div>
                </TabsContent>
@@ -264,24 +277,11 @@ export default function ModelDetailPage() {
                            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-brand-lime">Drift Radar Core</h3>
                            <p className="text-white/30 text-[11px] uppercase italic tracking-widest uppercase">Monitoring statistical divergence between training and inference.</p>
                         </div>
-                        <Badge className="bg-brand-lime text-black border-none text-[8px] font-black uppercase italic">STATUS: STABLE</Badge>
+                        <Badge className="bg-white/10 text-white/50 border-none text-[8px] font-black uppercase italic">NOT YET MONITORED</Badge>
                      </div>
-                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="p-8 bg-white/5 border border-white/5 rounded-3xl">
-                           <div className="text-[10px] font-black uppercase text-white/20 italic mb-2">Kolmogorov-Smirnov</div>
-                           <div className="text-3xl font-black italic text-brand-lime">0.024</div>
-                           <div className="text-[9px] text-white/40 font-black italic mt-2 uppercase">Optimal Range</div>
-                        </div>
-                        <div className="p-8 bg-white/5 border border-white/5 rounded-3xl">
-                           <div className="text-[10px] font-black uppercase text-white/20 italic mb-2">Population Stability Index</div>
-                           <div className="text-3xl font-black italic text-brand-lime">0.081</div>
-                           <div className="text-[9px] text-white/40 font-black italic mt-2 uppercase">&lt; 0.1 Green Zone</div>
-                        </div>
-                        <div className="p-8 bg-white/5 border border-white/5 rounded-3xl text-center flex flex-col items-center justify-center">
-                           <TrendingUp className="w-8 h-8 text-white/10 mb-2" />
-                           <span className="text-[10px] font-black uppercase text-white/20 italic">Last Scan</span>
-                           <span className="text-[12px] font-black text-white italic">14 mins ago</span>
-                        </div>
+                     <div className="flex flex-col items-center text-center gap-4 py-12">
+                        <TrendingDown className="w-10 h-10 text-white/10" />
+                        <p className="text-white/40 text-sm italic max-w-sm">Drift monitoring is not yet configured for this model. No statistical divergence data has been recorded.</p>
                      </div>
                   </div>
                </TabsContent>
@@ -299,7 +299,7 @@ export default function ModelDetailPage() {
                   </div>
                </CardHeader>
                <CardContent className="p-0 space-y-6">
-                  {(apiData || []).map((it, i) => (
+                  {lineage.map((it, i) => (
                     <div key={i} className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest italic border-b border-border/50 pb-4 last:border-0">
                        <span className="text-muted-foreground">{it.l}</span>
                        <span className="text-neutral-900 text-right">{it.v}</span>
@@ -315,17 +315,17 @@ export default function ModelDetailPage() {
                   <p className="text-white/30 text-[10px] uppercase italic tracking-widest leading-relaxed">Low-level management of the ML inference lifecycle.</p>
                </div>
                <div className="space-y-3">
-                  <Button className="w-full h-14 bg-brand-lime text-black rounded-3xl text-[10px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-brand-lime/10">
+                  <Button disabled={retraining} onClick={() => void handleRetrain()} className="w-full h-14 bg-brand-lime text-black rounded-3xl text-[10px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-brand-lime/10 disabled:opacity-50">
                      <BrainCircuit className="w-4 h-4 mr-2" />
-                     Retrain Baseline
+                     {retraining ? "Queuing..." : "Retrain Baseline"}
                   </Button>
-                  <Button variant="outline" className="w-full h-14 border-white/10 text-white rounded-3xl text-[10px] font-black uppercase italic hover:bg-white/5 transition-all">
+                  <Button disabled variant="outline" className="w-full h-14 border-white/10 text-white/40 rounded-3xl text-[10px] font-black uppercase italic opacity-50">
                      <Workflow className="w-4 h-4 mr-2" />
-                     Shadow Mode Toggle
+                     Shadow Mode (not yet available)
                   </Button>
-                  <Button variant="outline" className="w-full h-14 border-rose-500/50 text-rose-500 rounded-3xl text-[10px] font-black uppercase italic hover:bg-rose-500/5 transition-all">
+                  <Button disabled variant="outline" className="w-full h-14 border-rose-500/30 text-rose-500/40 rounded-3xl text-[10px] font-black uppercase italic opacity-50">
                      <History className="w-4 h-4 mr-2" />
-                     Model Rollback
+                     Rollback (not yet available)
                   </Button>
                </div>
             </Card>

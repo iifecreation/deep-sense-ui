@@ -17,6 +17,13 @@ import {
 } from "@/components/investigations/RiskDecisionView";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ApiError } from "@/lib/api/client";
 import {
   type NormalizedRiskDecision,
@@ -43,6 +50,8 @@ export default function InvestigationDetailPage() {
   const [isExecuting, setIsExecuting] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -79,22 +88,22 @@ export default function InvestigationDetailPage() {
     }
   }, [decision]);
 
-  const cancel = useCallback(async () => {
-    if (!decision) return;
-    const reason = window.prompt("Reason for cancelling this intervention");
-    if (!reason || reason.trim().length < 3) return;
+  const confirmCancel = useCallback(async () => {
+    if (!decision || cancelReason.trim().length < 3) return;
     setIsCancelling(true);
     setError(null);
     try {
       setDecision(
-        await riskDecisionsService.cancel(decision.decision_id, reason.trim()),
+        await riskDecisionsService.cancel(decision.decision_id, cancelReason.trim()),
       );
+      setShowCancelDialog(false);
+      setCancelReason("");
     } catch (cause) {
       setError(describeError(cause));
     } finally {
       setIsCancelling(false);
     }
-  }, [decision]);
+  }, [decision, cancelReason]);
 
   if (isLoading && !decision) {
     return (
@@ -162,7 +171,7 @@ export default function InvestigationDetailPage() {
           <InterventionState
             decision={decision}
             onExecute={() => void execute()}
-            onCancel={() => void cancel()}
+            onCancel={() => { setCancelReason(""); setShowCancelDialog(true); }}
             isExecuting={isExecuting}
             isCancelling={isCancelling}
           />
@@ -191,6 +200,34 @@ export default function InvestigationDetailPage() {
           </Card>
         </aside>
       </div>
+
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel this intervention</DialogTitle>
+          </DialogHeader>
+          <textarea
+            value={cancelReason}
+            onChange={(event) => setCancelReason(event.target.value)}
+            required
+            minLength={3}
+            placeholder="Reason for cancelling this intervention"
+            className="min-h-24 w-full rounded-md border border-slate-200 p-3 text-sm"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCancelDialog(false)}>
+              Back
+            </Button>
+            <Button
+              onClick={() => void confirmCancel()}
+              disabled={isCancelling || cancelReason.trim().length < 3}
+            >
+              {isCancelling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Confirm cancellation
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

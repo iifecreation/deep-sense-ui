@@ -34,15 +34,32 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { alertsService } from "@/services/alerts.service";
 
 
 export default function AlertsCenter() {
   const [searchQuery, setSearchQuery] = useState("");
   const [severityFilter, setSeverityFilter] = useState<string | null>(null);
-  const { data: alerts, isLoading, isError, error, refetch } = useAlerts({ 
+  // The real /alerts endpoint only supports a `search` filter server-side
+  // (see app/schemas/list_filters.py), so severity filtering is applied
+  // client-side below against the fetched page.
+  const { data: alerts, isLoading, isError, error, refetch } = useAlerts({
     query: { page: 1, page_size: 50 },
-    filters: severityFilter ? { severity: severityFilter } : {}
   });
+
+  const [showSuppressionDialog, setShowSuppressionDialog] = useState(false);
+  const [suppressionName, setSuppressionName] = useState("");
+  const [suppressionSeverity, setSuppressionSeverity] = useState("low");
+  const [suppressionDuration, setSuppressionDuration] = useState(60);
+  const [creatingSuppression, setCreatingSuppression] = useState(false);
+  const [suppressionError, setSuppressionError] = useState<string | null>(null);
 
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
@@ -66,15 +83,35 @@ export default function AlertsCenter() {
   };
 
   const filteredAlerts = alerts?.filter((alert: any) => {
+    if (severityFilter && alert.severity !== severityFilter) return false;
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
       alert.id?.toLowerCase().includes(query) ||
       alert.title?.toLowerCase().includes(query) ||
-      alert.description?.toLowerCase().includes(query) ||
-      alert.customer_id?.toLowerCase().includes(query)
+      alert.body?.toLowerCase().includes(query)
     );
   }) || [];
+
+  const handleCreateSuppressionRule = async () => {
+    if (!suppressionName.trim()) return;
+    setCreatingSuppression(true);
+    setSuppressionError(null);
+    try {
+      await alertsService.createSuppressionRule({
+        name: suppressionName.trim(),
+        condition_json: { field: "severity", eq: suppressionSeverity },
+        duration_minutes: suppressionDuration,
+        enabled: true,
+      });
+      setShowSuppressionDialog(false);
+      setSuppressionName("");
+    } catch (cause) {
+      setSuppressionError(cause instanceof Error ? cause.message : "Failed to create suppression rule.");
+    } finally {
+      setCreatingSuppression(false);
+    }
+  };
 
   // Derived Analytics Data
   const criticalCount = alerts?.filter((a: any) => a.severity === 'critical').length || 0;
@@ -145,11 +182,11 @@ export default function AlertsCenter() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="rounded-full shadow-sm">
-            Batch Acknowledge
+          <Button disabled variant="outline" size="sm" className="rounded-full shadow-sm opacity-50">
+            Batch Acknowledge (not yet available)
           </Button>
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 font-semibold shadow-sm rounded-full text-white">
-            <UserCheck className="w-4 h-4 mr-2" /> Start Triage
+          <Button disabled size="sm" className="font-semibold shadow-sm rounded-full opacity-50">
+            <UserCheck className="w-4 h-4 mr-2" /> Start Triage (not yet available)
           </Button>
         </div>
       </div>
@@ -231,7 +268,7 @@ export default function AlertsCenter() {
               <TableHeader className="bg-slate-50/50 dark:bg-slate-900/20">
                 <TableRow className="border-slate-100/50 dark:border-slate-800/50">
                   <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-500 pl-6 w-[300px]">Alert Title</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Risk Score</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Channel</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Severity</TableHead>
                   <TableHead className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Time</TableHead>
                   <TableHead className="text-right pr-6">Actions</TableHead>
@@ -254,8 +291,8 @@ export default function AlertsCenter() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="font-mono text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded w-fit">
-                        0.{(Math.random() * 99).toFixed(0)} {/* Mocking risk score for UI density */}
+                      <div className="font-mono text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded w-fit uppercase">
+                        {alert.channel || "N/A"}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -268,9 +305,11 @@ export default function AlertsCenter() {
                     </TableCell>
                     <TableCell className="text-right pr-6">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button variant="outline" size="sm" className="h-8 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/20">
-                          Approve
-                        </Button>
+                        <Link href={`/dashboard/alerts/${alert.id}`}>
+                          <Button variant="outline" size="sm" className="h-8 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/20">
+                            Open
+                          </Button>
+                        </Link>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
@@ -283,8 +322,8 @@ export default function AlertsCenter() {
                             <DropdownMenuItem className="text-xs cursor-pointer">
                               <Link href={`/dashboard/alerts/${alert.id}`} className="flex w-full">View Details</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-xs cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50">Decline Event</DropdownMenuItem>
-                            <DropdownMenuItem className="text-xs cursor-pointer">Escalate to Case</DropdownMenuItem>
+                            <DropdownMenuItem disabled className="text-xs opacity-50">Decline Event (not yet available)</DropdownMenuItem>
+                            <DropdownMenuItem disabled className="text-xs opacity-50">Escalate to Case (not yet available)</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
@@ -326,16 +365,69 @@ export default function AlertsCenter() {
               <h4 className="text-sm font-bold text-slate-900 dark:text-white">Quick Actions</h4>
             </div>
             <div className="space-y-3">
-              <Button size="sm" variant="outline" className="w-full text-xs font-bold border-slate-200/60 dark:border-slate-800/60 rounded-xl justify-start shadow-sm bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800">
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full text-xs font-bold border-slate-200/60 dark:border-slate-800/60 rounded-xl justify-start shadow-sm bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800"
+                onClick={() => setShowSuppressionDialog(true)}
+              >
                 <Filter className="w-4 h-4 mr-3 text-slate-400" /> Create Suppression Rule
               </Button>
-              <Button size="sm" variant="outline" className="w-full text-xs font-bold border-slate-200/60 dark:border-slate-800/60 rounded-xl justify-start shadow-sm bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800">
-                <Download className="w-4 h-4 mr-3 text-slate-400" /> Export Alerts CSV
+              <Button disabled size="sm" variant="outline" className="w-full text-xs font-bold rounded-xl justify-start shadow-sm opacity-50">
+                <Download className="w-4 h-4 mr-3 text-slate-400" /> Export Alerts CSV (not yet available)
               </Button>
             </div>
           </Card>
         </div>
       </div>
+
+      <Dialog open={showSuppressionDialog} onOpenChange={setShowSuppressionDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Suppression Rule</DialogTitle>
+          </DialogHeader>
+          {suppressionError ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800">{suppressionError}</div>
+          ) : null}
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs font-semibold text-slate-600 mb-1 block">Rule name</label>
+              <Input value={suppressionName} onChange={(e) => setSuppressionName(e.target.value)} placeholder="Suppress low-severity duplicates" />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-slate-600 mb-1 block">Suppress alerts with severity</label>
+              <select
+                value={suppressionSeverity}
+                onChange={(e) => setSuppressionSeverity(e.target.value)}
+                className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm"
+              >
+                {["low", "medium", "high", "critical"].map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-slate-600 mb-1 block">Suppression window (minutes)</label>
+              <Input
+                type="number"
+                min={1}
+                max={10080}
+                value={suppressionDuration}
+                onChange={(e) => setSuppressionDuration(Number(e.target.value))}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSuppressionDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => void handleCreateSuppressionRule()} disabled={creatingSuppression || !suppressionName.trim()}>
+              {creatingSuppression ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Create Rule
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -73,8 +73,8 @@ export const reportsService = {
   /**
    * Review report
    */
-  async reviewReport(reportId: string, action: string, comments?: string): Promise<ReportRead> {
-    return await post<ReportRead>(`/reports/${reportId}/review`, { action, comments });
+  async reviewReport(reportId: string, action: string, comments?: string): Promise<ReportMutationResponse> {
+    return await post<ReportMutationResponse>(`/reports/${reportId}/review`, { action, comments });
   },
 
   /**

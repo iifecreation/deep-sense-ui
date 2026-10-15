@@ -66,10 +66,12 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuditEvent } from "@/hooks";
 
-export default function AuditEventDetailPage() {
-  // Fallback: No specific hook generated, using generic state
-  const apiData: any[] = [];
+function formatDate(value?: string | null): string {
+  if (!value) return "Unknown";
+  return new Date(value).toLocaleString();
+}
 
+export default function AuditEventDetailPage() {
   const params = useParams();
   const eventId = params.eventId as string;
 
@@ -122,6 +124,28 @@ export default function AuditEventDetailPage() {
     );
   }
 
+  const kpis = [
+    { icon: <Hash className="w-5 h-5 text-neutral-400" />, label: "Category", value: event.category || "N/A" },
+    { icon: <Zap className="w-5 h-5 text-neutral-400" />, label: "Action", value: event.action || "N/A" },
+    { icon: <Cpu className="w-5 h-5 text-neutral-400" />, label: "Source Module", value: event.source_module || "N/A" },
+    { icon: <User className="w-5 h-5 text-neutral-400" />, label: "Actor Role", value: event.actor_role || "N/A" },
+    { icon: <Clock className="w-5 h-5 text-neutral-400" />, label: "Logged At", value: formatDate(event.created_at) },
+    { icon: <Fingerprint className="w-5 h-5 text-neutral-400" />, label: "Request ID", value: event.request_id ? event.request_id.split('-')[0] : "N/A" },
+  ];
+
+  const userProfileItems = [
+    { l: "User ID", v: event.user_id ? event.user_id.split('-')[0] : "System" },
+    { l: "Actor Role", v: event.actor_role || "N/A" },
+    { l: "IP Address", v: event.ip_address || "N/A" },
+    { l: "User Agent", v: event.user_agent || "N/A" },
+  ];
+
+  const stateChanges = Object.keys({ ...(event.before_state || {}), ...(event.after_state || {}) }).map((field) => ({
+    field,
+    before: event.before_state?.[field],
+    after: event.after_state?.[field],
+  }));
+
   return (
     <div className="flex flex-col gap-8 pb-20 font-black italic">
       {/* HEADER SECTION */}
@@ -134,7 +158,7 @@ export default function AuditEventDetailPage() {
             <div className="flex items-center gap-4 font-black italic">
               <h1 className="text-3xl font-black italic tracking-tighter uppercase leading-none">{event.id.split('-')[0]}</h1>
               <Badge className={`h-6 px-4 text-[9px] font-black uppercase italic tracking-widest border-none ${
-                event.severity === 'CRITICAL' ? 'bg-rose-500 text-white' : event.severity === 'HIGH' ? 'bg-orange-500 text-white' : 'bg-brand-lime text-black'
+                event.severity === 'critical' ? 'bg-rose-500 text-white' : event.severity === 'warning' ? 'bg-orange-500 text-white' : 'bg-brand-lime text-black'
               }`}>
                 {event.severity} Event
               </Badge>
@@ -159,14 +183,13 @@ export default function AuditEventDetailPage() {
 
       {/* KPI GRID */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 font-black italic leading-none">
-         {(apiData || []).map((kpi, i) => (
+         {kpis.map((kpi, i) => (
            <div key={i} className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border shadow-sm flex flex-col gap-4 font-black italic leading-none h-fit">
               <div className="flex items-center justify-between font-black italic">
                  <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center font-black h-10 leading-none">{kpi.icon}</div>
-                 <Badge variant="outline" className="text-[8px] font-black uppercase tracking-widest italic border-none px-0 h-3 leading-none">{kpi.delta}</Badge>
               </div>
               <div className="font-black italic">
-                 <div className={`text-xl font-black italic tracking-tighter leading-none h-6 uppercase ${kpi.color || 'text-neutral-900 dark:text-white'}`}>{kpi.value}</div>
+                 <div className="text-xl font-black italic tracking-tighter leading-none h-6 uppercase text-neutral-900 dark:text-white truncate">{kpi.value}</div>
                  <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1 h-3 leading-none uppercase">{kpi.label}</div>
               </div>
            </div>
@@ -182,15 +205,15 @@ export default function AuditEventDetailPage() {
                </div>
                <div className="p-10 bg-zinc-50 border border-neutral-100 rounded-[40px] font-black italic">
                   <p className="text-[16px] text-neutral-800 leading-relaxed font-medium italic font-black uppercase italic italic">
-                     {event.details?.description || `Action ${event.action} performed by ${event.actor_id} on ${event.entity_type} ${event.entity_id}.`}
+                     {event.description || `Action ${event.action} performed by ${event.user_id || 'system'} on ${event.resource_type || 'resource'} ${event.resource_id || ''}.`}
                   </p>
                </div>
 
-               {event.details?.changes && event.details.changes.length > 0 && (
+               {stateChanges.length > 0 && (
                  <div className="space-y-6 font-black italic">
                     <h4 className="text-[11px] font-black uppercase italic tracking-widest text-muted-foreground px-4 italic h-4 leading-none">System State Delta (Before/After)</h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-black italic">
-                       {event.details.changes.map((change: any, i: number) => (
+                       {stateChanges.map((change, i: number) => (
                           <div key={i} className="p-8 bg-white border border-border rounded-[32px] shadow-sm space-y-4 font-black italic h-32 overflow-hidden leading-none uppercase">
                              <div className="text-[9px] font-black uppercase text-muted-foreground italic h-4 leading-none uppercase">{change.field || 'Field'} Evolution</div>
                              <div className="flex flex-col gap-1 font-black italic h-12 leading-none uppercase">
@@ -216,8 +239,8 @@ export default function AuditEventDetailPage() {
                            <Box className="w-8 h-8 text-neutral-400 font-black h-8 leading-none italic font-bold" />
                         </div>
                         <div className="font-black italic leading-none h-12 overflow-hidden">
-                           <h5 className="text-[14px] font-black italic uppercase italic h-4 leading-none uppercase">{event.entity_id}</h5>
-                           <p className="text-[10px] font-black text-muted-foreground tracking-widest uppercase italic mt-1 h-4 leading-none uppercase">{event.entity_type} Node</p>
+                           <h5 className="text-[14px] font-black italic uppercase italic h-4 leading-none uppercase truncate">{event.resource_id || event.entity_label || 'N/A'}</h5>
+                           <p className="text-[10px] font-black text-muted-foreground tracking-widest uppercase italic mt-1 h-4 leading-none uppercase">{event.resource_type || 'Unknown'} Node</p>
                         </div>
                      </div>
                   </CardContent>
@@ -250,11 +273,11 @@ export default function AuditEventDetailPage() {
                      <Fingerprint className="w-12 h-12 text-neutral-300 font-black h-12 leading-none italic font-bold" />
                   </div>
                   <div className="space-y-1 font-black italic leading-none h-12 overflow-hidden">
-                     <h4 className="text-xl font-black italic uppercase tracking-tighter h-6 leading-none uppercase truncate">{event.actor_id}</h4>
+                     <h4 className="text-xl font-black italic uppercase tracking-tighter h-6 leading-none uppercase truncate">{event.user_id ? event.user_id.split('-')[0] : 'System'}</h4>
                   </div>
                </div>
                <div className="pt-6 border-t border-border space-y-4 font-black italic">
-                  {(apiData || []).map((it, i) => (
+                  {userProfileItems.map((it, i) => (
                     <div key={i} className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic font-black h-4 leading-none truncate">
                        <span className="text-muted-foreground mr-2">{it.l}</span>
                        <span className="text-neutral-900 font-black italic uppercase truncate">{it.v}</span>

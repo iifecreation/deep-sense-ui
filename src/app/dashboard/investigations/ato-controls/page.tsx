@@ -14,6 +14,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ApiError } from "@/lib/api/client";
 import {
   type ATOSession,
@@ -50,6 +58,10 @@ export default function ATOControlsPage() {
   const [actionKey, setActionKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [pendingRevoke, setPendingRevoke] = useState<
+    { kind: "device"; deviceId: string } | { kind: "session"; sessionId: string } | null
+  >(null);
+  const [revokeReason, setRevokeReason] = useState("");
 
   const load = async () => {
     if (!accountId.trim()) return;
@@ -92,9 +104,7 @@ export default function ATOControlsPage() {
     }
   };
 
-  const revokeDevice = async (deviceId: string) => {
-    const actionReason = window.prompt("Reason for revoking device trust");
-    if (!actionReason || actionReason.trim().length < 3) return;
+  const revokeDevice = async (deviceId: string, actionReason: string) => {
     setActionKey(`device-${deviceId}`);
     setError(null);
     setSuccess(null);
@@ -109,9 +119,7 @@ export default function ATOControlsPage() {
     }
   };
 
-  const revokeSession = async (sessionId: string) => {
-    const actionReason = window.prompt("Reason for revoking this active session");
-    if (!actionReason || actionReason.trim().length < 3) return;
+  const revokeSession = async (sessionId: string, actionReason: string) => {
     setActionKey(`session-${sessionId}`);
     setError(null);
     setSuccess(null);
@@ -137,6 +145,17 @@ export default function ATOControlsPage() {
     } finally {
       setActionKey(null);
     }
+  };
+
+  const confirmPendingRevoke = async () => {
+    if (!pendingRevoke || revokeReason.trim().length < 3) return;
+    if (pendingRevoke.kind === "device") {
+      await revokeDevice(pendingRevoke.deviceId, revokeReason);
+    } else {
+      await revokeSession(pendingRevoke.sessionId, revokeReason);
+    }
+    setPendingRevoke(null);
+    setRevokeReason("");
   };
 
   return (
@@ -271,7 +290,7 @@ export default function ATOControlsPage() {
                         variant="outline"
                         size="sm"
                         className="mt-3"
-                        onClick={() => void revokeDevice(device.id)}
+                        onClick={() => setPendingRevoke({ kind: "device", deviceId: device.id })}
                         disabled={actionKey === `device-${device.id}`}
                       >
                         Revoke trust
@@ -321,7 +340,7 @@ export default function ATOControlsPage() {
                       variant="destructive"
                       size="sm"
                       className="mt-4"
-                      onClick={() => void revokeSession(session.session_id)}
+                      onClick={() => setPendingRevoke({ kind: "session", sessionId: session.session_id })}
                       disabled={actionKey === `session-${session.session_id}`}
                     >
                       {actionKey === `session-${session.session_id}` ? (
@@ -344,6 +363,54 @@ export default function ATOControlsPage() {
           </Card>
         </div>
       ) : null}
+
+      <Dialog
+        open={pendingRevoke !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingRevoke(null);
+            setRevokeReason("");
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {pendingRevoke?.kind === "session" ? "Revoke session" : "Revoke device trust"}
+            </DialogTitle>
+            <DialogDescription>
+              This action is audited. Provide a reason (at least 3 characters) to confirm.
+            </DialogDescription>
+          </DialogHeader>
+          <textarea
+            value={revokeReason}
+            onChange={(event) => setRevokeReason(event.target.value)}
+            minLength={3}
+            autoFocus
+            placeholder="Reason for this revocation"
+            className="min-h-20 w-full rounded-md border border-slate-200 p-3 text-sm"
+          />
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setPendingRevoke(null);
+                setRevokeReason("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={revokeReason.trim().length < 3 || actionKey !== null}
+              onClick={() => void confirmPendingRevoke()}
+            >
+              {actionKey !== null ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Confirm revocation
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
