@@ -93,8 +93,8 @@ export default function ScreeningMatchDetailPage() {
 
   const sourceInfo = [
     { label: "Match Type", value: match.match_type },
-    { label: "Matched Via", value: match.matched_via || "Unknown" },
-    { label: "Assigned To", value: match.assigned_user_name || "Unassigned" },
+    { label: "Linked Case", value: match.linked_case_id || "None" },
+    { label: "Assigned To", value: match.assigned_user_id || "Unassigned" },
     { label: "Last Updated", value: formatDate(match.updated_at) },
   ];
 
@@ -108,7 +108,7 @@ export default function ScreeningMatchDetailPage() {
                <ArrowLeft className="w-3 h-3" /> Global Screening Hub
             </Link>
             <div className="flex items-center gap-4">
-              <h1 className="text-3xl font-black italic tracking-tighter uppercase leading-none">{match.matched_name}</h1>
+              <h1 className="text-3xl font-black italic tracking-tighter uppercase leading-none">{linkedCustomer.label || "Unknown Entity"}</h1>
               <Badge className={`h-6 px-4 text-[9px] font-black uppercase italic tracking-widest border-none ${
                 riskLevel === 'critical' ? 'bg-rose-500 text-white shadow-xl shadow-rose-500/20' : riskLevel === 'high' ? 'bg-orange-500 text-white' : 'bg-slate-400 text-white'
               }`}>
@@ -121,15 +121,15 @@ export default function ScreeningMatchDetailPage() {
             </div>
           </div>
           <div className="flex gap-3">
-             <Button disabled={actionBusy || match.status !== 'pending'} onClick={() => setPendingAction("escalate")} variant="outline" className="h-10 px-4 text-[9px] font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800">
+             <Button disabled={actionBusy || match.status !== 'pending_review'} onClick={() => setPendingAction("escalate")} variant="outline" className="h-10 px-4 text-[9px] font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800">
                 <AlertTriangle className="w-3.5 h-3.5 mr-2" />
                 Escalate Match
              </Button>
              <div className="flex gap-2">
-                <Button disabled={actionBusy || match.status !== 'pending'} onClick={() => setPendingAction("confirm")} className="h-10 px-10 bg-rose-600 text-white hover:bg-rose-700 transition-all font-black uppercase tracking-widest italic shadow-xl disabled:opacity-50">
+                <Button disabled={actionBusy || match.status !== 'pending_review'} onClick={() => setPendingAction("confirm")} className="h-10 px-10 bg-rose-600 text-white hover:bg-rose-700 transition-all font-black uppercase tracking-widest italic shadow-xl disabled:opacity-50">
                    Confirm Match
                 </Button>
-                <Button disabled={actionBusy || match.status !== 'pending'} onClick={() => setPendingAction("dismiss")} variant="outline" className="h-10 px-10 border-neutral-200 dark:border-neutral-800 text-neutral-400 hover:text-neutral-900 transition-all font-black uppercase tracking-widest italic disabled:opacity-50">
+                <Button disabled={actionBusy || match.status !== 'pending_review'} onClick={() => setPendingAction("dismiss")} variant="outline" className="h-10 px-10 border-neutral-200 dark:border-neutral-800 text-neutral-400 hover:text-neutral-900 transition-all font-black uppercase tracking-widest italic disabled:opacity-50">
                    Dismiss FP
                 </Button>
              </div>
@@ -214,8 +214,8 @@ export default function ScreeningMatchDetailPage() {
                               <UserPlus className="w-8 h-8 text-neutral-300" />
                            </div>
                            <div className="text-center font-black italic">
-                              <h4 className="text-xl font-black italic tracking-tighter text-neutral-900">{match.customer_name || "Unlinked"}</h4>
-                              <p className="text-[10px] font-black uppercase text-muted-foreground italic mt-1">{match.customer_id || "No customer linked"}</p>
+                              <h4 className="text-xl font-black italic tracking-tighter text-neutral-900">{linkedCustomer.label || "Unlinked"}</h4>
+                              <p className="text-[10px] font-black uppercase text-muted-foreground italic mt-1">{linkedCustomer.external_id || match.customer_id || "No customer linked"}</p>
                            </div>
                            {match.customer_id && (
                              <Link href={`/dashboard/users/${match.customer_id}`} className="w-full">
@@ -261,10 +261,10 @@ export default function ScreeningMatchDetailPage() {
                      <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic opacity-40">Source List</span>
                      <div className="text-[13px] font-black italic tracking-widest text-neutral-900">{match.source_list}</div>
                   </div>
-                  {match.assigned_user_name && (
+                  {match.assigned_user_id && (
                     <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic border-b border-neutral-50 pb-4 last:border-0">
                        <span className="text-muted-foreground">Assigned To</span>
-                       <span className="text-neutral-900">{match.assigned_user_name}</span>
+                       <span className="text-neutral-900">{match.assigned_user_id}</span>
                     </div>
                   )}
                </div>
@@ -277,15 +277,15 @@ export default function ScreeningMatchDetailPage() {
                   <p className="text-white/30 text-[10px] uppercase italic tracking-widest leading-relaxed">Decision will be audited.</p>
                </div>
                <div className="space-y-3 font-black italic">
-                  <Button disabled={actionBusy || match.status !== 'pending'} onClick={() => setPendingAction("confirm")} className="w-full h-14 bg-rose-600 text-white rounded-3xl text-[11px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-rose-600/20 disabled:opacity-50">
+                  <Button disabled={actionBusy || match.status !== 'pending_review'} onClick={() => setPendingAction("confirm")} className="w-full h-14 bg-rose-600 text-white rounded-3xl text-[11px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-rose-600/20 disabled:opacity-50">
                      <XCircle className="w-4 h-4 mr-2" />
                      Confirm & Restrict
                   </Button>
-                  <Button disabled={actionBusy || match.status !== 'pending'} onClick={() => setPendingAction("dismiss")} variant="outline" className="w-full h-14 border-white/10 bg-white/5 text-white text-[11px] font-black uppercase italic hover:bg-white/10 transition-all font-bold disabled:opacity-50">
+                  <Button disabled={actionBusy || match.status !== 'pending_review'} onClick={() => setPendingAction("dismiss")} variant="outline" className="w-full h-14 border-white/10 bg-white/5 text-white text-[11px] font-black uppercase italic hover:bg-white/10 transition-all font-bold disabled:opacity-50">
                      <CheckCircle2 className="w-4 h-4 mr-2" />
                      Dismiss False Positive
                   </Button>
-                  <Button disabled={actionBusy || match.status !== 'pending'} onClick={() => setPendingAction("escalate")} variant="outline" className="w-full h-14 border-indigo-500/50 text-indigo-400 rounded-3xl text-[10px] font-black uppercase italic hover:bg-indigo-500/5 transition-all font-bold disabled:opacity-50">
+                  <Button disabled={actionBusy || match.status !== 'pending_review'} onClick={() => setPendingAction("escalate")} variant="outline" className="w-full h-14 border-indigo-500/50 text-indigo-400 rounded-3xl text-[10px] font-black uppercase italic hover:bg-indigo-500/5 transition-all font-bold disabled:opacity-50">
                      <History className="w-4 h-4 mr-2" />
                      Request Senior Review
                   </Button>
