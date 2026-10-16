@@ -6,7 +6,7 @@ export { useTransactions, useTransaction } from './use-transactions';
 export { useCustomers, useCustomer, useCustomerRisk } from './use-customers';
 export { useScreeningMatches, useScreeningMatch, useWatchlists, useScreeningJobs } from './use-screening';
 export { useFraudRules, useFraudRule, useFraudRuleMetrics } from './use-fraud-rules';
-export { useDecisionPolicies, useDecisionPolicy } from './use-decision-policies';
+export { useDecisionPolicies, useDecisionPolicyVersions } from './use-decision-policies';
 export { useInterventions } from './use-interventions';
 export { useIntegrations, useIntegration } from './use-integrations';
 export { useWebhooks, useWebhook, useWebhookDeliveries } from './use-webhooks';
