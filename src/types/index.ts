@@ -110,19 +110,29 @@ export interface AvailableCountry {
 // Customer types
 export interface CustomerListItem {
   id: string;
-  customer_id: string;
-  full_name: string;
+  organization_id: string;
+  external_id: string;
+  label?: string;
+  first_name?: string;
+  last_name?: string;
   email?: string;
+  customer_type?: string;
   status: string;
+  risk_score?: number;
   risk_tier?: string;
+  pep_status?: string;
+  sanctions_status?: string;
   kyc_status?: string;
   screening_status?: string;
-  open_cases_count: number;
+  edd_status?: string;
   open_alerts_count: number;
+  open_cases_count: number;
+  linked_devices_count: number;
+  linked_transactions_count: number;
   owner_user_id?: string;
-  owner_full_name?: string;
-  created_at: string;
   last_activity_at?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CustomerDetail {
