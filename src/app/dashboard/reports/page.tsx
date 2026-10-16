@@ -82,8 +82,11 @@ function formatDeadline(dueAt?: string): string {
   return `${diffDays}d left`;
 }
 
+const REGISTRY_TABS = ["all", "draft", "in_review", "ready_for_submission", "submitted", "rejected"] as const;
+
 export default function RegulatoryReportsPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [registryTab, setRegistryTab] = useState<(typeof REGISTRY_TABS)[number]>("all");
   const { data: reports, isLoading, isError, error, refetch } = useReports({
     query: { page: 1, page_size: 50 }
   });
@@ -130,12 +133,13 @@ export default function RegulatoryReportsPage() {
   };
 
   const filteredReports = reports?.filter((r: any) => {
+    if (registryTab !== "all" && r.status?.toLowerCase() !== registryTab) return false;
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
       r.id?.toLowerCase().includes(query) ||
       r.report_type?.toLowerCase().includes(query) ||
-      r.case_id?.toLowerCase().includes(query)
+      r.linked_case_id?.toLowerCase().includes(query)
     );
   }) || [];
 
@@ -148,7 +152,7 @@ export default function RegulatoryReportsPage() {
     return [
       { label: "Total Reports", value: String(total), icon: <FileText className="w-4 h-4" /> },
       { label: "Draft", value: String(byStatus("draft")), icon: <FileX className="w-4 h-4 text-slate-400" /> },
-      { label: "Under Review", value: String(byStatus("under_review")), icon: <Clock className="w-4 h-4 text-amber-500" /> },
+      { label: "In Review", value: String(byStatus("in_review")), icon: <Clock className="w-4 h-4 text-amber-500" /> },
       { label: "Submitted", value: String(byStatus("submitted")), icon: <Send className="w-4 h-4 text-indigo-500" /> },
       { label: "Rejected", value: String(byStatus("rejected")), icon: <XCircle className="w-4 h-4 text-rose-500" /> },
       { label: "Overdue", value: String(overdue), icon: <AlertTriangle className="w-4 h-4 text-rose-500" /> },
@@ -244,15 +248,15 @@ export default function RegulatoryReportsPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" className="h-10 px-4 text-xs font-bold uppercase tracking-widest italic group border-neutral-200 dark:border-neutral-800">
+            <Button disabled variant="outline" className="h-10 px-4 text-xs font-bold uppercase tracking-widest italic group border-neutral-200 dark:border-neutral-800 opacity-50">
                <Download className="w-3.5 h-3.5 mr-2" />
-               Export Reports
+               Export Reports (not yet available)
             </Button>
             <Button onClick={() => setShowCreate(true)} className="h-10 px-6 bg-brand-lime text-neutral-900 hover:scale-105 transition-all font-bold text-xs uppercase tracking-widest italic shadow-xl shadow-brand-lime/20">
                <Plus className="w-3.5 h-3.5 mr-2" />
                Create Report
             </Button>
-            <Button size="icon" variant="ghost" className="h-10 w-10">
+            <Button size="icon" variant="ghost" className="h-10 w-10" onClick={() => refetch()}>
                <RefreshCcw className="w-3.5 h-3.5" />
             </Button>
           </div>
@@ -262,8 +266,10 @@ export default function RegulatoryReportsPage() {
         <div className="mt-6 flex flex-wrap gap-2 items-center bg-muted/30 p-2 rounded-2xl border border-border/50">
           <div className="flex items-center gap-2 px-3 py-1.5 bg-background rounded-xl border border-border shadow-sm">
             <Search className="w-3.5 h-3.5 text-muted-foreground" />
-            <Input 
-              placeholder="Search by ID, type, case..." 
+            <Input
+              placeholder="Search by ID, type, case..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="h-8 w-48 text-[10px] font-bold uppercase tracking-widest border-none shadow-none focus-visible:ring-0"
             />
           </div>
@@ -357,8 +363,8 @@ export default function RegulatoryReportsPage() {
                     </TableCell>
                     <TableCell className="text-center">
                        <Badge className={`text-[9px] font-black italic tracking-widest uppercase ${
-                         row.status === 'ready' ? 'bg-brand-lime text-black' :
-                         row.status === 'under_review' ? 'bg-indigo-500 text-white' :
+                         row.status === 'ready_for_submission' ? 'bg-brand-lime text-black' :
+                         row.status === 'in_review' ? 'bg-indigo-500 text-white' :
                          'bg-neutral-100 text-neutral-400'
                        }`}>
                          {row.status}
@@ -392,20 +398,20 @@ export default function RegulatoryReportsPage() {
                 <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-1 italic italic text-muted-foreground">Historical and active disclosure archive</CardDescription>
               </div>
               <div className="flex gap-2">
-                 <Button variant="outline" className="h-8 text-[9px] font-black uppercase italic border-neutral-200 dark:border-neutral-800">Assign Bulk</Button>
-                 <Button className="h-8 text-[9px] font-black uppercase italic bg-indigo-600 text-white">Submit Selection</Button>
+                 <Button disabled variant="outline" className="h-8 text-[9px] font-black uppercase italic border-neutral-200 dark:border-neutral-800 opacity-50">Assign Bulk (not yet available)</Button>
+                 <Button disabled className="h-8 text-[9px] font-black uppercase italic bg-indigo-600 text-white opacity-50">Submit Selection (not yet available)</Button>
               </div>
             </div>
           </CardHeader>
-          <Tabs defaultValue="all" className="w-full">
+          <Tabs value={registryTab} onValueChange={(v) => setRegistryTab(v as typeof registryTab)} className="w-full">
             <TabsList className="bg-muted/30 rounded-none border-b border-border/50 w-full justify-start px-8 h-12">
-              {["All", "Draft", "Review", "Ready", "Submitted", "Rejected"].map(tab => (
-                <TabsTrigger 
-                  key={tab} 
-                  value={tab.toLowerCase()}
+              {REGISTRY_TABS.map(tab => (
+                <TabsTrigger
+                  key={tab}
+                  value={tab}
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-brand-lime data-[state=active]:bg-transparent text-muted-foreground data-[state=active]:text-neutral-900 dark:data-[state=active]:text-white text-[10px] font-black uppercase italic tracking-widest px-8"
                 >
-                  {tab}
+                  {tab.replace(/_/g, " ")}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -430,8 +436,8 @@ export default function RegulatoryReportsPage() {
                     <TableRow key={row.id} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-4 font-black italic text-[11px] text-muted-foreground">{row.id}</TableCell>
                       <TableCell className="text-[10px] font-black italic">{row.report_type || 'Unknown'}</TableCell>
-                      <TableCell className="text-[11px] font-black italic">{row.target_entity_name || row.case_id || 'Unknown'}</TableCell>
-                      <TableCell className="text-[10px] font-medium text-muted-foreground italic">{row.assignee_id || 'System'}</TableCell>
+                      <TableCell className="text-[11px] font-black italic">{row.title || (row.linked_case_id ? row.linked_case_id.slice(0, 8) : 'Unknown')}</TableCell>
+                      <TableCell className="text-[10px] font-medium text-muted-foreground italic">{row.assigned_to_user_id ? row.assigned_to_user_id.slice(0, 8) : 'Unassigned'}</TableCell>
                       <TableCell className="text-center font-black italic text-[11px]">
                          <Badge variant="outline" className={`text-[8px] font-black uppercase italic tracking-widest ${
                            row.status === 'submitted' ? 'border-indigo-500 text-indigo-500' : 
@@ -578,7 +584,7 @@ export default function RegulatoryReportsPage() {
                         <TableCell className="text-[10px] font-bold italic text-muted-foreground">{sub.destination}</TableCell>
                         <TableCell className="text-center">
                            <Badge variant="outline" className={`text-[8px] font-black italic tracking-widest uppercase border-none px-0 ${
-                             sub.status === 'accepted' ? 'text-emerald-500' : sub.status === 'rejected' ? 'text-rose-500' : 'text-indigo-500'
+                             sub.status === 'acknowledged' ? 'text-emerald-500' : sub.status === 'failed' ? 'text-rose-500' : 'text-indigo-500'
                            }`}>
                              {sub.status}
                            </Badge>
