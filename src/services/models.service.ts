@@ -29,7 +29,7 @@ export interface ModelMetrics {
   average_latency_ms?: number;
   precision?: number;
   recall?: number;
-  f1_score?: number;
+  f1?: number;
   auc_roc?: number;
   last_trained_at?: string;
   active_version?: string;
@@ -56,6 +56,10 @@ export const modelsService = {
 
   async requestRetrain(modelId: string): Promise<any> {
     return await post<any>(`/models/${modelId}/retrain`, {});
+  },
+
+  async deactivateModel(modelId: string, reason?: string): Promise<any> {
+    return await post<any>(`/models/${modelId}/deactivate`, { reason });
   },
 
   async registerModel(data: { name: string; slug: string; model_type: string; description?: string }): Promise<MLModel> {
