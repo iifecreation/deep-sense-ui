@@ -24,6 +24,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ApiError } from "@/lib/api/client";
 import { casesService } from "@/services/cases.service";
 import { reportsService } from "@/services/reports.service";
@@ -106,6 +113,10 @@ export default function CaseWorkspace() {
   const [isResolving, setIsResolving] = useState(false);
   const [isFilingSar, setIsFilingSar] = useState(false);
 
+  const [showReassign, setShowReassign] = useState(false);
+  const [reassignUserId, setReassignUserId] = useState("");
+  const [isReassigning, setIsReassigning] = useState(false);
+
   const load = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -150,6 +161,22 @@ export default function CaseWorkspace() {
       setIsResolving(false);
     }
   }, [caseId, load]);
+
+  const reassign = useCallback(async () => {
+    if (!reassignUserId.trim()) return;
+    setIsReassigning(true);
+    setError(null);
+    try {
+      await casesService.assignCase(caseId, { assignee_user_id: reassignUserId.trim() });
+      setShowReassign(false);
+      setReassignUserId("");
+      await load();
+    } catch (cause) {
+      setError(describeError(cause));
+    } finally {
+      setIsReassigning(false);
+    }
+  }, [caseId, reassignUserId, load]);
 
   const fileSar = useCallback(async () => {
     setIsFilingSar(true);
@@ -243,8 +270,8 @@ export default function CaseWorkspace() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="font-semibold rounded-full shadow-sm">
-            <Share2 className="w-4 h-4 mr-2" /> Share Case
+          <Button disabled variant="outline" size="sm" className="font-semibold rounded-full shadow-sm opacity-50">
+            <Share2 className="w-4 h-4 mr-2" /> Share Case (not yet available)
           </Button>
         </div>
       </div>
@@ -290,8 +317,8 @@ export default function CaseWorkspace() {
                     disabled={isSavingNote}
                   />
                   <div className="flex justify-between items-center">
-                    <Button variant="outline" size="sm" className="h-8 text-xs font-semibold rounded-full border-dashed">
-                      <Paperclip className="w-3.5 h-3.5 mr-2" /> Attach File
+                    <Button disabled variant="outline" size="sm" className="h-8 text-xs font-semibold rounded-full border-dashed opacity-50">
+                      <Paperclip className="w-3.5 h-3.5 mr-2" /> Attach File (not yet available)
                     </Button>
                     <Button
                       size="sm"
@@ -313,8 +340,8 @@ export default function CaseWorkspace() {
                   <CardTitle className="text-sm font-bold flex items-center gap-2">
                     <Lock className="w-4 h-4 text-indigo-500" /> Evidence Locker
                   </CardTitle>
-                  <Button variant="outline" size="sm" className="h-8 text-xs font-semibold rounded-full bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100">
-                    <Plus className="w-3.5 h-3.5 mr-1" /> Upload Evidence
+                  <Button disabled variant="outline" size="sm" className="h-8 text-xs font-semibold rounded-full bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100 opacity-50">
+                    <Plus className="w-3.5 h-3.5 mr-1" /> Upload Evidence (not yet available)
                   </Button>
                 </CardHeader>
                 <CardContent className="p-6">
@@ -380,7 +407,7 @@ export default function CaseWorkspace() {
                     </div>
                     <span className="text-sm font-bold text-slate-900 dark:text-white">{shortId(fraudCase.assignee_user_id)}</span>
                   </div>
-                  <Button variant="ghost" size="sm" className="h-6 text-[10px] font-bold text-indigo-600">Reassign</Button>
+                  <Button variant="ghost" size="sm" className="h-6 text-[10px] font-bold text-indigo-600" onClick={() => { setReassignUserId(""); setShowReassign(true); }}>Reassign</Button>
                 </div>
               </div>
 
@@ -404,8 +431,8 @@ export default function CaseWorkspace() {
                   File Suspicious Activity Report (SAR)
                 </Button>
 
-                <Button variant="outline" className="w-full text-xs font-bold border-slate-200/60 dark:border-slate-800/60 rounded-xl h-10 shadow-sm bg-white dark:bg-slate-900 text-slate-600">
-                  <Lock className="w-4 h-4 mr-2" /> Block Entity Globally
+                <Button disabled variant="outline" className="w-full text-xs font-bold border-slate-200/60 dark:border-slate-800/60 rounded-xl h-10 shadow-sm bg-white dark:bg-slate-900 text-slate-600 opacity-50">
+                  <Lock className="w-4 h-4 mr-2" /> Block Entity Globally (not yet available)
                 </Button>
               </div>
 
@@ -414,6 +441,29 @@ export default function CaseWorkspace() {
         </div>
 
       </div>
+
+      <Dialog open={showReassign} onOpenChange={setShowReassign}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Re-assign case</DialogTitle>
+          </DialogHeader>
+          <input
+            value={reassignUserId}
+            onChange={(e) => setReassignUserId(e.target.value)}
+            placeholder="Assignee user ID"
+            className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowReassign(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => void reassign()} disabled={!reassignUserId.trim() || isReassigning}>
+              {isReassigning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Re-assign
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
