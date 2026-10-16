@@ -77,7 +77,9 @@ export default function ComplianceWorkspacePage() {
   const allCustomers = customers || [];
   const allReports = reports || [];
 
-  const openAlerts = allAlerts.filter((a) => a.status === "open");
+  // Alert has no status/lifecycle field (see app/schemas/alert.py) - every
+  // fetched alert is effectively "open" for this workspace's purposes.
+  const openAlerts = allAlerts;
   const criticalAlerts = openAlerts.filter((a) => a.severity === "critical" || a.severity === "high");
   const openCases = allCases.filter((c) => c.status !== "closed" && c.status !== "resolved");
   const unresolvedMatches = allMatches.filter((m) => m.status === "pending" || m.status === "open" || m.status === "unresolved");
@@ -236,14 +238,16 @@ export default function ComplianceWorkspacePage() {
                   <TableRow key={row.id} className="group hover:bg-muted/30 transition-colors border-b border-border/50">
                     <TableCell className="px-8 py-5">
                       <Badge variant="outline" className="text-[9px] font-bold uppercase italic tracking-widest px-2 py-0.5 rounded-md">
-                        {row.alert_type}
+                        {row.channel}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-xs font-black italic text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                       {row.id.slice(0, 8)}
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs font-black italic tracking-tight">{row.customer_name || "Unknown"}</span>
+                      <span className="text-xs font-black italic tracking-tight">
+                        {row.transaction_id ? row.transaction_id.slice(0, 8) : row.fraud_case_id ? row.fraud_case_id.slice(0, 8) : "—"}
+                      </span>
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate text-[10px] font-bold text-muted-foreground italic">
                       {row.title}
@@ -288,7 +292,7 @@ export default function ComplianceWorkspacePage() {
                   <TableRow className="hover:bg-transparent border-b border-border/50">
                     <TableHead className="text-[9px] font-black uppercase tracking-widest italic h-10 px-8">Alert ID</TableHead>
                     <TableHead className="text-[9px] font-black uppercase tracking-widest italic h-10">Entity</TableHead>
-                    <TableHead className="text-[9px] font-black uppercase tracking-widest italic h-10">Risk Score</TableHead>
+                    <TableHead className="text-[9px] font-black uppercase tracking-widest italic h-10">Severity</TableHead>
                     <TableHead className="text-[9px] font-black uppercase tracking-widest italic h-10 text-right px-8">Action</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -299,11 +303,13 @@ export default function ComplianceWorkspacePage() {
                     <TableRow key={alert.id} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-4 text-xs font-black italic text-neutral-400">{alert.id.slice(0, 8)}</TableCell>
                       <TableCell>
-                        <div className="text-[11px] font-black italic tracking-tight">{alert.customer_name || "Unknown"}</div>
-                        <div className="text-[8px] font-bold text-muted-foreground uppercase">{alert.alert_type}</div>
+                        <div className="text-[11px] font-black italic tracking-tight">
+                          {alert.transaction_id ? alert.transaction_id.slice(0, 8) : alert.fraud_case_id ? alert.fraud_case_id.slice(0, 8) : "—"}
+                        </div>
+                        <div className="text-[8px] font-bold text-muted-foreground uppercase">{alert.channel}</div>
                       </TableCell>
                       <TableCell>
-                        <span className="text-[10px] font-black italic tracking-tighter">{alert.risk_score != null ? alert.risk_score.toFixed(2) : "N/A"}</span>
+                        <span className="text-[10px] font-black italic tracking-tighter uppercase">{alert.severity}</span>
                       </TableCell>
                       <TableCell className="px-8 text-right">
                         <Link href={`/dashboard/alerts/${alert.id}`}>
@@ -344,7 +350,7 @@ export default function ComplianceWorkspacePage() {
                   ) : allMatches.slice(0, 8).map((match) => (
                     <TableRow key={match.id} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-4">
-                        <div className="text-[11px] font-black italic tracking-tight">{match.matched_name}</div>
+                        <div className="text-[11px] font-black italic tracking-tight">{match.customer_id ? match.customer_id.slice(0, 8) : "Unknown"}</div>
                         <div className="text-[8px] font-bold text-muted-foreground uppercase">{match.source_list}</div>
                       </TableCell>
                       <TableCell>
@@ -385,14 +391,18 @@ export default function ComplianceWorkspacePage() {
                 <div className="space-y-1 px-4 pb-4">
                   {highRiskCustomers.length === 0 ? (
                     <p className="text-center py-10 text-sm text-slate-400 italic">No high-risk customers found.</p>
-                  ) : highRiskCustomers.slice(0, 10).map((cust) => (
+                  ) : highRiskCustomers.slice(0, 10).map((cust) => {
+                    const displayName = (cust.first_name || cust.last_name)
+                      ? `${cust.first_name || ''} ${cust.last_name || ''}`.trim()
+                      : (cust.label || cust.external_id || 'Unknown');
+                    return (
                     <Link key={cust.id} href={`/dashboard/users/${cust.id}`} className="flex items-center justify-between p-5 rounded-3xl hover:bg-muted/50 border border-transparent hover:border-border/50 transition-all cursor-pointer group">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-muted rounded-2xl flex items-center justify-center font-black italic text-sm group-hover:bg-brand-lime group-hover:text-black transition-colors">
-                          {cust.full_name.substring(0, 2).toUpperCase()}
+                          {displayName.substring(0, 2).toUpperCase()}
                         </div>
                         <div>
-                          <div className="font-black italic tracking-tight text-[14px]">{cust.full_name}</div>
+                          <div className="font-black italic tracking-tight text-[14px]">{displayName}</div>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge className={`text-[8px] font-black italic tracking-widest uppercase h-4 leading-none ${
                                cust.risk_tier === 'critical' ? 'bg-rose-500' : 'bg-orange-500'
@@ -410,7 +420,7 @@ export default function ComplianceWorkspacePage() {
                         <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-black dark:group-hover:text-white transition-colors" />
                       </div>
                     </Link>
-                  ))}
+                  );})}
                 </div>
               </ScrollArea>
             </CardContent>

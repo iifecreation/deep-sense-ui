@@ -85,27 +85,27 @@ export default function AlertDetailView() {
   const { alert } = data;
 
   const kpis = [
-    { label: "Risk Score", value: alert.risk_score != null ? alert.risk_score.toFixed(2) : "N/A", subtext: "Model-assigned score", icon: <ShieldAlert className="w-5 h-5 text-red-500" />, color: "border-red-100" },
+    { label: "Severity", value: alert.severity, subtext: "Alert severity", icon: <ShieldAlert className="w-5 h-5 text-red-500" />, color: "border-red-100" },
     { label: "Created", value: formatDateTime(alert.created_at).split(",")[0], subtext: formatDateTime(alert.created_at).split(",")[1] || "", icon: <Clock className="w-5 h-5 text-blue-500" />, color: "border-blue-100" },
-    { label: "Customer", value: alert.customer_name || "Unknown", subtext: alert.customer_id ? alert.customer_id.slice(0, 8) : "No linked customer", icon: <User className="w-5 h-5 text-slate-500" />, color: "border-slate-100" },
+    { label: "Channel", value: alert.channel || "Unknown", subtext: alert.transaction_id ? `Tx ${alert.transaction_id.slice(0, 8)}` : "No linked transaction", icon: <User className="w-5 h-5 text-slate-500" />, color: "border-slate-100" },
   ];
 
   const subjectIdentity = [
-    { label: "Customer Name", value: alert.customer_name || "Unknown", icon: <User className="w-3.5 h-3.5" /> },
-    { label: "Customer ID", value: alert.customer_id || "Not linked", icon: <Fingerprint className="w-3.5 h-3.5" /> },
-    { label: "Assigned To", value: alert.assigned_user_name || "Unassigned", icon: <BadgeCheck className="w-3.5 h-3.5" /> },
+    { label: "Transaction", value: alert.transaction_id || "Not linked", icon: <CreditCard className="w-3.5 h-3.5" /> },
+    { label: "Fraud Case", value: alert.fraud_case_id || "Not linked", icon: <Fingerprint className="w-3.5 h-3.5" /> },
+    { label: "Delivery Channel", value: alert.channel || "Unknown", icon: <BadgeCheck className="w-3.5 h-3.5" /> },
   ];
 
   const objectDetails = [
-    { label: "Alert Type", value: alert.alert_type, icon: <Activity className="w-3.5 h-3.5" /> },
+    { label: "Severity", value: alert.severity, icon: <Activity className="w-3.5 h-3.5" /> },
+    { label: "Channel", value: alert.channel || "Unknown", icon: <Activity className="w-3.5 h-3.5" /> },
     { label: "Transaction ID", value: alert.transaction_id || "Not linked", icon: <CreditCard className="w-3.5 h-3.5" /> },
     { label: "Created At", value: formatDateTime(alert.created_at), icon: <Calendar className="w-3.5 h-3.5" /> },
-    { label: "Updated At", value: formatDateTime(alert.updated_at), icon: <History className="w-3.5 h-3.5" /> },
   ];
 
   const linkedIntelligence = [
-    ...(alert.customer_id ? [{ label: "Customer Profile", href: `/dashboard/users/${alert.customer_id}`, icon: <User className="w-3.5 h-3.5" /> }] : []),
     ...(alert.transaction_id ? [{ label: "Transaction Detail", href: `/dashboard/transactions/${alert.transaction_id}`, icon: <CreditCard className="w-3.5 h-3.5" /> }] : []),
+    ...(alert.fraud_case_id ? [{ label: "Linked Case", href: `/dashboard/cases/${alert.fraud_case_id}`, icon: <User className="w-3.5 h-3.5" /> }] : []),
   ];
 
   return (
@@ -122,10 +122,10 @@ export default function AlertDetailView() {
               {alert.severity} Severity
             </Badge>
             <Badge variant="outline" className="rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wide bg-blue-50 text-blue-700 border-none">
-              {alert.status}
+              {alert.channel}
             </Badge>
           </div>
-          <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">{alert.alert_type} • Assigned to {alert.assigned_user_name || "Unassigned"}</p>
+          <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">Delivered via {alert.channel}</p>
         </div>
         <div className="flex gap-2">
           <Button disabled variant="outline" size="sm" className="font-semibold opacity-40">
@@ -183,7 +183,7 @@ export default function AlertDetailView() {
              </p>
              <div className="bg-black/40 p-4 rounded-lg font-mono text-[11px] text-emerald-400 leading-relaxed border border-white/5">
                 <span className="text-white/40 block mb-1 uppercase text-[9px]">Execution Trace</span>
-                {alert.description}
+                {alert.body || "No additional detail recorded."}
              </div>
           </Card>
 
