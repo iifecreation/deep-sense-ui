@@ -14,6 +14,7 @@ export async function loginTenant(page: Page): Promise<void> {
   await expect(page).toHaveURL('/dashboard', { timeout: 45_000 });
   await expect(page.getByText('Browser Owner', { exact: true })).toBeVisible({ timeout: 20_000 });
   await expect(page.getByText('DeepSense Browser Certification Bank', { exact: true })).toBeVisible();
-  const token = await page.evaluate(() => localStorage.getItem('deep_sense_sandbox_access_token'));
-  expect(token?.split('.')).toHaveLength(3);
+  // The access token lives only in memory (src/lib/api/client.ts); it must never be persisted.
+  const persisted = await page.evaluate(() => localStorage.getItem('deep_sense_sandbox_access_token'));
+  expect(persisted).toBeNull();
 }
