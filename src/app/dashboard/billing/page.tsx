@@ -70,6 +70,14 @@ export default function BillingPage() {
     }
   };
 
+  // /billing/usage returns a list of per-feature counters (feature_key, used,
+  // limit, remaining, exceeded) - there is no single aggregate object, so the
+  // "total requests" figure is derived from a representative counter.
+  const usageList: any[] = Array.isArray(usage) ? usage : [];
+  const requestCounter = usageList.find((u) => u.feature_key === 'api_requests') || usageList[0];
+  const totalUsed = usageList.reduce((sum, u) => sum + (u.used || 0), 0);
+  const requestPct = requestCounter?.limit ? Math.min(100, Math.round((requestCounter.used / requestCounter.limit) * 100)) : 0;
+
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'active': return 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
@@ -193,12 +201,12 @@ export default function BillingPage() {
           <CardContent className="p-0">
             <div className="space-y-4">
               <div className="text-4xl font-black italic text-neutral-900 tracking-tighter uppercase">
-                {usage?.total_requests?.toLocaleString() || '0'}
+                {totalUsed.toLocaleString()}
               </div>
               <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground italic">
-                API requests this month
+                {requestCounter?.feature_key ? `${requestCounter.feature_key.replace(/_/g, ' ')} this period` : 'Usage across all metered features'}
               </div>
-              <Progress value={usage?.usage_percentage || 0} className="h-2" />
+              <Progress value={requestPct} className="h-2" />
             </div>
           </CardContent>
         </Card>
@@ -207,17 +215,17 @@ export default function BillingPage() {
           <CardHeader className="p-0 mb-8">
             <CardTitle className="text-xl font-black uppercase tracking-tighter flex items-center gap-2 italic">
               <DollarSign className="w-5 h-5 text-emerald-500" />
-              Next Billing
+              Current Billing Period
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="space-y-4">
-              <div className="text-4xl font-black italic text-neutral-900 tracking-tighter uppercase">
-                ${subscription?.next_billing_amount || '0.00'}
+              <div className="text-2xl font-black italic text-neutral-900 tracking-tighter uppercase">
+                {subscription?.billing_cycle || 'N/A'}
               </div>
               <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 italic">
                 <Calendar className="w-3.5 h-3.5" />
-                {subscription?.next_billing_date ? new Date(subscription.next_billing_date).toLocaleDateString() : 'N/A'}
+                Renews {subscription?.current_period_end ? new Date(subscription.current_period_end).toLocaleDateString() : 'N/A'}
               </div>
             </div>
           </CardContent>
@@ -236,18 +244,22 @@ export default function BillingPage() {
         </CardHeader>
         <CardContent className="p-0">
           <div className="space-y-6">
-            {usage && Array.isArray(usage) ? usage.map((item: any, index: number) => (
+            {usageList.length > 0 ? usageList.map((item: any, index: number) => {
+              const pct = item.limit ? Math.min(100, Math.round((item.used / item.limit) * 100)) : 0;
+              return (
               <div key={index} className="flex items-center justify-between p-6 bg-muted/20 border border-border/50 rounded-3xl group hover:border-brand-lime transition-all">
                 <div className="space-y-1">
-                  <div className="text-[13px] font-black italic uppercase">{item.feature_key || 'Feature'}</div>
-                  <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground italic">{item.description || ''}</div>
+                  <div className="text-[13px] font-black italic uppercase">{(item.feature_key || 'Feature').replace(/_/g, ' ')}</div>
+                  {item.exceeded ? (
+                    <div className="text-[9px] font-black uppercase tracking-widest text-rose-500 italic">Quota exceeded</div>
+                  ) : null}
                 </div>
                 <div className="text-right">
-                  <div className="text-[11px] font-black uppercase italic tracking-tighter">{item.current || 0} / {item.limit || '∞'}</div>
-                  <Progress value={item.percentage || 0} className="h-2 w-32 mt-2 bg-neutral-200 [&>div]:bg-brand-lime" />
+                  <div className="text-[11px] font-black uppercase italic tracking-tighter">{item.used || 0} / {item.limit ?? '∞'}</div>
+                  <Progress value={pct} className="h-2 w-32 mt-2 bg-neutral-200 [&>div]:bg-brand-lime" />
                 </div>
               </div>
-            )) : (
+            );}) : (
               <div className="text-center text-slate-500 p-8 font-black italic">
                 No usage data available
               </div>

@@ -22,6 +22,7 @@ import {
   FileText,
   History,
   CheckCircle2,
+  BadgeCheck,
   Plug,
   HelpCircle,
   Bell,
@@ -103,6 +104,7 @@ const navigation: NavGroup[] = [
     name: "Operations",
     items: [
       { name: "Onboarding Reviews", icon: <CheckCircle2 />, href: "/dashboard/onboarding", services: ["onboarding"] },
+      { name: "Verification Flows", icon: <BadgeCheck />, href: "/dashboard/verification", services: ["onboarding", "document_intelligence"] },
       { name: "Integrations", icon: <Plug />, href: "/dashboard/integrations" },
       { name: "Risk Operations", icon: <Activity />, href: "/dashboard/risk-operations", services: ["unified_risk"] },
       { name: "Analytics", icon: <BarChart3 />, href: "/dashboard/analytics", services: ["analytics"] }

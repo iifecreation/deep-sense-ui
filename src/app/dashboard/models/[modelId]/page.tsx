@@ -45,12 +45,20 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 function formatDate(value?: string | null): string {
   if (!value) return "Not recorded";
@@ -65,6 +73,10 @@ export default function ModelDetailPage() {
   const { data: metrics } = useModelMetrics(modelId);
   const [retraining, setRetraining] = useState(false);
   const [retrainMessage, setRetrainMessage] = useState<string | null>(null);
+  const [showDeactivate, setShowDeactivate] = useState(false);
+  const [deactivateReason, setDeactivateReason] = useState("");
+  const [deactivating, setDeactivating] = useState(false);
+  const [deactivateError, setDeactivateError] = useState<string | null>(null);
 
   const handleRetrain = async () => {
     setRetraining(true);
@@ -80,14 +92,31 @@ export default function ModelDetailPage() {
     }
   };
 
+  const handleDeactivate = async () => {
+    setDeactivating(true);
+    setDeactivateError(null);
+    try {
+      await modelsService.deactivateModel(modelId, deactivateReason || undefined);
+      setShowDeactivate(false);
+      setDeactivateReason("");
+      await refetchDetail();
+    } catch (err) {
+      setDeactivateError(err instanceof Error ? err.message : "Failed to deactivate model.");
+    } finally {
+      setDeactivating(false);
+    }
+  };
+
   const efficacyScores = metrics
     ? [
         { label: "Precision", value: metrics.precision, icon: <Target className="w-3.5 h-3.5" /> },
         { label: "Recall", value: metrics.recall, icon: <Activity className="w-3.5 h-3.5" /> },
-        { label: "F1 Score", value: metrics.f1_score, icon: <Zap className="w-3.5 h-3.5" /> },
+        { label: "F1 Score", value: metrics.f1, icon: <Zap className="w-3.5 h-3.5" /> },
         { label: "AUC-ROC", value: metrics.auc_roc, icon: <TrendingUp className="w-3.5 h-3.5" /> },
       ].filter((s) => typeof s.value === "number")
     : [];
+
+  const canDeactivate = !!model?.available_actions?.includes("deactivate");
 
   const lineage = model
     ? [
@@ -154,8 +183,12 @@ export default function ModelDetailPage() {
                      <DropdownMenuItem disabled className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 opacity-40">
                         Compare Versions (not yet available)
                      </DropdownMenuItem>
-                     <DropdownMenuItem disabled className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 text-rose-500 opacity-40">
-                        Deactivate Inference (not yet available)
+                     <DropdownMenuItem
+                        disabled={!canDeactivate}
+                        onClick={() => canDeactivate && setShowDeactivate(true)}
+                        className={`text-[10px] font-black uppercase italic tracking-widest h-11 px-4 text-rose-500 ${!canDeactivate ? "opacity-40" : ""}`}
+                     >
+                        Deactivate Inference{!canDeactivate ? " (not yet available)" : ""}
                      </DropdownMenuItem>
                      <DropdownMenuItem disabled className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 opacity-40">
                         Export Weights (not yet available)
@@ -331,6 +364,31 @@ export default function ModelDetailPage() {
             </Card>
          </div>
       </div>
+
+      <Dialog open={showDeactivate} onOpenChange={(open) => { if (!open) { setShowDeactivate(false); setDeactivateError(null); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Deactivate this model?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-slate-600">
+            This stops {model.name} from scoring live traffic. It can be reactivated later by deploying a version.
+          </p>
+          <Textarea
+            value={deactivateReason}
+            onChange={(e) => setDeactivateReason(e.target.value)}
+            placeholder="Reason (optional)"
+          />
+          {deactivateError ? <p className="text-xs text-red-600">{deactivateError}</p> : null}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeactivate(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={() => void handleDeactivate()} disabled={deactivating}>
+              {deactivating ? "Deactivating..." : "Deactivate Model"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

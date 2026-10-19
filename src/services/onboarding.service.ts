@@ -9,6 +9,16 @@ export const onboardingService = {
     return get<any>(`/onboarding/reviews/${reviewId}`);
   },
 
+  createReview: async (data: {
+    customer_type: string;
+    applicant_name: string;
+    applicant_email?: string;
+    applicant_phone?: string;
+    onboarding_channel?: string;
+  }) => {
+    return post<any>('/onboarding/reviews', data);
+  },
+
   approveReview: async (reviewId: string, data: { reason?: string; initialize_risk_profile?: boolean; idempotency_key?: string }) => {
     return post<any>(`/onboarding/reviews/${reviewId}/approve`, data);
   },

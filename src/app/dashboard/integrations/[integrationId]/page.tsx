@@ -29,6 +29,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useIntegration } from "@/hooks/use-integrations";
 import { integrationsService } from "@/services/integrations.service";
 
@@ -50,6 +59,11 @@ export default function IntegrationDetailPage() {
   const [logs, setLogs] = useState<any[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
 
+  const [showEdit, setShowEdit] = useState(false);
+  const [editForm, setEditForm] = useState({ base_url: "", auth_type: "", description: "" });
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
   useEffect(() => {
     if (!integrationId) return;
     setLogsLoading(true);
@@ -70,6 +84,35 @@ export default function IntegrationDetailPage() {
       setTestMessage(err instanceof Error ? err.message : "Test failed.");
     } finally {
       setTesting(false);
+    }
+  };
+
+  const openEdit = () => {
+    if (!integration) return;
+    setEditForm({
+      base_url: integration.base_url || "",
+      auth_type: integration.auth_type || "",
+      description: integration.description || "",
+    });
+    setSaveError(null);
+    setShowEdit(true);
+  };
+
+  const handleSaveEdit = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await integrationsService.update(integrationId, {
+        base_url: editForm.base_url || undefined,
+        auth_type: editForm.auth_type || undefined,
+        description: editForm.description || undefined,
+      });
+      setShowEdit(false);
+      await refetch();
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Failed to update integration.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -108,6 +151,8 @@ export default function IntegrationDetailPage() {
     );
   }
 
+  const canUpdate = !!integration.available_actions?.includes("update");
+
   const topology = [
     { label: "Type", value: integration.integration_type },
     { label: "Environment", value: integration.environment || "Not set" },
@@ -118,11 +163,11 @@ export default function IntegrationDetailPage() {
   ];
 
   const healthMatrix = [
-    { label: "Last Tested", value: formatDate(integration.last_tested_at) },
-    { label: "Last Test Status", value: integration.last_test_status || "Never tested" },
-    { label: "Last Success", value: formatDate(integration.last_success_at) },
-    { label: "Last Error", value: formatDate(integration.last_error_at) },
-    { label: "Error Count", value: String(integration.error_count ?? 0) },
+    { label: "Last Tested", value: formatDate(integration.health?.last_tested_at) },
+    { label: "Last Test Status", value: integration.health?.last_test_status || "Never tested" },
+    { label: "Last Success", value: formatDate(integration.health?.last_success_at) },
+    { label: "Last Error", value: formatDate(integration.health?.last_error_at) },
+    { label: "Error Count", value: String(integration.health?.error_count ?? 0) },
   ];
 
   return (
@@ -159,8 +204,12 @@ export default function IntegrationDetailPage() {
                      </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56 bg-white rounded-2xl border-border shadow-2xl font-bold">
-                     <DropdownMenuItem disabled className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 opacity-40">
-                        Edit Configuration (not yet available)
+                     <DropdownMenuItem
+                        disabled={!canUpdate}
+                        onClick={() => canUpdate && openEdit()}
+                        className={`text-[10px] font-black uppercase italic tracking-widest h-11 px-4 ${!canUpdate ? "opacity-40" : ""}`}
+                     >
+                        Edit Configuration{!canUpdate ? " (not yet available)" : ""}
                      </DropdownMenuItem>
                      <DropdownMenuItem onClick={() => void handleToggle()} className="text-[10px] font-black uppercase italic tracking-widest h-11 px-4 text-rose-500">
                         {integration.status === "disabled" ? "Enable Integration" : "Disable Integration"}
@@ -185,21 +234,21 @@ export default function IntegrationDetailPage() {
          <div className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
             <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center"><Activity className="w-5 h-5" /></div>
             <div>
-               <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white">{integration.last_test_status || "N/A"}</div>
+               <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white">{integration.health?.last_test_status || "N/A"}</div>
                <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1">Last Test Status</div>
             </div>
          </div>
          <div className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
             <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center"><AlertTriangle className="w-5 h-5 text-rose-500" /></div>
             <div>
-               <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white">{integration.error_count ?? 0}</div>
+               <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white">{integration.health?.error_count ?? 0}</div>
                <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1">Error Count</div>
             </div>
          </div>
          <div className="p-5 bg-white dark:bg-neutral-900 rounded-[32px] border border-border/50 shadow-sm flex flex-col gap-4">
             <div className="w-10 h-10 bg-muted/50 rounded-xl flex items-center justify-center"><RefreshCw className="w-5 h-5" /></div>
             <div>
-               <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white">{formatDate(integration.last_sync_at)}</div>
+               <div className="text-2xl font-black italic tracking-tighter leading-none text-neutral-900 dark:text-white">{formatDate(integration.health?.last_sync_at)}</div>
                <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground italic mt-1">Last Sync</div>
             </div>
          </div>
@@ -334,9 +383,14 @@ export default function IntegrationDetailPage() {
                      <RefreshCw className="w-4 h-4 mr-2" />
                      {testing ? "Testing..." : "Test Connection"}
                   </Button>
-                  <Button disabled variant="outline" className="w-full h-14 border-white/10 text-white/40 rounded-3xl text-[10px] font-black uppercase italic opacity-50">
+                  <Button
+                     disabled={!canUpdate}
+                     onClick={openEdit}
+                     variant="outline"
+                     className={`w-full h-14 border-white/10 text-white rounded-3xl text-[10px] font-black uppercase italic hover:bg-white/5 transition-all ${!canUpdate ? "text-white/40 opacity-50" : ""}`}
+                  >
                      <Settings className="w-4 h-4 mr-2" />
-                     Configure Params (not yet available)
+                     Configure Params{!canUpdate ? " (not yet available)" : ""}
                   </Button>
                   <Button disabled={toggling} onClick={() => void handleToggle()} variant="outline" className="w-full h-14 border-rose-500/50 text-rose-500 rounded-3xl text-[10px] font-black uppercase italic hover:bg-rose-500/5 transition-all disabled:opacity-50">
                      <ShieldAlert className="w-4 h-4 mr-2" />
@@ -346,6 +400,46 @@ export default function IntegrationDetailPage() {
             </Card>
          </div>
       </div>
+
+      <Dialog open={showEdit} onOpenChange={(open) => { if (!open) { setShowEdit(false); setSaveError(null); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit {integration.name} configuration</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-xs font-bold uppercase tracking-wide text-slate-500">Base URL</label>
+              <Input
+                value={editForm.base_url}
+                onChange={(e) => setEditForm((f) => ({ ...f, base_url: e.target.value }))}
+                placeholder="https://api.example.com"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold uppercase tracking-wide text-slate-500">Auth Type</label>
+              <Input
+                value={editForm.auth_type}
+                onChange={(e) => setEditForm((f) => ({ ...f, auth_type: e.target.value }))}
+                placeholder="oauth2, api_key, basic..."
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold uppercase tracking-wide text-slate-500">Description</label>
+              <Textarea
+                value={editForm.description}
+                onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
+              />
+            </div>
+          </div>
+          {saveError ? <p className="text-xs text-red-600">{saveError}</p> : null}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEdit(false)}>Cancel</Button>
+            <Button onClick={() => void handleSaveEdit()} disabled={saving} className="bg-neutral-900 hover:bg-neutral-800">
+              {saving ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

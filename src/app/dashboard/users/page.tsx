@@ -206,10 +206,26 @@ export default function CustomerRegistry() {
           </TableBody>
         </Table>
         <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Showing {customers?.length || 0} Entities</p>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Showing {customers?.length || 0} Entities &middot; Page {page}</p>
           <div className="flex gap-2">
-            <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase tracking-wider text-slate-400">Previous</Button>
-            <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase tracking-wider text-slate-400">Next</Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 text-[10px] font-bold uppercase tracking-wider text-slate-400 disabled:opacity-30"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 text-[10px] font-bold uppercase tracking-wider text-slate-400 disabled:opacity-30"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={(customers?.length || 0) < pageSize}
+            >
+              Next
+            </Button>
           </div>
         </div>
       </Card>

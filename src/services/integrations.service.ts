@@ -18,14 +18,37 @@ export interface Integration {
   updated_at: string;
 }
 
-export interface IntegrationDetail extends Integration {
+export interface IntegrationHealthSummary {
+  status: string;
+  last_tested_at?: string | null;
+  last_test_status?: string | null;
+  last_test_summary?: string | null;
+  last_sync_at?: string | null;
+  last_success_at?: string | null;
+  last_error_at?: string | null;
+  last_error_summary?: string | null;
+  error_count: number;
+  uptime_indicator: string;
+}
+
+// Note: unlike Integration (list item), the detail payload nests all health
+// fields under `health` rather than flattening them onto the object.
+export interface IntegrationDetail {
+  id: string;
+  organization_id: string;
+  name: string;
+  integration_type: string;
+  status: string;
+  environment?: string | null;
   description?: string | null;
   base_url?: string | null;
   auth_type?: string | null;
-  config?: Record<string, any> | null;
-  health?: { status: string; uptime_indicator?: string } | null;
-  webhook_count?: number;
-  api_key_count?: number;
+  config_display?: Record<string, any> | null;
+  health: IntegrationHealthSummary;
+  webhook_count: number;
+  api_key_count: number;
+  created_at: string;
+  updated_at: string;
   available_actions: string[];
 }
 

@@ -55,11 +55,53 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useOnboardingReviews } from "@/hooks";
+import { onboardingService } from "@/services/onboarding.service";
+
+const STATUS_TABS = ["all", "pending", "in_review", "approved", "rejected", "escalated"] as const;
 
 export default function OnboardingReviewsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: reviewsData, isLoading, isError, refetch } = useOnboardingReviews({ search: searchQuery });
+  const [activeTab, setActiveTab] = useState<(typeof STATUS_TABS)[number]>("all");
+  const { data: reviewsData, isLoading, isError, refetch } = useOnboardingReviews({
+    search: searchQuery,
+    status: activeTab === "all" ? undefined : activeTab,
+  });
+
+  const [showNewReview, setShowNewReview] = useState(false);
+  const [newApplicantName, setNewApplicantName] = useState("");
+  const [newApplicantEmail, setNewApplicantEmail] = useState("");
+  const [newCustomerType, setNewCustomerType] = useState("individual");
+  const [creatingReview, setCreatingReview] = useState(false);
+  const [newReviewError, setNewReviewError] = useState<string | null>(null);
+
+  const handleCreateReview = async () => {
+    if (!newApplicantName.trim()) return;
+    setCreatingReview(true);
+    setNewReviewError(null);
+    try {
+      await onboardingService.createReview({
+        customer_type: newCustomerType,
+        applicant_name: newApplicantName.trim(),
+        applicant_email: newApplicantEmail.trim() || undefined,
+      });
+      setShowNewReview(false);
+      setNewApplicantName("");
+      setNewApplicantEmail("");
+      await refetch();
+    } catch (cause) {
+      setNewReviewError(cause instanceof Error ? cause.message : "Failed to create review.");
+    } finally {
+      setCreatingReview(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -144,11 +186,14 @@ export default function OnboardingReviewsPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" className="h-10 px-4 text-xs font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800">
+            <Button disabled variant="outline" className="h-10 px-4 text-xs font-black uppercase tracking-widest italic border-neutral-200 dark:border-neutral-800 opacity-50">
                <Settings className="w-3.5 h-3.5 mr-2" />
-               Onboarding Rules
+               Onboarding Rules (not yet available)
             </Button>
-            <Button className="h-10 px-6 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:scale-[1.03] transition-all font-black uppercase tracking-widest italic shadow-xl">
+            <Button
+              className="h-10 px-6 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:scale-[1.03] transition-all font-black uppercase tracking-widest italic shadow-xl"
+              onClick={() => setShowNewReview(true)}
+            >
                <Plus className="w-3.5 h-3.5 mr-2" />
                New Review
             </Button>
@@ -208,7 +253,7 @@ export default function OnboardingReviewsPage() {
               <CardTitle className="text-xl font-black italic uppercase tracking-tighter">Priority Onboarding Queue</CardTitle>
               <CardDescription className="text-rose-500/60 text-[10px] font-black uppercase tracking-widest mt-1 italic">High-risk or time-sensitive applications requiring immediate oversight</CardDescription>
             </div>
-            <Button variant="outline" className="h-8 text-[9px] font-black uppercase italic border-border shadow-sm">View SLA Matrix</Button>
+            <Button disabled variant="outline" className="h-8 text-[9px] font-black uppercase italic border-border shadow-sm opacity-50">View SLA Matrix (not yet available)</Button>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -258,7 +303,7 @@ export default function OnboardingReviewsPage() {
                     </TableCell>
                     <TableCell className="px-8 text-right">
                        <div className="flex items-center justify-end gap-3 group/actor font-bold italic">
-                          <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground group-hover/actor:text-neutral-900 dark:group-hover/actor:text-white transition-colors">{row.assigned_user_id ? 'Assigned' : 'Unassigned'}</span>
+                          <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground group-hover/actor:text-neutral-900 dark:group-hover/actor:text-white transition-colors">{row.assigned_to_user_id ? 'Assigned' : 'Unassigned'}</span>
                           <div className="w-8 h-8 rounded-full bg-muted border border-border border-dashed flex items-center justify-center">
                              <Users className="w-3.5 h-3.5 text-muted-foreground/40 group-hover/actor:text-brand-lime" />
                           </div>
@@ -283,7 +328,11 @@ export default function OnboardingReviewsPage() {
         {/* 4. ALL APPLICATIONS & 5/6/7. TABS */}
         <section className="xl:col-span-2">
           <Card className="rounded-[40px] border-border/50 shadow-2xl overflow-hidden h-full flex flex-col font-bold italic">
-            <Tabs defaultValue="all" className="w-full flex-1 flex flex-col font-black italic">
+            <Tabs
+              value={activeTab}
+              onValueChange={(v) => setActiveTab(v as typeof activeTab)}
+              className="w-full flex-1 flex flex-col font-black italic"
+            >
               <CardHeader className="p-8 border-b border-border/50 bg-white dark:bg-neutral-950">
                 <div className="flex items-center justify-between gap-8 flex-wrap">
                   <div>
@@ -291,13 +340,13 @@ export default function OnboardingReviewsPage() {
                     <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-1 italic text-muted-foreground">Universal feed of all customer onboarding cycles</CardDescription>
                   </div>
                   <TabsList className="bg-muted/50 p-1 rounded-2xl border border-border/50 h-10 overflow-x-auto">
-                    {["All", "Pending", "Approved", "Rejected", "Escalated"].map(tab => (
-                      <TabsTrigger 
-                        key={tab} 
-                        value={tab.toLowerCase()}
+                    {STATUS_TABS.map(tab => (
+                      <TabsTrigger
+                        key={tab}
+                        value={tab}
                         className="rounded-xl px-5 text-[9px] font-black uppercase italic tracking-widest data-[state=active]:bg-neutral-900 data-[state=active]:text-white dark:data-[state=active]:bg-white dark:data-[state=active]:text-neutral-900"
                       >
-                        {tab}
+                        {tab.replace("_", " ")}
                       </TabsTrigger>
                     ))}
                   </TabsList>
@@ -404,7 +453,7 @@ export default function OnboardingReviewsPage() {
                   </div>
                </div>
                
-               <Button className="w-full h-11 bg-neutral-900 text-white rounded-2xl text-[10px] font-black uppercase italic tracking-widest mt-auto hover:scale-[1.02] transition-all shadow-xl font-bold font-black">Full Funnel Analysis</Button>
+               <Button disabled className="w-full h-11 bg-neutral-900 text-white rounded-2xl text-[10px] font-black uppercase italic tracking-widest mt-auto hover:scale-[1.02] transition-all shadow-xl font-bold font-black opacity-50">Full Funnel Analysis (not yet available)</Button>
             </CardContent>
           </Card>
         </section>
@@ -444,7 +493,7 @@ export default function OnboardingReviewsPage() {
                            <span className="text-[8px] font-black text-muted-foreground uppercase opacity-40">{new Date(act.updated_at || act.created_at).toLocaleDateString()}</span>
                         </div>
                         <div className="text-[11px] font-black italic tracking-tighter text-muted-foreground group-hover:text-neutral-900 transition-colors">
-                           {act.assigned_user_id || "System"} <span className="mx-2 opacity-20">•</span> {act.applicant_name}
+                           {act.assigned_to_user_id || "System"} <span className="mx-2 opacity-20">•</span> {act.applicant_name}
                         </div>
                      </div>
                   </div>
@@ -474,6 +523,47 @@ export default function OnboardingReviewsPage() {
            </div>
         </section>
       </div>
+
+      <Dialog open={showNewReview} onOpenChange={(open) => { if (!open) { setShowNewReview(false); setNewReviewError(null); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>New Onboarding Review</DialogTitle>
+          </DialogHeader>
+          {newReviewError ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800">{newReviewError}</div>
+          ) : null}
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs font-semibold text-slate-600 mb-1 block">Applicant name</label>
+              <Input value={newApplicantName} onChange={(e) => setNewApplicantName(e.target.value)} placeholder="Jane Doe" />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-slate-600 mb-1 block">Applicant email</label>
+              <Input value={newApplicantEmail} onChange={(e) => setNewApplicantEmail(e.target.value)} placeholder="jane.doe@example.com" />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-slate-600 mb-1 block">Customer type</label>
+              <select
+                value={newCustomerType}
+                onChange={(e) => setNewCustomerType(e.target.value)}
+                className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm"
+              >
+                <option value="individual">Individual</option>
+                <option value="business">Business</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNewReview(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => void handleCreateReview()} disabled={creatingReview || !newApplicantName.trim()}>
+              {creatingReview ? <RefreshCcw className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Create Review
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

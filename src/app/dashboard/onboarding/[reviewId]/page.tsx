@@ -131,6 +131,10 @@ export default function OnboardingReviewDetailPage() {
   const riskTier = review.risk_summary?.risk_tier || "low";
   const riskScore = review.risk_summary?.risk_score;
   const screening = review.screening_summary || {};
+  const availableActions: string[] = review.available_actions || [];
+  const canApprove = availableActions.includes("approve");
+  const canReject = availableActions.includes("reject");
+  const canEscalate = availableActions.includes("escalate");
   const screeningItems = [
     { category: "Sanctions", result: screening.sanctions_status },
     { category: "PEP", result: screening.pep_status },
@@ -172,7 +176,7 @@ export default function OnboardingReviewDetailPage() {
                <div className="flex flex-wrap gap-6 text-muted-foreground text-[10px] font-black uppercase tracking-widest italic leading-none font-bold">
                   <div className="flex items-center gap-2"><Briefcase className="w-3.5 h-3.5" /> {review.customer_type}</div>
                   <div className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5" /> Submitted: {new Date(review.created_at).toLocaleDateString()}</div>
-                  <div className="flex items-center gap-2"><Globe className="w-3.5 h-3.5" /> {review.jurisdiction || 'Unknown'}</div>
+                  <div className="flex items-center gap-2"><Globe className="w-3.5 h-3.5" /> {review.application_reference || 'No reference'}</div>
                </div>
                <div className="flex items-center gap-3">
                   <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-xl border text-[10px] font-black uppercase italic tracking-widest ${
@@ -188,9 +192,9 @@ export default function OnboardingReviewDetailPage() {
                <div className="px-8 py-5 bg-muted/30 border border-border/50 rounded-3xl text-right">
                   <div className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground italic mb-2">Assigned Reviewer</div>
                   <div className="flex items-center gap-3 justify-end leading-none">
-                     <span className="text-[17px] font-black italic">{review.assigned_user_id || "Unassigned"}</span>
+                     <span className="text-[17px] font-black italic">{review.assigned_to_user_id || "Unassigned"}</span>
                      <div className="w-10 h-10 rounded-2xl bg-white border border-border shadow-sm flex items-center justify-center font-bold">
-                       {review.assigned_user_id ? review.assigned_user_id.substring(0, 2).toUpperCase() : "?"}
+                       {review.assigned_to_user_id ? review.assigned_to_user_id.substring(0, 2).toUpperCase() : "?"}
                      </div>
                   </div>
                </div>
@@ -319,11 +323,11 @@ export default function OnboardingReviewDetailPage() {
                   {notes.map((note: any, i: number) => (
                     <div key={i} className="flex gap-6 items-start p-6 bg-white dark:bg-neutral-900 border border-border/50 rounded-[32px] hover:shadow-xl transition-all font-bold italic leading-none h-32 uppercase font-black whitespace-nowrap">
                        <div className="w-12 h-12 rounded-[20px] bg-muted flex items-center justify-center shrink-0 border border-border h-12 font-bold font-black">
-                          {note.author_id ? note.author_id.substring(0, 1).toUpperCase() : "S"}
+                          {note.author_user_id ? note.author_user_id.substring(0, 1).toUpperCase() : "S"}
                        </div>
                        <div className="flex-1 space-y-2 font-bold italic leading-none h-20 h-full font-black uppercase">
                           <div className="flex justify-between items-baseline font-black leading-none h-5">
-                             <div className="text-[13px] font-bold italic tracking-tighter uppercase whitespace-nowrap h-4 font-black">{note.author_id || 'System'}</div>
+                             <div className="text-[13px] font-bold italic tracking-tighter uppercase whitespace-nowrap h-4 font-black">{note.author_user_id || 'System'}</div>
                              <span className="text-[8px] font-black italic text-muted-foreground uppercase opacity-40">{new Date(note.created_at).toLocaleString()}</span>
                           </div>
                           <p className="text-[11px] text-muted-foreground leading-relaxed italic uppercase font-black whitespace-normal line-clamp-2 h-10">{note.body}</p>
@@ -378,15 +382,15 @@ export default function OnboardingReviewDetailPage() {
                </div>
                
                <div className="space-y-3 font-bold italic font-black uppercase">
-                  <Button disabled={actionBusy || review.status !== 'pending'} onClick={() => setPendingAction("approve")} className="w-full h-14 bg-brand-lime text-black rounded-3xl text-[11px] font-black uppercase italic hover:scale-[1.03] hover:bg-brand-lime/90 active:scale-95 transition-all shadow-xl shadow-brand-lime/10 font-bold font-black disabled:opacity-50">
+                  <Button disabled={actionBusy || !canApprove} onClick={() => setPendingAction("approve")} className="w-full h-14 bg-brand-lime text-black rounded-3xl text-[11px] font-black uppercase italic hover:scale-[1.03] hover:bg-brand-lime/90 active:scale-95 transition-all shadow-xl shadow-brand-lime/10 font-bold font-black disabled:opacity-50">
                      <ShieldCheck className="w-4 h-4 mr-2" />
                      Approve Onboarding
                   </Button>
-                  <Button disabled={actionBusy || review.status !== 'pending'} onClick={() => setPendingAction("reject")} className="w-full h-14 bg-rose-500 text-white rounded-3xl text-[11px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-rose-500/20 font-bold font-black disabled:opacity-50">
+                  <Button disabled={actionBusy || !canReject} onClick={() => setPendingAction("reject")} className="w-full h-14 bg-rose-500 text-white rounded-3xl text-[11px] font-black uppercase italic hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-rose-500/20 font-bold font-black disabled:opacity-50">
                      <XCircle className="w-4 h-4 mr-2" />
                      Reject Application
                   </Button>
-                  <Button disabled={actionBusy || review.status !== 'pending'} onClick={() => setPendingAction("escalate")} variant="outline" className="w-full h-14 rounded-3xl border-white/10 bg-white/5 text-white text-[11px] font-black uppercase italic hover:bg-white/10 transition-all font-bold font-black disabled:opacity-50">
+                  <Button disabled={actionBusy || !canEscalate} onClick={() => setPendingAction("escalate")} variant="outline" className="w-full h-14 rounded-3xl border-white/10 bg-white/5 text-white text-[11px] font-black uppercase italic hover:bg-white/10 transition-all font-bold font-black disabled:opacity-50">
                      <AlertTriangle className="w-4 h-4 mr-2 text-indigo-400" />
                      Escalate to EDD
                   </Button>

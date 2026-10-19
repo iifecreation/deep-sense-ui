@@ -24,6 +24,23 @@ import {
 import { useModels, useModelMetrics } from "@/hooks/use-models";
 import { MLModel, modelsService } from "@/services/models.service";
 
+function ModelBar({ model }: { model: MLModel }) {
+  const { data: metrics, isLoading } = useModelMetrics(model.id);
+  const pct = typeof metrics?.precision === "number" ? Math.round(metrics.precision * 100) : null;
+  return (
+    <div className="flex-1 space-y-1 group/tick flex flex-col items-center min-w-0">
+      <div className="w-full flex-1 flex items-end">
+        <div
+          style={{ height: isLoading || pct == null ? "4%" : `${Math.max(4, pct)}%` }}
+          className="w-full bg-white/5 rounded-full group-hover/tick:bg-brand-lime transition-all cursor-crosshair shadow-sm relative"
+          title={`${model.name}: ${pct != null ? pct + "%" : "N/A"} precision`}
+        />
+      </div>
+      <span className="text-[7px] font-black text-white/20 uppercase tracking-widest mt-2 italic truncate max-w-full">{model.name}</span>
+    </div>
+  );
+}
+
 function ModelCard({ model }: { model: MLModel }) {
   const { data: metrics, isLoading } = useModelMetrics(model.id);
   const router = useRouter();
@@ -86,6 +103,23 @@ export default function ModelsPage() {
   const [newDescription, setNewDescription] = useState("");
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [retraining, setRetraining] = useState(false);
+  const [retrainMessage, setRetrainMessage] = useState<string | null>(null);
+
+  const handleRetrain = async () => {
+    const activeModel = models?.find((m) => m.status.toUpperCase() === "ACTIVE");
+    if (!activeModel) return;
+    setRetraining(true);
+    setRetrainMessage(null);
+    try {
+      await modelsService.requestRetrain(activeModel.id);
+      setRetrainMessage(`Retraining requested for ${activeModel.name}.`);
+    } catch (err) {
+      setRetrainMessage(err instanceof Error ? err.message : "Failed to request retraining.");
+    } finally {
+      setRetraining(false);
+    }
+  };
 
   const handleCreateModel = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,19 +210,13 @@ export default function ModelsPage() {
               <div className="flex items-center justify-between relative z-10 font-bold italic">
                  <h3 className="text-2xl lg:text-5xl font-black uppercase tracking-tighter text-white opacity-10 leading-none">Telemetry Core.</h3>
                  <div className="flex gap-4">
-                    <span className="flex items-center gap-2 text-[10px] font-black text-brand-lime uppercase tracking-widest"><TrendingUp className="w-3.5 h-3.5 shadow-[0_0_8px_#D1F701]" /> Live Evaluation</span>
+                    <span className="flex items-center gap-2 text-[10px] font-black text-brand-lime uppercase tracking-widest"><TrendingUp className="w-3.5 h-3.5 shadow-[0_0_8px_#D1F701]" /> Precision by Model</span>
                  </div>
               </div>
 
-              <div className="relative z-10 space-y-12 h-[300px] flex items-end gap-1 px-4">
-                 {Array.from({ length: 48 }).map((_, i) => (
-                   <div key={i} className="flex-1 space-y-1 group/tick flex flex-col items-center">
-                      <div 
-                        style={{ height: `${20 + ((i * 31 + 17) % 81)}%` }}
-                        className="w-full bg-white/5 rounded-full group-hover/tick:bg-brand-lime transition-all cursor-crosshair shadow-sm" 
-                      />
-                      {i % 12 === 0 && <span className="text-[8px] font-black text-white/20 uppercase tracking-widest mt-4 italic">Epoch {i/12}</span>}
-                   </div>
+              <div className="relative z-10 space-y-12 h-[300px] flex items-end gap-2 px-4">
+                 {models.map((m) => (
+                   <ModelBar key={m.id} model={m} />
                  ))}
               </div>
            </div>
@@ -204,10 +232,17 @@ export default function ModelsPage() {
                  <div className="p-8 bg-zinc-50 rounded-[40px] border border-neutral-100 space-y-8 italic">
                     <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest text-neutral-300">
                        <span>Target Model</span>
-                       <span>Auto-select active</span>
+                       <span>{models.find((m) => m.status.toUpperCase() === "ACTIVE")?.name || "No active model"}</span>
                     </div>
-                    <button className="w-full py-5 bg-neutral-900 text-white rounded-[32px] font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-brand-lime hover:text-neutral-900 hover:scale-105 transition-all italic shadow-xl">
-                       Initiate Retrain <RotateCcw className="w-4 h-4 transition-transform group-hover:rotate-180 duration-1000" />
+                    {retrainMessage ? (
+                      <p className="text-[9px] font-bold text-neutral-500 italic normal-case">{retrainMessage}</p>
+                    ) : null}
+                    <button
+                      onClick={() => void handleRetrain()}
+                      disabled={retraining || !models.some((m) => m.status.toUpperCase() === "ACTIVE")}
+                      className="w-full py-5 bg-neutral-900 text-white rounded-[32px] font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-brand-lime hover:text-neutral-900 hover:scale-105 transition-all italic shadow-xl disabled:opacity-40 disabled:hover:scale-100"
+                    >
+                       {retraining ? "Requesting..." : "Initiate Retrain"} <RotateCcw className={`w-4 h-4 transition-transform duration-1000 ${retraining ? "animate-spin" : "group-hover:rotate-180"}`} />
                     </button>
                  </div>
               </div>

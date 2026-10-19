@@ -1,103 +1,87 @@
-import { get, post, patch, del } from '@/lib/api/client';
+import { get, post } from '@/lib/api/client';
 
 export interface DecisionPolicy {
   id: string;
+  organization_id: string;
   name: string;
-  description: string;
-  enabled: boolean;
-  priority: number;
-  conditions: Record<string, any>;
-  actions: Record<string, any>;
+  slug: string;
   created_at: string;
   updated_at: string;
 }
 
-export interface DecisionPolicyCreate {
-  name: string;
-  description?: string;
-  enabled?: boolean;
-  priority?: number;
-  conditions: Record<string, any>;
-  actions: Record<string, any>;
-}
-
-export interface DecisionPolicyUpdate {
-  name?: string;
-  description?: string;
-  enabled?: boolean;
-  priority?: number;
-  conditions?: Record<string, any>;
-  actions?: Record<string, any>;
-}
-
-export interface DecisionPolicySimulateRequest {
-  transaction: Record<string, any>;
-  policy_id?: string;
-}
-
-export interface DecisionPolicySimulateResponse {
-  decision: string;
-  final_score: number;
-  triggered_rules: string[];
-  evaluations: Record<string, any>;
-}
-
 export interface DecisionPolicyVersion {
   id: string;
-  policy_id: string;
-  version: number;
-  conditions: Record<string, any>;
-  actions: Record<string, any>;
+  decision_policy_id: string;
+  version_number: number;
+  status: string; // draft | active | retired
+  block_threshold: number;
+  review_threshold: number;
+  notes: string | null;
+  activated_at: string | null;
+  activated_by_user_id: string | null;
   created_at: string;
-  created_by: string;
+  updated_at: string;
 }
 
-export interface TransactionAuditResponse {
-  transaction_id: string;
-  decision: string;
+export interface DecisionPolicyVersionCreate {
+  block_threshold: number;
+  review_threshold: number;
+  notes?: string;
+}
+
+export interface DecisionSimulateRequest {
   final_score: number;
-  triggered_rules: string[];
-  policy_version: string;
+  policy_version_id?: string;
+  block_threshold?: number;
+  review_threshold?: number;
+  dry_run?: boolean;
+}
+
+export interface DecisionSimulateResponse {
+  final_score: number;
+  outcome: string; // allow | review | block
+  reason_codes: string[];
+  block_threshold: number;
+  review_threshold: number;
+  dry_run: boolean;
+}
+
+export interface TransactionDecision {
+  id: string;
+  transaction_id: string;
+  decision_policy_version_id: string;
+  final_score: number;
+  fusion_decision: string;
+  policy_decision: string;
+  effective_decision: string;
+  shadow_mode: boolean;
+  reason_codes_json: string[];
+  explainability_json: Record<string, any>;
+  created_at: string;
 }
 
 export const decisionPoliciesService = {
-  async list(params?: { page?: number; page_size?: number; search?: string }) {
-    return await get<any>('/decision-policies', { params });
+  async list(): Promise<DecisionPolicy[]> {
+    return await get<DecisionPolicy[]>('/decision-policies');
   },
 
-  async create(data: DecisionPolicyCreate) {
-    return await post<any>('/decision-policies', data);
-  },
-
-  async get(policyId: string) {
-    return await get<any>(`/decision-policies/${policyId}`);
-  },
-
-  async update(policyId: string, data: DecisionPolicyUpdate) {
-    return await patch<any>(`/decision-policies/${policyId}`, data);
-  },
-
-  async delete(policyId: string) {
-    return await del<any>(`/decision-policies/${policyId}`);
-  },
-
-  async simulate(data: DecisionPolicySimulateRequest) {
-    return await post<DecisionPolicySimulateResponse>('/decision-policies/simulate', data);
-  },
-
-  async getTransactionAudit(transactionId: string) {
-    return await get<TransactionAuditResponse>(`/decision-policies/transaction/${transactionId}/audit`);
-  },
-
-  async listVersions(policyId: string) {
+  async listVersions(policyId: string): Promise<DecisionPolicyVersion[]> {
     return await get<DecisionPolicyVersion[]>(`/decision-policies/${policyId}/versions`);
   },
 
-  async createVersion(policyId: string, data: { conditions: Record<string, any>; actions: Record<string, any> }) {
+  async createVersion(policyId: string, data: DecisionPolicyVersionCreate): Promise<DecisionPolicyVersion> {
     return await post<DecisionPolicyVersion>(`/decision-policies/${policyId}/versions`, data);
   },
 
-  async activateVersion(versionId: string) {
+  async activateVersion(versionId: string): Promise<DecisionPolicyVersion> {
     return await post<DecisionPolicyVersion>(`/decision-policies/versions/${versionId}/activate`);
+  },
+
+  async simulate(data: DecisionSimulateRequest): Promise<DecisionSimulateResponse> {
+    return await post<DecisionSimulateResponse>('/decision-policies/simulate', data);
+  },
+
+  async getTransactionAudit(transactionId: string): Promise<TransactionDecision> {
+    return await get<TransactionDecision>(`/decision-policies/transaction/${transactionId}/audit`);
   },
 };
