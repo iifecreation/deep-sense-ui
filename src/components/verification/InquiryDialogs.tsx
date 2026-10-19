@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, Copy } from "lucide-react";
+import { toast } from "sonner";
 import type {
   InquiryRead,
   OneTimeLinkRead,
@@ -23,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   conflictingInquiryId,
   describeError,
+  errorCode,
   errorStatus,
   hostedVerifyUrl,
   humanize,
@@ -114,7 +116,7 @@ export function ReviewDialog({
     setSubmitting(true);
     setError(null);
     try {
-      await verificationFlowsService.reviewInquiry(inquiry.id, {
+      const result = await verificationFlowsService.reviewInquiry(inquiry.id, {
         decision,
         reject_labels: decision === "decline" ? selected : null,
         reject_type: decision === "decline" ? effectiveType : null,
@@ -122,10 +124,17 @@ export function ReviewDialog({
         client_comment: clientComment.trim() || null,
         internal_comment: internalComment.trim() || null,
       });
+      if (result.pending_decision) {
+        toast.info(`${humanize(decision)} proposed. A second reviewer has to confirm it.`);
+      }
       onOpenChange(false);
       await onDone();
     } catch (cause) {
-      setError(describeError(cause, "Review failed"));
+      setError(
+        errorCode(cause) === "decision_pending_confirmation"
+          ? "A proposed decision is already waiting for a second reviewer. Confirm or reject it first."
+          : describeError(cause, "Review failed"),
+      );
     } finally {
       setSubmitting(false);
     }

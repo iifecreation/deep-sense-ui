@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
   BUSINESS_ONLY_STEPS,
+  POA_DOCUMENT_TYPES,
   STEP_TYPES,
   humanize,
   type InquiryKind,
@@ -26,7 +27,24 @@ interface StepDraft {
   requiredFields: string;
   consentText: string;
   ownershipThreshold: string;
+  poa: PoaDraft;
 }
+
+/** Proof-of-address thresholds; empty strings fall back to the backend defaults. */
+interface PoaDraft {
+  maxAgeDays: string;
+  documentTypes: string;
+  minNameSimilarity: string;
+  minAddressSimilarity: string;
+  minExtractionConfidence: string;
+}
+
+const POA_KEYS = {
+  maxAgeDays: "max_age_days",
+  minNameSimilarity: "min_name_similarity",
+  minAddressSimilarity: "min_address_similarity",
+  minExtractionConfidence: "min_extraction_confidence",
+} as const;
 
 export interface LevelFormValue {
   name: string;
@@ -41,8 +59,20 @@ const DEFAULT_CONSENT =
 const toDraft = (step: { type?: unknown; required?: unknown; config?: unknown }): StepDraft => {
   const config = (step.config && typeof step.config === "object" ? step.config : {}) as Record<string, unknown>;
   const type = step.type as StepType;
-  const { required_fields, consent_text, ownership_threshold_pct, ...rest } = config;
-  const special = type === "questionnaire" || type === "consent" || type === "ubo_declaration";
+  const {
+    required_fields,
+    consent_text,
+    ownership_threshold_pct,
+    max_age_days,
+    accepted_document_types,
+    min_name_similarity,
+    min_address_similarity,
+    min_extraction_confidence,
+    ...rest
+  } = config;
+  const poa = type === "proof_of_address";
+  const special = poa || type === "questionnaire" || type === "consent" || type === "ubo_declaration";
+  const text = (value: unknown) => (poa && value !== undefined && value !== null ? String(value) : "");
   return {
     type,
     required: step.required !== false,
@@ -50,6 +80,13 @@ const toDraft = (step: { type?: unknown; required?: unknown; config?: unknown })
     requiredFields: Array.isArray(required_fields) ? required_fields.join(", ") : "",
     consentText: typeof consent_text === "string" ? consent_text : type === "consent" ? DEFAULT_CONSENT : "",
     ownershipThreshold: ownership_threshold_pct !== undefined ? String(ownership_threshold_pct) : "25",
+    poa: {
+      maxAgeDays: text(max_age_days),
+      documentTypes: poa && Array.isArray(accepted_document_types) ? accepted_document_types.join(", ") : "",
+      minNameSimilarity: text(min_name_similarity),
+      minAddressSimilarity: text(min_address_similarity),
+      minExtractionConfidence: text(min_extraction_confidence),
+    },
   };
 };
 
@@ -70,10 +107,21 @@ function buildConfig(step: StepDraft): Record<string, unknown> {
   if (step.type === "ubo_declaration") {
     return { ...extra, ownership_threshold_pct: Number(step.ownershipThreshold || 25) };
   }
+  if (step.type === "proof_of_address") {
+    const config: Record<string, unknown> = { ...extra };
+    for (const [draftKey, configKey] of Object.entries(POA_KEYS)) {
+      const value = step.poa[draftKey as keyof typeof POA_KEYS].trim();
+      if (value) config[configKey] = Number(value);
+    }
+    const types = step.poa.documentTypes.split(",").map((t) => t.trim()).filter(Boolean);
+    if (types.length) config.accepted_document_types = types;
+    return config;
+  }
   return extra;
 }
 
 const num = (value: string, fallback: number) => (value.trim() === "" ? fallback : Number(value));
+const numOrNull = (value: string) => (value.trim() === "" ? null : Number(value));
 
 export function LevelForm({
   mode,
@@ -115,6 +163,13 @@ export function LevelForm({
   );
   const [reusableAge, setReusableAge] = useState(String(initial?.reusable_max_age_days ?? 365));
   const [duplicateCheck, setDuplicateCheck] = useState(initial?.duplicate_check_enabled ?? true);
+  const [fourEyes, setFourEyes] = useState(
+    initial?.four_eyes_min_risk_score != null ? String(initial.four_eyes_min_risk_score) : "",
+  );
+  const [reviewSla, setReviewSla] = useState(initial?.review_sla_hours ? String(initial.review_sla_hours) : "");
+  const [retentionDays, setRetentionDays] = useState(initial?.retention_days ? String(initial.retention_days) : "");
+  const [monitoring, setMonitoring] = useState(initial?.ongoing_monitoring_enabled ?? false);
+  const [monitoringMin, setMonitoringMin] = useState(String(initial?.monitoring_min_score ?? 0.85));
   const [formError, setFormError] = useState<string | null>(null);
 
   const availableSteps = useMemo(
@@ -129,6 +184,8 @@ export function LevelForm({
 
   const updateStep = (index: number, patch: Partial<StepDraft>) =>
     setSteps((prev) => prev.map((step, i) => (i === index ? { ...step, ...patch } : step)));
+  const updatePoa = (index: number, patch: Partial<PoaDraft>) =>
+    setSteps((prev) => prev.map((step, i) => (i === index ? { ...step, poa: { ...step.poa, ...patch } } : step)));
   const moveStep = (index: number, delta: number) =>
     setSteps((prev) => {
       const next = [...prev];
@@ -167,6 +224,12 @@ export function LevelForm({
         reverification_interval_days: kind === "onboarding" && reverifyDays.trim() ? Number(reverifyDays) : null,
         reusable_max_age_days: num(reusableAge, 365),
         duplicate_check_enabled: duplicateCheck,
+        four_eyes_min_risk_score: numOrNull(fourEyes),
+        review_sla_hours: numOrNull(reviewSla),
+        retention_days: numOrNull(retentionDays),
+        // Monitoring re-screens approved onboarding applicants; actions have nothing to monitor.
+        ongoing_monitoring_enabled: kind === "onboarding" && monitoring,
+        monitoring_min_score: num(monitoringMin, 0.85),
       };
       onSubmit({ name: name.trim(), kind, body });
     } catch (cause) {
@@ -298,6 +361,30 @@ export function LevelForm({
                   <Input id={`uo-${index}`} type="number" min={1} max={100} value={step.ownershipThreshold} onChange={(e) => updateStep(index, { ownershipThreshold: e.target.value })} />
                 </div>
               )}
+              {step.type === "proof_of_address" && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3" data-testid="poa-config">
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`poa-age-${index}`}>Max document age (days)</Label>
+                    <Input id={`poa-age-${index}`} type="number" min={1} max={3650} placeholder="90" value={step.poa.maxAgeDays} onChange={(e) => updatePoa(index, { maxAgeDays: e.target.value })} />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label htmlFor={`poa-types-${index}`}>Accepted document types (comma separated; empty = defaults)</Label>
+                    <Input id={`poa-types-${index}`} placeholder={POA_DOCUMENT_TYPES.join(", ")} value={step.poa.documentTypes} onChange={(e) => updatePoa(index, { documentTypes: e.target.value })} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`poa-name-${index}`}>Min name similarity</Label>
+                    <Input id={`poa-name-${index}`} type="number" step="0.01" min={0} max={1} placeholder="0.85" value={step.poa.minNameSimilarity} onChange={(e) => updatePoa(index, { minNameSimilarity: e.target.value })} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`poa-address-${index}`}>Min address similarity</Label>
+                    <Input id={`poa-address-${index}`} type="number" step="0.01" min={0} max={1} placeholder="0.7" value={step.poa.minAddressSimilarity} onChange={(e) => updatePoa(index, { minAddressSimilarity: e.target.value })} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`poa-confidence-${index}`}>Min extraction confidence</Label>
+                    <Input id={`poa-confidence-${index}`} type="number" step="0.01" min={0} max={1} placeholder="0.6" value={step.poa.minExtractionConfidence} onChange={(e) => updatePoa(index, { minExtractionConfidence: e.target.value })} />
+                  </div>
+                </div>
+              )}
               <details>
                 <summary className="text-xs text-muted-foreground cursor-pointer">Advanced config (JSON)</summary>
                 <Textarea
@@ -374,6 +461,36 @@ export function LevelForm({
             <Label htmlFor="level-reusable-age">Reusable KYC max age (days)</Label>
             <Input id="level-reusable-age" type="number" min={1} max={3650} value={reusableAge} onChange={(e) => setReusableAge(e.target.value)} />
           </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="level-four-eyes">Four-eyes from risk score</Label>
+            <Input id="level-four-eyes" type="number" step="0.01" min={0} max={1} value={fourEyes} onChange={(e) => setFourEyes(e.target.value)} placeholder="off" />
+            <p className="text-xs text-muted-foreground">Approvals and final declines at or above this score need a second reviewer. 0 = always.</p>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="level-review-sla">Review deadline (hours)</Label>
+            <Input id="level-review-sla" type="number" min={1} max={720} value={reviewSla} onChange={(e) => setReviewSla(e.target.value)} placeholder="none" />
+            <p className="text-xs text-muted-foreground">Inquiries waiting longer for a reviewer are marked overdue.</p>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="level-retention">Auto-redact after (days)</Label>
+            <Input id="level-retention" type="number" min={30} max={3650} value={retentionDays} onChange={(e) => setRetentionDays(e.target.value)} placeholder="keep" />
+            <p className="text-xs text-muted-foreground">
+              Declined, expired and superseded inquiries are redacted this long after they closed. The applicant&apos;s current
+              approval is never auto-redacted; redact it yourself when the relationship ends.
+            </p>
+          </div>
+          {kind === "onboarding" && (
+            <>
+              <label className="flex items-center gap-2 text-sm md:col-span-2">
+                <Switch checked={monitoring} onCheckedChange={setMonitoring} aria-label="Ongoing monitoring" />
+                Re-screen approved applicants daily against sanctions/PEP lists and internal watchlists
+              </label>
+              <div className="space-y-1.5">
+                <Label htmlFor="level-monitoring-min">Monitoring min match score</Label>
+                <Input id="level-monitoring-min" type="number" step="0.01" min={0.55} max={1} value={monitoringMin} onChange={(e) => setMonitoringMin(e.target.value)} disabled={!monitoring} />
+              </div>
+            </>
+          )}
           <label className="flex items-center gap-2 text-sm md:col-span-3">
             <Switch checked={duplicateCheck} onCheckedChange={setDuplicateCheck} aria-label="Duplicate applicant check" />
             Route applicants sharing an ID number, email, phone or device with another applicant to review

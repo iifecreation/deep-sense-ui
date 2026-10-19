@@ -10,6 +10,7 @@ import {
   FlaskConical,
   Gavel,
   Link2,
+  Lock,
   RefreshCcw,
   Repeat,
   Share2,
@@ -34,6 +35,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
+  LegalHoldBanner,
+  LegalHoldDialog,
+  MonitoringCard,
+  NotesCard,
+  PendingDecisionCard,
+  ProofOfAddressCard,
+  ProofOfAddressDialog,
+  QueueCard,
+} from "@/components/verification/InquiryCaseWork";
+import {
   OneTimeLinkDialog,
   ReviewDialog,
   ShareTokenDialog,
@@ -44,19 +55,25 @@ import {
 import {
   ErrorCard,
   KindBadge,
+  OverdueBadge,
   ReferenceLink,
   StatusBadge,
   VerificationShell,
   formatDate,
   formatScore,
+  userLabel,
 } from "@/components/verification/VerificationShell";
 import {
   useInquiry,
   useInquiryActions,
   useInquiryEvents,
+  useInquiryNotes,
   useRejectLabels,
+  useTeamMembers,
+  useVerificationLevel,
   useVerificationLevels,
 } from "@/hooks/use-verification-flows";
+import { useCurrentUser } from "@/lib/auth";
 import { useRuntimeEnvironment } from "@/hooks/use-runtime-environment";
 import {
   OPEN_STATUSES,
@@ -65,8 +82,10 @@ import {
   applicantProfileHref,
   describeError,
   describeReviewReason,
+  errorCode,
   humanize,
   parseDuplicateMatches,
+  parsePendingDecision,
   verificationFlowsService,
 } from "@/services/verification-flows.service";
 
@@ -107,6 +126,10 @@ export default function InquiryDetailPage() {
   const isOnboarding = inquiry.data?.kind === "onboarding";
   const actions = useInquiryActions(inquiryId, isOnboarding);
   const levels = useVerificationLevels();
+  const notes = useInquiryNotes(inquiryId);
+  const team = useTeamMembers();
+  const { user: currentUser } = useCurrentUser();
+  const level = useVerificationLevel(inquiry.data?.level_id);
 
   const [reviewOpen, setReviewOpen] = useState(false);
   const [linkOpen, setLinkOpen] = useState(false);
@@ -117,9 +140,11 @@ export default function InquiryDetailPage() {
   const [simulateOpen, setSimulateOpen] = useState(false);
   // The backend refuses simulation in production (403); hide the control once it says so.
   const [simulateForbidden, setSimulateForbidden] = useState(false);
+  const [holdOpen, setHoldOpen] = useState(false);
+  const [poaOpen, setPoaOpen] = useState(false);
 
   const refresh = async () => {
-    await Promise.all([inquiry.refetch(), events.refetch(), actions.refetch()]);
+    await Promise.all([inquiry.refetch(), events.refetch(), actions.refetch(), notes.refetch()]);
   };
 
   const runConfirm = async () => {
@@ -139,7 +164,11 @@ export default function InquiryDetailPage() {
       if (action === "redact") setShowPii(false);
       await refresh();
     } catch (cause) {
-      toast.error(describeError(cause));
+      toast.error(
+        errorCode(cause) === "legal_hold"
+          ? "This inquiry or one of its actions is on legal hold. Release the hold before redacting."
+          : describeError(cause),
+      );
     }
   };
 
@@ -165,7 +194,17 @@ export default function InquiryDetailPage() {
   const approvedOnboarding = !isAction && data.status === "approved" && !redacted;
   const canSimulate = environment !== "production" && !simulateForbidden && (isOpen || canReview);
   const duplicates = parseDuplicateMatches(data.duplicate_matches);
-  const actionLevels = (levels.data ?? []).filter((level) => level.kind === "action");
+  const actionLevels = (levels.data ?? []).filter((item) => item.kind === "action");
+  const pendingDecision = parsePendingDecision(data.pending_decision);
+  const onHold = data.legal_hold_at !== null;
+  const hasPoaStep = data.steps.some((step) => step.step_type === "proof_of_address");
+  const canEvaluatePoa =
+    hasPoaStep && isOpen && data.steps.find((step) => step.step_type === "proof_of_address")?.status !== "passed";
+  const poaConfig = level.data?.steps.find((step) => step.type === "proof_of_address")?.config as
+    | { accepted_document_types?: unknown }
+    | undefined;
+  const poaTypes = Array.isArray(poaConfig?.accepted_document_types) ? poaConfig.accepted_document_types.map(String) : null;
+  const showMonitoring = !isAction && (data.status === "approved" || data.monitoring_status !== null);
 
   return (
     <VerificationShell
@@ -185,7 +224,11 @@ export default function InquiryDetailPage() {
             </Button>
           )}
           {canReview && (
-            <Button onClick={() => setReviewOpen(true)}>
+            <Button
+              onClick={() => setReviewOpen(true)}
+              disabled={!!pendingDecision}
+              title={pendingDecision ? "A proposed decision is waiting for a second reviewer" : undefined}
+            >
               <Gavel className="w-3.5 h-3.5 mr-2" /> Review
             </Button>
           )}
@@ -214,8 +257,19 @@ export default function InquiryDetailPage() {
               <TimerOff className="w-3.5 h-3.5 mr-2" /> Expire
             </Button>
           )}
+          {!onHold && !redacted && (
+            <Button variant="outline" onClick={() => setHoldOpen(true)}>
+              <Lock className="w-3.5 h-3.5 mr-2" /> Legal hold
+            </Button>
+          )}
           {isTerminal && !redacted && (
-            <Button variant="outline" className="text-rose-600" onClick={() => setConfirm("redact")}>
+            <Button
+              variant="outline"
+              className="text-rose-600"
+              onClick={() => setConfirm("redact")}
+              disabled={onHold}
+              title={onHold ? "Release the legal hold before redacting" : undefined}
+            >
               <ShieldOff className="w-3.5 h-3.5 mr-2" /> Redact
             </Button>
           )}
@@ -225,6 +279,9 @@ export default function InquiryDetailPage() {
         </>
       }
     >
+      <LegalHoldBanner inquiry={data} onDone={refresh} />
+      <PendingDecisionCard inquiry={data} members={team.data} currentUserId={currentUser?.id} onDone={refresh} />
+
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <Card className="rounded-3xl xl:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
@@ -255,6 +312,12 @@ export default function InquiryDetailPage() {
               </Field>
             )}
             <Field label="Risk score">{formatScore(data.risk_score)}</Field>
+            <Field label="Assignee">
+              <span data-testid="inquiry-assignee">{data.assigned_to_user_id ? userLabel(data.assigned_to_user_id, team.data) : "Unassigned"}</span>
+            </Field>
+            <Field label="Review due">
+              {formatDate(data.review_due_at)} <OverdueBadge dueAt={data.review_due_at} />
+            </Field>
             <Field label="Attempts">{data.attempt_count}</Field>
             <Field label="Source">{humanize(data.source)}</Field>
             <Field label="Country">{data.country_code ?? "—"}</Field>
@@ -308,7 +371,6 @@ export default function InquiryDetailPage() {
                 </Field>
               </div>
             )}
-            {!!data.tags?.length && <Field label="Tags">{data.tags.join(", ")}</Field>}
           </CardContent>
         </Card>
 
@@ -340,6 +402,28 @@ export default function InquiryDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <QueueCard
+          key={(data.tags ?? []).join(",")}
+          inquiry={data}
+          members={team.data}
+          currentUserId={currentUser?.id}
+          onDone={refresh}
+        />
+        <div className="xl:col-span-2">
+          <NotesCard
+            inquiry={data}
+            members={team.data}
+            notes={notes.data}
+            notesError={notes.error}
+            onRetry={notes.refetch}
+            onAdded={() => Promise.all([notes.refetch(), events.refetch()]).then(() => undefined)}
+          />
+        </div>
+      </div>
+
+      {showMonitoring && <MonitoringCard inquiry={data} onDone={refresh} />}
 
       {duplicates.length > 0 && (
         <Card className="rounded-3xl border-amber-200" data-testid="duplicate-matches">
@@ -467,7 +551,12 @@ export default function InquiryDetailPage() {
                   <TableCell className="text-xs">{formatDate(step.evaluated_at)}</TableCell>
                   <TableCell className="text-right px-6">
                     {isOpen && step.status !== "passed" && (
-                      <Button size="sm" variant="outline" onClick={() => setStepType(step.step_type)}>Record result</Button>
+                      <div className="flex justify-end gap-2">
+                        {step.step_type === "proof_of_address" && (
+                          <Button size="sm" variant="outline" onClick={() => setPoaOpen(true)}>Evaluate document</Button>
+                        )}
+                        <Button size="sm" variant="outline" onClick={() => setStepType(step.step_type)}>Record result</Button>
+                      </div>
                     )}
                   </TableCell>
                 </TableRow>
@@ -476,6 +565,8 @@ export default function InquiryDetailPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <ProofOfAddressCard inquiry={data} canEvaluate={canEvaluatePoa} onEvaluate={() => setPoaOpen(true)} />
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <Card className="rounded-3xl">
@@ -488,7 +579,7 @@ export default function InquiryDetailPage() {
             ) : (
               <ol className="space-y-4">
                 {data.reviews.map((review) => (
-                  <li key={review.id} className="border-l-2 border-border pl-4">
+                  <li key={review.id} className="border-l-2 border-border pl-4" data-testid="review-record">
                     <div className="flex flex-wrap items-center gap-2 text-sm">
                       <span className="font-bold">{humanize(review.decision)}</span>
                       {review.reject_type && <Badge variant="outline" className="text-[9px]">{review.reject_type}</Badge>}
@@ -497,6 +588,18 @@ export default function InquiryDetailPage() {
                         {formatDate(review.created_at)}
                       </span>
                     </div>
+                    {!review.automated && (
+                      <div className="text-xs mt-1">
+                        {review.proposed_by_user_id ? (
+                          <>
+                            Proposed by {userLabel(review.proposed_by_user_id, team.data)} · confirmed by{" "}
+                            {userLabel(review.reviewer_user_id, team.data)}
+                          </>
+                        ) : (
+                          <>Reviewer: {userLabel(review.reviewer_user_id, team.data)}</>
+                        )}
+                      </div>
+                    )}
                     {!!review.reject_labels?.length && <div className="text-[11px] font-mono mt-1">{review.reject_labels.join(", ")}</div>}
                     {!!review.reset_steps?.length && <div className="text-xs mt-1">Reset: {review.reset_steps.map(humanize).join(", ")}</div>}
                     {review.client_comment && <div className="text-xs mt-1">To applicant: {review.client_comment}</div>}
@@ -540,6 +643,17 @@ export default function InquiryDetailPage() {
         </Card>
       </div>
 
+      <LegalHoldDialog key={`hold-${holdOpen}`} open={holdOpen} onOpenChange={setHoldOpen} inquiry={data} onDone={refresh} />
+      {hasPoaStep && (
+        <ProofOfAddressDialog
+          key={`poa-${poaOpen}-${poaTypes?.join(",") ?? ""}`}
+          open={poaOpen}
+          onOpenChange={setPoaOpen}
+          inquiry={data}
+          acceptedTypes={poaTypes}
+          onDone={refresh}
+        />
+      )}
       <ReviewDialog key={`review-${reviewOpen}`} open={reviewOpen} onOpenChange={setReviewOpen} inquiry={data} onDone={refresh} labels={labels.data ?? []} />
       <OneTimeLinkDialog open={linkOpen} onOpenChange={setLinkOpen} inquiry={data} onDone={events.refetch} />
       <ShareTokenDialog key={`share-${shareOpen}`} open={shareOpen} onOpenChange={setShareOpen} inquiry={data} onDone={events.refetch} />

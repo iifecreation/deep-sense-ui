@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { settingsService } from '@/services/settings.service';
 import {
   verificationFlowsService,
   type InquiryListFilters,
@@ -51,10 +52,22 @@ export function useRejectLabels() {
 }
 
 export function useInquiries(filters: InquiryListFilters) {
-  const { status, kind, reference_id, level_name, limit, offset } = filters;
+  const { status, kind, reference_id, level_name, assigned_to_me, unassigned, review_overdue, limit, offset } = filters;
   const loader = useCallback(
-    () => verificationFlowsService.listInquiries({ status, kind, reference_id, level_name, limit, offset }),
-    [status, kind, reference_id, level_name, limit, offset],
+    () =>
+      verificationFlowsService.listInquiries({
+        status,
+        kind,
+        reference_id,
+        level_name,
+        // Only send the queue switches when on, so the URL stays short.
+        assigned_to_me: assigned_to_me || undefined,
+        unassigned: unassigned || undefined,
+        review_overdue: review_overdue || undefined,
+        limit,
+        offset,
+      }),
+    [status, kind, reference_id, level_name, assigned_to_me, unassigned, review_overdue, limit, offset],
   );
   return useResource(loader);
 }
@@ -81,6 +94,20 @@ export function useInquiryActions(inquiryId: string, enabled: boolean) {
   return useResource(loader);
 }
 
+export function useInquiryNotes(inquiryId: string) {
+  const loader = useCallback(() => verificationFlowsService.listNotes(inquiryId), [inquiryId]);
+  return useResource(loader);
+}
+
+/** The organization's active users (not pending invites), for assignment and reviewer names. */
+export function useTeamMembers() {
+  const loader = useCallback(
+    () => settingsService.listTeam().then((team) => team.members.filter((member) => !member.is_invite)),
+    [],
+  );
+  return useResource(loader);
+}
+
 export function useApplicantProfile(referenceId: string) {
   const loader = useCallback(() => verificationFlowsService.getApplicantProfile(referenceId), [referenceId]);
   return useResource(loader);
@@ -95,6 +122,14 @@ export function useRiskListItems(listId: string | null) {
   const loader = useCallback(
     () => (listId ? verificationFlowsService.listRiskListItems(listId) : Promise.resolve([])),
     [listId],
+  );
+  return useResource(loader);
+}
+
+export function useVerificationLevel(levelId: string | undefined) {
+  const loader = useCallback(
+    () => (levelId ? verificationFlowsService.getLevel(levelId) : Promise.resolve(undefined)),
+    [levelId],
   );
   return useResource(loader);
 }

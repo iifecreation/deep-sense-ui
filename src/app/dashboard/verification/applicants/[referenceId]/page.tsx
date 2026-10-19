@@ -20,6 +20,8 @@ import { errorStatus } from "@/services/verification-flows.service";
 
 const STATUS_COPY: Record<string, string> = {
   verified: "Approved onboarding inquiry on file.",
+  monitoring_hit:
+    "Ongoing monitoring matched this approved applicant against a sanctions/PEP list or watchlist. Review the hit on the current inquiry.",
   reverification_due: "Approved, but the level's re-verification interval has passed.",
   in_progress: "An onboarding inquiry is still in progress.",
   needs_review: "An onboarding inquiry is waiting for a reviewer.",
@@ -160,13 +162,20 @@ export default function ApplicantProfilePage() {
         </>
       }
     >
-      <Card className="rounded-3xl">
+      <Card className={`rounded-3xl ${data.verification_status === "monitoring_hit" ? "border-rose-400 bg-rose-50/60" : ""}`}>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base font-black uppercase italic tracking-tight">Verification status</CardTitle>
           <div data-testid="applicant-status"><StatusBadge status={data.verification_status} /></div>
         </CardHeader>
         <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="col-span-2 md:col-span-4 text-sm text-muted-foreground">{STATUS_COPY[data.verification_status]}</div>
+          <div
+            className={`col-span-2 md:col-span-4 text-sm ${
+              data.verification_status === "monitoring_hit" ? "text-rose-700 font-semibold" : "text-muted-foreground"
+            }`}
+            role={data.verification_status === "monitoring_hit" ? "alert" : undefined}
+          >
+            {STATUS_COPY[data.verification_status]}
+          </div>
           <Field label="Current inquiry"><InquiryLink id={data.current_inquiry_id} /></Field>
           <Field label="Open inquiry"><InquiryLink id={data.open_inquiry_id} /></Field>
           <Field label="Verified">{formatDate(data.verified_at)}</Field>

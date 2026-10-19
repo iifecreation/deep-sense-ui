@@ -15,13 +15,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import {
   ErrorCard,
   KindBadge,
+  OverdueBadge,
   ReferenceLink,
   StatusBadge,
   VerificationShell,
   formatDate,
   formatScore,
+  userLabel,
 } from "@/components/verification/VerificationShell";
-import { useInquiries, useVerificationLevels } from "@/hooks/use-verification-flows";
+import { useInquiries, useTeamMembers, useVerificationLevels } from "@/hooks/use-verification-flows";
 import {
   INQUIRY_KINDS,
   INQUIRY_STATUSES,
@@ -35,6 +37,14 @@ import {
 const PAGE_SIZE = 25;
 const ALL = "all";
 
+/** Queue switches; "Assigned to me" and "Unassigned" exclude each other. */
+const QUEUE_FILTERS = [
+  { key: "assigned_to_me", label: "Assigned to me" },
+  { key: "unassigned", label: "Unassigned" },
+  { key: "review_overdue", label: "Review overdue" },
+] as const;
+type QueueFilter = (typeof QUEUE_FILTERS)[number]["key"];
+
 export default function InquiriesQueuePage() {
   const router = useRouter();
   const [status, setStatus] = useState<InquiryStatus | typeof ALL>(ALL);
@@ -43,12 +53,29 @@ export default function InquiriesQueuePage() {
   const [referenceInput, setReferenceInput] = useState("");
   const [reference, setReference] = useState("");
   const [offset, setOffset] = useState(0);
+  const [queue, setQueue] = useState<Record<QueueFilter, boolean>>({
+    assigned_to_me: false,
+    unassigned: false,
+    review_overdue: false,
+  });
+  const team = useTeamMembers();
+
+  const toggleQueue = (key: QueueFilter) => {
+    setQueue((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      if (key === "assigned_to_me" && next.assigned_to_me) next.unassigned = false;
+      if (key === "unassigned" && next.unassigned) next.assigned_to_me = false;
+      return next;
+    });
+    setOffset(0);
+  };
 
   const inquiries = useInquiries({
     status: status === ALL ? undefined : status,
     kind: kind === ALL ? undefined : kind,
     level_name: levelName === ALL ? undefined : levelName,
     reference_id: reference || undefined,
+    ...queue,
     limit: PAGE_SIZE,
     offset,
   });
@@ -191,6 +218,20 @@ export default function InquiriesQueuePage() {
             ))}
           </SelectContent>
         </Select>
+        <div className="flex flex-wrap gap-2" aria-label="Queue filters">
+          {QUEUE_FILTERS.map(({ key, label }) => (
+            <Button
+              key={key}
+              size="sm"
+              variant={queue[key] ? "default" : "outline"}
+              aria-pressed={queue[key]}
+              className="text-[10px] font-black uppercase tracking-widest"
+              onClick={() => toggleQueue(key)}
+            >
+              {label}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {inquiries.isError && !inquiries.data ? (
@@ -206,6 +247,8 @@ export default function InquiriesQueuePage() {
                   <TableHead>Status</TableHead>
                   <TableHead>Risk</TableHead>
                   <TableHead>Attempts</TableHead>
+                  <TableHead>Assignee</TableHead>
+                  <TableHead>Review due</TableHead>
                   <TableHead>Source</TableHead>
                   <TableHead>Country</TableHead>
                   <TableHead>Created</TableHead>
@@ -215,12 +258,12 @@ export default function InquiriesQueuePage() {
               <TableBody>
                 {inquiries.isLoading && (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-10 text-slate-500">Loading inquiries…</TableCell>
+                    <TableCell colSpan={11} className="text-center py-10 text-slate-500">Loading inquiries…</TableCell>
                   </TableRow>
                 )}
                 {!inquiries.isLoading && rows.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-10 text-slate-500">No inquiries match these filters.</TableCell>
+                    <TableCell colSpan={11} className="text-center py-10 text-slate-500">No inquiries match these filters.</TableCell>
                   </TableRow>
                 )}
                 {rows.map((row) => (
@@ -249,6 +292,12 @@ export default function InquiriesQueuePage() {
                     </TableCell>
                     <TableCell className="font-mono text-xs">{formatScore(row.risk_score)}</TableCell>
                     <TableCell className="text-xs">{row.attempt_count}</TableCell>
+                    <TableCell className="text-xs" data-testid="inquiry-assignee">
+                      {row.assigned_to_user_id ? userLabel(row.assigned_to_user_id, team.data) : <span className="text-muted-foreground">Unassigned</span>}
+                    </TableCell>
+                    <TableCell className="text-xs">
+                      {formatDate(row.review_due_at)} <OverdueBadge dueAt={row.review_due_at} />
+                    </TableCell>
                     <TableCell className="text-xs">{humanize(row.source)}</TableCell>
                     <TableCell className="text-xs">{row.country_code ?? "—"}</TableCell>
                     <TableCell className="text-xs">{formatDate(row.created_at)}</TableCell>

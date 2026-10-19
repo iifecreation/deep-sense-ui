@@ -4,10 +4,15 @@ import type {
   InquiryCreate,
   InquiryEventRead,
   InquiryListItem,
+  InquiryNoteRead,
   InquiryPage,
   InquiryRead,
   InquiryReviewCreate,
+  MonitoringResolve,
+  MonitoringRunResult,
   OneTimeLinkCreate,
+  ProofOfAddressEvaluate,
+  RetentionRunResult,
   OneTimeLinkRead,
   RejectLabelRead,
   RiskListCreate,
@@ -26,7 +31,7 @@ import type {
   VerificationLevelCreate,
   VerificationLevelRead,
 } from '@/lib/api-client/api';
-import { del, get, post } from '@/lib/api/client';
+import { del, get, post, put } from '@/lib/api/client';
 
 export const STEP_TYPES = [
   'document',
@@ -93,11 +98,108 @@ export const parseDuplicateMatches = (value: unknown): DuplicateMatch[] =>
         }))
     : [];
 
+/** `InquiryRead.pending_decision`: a four-eyes proposal waiting for a second reviewer. */
+export interface PendingDecision {
+  decision: string;
+  reject_labels: string[];
+  reject_type: string | null;
+  client_comment: string | null;
+  internal_comment: string | null;
+  proposed_by_user_id: string;
+  proposed_at: string | null;
+}
+
+export const parsePendingDecision = (value: unknown): PendingDecision | null => {
+  if (!value || typeof value !== 'object' || !('decision' in value)) return null;
+  const item = value as Record<string, unknown>;
+  const text = (key: string) => (typeof item[key] === 'string' ? (item[key] as string) : null);
+  return {
+    decision: String(item.decision),
+    reject_labels: Array.isArray(item.reject_labels) ? item.reject_labels.map(String) : [],
+    reject_type: text('reject_type'),
+    client_comment: text('client_comment'),
+    internal_comment: text('internal_comment'),
+    proposed_by_user_id: String(item.proposed_by_user_id ?? ''),
+    proposed_at: text('proposed_at'),
+  };
+};
+
+/** One entry of `InquiryRead.monitoring_hits`. */
+export interface MonitoringHit {
+  fingerprint: string;
+  source: string;
+  list_name: string;
+  list_issuer: string | null;
+  matched_name: string;
+  score: number | null;
+  risk_level: string | null;
+  detected_at: string | null;
+}
+
+export const parseMonitoringHits = (value: unknown): MonitoringHit[] =>
+  Array.isArray(value)
+    ? value
+        .filter((item): item is Record<string, unknown> => !!item && typeof item === 'object')
+        .map((item, index) => ({
+          fingerprint: String(item.fingerprint ?? index),
+          source: String(item.source ?? ''),
+          list_name: String(item.list_name ?? ''),
+          list_issuer: item.list_issuer == null ? null : String(item.list_issuer),
+          matched_name: String(item.matched_name ?? ''),
+          score: typeof item.score === 'number' ? item.score : null,
+          risk_level: item.risk_level == null ? null : String(item.risk_level),
+          detected_at: item.detected_at == null ? null : String(item.detected_at),
+        }))
+    : [];
+
+/** The `proof_of_address` step's `result`, as stored by the PoA evaluation. */
+export interface ProofOfAddressResult {
+  document_type: string | null;
+  document_type_accepted: boolean | null;
+  document_age_days: number | null;
+  max_age_days: number | null;
+  name_similarity: number | null;
+  address_similarity: number | null;
+  address_compared: boolean;
+  extraction_confidence: number | null;
+  failures: string[];
+  address_captured_from_document: boolean;
+}
+
+export const parseProofOfAddressResult = (value: unknown): ProofOfAddressResult | null => {
+  if (!value || typeof value !== 'object' || (value as Record<string, unknown>).check !== 'proof_of_address') return null;
+  const item = value as Record<string, unknown>;
+  const numberOrNull = (key: string) => (typeof item[key] === 'number' ? (item[key] as number) : null);
+  return {
+    document_type: typeof item.document_type === 'string' ? item.document_type : null,
+    document_type_accepted: typeof item.document_type_accepted === 'boolean' ? item.document_type_accepted : null,
+    document_age_days: numberOrNull('document_age_days'),
+    max_age_days: numberOrNull('max_age_days'),
+    name_similarity: numberOrNull('name_similarity'),
+    address_similarity: numberOrNull('address_similarity'),
+    address_compared: item.address_compared === true,
+    extraction_confidence: numberOrNull('extraction_confidence'),
+    failures: Array.isArray(item.failures) ? item.failures.map(String) : [],
+    address_captured_from_document: item.address_captured_from_document === true,
+  };
+};
+
+export const POA_DOCUMENT_TYPES = [
+  'utility_bill',
+  'bank_statement',
+  'tax_document',
+  'government_letter',
+  'tenancy_agreement',
+] as const;
+
 export interface InquiryListFilters {
   status?: InquiryStatus;
   kind?: InquiryKind;
   reference_id?: string;
   level_name?: string;
+  assigned_to_me?: boolean;
+  unassigned?: boolean;
+  review_overdue?: boolean;
   limit?: number;
   offset?: number;
 }
@@ -136,6 +238,37 @@ export const verificationFlowsService = {
   reverifyInquiry: (inquiryId: string) => post<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/reverify`),
   simulateReview: (inquiryId: string, body: SimulateReviewCreate) =>
     post<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/simulate-review`, body),
+  evaluateProofOfAddress: (inquiryId: string, body: ProofOfAddressEvaluate) =>
+    post<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/proof-of-address`, body),
+
+  // Four-eyes review
+  confirmProposal: (inquiryId: string) =>
+    post<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/review/confirm`),
+  rejectProposal: (inquiryId: string, reason: string) =>
+    post<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/review/reject-proposal`, { reason }),
+
+  // Queue management
+  assignInquiry: (inquiryId: string, userId: string | null) =>
+    post<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/assign`, { user_id: userId }),
+  listNotes: (inquiryId: string) => get<InquiryNoteRead[]>(`/verification/inquiries/${enc(inquiryId)}/notes`),
+  addNote: (inquiryId: string, body: string) =>
+    post<InquiryNoteRead>(`/verification/inquiries/${enc(inquiryId)}/notes`, { body }),
+  setTags: (inquiryId: string, tags: string[]) =>
+    put<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/tags`, { tags }),
+
+  // Retention and legal holds
+  placeLegalHold: (inquiryId: string, reason: string) =>
+    post<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/legal-hold`, { reason }),
+  releaseLegalHold: (inquiryId: string) => del<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/legal-hold`),
+  runRetention: (dryRun: boolean) =>
+    post<RetentionRunResult>('/verification/retention/run', undefined, { params: { dry_run: dryRun } }),
+
+  // Ongoing monitoring
+  runInquiryMonitoring: (inquiryId: string) =>
+    post<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/monitoring/run`),
+  resolveMonitoring: (inquiryId: string, body: MonitoringResolve) =>
+    post<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/monitoring/resolve`, body),
+  runMonitoring: () => post<MonitoringRunResult>('/verification/monitoring/run'),
 
   // Step-up actions
   createAction: (inquiryId: string, body: ActionCreate) =>
@@ -191,6 +324,12 @@ export const humanize = (value: string | null | undefined): string =>
 const errorDetails = (error: unknown): Record<string, unknown> | undefined => {
   const details = (error as { details?: { details?: unknown } } | null)?.details?.details;
   return details && typeof details === 'object' && !Array.isArray(details) ? (details as Record<string, unknown>) : undefined;
+};
+
+/** Machine error code of a DeepSense error (e.g. `legal_hold`, `four_eyes_same_reviewer`). */
+export const errorCode = (error: unknown): string | undefined => {
+  const code = errorDetails(error)?.error;
+  return typeof code === 'string' ? code : undefined;
 };
 
 /** The existing inquiry named by a 409 `action_exists` error, if any. */

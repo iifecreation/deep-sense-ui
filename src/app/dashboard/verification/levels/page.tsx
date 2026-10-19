@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LevelForm, type LevelFormValue } from "@/components/verification/LevelForm";
+import { MonitoringRunPanel, RetentionPanel } from "@/components/verification/MaintenancePanels";
 import { ErrorCard, KindBadge, VerificationShell, formatDate } from "@/components/verification/VerificationShell";
 import { useRiskLists, useVerificationLevels } from "@/hooks/use-verification-flows";
 import { describeError, humanize, verificationFlowsService } from "@/services/verification-flows.service";
@@ -95,6 +96,7 @@ export default function VerificationLevelsPage() {
                   <TableHead>Applicant</TableHead>
                   <TableHead>Steps</TableHead>
                   <TableHead>Auto-approve</TableHead>
+                  <TableHead>Review &amp; retention</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right px-6">Actions</TableHead>
                 </TableRow>
@@ -102,12 +104,12 @@ export default function VerificationLevelsPage() {
               <TableBody>
                 {levels.isLoading && (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-10 text-slate-500">Loading levels…</TableCell>
+                    <TableCell colSpan={9} className="text-center py-10 text-slate-500">Loading levels…</TableCell>
                   </TableRow>
                 )}
                 {!levels.isLoading && rows.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-10 text-slate-500">
+                    <TableCell colSpan={9} className="text-center py-10 text-slate-500">
                       No verification levels yet. Create one to start issuing inquiries.
                     </TableCell>
                   </TableRow>
@@ -142,6 +144,12 @@ export default function VerificationLevelsPage() {
                       {level.auto_approve_enabled ? `≤ ${level.auto_approve_max_risk_score}` : "Off"}
                       {!level.duplicate_check_enabled && <div className="text-muted-foreground">No duplicate check</div>}
                     </TableCell>
+                    <TableCell className="text-xs space-y-0.5" data-testid={`level-policy-${level.name}`}>
+                      <div>Four-eyes: {level.four_eyes_min_risk_score == null ? "off" : `≥ ${level.four_eyes_min_risk_score}`}</div>
+                      {level.review_sla_hours != null && <div>Review within {level.review_sla_hours} h</div>}
+                      <div>Retention: {level.retention_days == null ? "keep" : `${level.retention_days} days`}</div>
+                      {level.ongoing_monitoring_enabled && <div>Monitoring ≥ {level.monitoring_min_score}</div>}
+                    </TableCell>
                     <TableCell className="text-xs">{formatDate(level.created_at)}</TableCell>
                     <TableCell className="text-right px-6">
                       <div className="flex justify-end gap-2">
@@ -162,6 +170,11 @@ export default function VerificationLevelsPage() {
           </CardContent>
         </Card>
       )}
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <RetentionPanel />
+        <MonitoringRunPanel />
+      </div>
 
       <Dialog open={dialog !== null} onOpenChange={(open) => !open && setDialog(null)}>
         <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">

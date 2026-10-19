@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AlertCircle, RefreshCcw } from "lucide-react";
@@ -115,6 +116,11 @@ const STATUS_STYLES: Record<string, string> = {
   reverification_due: "border-orange-300 text-orange-700 bg-orange-50",
   in_progress: "border-blue-300 text-blue-700 bg-blue-50",
   unverified: "border-slate-300 text-slate-600 bg-slate-50",
+  monitoring_hit: "border-rose-600 text-white bg-rose-600",
+  // ongoing monitoring statuses
+  clear: "border-emerald-300 text-emerald-700 bg-emerald-50",
+  hit: "border-rose-600 text-white bg-rose-600",
+  confirmed: "border-rose-300 text-rose-700 bg-rose-50",
 };
 
 export function StatusBadge({ status }: { status: string }) {
@@ -128,6 +134,28 @@ export function StatusBadge({ status }: { status: string }) {
     </Badge>
   );
 }
+
+/** "Overdue" when a review deadline has passed, nothing otherwise. */
+export function OverdueBadge({ dueAt }: { dueAt: string | null | undefined }) {
+  // Read the clock once per mount: a re-render shouldn't flip the badge mid-session.
+  const [now] = useState(() => Date.now());
+  if (!dueAt || new Date(dueAt).getTime() > now) return null;
+  return (
+    <Badge variant="outline" data-testid="overdue-badge" className="text-[9px] font-black uppercase italic tracking-widest border-rose-300 text-rose-700 bg-rose-50">
+      Overdue
+    </Badge>
+  );
+}
+
+/** Display name of an org user, falling back to a short ID when the user isn't listed. */
+export const userLabel = (
+  userId: string | null | undefined,
+  members: { user_id: string; full_name: string | null; email: string }[] | undefined,
+): string => {
+  if (!userId) return "—";
+  const member = members?.find((m) => m.user_id === userId);
+  return member ? member.full_name || member.email : userId.split("-")[0];
+};
 
 export const formatDate = (value: string | null | undefined): string =>
   value ? new Date(value).toLocaleString() : "—";
