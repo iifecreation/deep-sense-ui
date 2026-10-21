@@ -46,8 +46,8 @@ export const promotionService = {
   async getGoLiveRequest(): Promise<GoLiveRequestRead | null> {
     try {
       return await get<GoLiveRequestRead>('/sandbox/promotion/request');
-    } catch (error: any) {
-      if (error.response?.status === 404) {
+    } catch (error: unknown) {
+      if ((error as { response?: { status?: number } }).response?.status === 404) {
         return null;
       }
       throw error;

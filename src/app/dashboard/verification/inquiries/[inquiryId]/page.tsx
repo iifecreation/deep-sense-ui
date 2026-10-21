@@ -44,6 +44,8 @@ import {
   ProofOfAddressDialog,
   QueueCard,
 } from "@/components/verification/InquiryCaseWork";
+import { BeneficiariesCard } from "@/components/verification/BeneficiariesCard";
+import { VideoSessionsCard } from "@/components/verification/VideoSessionsCard";
 import {
   OneTimeLinkDialog,
   ReviewDialog,
@@ -69,6 +71,9 @@ import {
   useInquiryEvents,
   useInquiryNotes,
   useRejectLabels,
+  useBeneficiaries,
+  useVideoSessions,
+  useReviewers,
   useTeamMembers,
   useVerificationLevel,
   useVerificationLevels,
@@ -128,8 +133,13 @@ export default function InquiryDetailPage() {
   const levels = useVerificationLevels();
   const notes = useInquiryNotes(inquiryId);
   const team = useTeamMembers();
+  const reviewers = useReviewers();
   const { user: currentUser } = useCurrentUser();
   const level = useVerificationLevel(inquiry.data?.level_id);
+  const isBusiness = inquiry.data?.kind === "onboarding" && level.data?.applicant_type === "business";
+  const beneficiaries = useBeneficiaries(inquiryId, showPii, isBusiness);
+  const hasVideoStep = !!inquiry.data?.steps.some((step) => step.step_type === "video_ident");
+  const videoSessions = useVideoSessions(inquiryId, hasVideoStep);
 
   const [reviewOpen, setReviewOpen] = useState(false);
   const [linkOpen, setLinkOpen] = useState(false);
@@ -144,7 +154,14 @@ export default function InquiryDetailPage() {
   const [poaOpen, setPoaOpen] = useState(false);
 
   const refresh = async () => {
-    await Promise.all([inquiry.refetch(), events.refetch(), actions.refetch(), notes.refetch()]);
+    await Promise.all([
+      inquiry.refetch(),
+      events.refetch(),
+      actions.refetch(),
+      notes.refetch(),
+      beneficiaries.refetch(),
+      videoSessions.refetch(),
+    ]);
   };
 
   const runConfirm = async () => {
@@ -408,6 +425,7 @@ export default function InquiryDetailPage() {
           key={(data.tags ?? []).join(",")}
           inquiry={data}
           members={team.data}
+          reviewers={reviewers.data}
           currentUserId={currentUser?.id}
           onDone={refresh}
         />
@@ -424,6 +442,30 @@ export default function InquiryDetailPage() {
       </div>
 
       {showMonitoring && <MonitoringCard inquiry={data} onDone={refresh} />}
+
+      {hasVideoStep && (
+        <VideoSessionsCard
+          inquiry={data}
+          sessions={videoSessions.data}
+          error={videoSessions.error}
+          onRetry={videoSessions.refetch}
+          currentUserId={currentUser?.id}
+          onChanged={refresh}
+        />
+      )}
+
+      {isBusiness && (
+        <BeneficiariesCard
+          inquiry={data}
+          beneficiaries={beneficiaries.data}
+          error={beneficiaries.error}
+          onRetry={beneficiaries.refetch}
+          showPii={showPii}
+          beneficiaryLevelName={level.data?.beneficiary_level_name}
+          requiredRoles={level.data?.required_beneficiary_roles ?? ["ubo"]}
+          onChanged={refresh}
+        />
+      )}
 
       {duplicates.length > 0 && (
         <Card className="rounded-3xl border-amber-200" data-testid="duplicate-matches">
@@ -545,7 +587,35 @@ export default function InquiryDetailPage() {
                   <TableCell><StatusBadge status={step.status} /></TableCell>
                   <TableCell className="text-xs">{step.attempt}</TableCell>
                   <TableCell className="font-mono text-xs">{formatScore(step.risk_score)}</TableCell>
-                  <TableCell className="font-mono text-xs max-w-[10rem] truncate" title={step.evidence_ref ?? undefined}>{step.evidence_ref ?? "—"}</TableCell>
+                  <TableCell className="font-mono text-xs max-w-[10rem] truncate" title={step.evidence_ref ?? undefined}>
+                    {step.evidence_ref && step.evidence_ref_source === "upload" ? (
+                      <button
+                        type="button"
+                        className="underline"
+                        data-testid={`view-upload-${step.step_type}`}
+                        onClick={async () => {
+                          // Open the tab synchronously so pop-up blockers allow it, then load the file.
+                          // ("noopener" would make window.open return null, so detach by hand.)
+                          const tab = window.open("", "_blank");
+                          if (tab) tab.opener = null;
+                          try {
+                            const url = await verificationFlowsService.openUploadedFile(step.evidence_ref!);
+                            if (tab) tab.location.href = url;
+                            else window.open(url, "_blank", "noopener,noreferrer");
+                            // The new tab keeps its own reference once loaded.
+                            setTimeout(() => URL.revokeObjectURL(url), 60_000);
+                          } catch (cause) {
+                            tab?.close();
+                            toast.error(describeError(cause, "Could not open the file"));
+                          }
+                        }}
+                      >
+                        View file
+                      </button>
+                    ) : (
+                      step.evidence_ref ?? "—"
+                    )}
+                  </TableCell>
                   <TableCell className="text-[10px] font-mono">{step.reject_labels?.join(", ") || "—"}</TableCell>
                   <TableCell className="text-xs">{formatDate(step.submitted_at)}</TableCell>
                   <TableCell className="text-xs">{formatDate(step.evaluated_at)}</TableCell>

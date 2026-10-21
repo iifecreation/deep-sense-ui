@@ -14,6 +14,18 @@ import { authService } from "@/services/auth.service";
 import { ApiError } from "@/lib/api/client";
 import axios from "axios";
 
+/**
+ * The post-login destination from `?redirect=`. searchParams.get() has already decoded it once,
+ * so it is used as-is (decoding again breaks paths containing "%"). Only same-site paths are
+ * accepted, so a crafted link can't bounce a freshly signed-in user to another site.
+ */
+export function safeRedirectPath(redirect: string | null): string {
+  if (!redirect || !redirect.startsWith('/') || redirect.startsWith('//') || redirect.startsWith('/\\')) {
+    return '/dashboard';
+  }
+  return redirect;
+}
+
 function LoginFormContent({ redirect }: { redirect: string | null }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,11 +56,7 @@ function LoginFormContent({ redirect }: { redirect: string | null }) {
       }
 
       // Redirect to intended destination or dashboard
-      if (redirect) {
-        router.push(decodeURIComponent(redirect));
-      } else {
-        router.push('/dashboard');
-      }
+      router.push(safeRedirectPath(redirect));
     } catch (err) {
       const apiError = err as ApiError;
       const statusCode = axios.isAxiosError(err) ? err.response?.status : apiError.statusCode;

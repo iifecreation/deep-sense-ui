@@ -642,6 +642,23 @@ export interface ApiKeyUsageRead {
   usage_by_scope?: ApiKeyUsageReadUsageByScope;
 }
 
+export interface ApiVersionInfo {
+  date: string;
+  summary: string;
+  changes: string[];
+}
+
+export interface ApiVersionPin {
+  /** A dated version (YYYY-MM-DD), or null to follow the current one. */
+  version: string | null;
+}
+
+export interface ApiVersionsRead {
+  current: string;
+  organization_pin: string | null;
+  versions: ApiVersionInfo[];
+}
+
 export interface AppPaymentAssessmentRequest {
   /**
      * @minLength 1
@@ -793,7 +810,16 @@ export type ApplicantStepSubmitData = { [key: string]: unknown };
 
 export interface ApplicantStepSubmit {
   data?: ApplicantStepSubmitData;
+  /** ID of an upload the applicant made. Treated as unverified until your backend records the step. */
   evidence_ref?: string | null;
+}
+
+export interface ApplicantVideoSessionView {
+  id: string;
+  status: string;
+  scheduled_at: string;
+  /** Set once the agent has started the call. */
+  join_url: string | null;
 }
 
 export interface AssignmentRecommendation {
@@ -1017,6 +1043,28 @@ export interface BehavioralSessionStartResponse {
   started_at: string;
 }
 
+export type BeneficiaryCreateRole = typeof BeneficiaryCreateRole[keyof typeof BeneficiaryCreateRole];
+
+
+export const BeneficiaryCreateRole = {
+  ubo: 'ubo',
+  director: 'director',
+  shareholder: 'shareholder',
+  representative: 'representative',
+} as const;
+
+export interface BeneficiaryCreate {
+  role: BeneficiaryCreateRole;
+  /**
+     * @minLength 1
+     * @maxLength 255
+     */
+  first_name: string;
+  last_name?: string | null;
+  email?: string | null;
+  ownership_pct?: number | null;
+}
+
 export type BeneficiaryDispositionRequestDisposition = typeof BeneficiaryDispositionRequestDisposition[keyof typeof BeneficiaryDispositionRequestDisposition];
 
 
@@ -1036,6 +1084,45 @@ export interface BeneficiaryDispositionRequest {
      * @maxLength 2000
      */
   note: string;
+}
+
+export interface BeneficiaryKycStart {
+  /** Defaults to '<business reference>:beneficiary:<id>'. */
+  reference_id?: string | null;
+}
+
+export interface BeneficiaryLink {
+  person_inquiry_id: string;
+}
+
+export type BeneficiaryReadStatus = typeof BeneficiaryReadStatus[keyof typeof BeneficiaryReadStatus];
+
+
+export const BeneficiaryReadStatus = {
+  not_started: 'not_started',
+  in_progress: 'in_progress',
+  verified: 'verified',
+  failed: 'failed',
+  expired: 'expired',
+} as const;
+
+/**
+ * Name and email; only with include_pii=true.
+ */
+export type BeneficiaryReadDetails = { [key: string]: unknown } | null;
+
+export interface BeneficiaryRead {
+  id: string;
+  role: string;
+  /** manual, or ubo_declaration when created from the applicant's declaration. */
+  source: string;
+  ownership_pct: number | null;
+  person_inquiry_id: string | null;
+  status: BeneficiaryReadStatus;
+  /** Name and email; only with include_pii=true. */
+  details?: BeneficiaryReadDetails;
+  redacted_at: string | null;
+  created_at: string;
 }
 
 /**
@@ -5199,6 +5286,8 @@ export type InquiryReadMetadata = { [key: string]: unknown } | null;
 
 export type InquiryReadFields = { [key: string]: unknown } | null;
 
+export type InquiryStepReadApplicantFlags = { [key: string]: unknown } | null;
+
 export type InquiryStepReadResult = { [key: string]: unknown } | null;
 
 export interface InquiryStepRead {
@@ -5209,6 +5298,9 @@ export interface InquiryStepRead {
   attempt: number;
   risk_score: number | null;
   evidence_ref: string | null;
+  /** 'applicant' (unverified, sent through /verify) or 'server' (recorded by your backend). */
+  evidence_ref_source: string | null;
+  applicant_flags: InquiryStepReadApplicantFlags;
   result: InquiryStepReadResult;
   reject_labels: string[] | null;
   submitted_at: string | null;
@@ -5302,7 +5394,7 @@ export interface InquiryReviewCreate {
   client_comment?: string | null;
   /** Never shown to the applicant. */
   internal_comment?: string | null;
-  reset_steps?: ('document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration')[] | null;
+  reset_steps?: ('document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident')[] | null;
 }
 
 export interface InquiryTagsUpdate {
@@ -6190,6 +6282,7 @@ export const LevelStepType = {
   email: 'email',
   consent: 'consent',
   ubo_declaration: 'ubo_declaration',
+  video_ident: 'video_ident',
 } as const;
 
 export type LevelStepConfig = { [key: string]: unknown };
@@ -11122,6 +11215,13 @@ export interface ReviewBody {
   dashboard_base_url?: string | null;
 }
 
+export interface ReviewerRead {
+  id: string;
+  email: string;
+  full_name: string | null;
+  role: string;
+}
+
 export interface RiskActionRequest {
   user_id?: string | null;
   session_id?: string | null;
@@ -12303,7 +12403,7 @@ export interface ShareTokenCreate {
   consent_captured_at: string;
   consent_ip_address?: string | null;
   ttl_seconds?: number | null;
-  steps?: ('document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration')[] | null;
+  steps?: ('document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident')[] | null;
 }
 
 export interface ShareTokenRead {
@@ -14531,7 +14631,7 @@ export interface VerificationLevelBody {
   applicant_type?: VerificationLevelBodyApplicantType;
   /**
      * @minItems 1
-     * @maxItems 13
+     * @maxItems 14
      */
   steps: LevelStep[];
   allowed_countries?: string[] | null;
@@ -14586,6 +14686,10 @@ export interface VerificationLevelBody {
      * @maximum 1
      */
   monitoring_min_score?: number;
+  /** Business levels: the individual level each beneficiary's own KYC runs on. */
+  beneficiary_level_name?: string | null;
+  /** Business levels: roles that must pass their own KYC before the company can be approved. null = ['ubo']; [] = no beneficiary requirement. */
+  required_beneficiary_roles?: ('ubo' | 'director' | 'shareholder' | 'representative')[] | null;
   /** Auto-redact declined, expired and superseded inquiries this many days after they closed. The applicant's current approval is never auto-redacted. */
   retention_days?: number | null;
   /** Route applicants sharing an ID number, email, phone or device with another applicant to review. */
@@ -14621,7 +14725,7 @@ export interface VerificationLevelCreate {
   applicant_type?: VerificationLevelCreateApplicantType;
   /**
      * @minItems 1
-     * @maxItems 13
+     * @maxItems 14
      */
   steps: LevelStep[];
   allowed_countries?: string[] | null;
@@ -14676,6 +14780,10 @@ export interface VerificationLevelCreate {
      * @maximum 1
      */
   monitoring_min_score?: number;
+  /** Business levels: the individual level each beneficiary's own KYC runs on. */
+  beneficiary_level_name?: string | null;
+  /** Business levels: roles that must pass their own KYC before the company can be approved. null = ['ubo']; [] = no beneficiary requirement. */
+  required_beneficiary_roles?: ('ubo' | 'director' | 'shareholder' | 'representative')[] | null;
   /** Auto-redact declined, expired and superseded inquiries this many days after they closed. The applicant's current approval is never auto-redacted. */
   retention_days?: number | null;
   /** Route applicants sharing an ID number, email, phone or device with another applicant to review. */
@@ -14720,6 +14828,8 @@ export interface VerificationLevelRead {
   review_sla_hours: number | null;
   ongoing_monitoring_enabled: boolean;
   monitoring_min_score: number;
+  beneficiary_level_name: string | null;
+  required_beneficiary_roles: string[] | null;
   created_at: string;
 }
 
@@ -14734,6 +14844,50 @@ export interface Verify2FARequest {
 export interface VerifyEmailRequest {
   email: string;
   token: string;
+}
+
+/**
+ * What the agent confirmed on the call. Every item must be true for the step to pass.
+ */
+export interface VideoChecklist {
+  identity_document_shown: boolean;
+  document_security_features_checked: boolean;
+  face_matches_document: boolean;
+  liveness_confirmed: boolean;
+  recording_consent_given: boolean;
+  no_third_party_present: boolean;
+}
+
+export interface VideoSessionBook {
+  /** Slot start; between 5 minutes and 30 days ahead, before the inquiry expires. */
+  scheduled_at: string;
+}
+
+export interface VideoSessionComplete {
+  checklist: VideoChecklist;
+  /** Provider recording ID. */
+  recording_ref?: string | null;
+  /** Saved as an analyst note on the inquiry. */
+  notes?: string | null;
+}
+
+export type VideoSessionReadChecklist = { [key: string]: unknown } | null;
+
+export interface VideoSessionRead {
+  id: string;
+  inquiry_id: string;
+  status: string;
+  scheduled_at: string;
+  booked_by: string;
+  provider: string | null;
+  agent_join_url: string | null;
+  agent_user_id: string | null;
+  started_at: string | null;
+  ended_at: string | null;
+  checklist: VideoSessionReadChecklist;
+  outcome: string | null;
+  recording_ref: string | null;
+  created_at: string;
 }
 
 export type VoiceAuthAssessmentRequestEventType = typeof VoiceAuthAssessmentRequestEventType[keyof typeof VoiceAuthAssessmentRequestEventType];
@@ -16081,6 +16235,13 @@ organization_id?: string | null;
 
 export type GetDocumentSignedUrlApiV1DocumentUploadsDocumentIdSignedUrlGetParams = {
 expires_in_seconds?: number | null;
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type DownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetParams = {
 /**
  * Required when caller is super_admin
  */
@@ -20659,6 +20820,34 @@ export type DeactivateLevelApiV1VerificationLevelsLevelIdDeactivatePostParams = 
 organization_id?: string | null;
 };
 
+export type ListReviewersApiV1VerificationReviewersGetParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type ListApiVersionsApiV1VerificationApiVersionsGetParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type PinApiVersionApiV1VerificationApiVersionPutParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type ListRejectLabelsApiV1VerificationRejectLabelsGetParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
 export type CreateInquiryApiV1VerificationInquiriesPostParams = {
 /**
  * Required when caller is super_admin
@@ -20784,6 +20973,87 @@ export type RejectProposedDecisionApiV1VerificationInquiriesInquiryIdReviewRejec
 organization_id?: string | null;
 };
 
+export type ListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetParams = {
+/**
+ * Include names/emails (requires onboarding:write; audited).
+ */
+include_pii?: boolean;
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type AddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type RemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type LinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type StartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type ListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type BookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type StartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type CompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type CancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type NoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
 export type AssignInquiryApiV1VerificationInquiriesInquiryIdAssignPostParams = {
 /**
  * Required when caller is super_admin
@@ -20834,6 +21104,13 @@ organization_id?: string | null;
 };
 
 export type EvaluateProofOfAddressApiV1VerificationInquiriesInquiryIdProofOfAddressPostParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type RevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostParams = {
 /**
  * Required when caller is super_admin
  */
@@ -20996,6 +21273,10 @@ export type MatchListsApiV1VerificationListsMatchPostParams = {
  * Required when caller is super_admin
  */
 organization_id?: string | null;
+};
+
+export type UploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostBody = {
+  file: Blob;
 };
 
 export type ListThresholdsApiV1TravelRuleThresholdsGetParams = {
@@ -41391,6 +41672,172 @@ export function useGetDocumentSignedUrlApiV1DocumentUploadsDocumentIdSignedUrlGe
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetDocumentSignedUrlApiV1DocumentUploadsDocumentIdSignedUrlGetQueryOptions(documentId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse200 = {
+  data: Blob
+  status: 200
+}
+
+export type downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponseSuccess = (downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse200) & {
+  headers: Headers;
+};
+export type downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponseError = (downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse400 | downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse401 | downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse403 | downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse404 | downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse409 | downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse422 | downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse429) & {
+  headers: Headers;
+};
+
+export type downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse = (downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponseSuccess | downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponseError)
+
+export const getDownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetUrl = (documentId: string,
+    params?: DownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/document-uploads/${documentId}/content?${stringifiedParams}` : `/api/v1/document-uploads/${documentId}/content`
+}
+
+/**
+ * Streams the file to an authorized user of the organization. Used where the storage backend can't issue signed URLs (e.g. local storage). Every download is audited.
+ * @summary Download a document's content
+ */
+export const downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet = async (documentId: string,
+    params?: DownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetParams, options?: Parameters<typeof customInstance>[1]): Promise<downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse> => {
+
+  return customInstance<downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetResponse>(getDownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetUrl(documentId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetQueryKey = (documentId: string,
+    params?: DownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetParams,) => {
+    return [
+    `/api/v1/document-uploads/${documentId}/content`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getDownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetQueryOptions = <TData = Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>, TError = ErrorResponse>(documentId: string,
+    params?: DownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetQueryKey(documentId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>> = ({ signal }) => downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet(documentId,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: documentId !== null && documentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetQueryResult = NonNullable<Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>>
+export type DownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetQueryError = ErrorResponse
+
+
+export function useDownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet<TData = Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>, TError = ErrorResponse>(
+ documentId: string,
+    params: undefined |  DownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>,
+          TError,
+          Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet<TData = Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>, TError = ErrorResponse>(
+ documentId: string,
+    params?: DownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>,
+          TError,
+          Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet<TData = Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>, TError = ErrorResponse>(
+ documentId: string,
+    params?: DownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download a document's content
+ */
+
+export function useDownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet<TData = Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>, TError = ErrorResponse>(
+ documentId: string,
+    params?: DownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof downloadDocumentContentApiV1DocumentUploadsDocumentIdContentGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDownloadDocumentContentApiV1DocumentUploadsDocumentIdContentGetQueryOptions(documentId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -133164,6 +133611,450 @@ export const useDeactivateLevelApiV1VerificationLevelsLevelIdDeactivatePost = <T
       return useMutation(getDeactivateLevelApiV1VerificationLevelsLevelIdDeactivatePostMutationOptions(options), queryClient);
     }
 
+export type listReviewersApiV1VerificationReviewersGetResponse200 = {
+  data: ReviewerRead[]
+  status: 200
+}
+
+export type listReviewersApiV1VerificationReviewersGetResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type listReviewersApiV1VerificationReviewersGetResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type listReviewersApiV1VerificationReviewersGetResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type listReviewersApiV1VerificationReviewersGetResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type listReviewersApiV1VerificationReviewersGetResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type listReviewersApiV1VerificationReviewersGetResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type listReviewersApiV1VerificationReviewersGetResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type listReviewersApiV1VerificationReviewersGetResponseSuccess = (listReviewersApiV1VerificationReviewersGetResponse200) & {
+  headers: Headers;
+};
+export type listReviewersApiV1VerificationReviewersGetResponseError = (listReviewersApiV1VerificationReviewersGetResponse400 | listReviewersApiV1VerificationReviewersGetResponse401 | listReviewersApiV1VerificationReviewersGetResponse403 | listReviewersApiV1VerificationReviewersGetResponse404 | listReviewersApiV1VerificationReviewersGetResponse409 | listReviewersApiV1VerificationReviewersGetResponse422 | listReviewersApiV1VerificationReviewersGetResponse429) & {
+  headers: Headers;
+};
+
+export type listReviewersApiV1VerificationReviewersGetResponse = (listReviewersApiV1VerificationReviewersGetResponseSuccess | listReviewersApiV1VerificationReviewersGetResponseError)
+
+export const getListReviewersApiV1VerificationReviewersGetUrl = (params?: ListReviewersApiV1VerificationReviewersGetParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/reviewers?${stringifiedParams}` : `/api/v1/verification/reviewers`
+}
+
+/**
+ * Active members of your organization with onboarding:write: the valid choices for assignment.
+ * @summary List users who can review inquiries
+ */
+export const listReviewersApiV1VerificationReviewersGet = async (params?: ListReviewersApiV1VerificationReviewersGetParams, options?: Parameters<typeof customInstance>[1]): Promise<listReviewersApiV1VerificationReviewersGetResponse> => {
+
+  return customInstance<listReviewersApiV1VerificationReviewersGetResponse>(getListReviewersApiV1VerificationReviewersGetUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListReviewersApiV1VerificationReviewersGetQueryKey = (params?: ListReviewersApiV1VerificationReviewersGetParams,) => {
+    return [
+    `/api/v1/verification/reviewers`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListReviewersApiV1VerificationReviewersGetQueryOptions = <TData = Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>, TError = ErrorResponse>(params?: ListReviewersApiV1VerificationReviewersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListReviewersApiV1VerificationReviewersGetQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>> = ({ signal }) => listReviewersApiV1VerificationReviewersGet(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListReviewersApiV1VerificationReviewersGetQueryResult = NonNullable<Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>>
+export type ListReviewersApiV1VerificationReviewersGetQueryError = ErrorResponse
+
+
+export function useListReviewersApiV1VerificationReviewersGet<TData = Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>, TError = ErrorResponse>(
+ params: undefined |  ListReviewersApiV1VerificationReviewersGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>,
+          TError,
+          Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListReviewersApiV1VerificationReviewersGet<TData = Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>, TError = ErrorResponse>(
+ params?: ListReviewersApiV1VerificationReviewersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>,
+          TError,
+          Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListReviewersApiV1VerificationReviewersGet<TData = Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>, TError = ErrorResponse>(
+ params?: ListReviewersApiV1VerificationReviewersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List users who can review inquiries
+ */
+
+export function useListReviewersApiV1VerificationReviewersGet<TData = Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>, TError = ErrorResponse>(
+ params?: ListReviewersApiV1VerificationReviewersGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listReviewersApiV1VerificationReviewersGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListReviewersApiV1VerificationReviewersGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type listApiVersionsApiV1VerificationApiVersionsGetResponse200 = {
+  data: ApiVersionsRead
+  status: 200
+}
+
+export type listApiVersionsApiV1VerificationApiVersionsGetResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type listApiVersionsApiV1VerificationApiVersionsGetResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type listApiVersionsApiV1VerificationApiVersionsGetResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type listApiVersionsApiV1VerificationApiVersionsGetResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type listApiVersionsApiV1VerificationApiVersionsGetResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type listApiVersionsApiV1VerificationApiVersionsGetResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type listApiVersionsApiV1VerificationApiVersionsGetResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type listApiVersionsApiV1VerificationApiVersionsGetResponseSuccess = (listApiVersionsApiV1VerificationApiVersionsGetResponse200) & {
+  headers: Headers;
+};
+export type listApiVersionsApiV1VerificationApiVersionsGetResponseError = (listApiVersionsApiV1VerificationApiVersionsGetResponse400 | listApiVersionsApiV1VerificationApiVersionsGetResponse401 | listApiVersionsApiV1VerificationApiVersionsGetResponse403 | listApiVersionsApiV1VerificationApiVersionsGetResponse404 | listApiVersionsApiV1VerificationApiVersionsGetResponse409 | listApiVersionsApiV1VerificationApiVersionsGetResponse422 | listApiVersionsApiV1VerificationApiVersionsGetResponse429) & {
+  headers: Headers;
+};
+
+export type listApiVersionsApiV1VerificationApiVersionsGetResponse = (listApiVersionsApiV1VerificationApiVersionsGetResponseSuccess | listApiVersionsApiV1VerificationApiVersionsGetResponseError)
+
+export const getListApiVersionsApiV1VerificationApiVersionsGetUrl = (params?: ListApiVersionsApiV1VerificationApiVersionsGetParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/api-versions?${stringifiedParams}` : `/api/v1/verification/api-versions`
+}
+
+/**
+ * @summary List API versions and your organization's pin
+ */
+export const listApiVersionsApiV1VerificationApiVersionsGet = async (params?: ListApiVersionsApiV1VerificationApiVersionsGetParams, options?: Parameters<typeof customInstance>[1]): Promise<listApiVersionsApiV1VerificationApiVersionsGetResponse> => {
+
+  return customInstance<listApiVersionsApiV1VerificationApiVersionsGetResponse>(getListApiVersionsApiV1VerificationApiVersionsGetUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListApiVersionsApiV1VerificationApiVersionsGetQueryKey = (params?: ListApiVersionsApiV1VerificationApiVersionsGetParams,) => {
+    return [
+    `/api/v1/verification/api-versions`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListApiVersionsApiV1VerificationApiVersionsGetQueryOptions = <TData = Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>, TError = ErrorResponse>(params?: ListApiVersionsApiV1VerificationApiVersionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListApiVersionsApiV1VerificationApiVersionsGetQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>> = ({ signal }) => listApiVersionsApiV1VerificationApiVersionsGet(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListApiVersionsApiV1VerificationApiVersionsGetQueryResult = NonNullable<Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>>
+export type ListApiVersionsApiV1VerificationApiVersionsGetQueryError = ErrorResponse
+
+
+export function useListApiVersionsApiV1VerificationApiVersionsGet<TData = Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>, TError = ErrorResponse>(
+ params: undefined |  ListApiVersionsApiV1VerificationApiVersionsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>,
+          TError,
+          Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListApiVersionsApiV1VerificationApiVersionsGet<TData = Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>, TError = ErrorResponse>(
+ params?: ListApiVersionsApiV1VerificationApiVersionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>,
+          TError,
+          Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListApiVersionsApiV1VerificationApiVersionsGet<TData = Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>, TError = ErrorResponse>(
+ params?: ListApiVersionsApiV1VerificationApiVersionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List API versions and your organization's pin
+ */
+
+export function useListApiVersionsApiV1VerificationApiVersionsGet<TData = Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>, TError = ErrorResponse>(
+ params?: ListApiVersionsApiV1VerificationApiVersionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listApiVersionsApiV1VerificationApiVersionsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListApiVersionsApiV1VerificationApiVersionsGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type pinApiVersionApiV1VerificationApiVersionPutResponse200 = {
+  data: ApiVersionsRead
+  status: 200
+}
+
+export type pinApiVersionApiV1VerificationApiVersionPutResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type pinApiVersionApiV1VerificationApiVersionPutResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type pinApiVersionApiV1VerificationApiVersionPutResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type pinApiVersionApiV1VerificationApiVersionPutResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type pinApiVersionApiV1VerificationApiVersionPutResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type pinApiVersionApiV1VerificationApiVersionPutResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type pinApiVersionApiV1VerificationApiVersionPutResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type pinApiVersionApiV1VerificationApiVersionPutResponseSuccess = (pinApiVersionApiV1VerificationApiVersionPutResponse200) & {
+  headers: Headers;
+};
+export type pinApiVersionApiV1VerificationApiVersionPutResponseError = (pinApiVersionApiV1VerificationApiVersionPutResponse400 | pinApiVersionApiV1VerificationApiVersionPutResponse401 | pinApiVersionApiV1VerificationApiVersionPutResponse403 | pinApiVersionApiV1VerificationApiVersionPutResponse404 | pinApiVersionApiV1VerificationApiVersionPutResponse409 | pinApiVersionApiV1VerificationApiVersionPutResponse422 | pinApiVersionApiV1VerificationApiVersionPutResponse429) & {
+  headers: Headers;
+};
+
+export type pinApiVersionApiV1VerificationApiVersionPutResponse = (pinApiVersionApiV1VerificationApiVersionPutResponseSuccess | pinApiVersionApiV1VerificationApiVersionPutResponseError)
+
+export const getPinApiVersionApiV1VerificationApiVersionPutUrl = (params?: PinApiVersionApiV1VerificationApiVersionPutParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/api-version?${stringifiedParams}` : `/api/v1/verification/api-version`
+}
+
+/**
+ * Requests without a DeepSense-Version header are served as this version. Send null to follow the current version. Organization admins only.
+ * @summary Pin your organization's default API version
+ */
+export const pinApiVersionApiV1VerificationApiVersionPut = async (apiVersionPin: ApiVersionPin,
+    params?: PinApiVersionApiV1VerificationApiVersionPutParams, options?: Parameters<typeof customInstance>[1]): Promise<pinApiVersionApiV1VerificationApiVersionPutResponse> => {
+
+  return customInstance<pinApiVersionApiV1VerificationApiVersionPutResponse>(getPinApiVersionApiV1VerificationApiVersionPutUrl(params),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(apiVersionPin)
+  }
+);}
+
+
+
+
+
+export const getPinApiVersionApiV1VerificationApiVersionPutMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pinApiVersionApiV1VerificationApiVersionPut>>, TError,{data: ApiVersionPin;params?: PinApiVersionApiV1VerificationApiVersionPutParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof pinApiVersionApiV1VerificationApiVersionPut>>, TError,{data: ApiVersionPin;params?: PinApiVersionApiV1VerificationApiVersionPutParams}, TContext> => {
+
+const mutationKey = ['pinApiVersionApiV1VerificationApiVersionPut'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof pinApiVersionApiV1VerificationApiVersionPut>>, {data: ApiVersionPin;params?: PinApiVersionApiV1VerificationApiVersionPutParams}> = (props) => {
+          const {data,params} = props ?? {};
+
+          return  pinApiVersionApiV1VerificationApiVersionPut(data,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PinApiVersionApiV1VerificationApiVersionPutMutationResult = NonNullable<Awaited<ReturnType<typeof pinApiVersionApiV1VerificationApiVersionPut>>>
+    export type PinApiVersionApiV1VerificationApiVersionPutMutationBody = ApiVersionPin
+    export type PinApiVersionApiV1VerificationApiVersionPutMutationError = ErrorResponse
+
+    /**
+ * @summary Pin your organization's default API version
+ */
+export const usePinApiVersionApiV1VerificationApiVersionPut = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pinApiVersionApiV1VerificationApiVersionPut>>, TError,{data: ApiVersionPin;params?: PinApiVersionApiV1VerificationApiVersionPutParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof pinApiVersionApiV1VerificationApiVersionPut>>,
+        TError,
+        {data: ApiVersionPin;params?: PinApiVersionApiV1VerificationApiVersionPutParams},
+        TContext
+      > => {
+      return useMutation(getPinApiVersionApiV1VerificationApiVersionPutMutationOptions(options), queryClient);
+    }
+
 export type listRejectLabelsApiV1VerificationRejectLabelsGetResponse200 = {
   data: RejectLabelRead[]
   status: 200
@@ -133213,20 +134104,27 @@ export type listRejectLabelsApiV1VerificationRejectLabelsGetResponseError = (lis
 
 export type listRejectLabelsApiV1VerificationRejectLabelsGetResponse = (listRejectLabelsApiV1VerificationRejectLabelsGetResponseSuccess | listRejectLabelsApiV1VerificationRejectLabelsGetResponseError)
 
-export const getListRejectLabelsApiV1VerificationRejectLabelsGetUrl = () => {
+export const getListRejectLabelsApiV1VerificationRejectLabelsGetUrl = (params?: ListRejectLabelsApiV1VerificationRejectLabelsGetParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/api/v1/verification/reject-labels`
+  return stringifiedParams.length > 0 ? `/api/v1/verification/reject-labels?${stringifiedParams}` : `/api/v1/verification/reject-labels`
 }
 
 /**
  * @summary List structured reject labels
  */
-export const listRejectLabelsApiV1VerificationRejectLabelsGet = async ( options?: Parameters<typeof customInstance>[1]): Promise<listRejectLabelsApiV1VerificationRejectLabelsGetResponse> => {
+export const listRejectLabelsApiV1VerificationRejectLabelsGet = async (params?: ListRejectLabelsApiV1VerificationRejectLabelsGetParams, options?: Parameters<typeof customInstance>[1]): Promise<listRejectLabelsApiV1VerificationRejectLabelsGetResponse> => {
 
-  return customInstance<listRejectLabelsApiV1VerificationRejectLabelsGetResponse>(getListRejectLabelsApiV1VerificationRejectLabelsGetUrl(),
+  return customInstance<listRejectLabelsApiV1VerificationRejectLabelsGetResponse>(getListRejectLabelsApiV1VerificationRejectLabelsGetUrl(params),
   {
     ...options,
     method: 'GET'
@@ -133239,23 +134137,23 @@ export const listRejectLabelsApiV1VerificationRejectLabelsGet = async ( options?
 
 
 
-export const getListRejectLabelsApiV1VerificationRejectLabelsGetQueryKey = () => {
+export const getListRejectLabelsApiV1VerificationRejectLabelsGetQueryKey = (params?: ListRejectLabelsApiV1VerificationRejectLabelsGetParams,) => {
     return [
-    `/api/v1/verification/reject-labels`
+    `/api/v1/verification/reject-labels`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getListRejectLabelsApiV1VerificationRejectLabelsGetQueryOptions = <TData = Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getListRejectLabelsApiV1VerificationRejectLabelsGetQueryOptions = <TData = Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError = ErrorResponse>(params?: ListRejectLabelsApiV1VerificationRejectLabelsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListRejectLabelsApiV1VerificationRejectLabelsGetQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getListRejectLabelsApiV1VerificationRejectLabelsGetQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>> = ({ signal }) => listRejectLabelsApiV1VerificationRejectLabelsGet({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>> = ({ signal }) => listRejectLabelsApiV1VerificationRejectLabelsGet(params, { signal, ...requestOptions });
 
 
 
@@ -133269,7 +134167,7 @@ export type ListRejectLabelsApiV1VerificationRejectLabelsGetQueryError = ErrorRe
 
 
 export function useListRejectLabelsApiV1VerificationRejectLabelsGet<TData = Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError = ErrorResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError, TData>> & Pick<
+ params: undefined |  ListRejectLabelsApiV1VerificationRejectLabelsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>,
           TError,
@@ -133279,7 +134177,7 @@ export function useListRejectLabelsApiV1VerificationRejectLabelsGet<TData = Awai
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListRejectLabelsApiV1VerificationRejectLabelsGet<TData = Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError, TData>> & Pick<
+ params?: ListRejectLabelsApiV1VerificationRejectLabelsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>,
           TError,
@@ -133289,7 +134187,7 @@ export function useListRejectLabelsApiV1VerificationRejectLabelsGet<TData = Awai
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListRejectLabelsApiV1VerificationRejectLabelsGet<TData = Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params?: ListRejectLabelsApiV1VerificationRejectLabelsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -133297,11 +134195,11 @@ export function useListRejectLabelsApiV1VerificationRejectLabelsGet<TData = Awai
  */
 
 export function useListRejectLabelsApiV1VerificationRejectLabelsGet<TData = Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params?: ListRejectLabelsApiV1VerificationRejectLabelsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listRejectLabelsApiV1VerificationRejectLabelsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getListRejectLabelsApiV1VerificationRejectLabelsGetQueryOptions(options)
+  const queryOptions = getListRejectLabelsApiV1VerificationRejectLabelsGetQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -134263,7 +135161,7 @@ export type recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost
 export type recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostResponse = (recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostResponseSuccess | recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostResponseError)
 
 export const getRecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostUrl = (inquiryId: string,
-    stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration',
+    stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident',
     params?: RecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -134283,7 +135181,7 @@ export const getRecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepType
  * @summary Record a server-side step result
  */
 export const recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost = async (inquiryId: string,
-    stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration',
+    stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident',
     stepResultCreate: StepResultCreate,
     params?: RecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostParams, options?: Parameters<typeof customInstance>[1]): Promise<recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostResponse> => {
 
@@ -134301,8 +135199,8 @@ export const recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePos
 
 
 export const getRecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost>>, TError,{inquiryId: string;stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration';data: StepResultCreate;params?: RecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost>>, TError,{inquiryId: string;stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration';data: StepResultCreate;params?: RecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostParams}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost>>, TError,{inquiryId: string;stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: StepResultCreate;params?: RecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost>>, TError,{inquiryId: string;stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: StepResultCreate;params?: RecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostParams}, TContext> => {
 
 const mutationKey = ['recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -134314,7 +135212,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost>>, {inquiryId: string;stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration';data: StepResultCreate;params?: RecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostParams}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost>>, {inquiryId: string;stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: StepResultCreate;params?: RecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostParams}> = (props) => {
           const {inquiryId,stepType,data,params} = props ?? {};
 
           return  recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost(inquiryId,stepType,data,params,requestOptions)
@@ -134335,11 +135233,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Record a server-side step result
  */
 export const useRecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost>>, TError,{inquiryId: string;stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration';data: StepResultCreate;params?: RecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost>>, TError,{inquiryId: string;stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: StepResultCreate;params?: RecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof recordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePost>>,
         TError,
-        {inquiryId: string;stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration';data: StepResultCreate;params?: RecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostParams},
+        {inquiryId: string;stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: StepResultCreate;params?: RecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostParams},
         TContext
       > => {
       return useMutation(getRecordStepResultApiV1VerificationInquiriesInquiryIdStepsStepTypePostMutationOptions(options), queryClient);
@@ -134734,6 +135632,1511 @@ export const useRejectProposedDecisionApiV1VerificationInquiriesInquiryIdReviewR
         TContext
       > => {
       return useMutation(getRejectProposedDecisionApiV1VerificationInquiriesInquiryIdReviewRejectProposalPostMutationOptions(options), queryClient);
+    }
+
+export type listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse200 = {
+  data: BeneficiaryRead[]
+  status: 200
+}
+
+export type listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponseSuccess = (listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse200) & {
+  headers: Headers;
+};
+export type listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponseError = (listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse400 | listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse401 | listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse403 | listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse404 | listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse409 | listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse422 | listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse429) & {
+  headers: Headers;
+};
+
+export type listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse = (listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponseSuccess | listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponseError)
+
+export const getListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetUrl = (inquiryId: string,
+    params?: ListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/inquiries/${inquiryId}/beneficiaries?${stringifiedParams}` : `/api/v1/verification/inquiries/${inquiryId}/beneficiaries`
+}
+
+/**
+ * @summary List a business's beneficiaries
+ */
+export const listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet = async (inquiryId: string,
+    params?: ListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetParams, options?: Parameters<typeof customInstance>[1]): Promise<listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse> => {
+
+  return customInstance<listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetResponse>(getListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetUrl(inquiryId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetQueryKey = (inquiryId: string,
+    params?: ListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetParams,) => {
+    return [
+    `/api/v1/verification/inquiries/${inquiryId}/beneficiaries`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetQueryOptions = <TData = Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>, TError = ErrorResponse>(inquiryId: string,
+    params?: ListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetQueryKey(inquiryId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>> = ({ signal }) => listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet(inquiryId,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: inquiryId !== null && inquiryId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetQueryResult = NonNullable<Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>>
+export type ListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetQueryError = ErrorResponse
+
+
+export function useListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet<TData = Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>, TError = ErrorResponse>(
+ inquiryId: string,
+    params: undefined |  ListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>,
+          TError,
+          Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet<TData = Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>, TError = ErrorResponse>(
+ inquiryId: string,
+    params?: ListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>,
+          TError,
+          Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet<TData = Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>, TError = ErrorResponse>(
+ inquiryId: string,
+    params?: ListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List a business's beneficiaries
+ */
+
+export function useListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet<TData = Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>, TError = ErrorResponse>(
+ inquiryId: string,
+    params?: ListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListBeneficiariesApiV1VerificationInquiriesInquiryIdBeneficiariesGetQueryOptions(inquiryId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse201 = {
+  data: BeneficiaryRead
+  status: 201
+}
+
+export type addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponseSuccess = (addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse201) & {
+  headers: Headers;
+};
+export type addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponseError = (addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse400 | addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse401 | addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse403 | addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse404 | addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse409 | addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse422 | addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse429) & {
+  headers: Headers;
+};
+
+export type addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse = (addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponseSuccess | addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponseError)
+
+export const getAddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostUrl = (inquiryId: string,
+    params?: AddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/inquiries/${inquiryId}/beneficiaries?${stringifiedParams}` : `/api/v1/verification/inquiries/${inquiryId}/beneficiaries`
+}
+
+/**
+ * @summary Add a beneficiary to a business
+ */
+export const addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPost = async (inquiryId: string,
+    beneficiaryCreate: BeneficiaryCreate,
+    params?: AddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostParams, options?: Parameters<typeof customInstance>[1]): Promise<addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse> => {
+
+  return customInstance<addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostResponse>(getAddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostUrl(inquiryId,params),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(beneficiaryCreate)
+  }
+);}
+
+
+
+
+
+export const getAddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPost>>, TError,{inquiryId: string;data: BeneficiaryCreate;params?: AddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPost>>, TError,{inquiryId: string;data: BeneficiaryCreate;params?: AddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostParams}, TContext> => {
+
+const mutationKey = ['addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPost>>, {inquiryId: string;data: BeneficiaryCreate;params?: AddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostParams}> = (props) => {
+          const {inquiryId,data,params} = props ?? {};
+
+          return  addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPost(inquiryId,data,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostMutationResult = NonNullable<Awaited<ReturnType<typeof addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPost>>>
+    export type AddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostMutationBody = BeneficiaryCreate
+    export type AddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostMutationError = ErrorResponse
+
+    /**
+ * @summary Add a beneficiary to a business
+ */
+export const useAddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPost = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPost>>, TError,{inquiryId: string;data: BeneficiaryCreate;params?: AddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof addBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPost>>,
+        TError,
+        {inquiryId: string;data: BeneficiaryCreate;params?: AddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostParams},
+        TContext
+      > => {
+      return useMutation(getAddBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesPostMutationOptions(options), queryClient);
+    }
+
+export type removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse204 = {
+  data: void
+  status: 204
+}
+
+export type removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponseSuccess = (removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse204) & {
+  headers: Headers;
+};
+export type removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponseError = (removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse400 | removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse401 | removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse403 | removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse404 | removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse409 | removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse422 | removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse429) & {
+  headers: Headers;
+};
+
+export type removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse = (removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponseSuccess | removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponseError)
+
+export const getRemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteUrl = (inquiryId: string,
+    beneficiaryId: string,
+    params?: RemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/inquiries/${inquiryId}/beneficiaries/${beneficiaryId}?${stringifiedParams}` : `/api/v1/verification/inquiries/${inquiryId}/beneficiaries/${beneficiaryId}`
+}
+
+/**
+ * @summary Remove a beneficiary
+ */
+export const removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDelete = async (inquiryId: string,
+    beneficiaryId: string,
+    params?: RemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteParams, options?: Parameters<typeof customInstance>[1]): Promise<removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse> => {
+
+  return customInstance<removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteResponse>(getRemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteUrl(inquiryId,beneficiaryId,params),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getRemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDelete>>, TError,{inquiryId: string;beneficiaryId: string;params?: RemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDelete>>, TError,{inquiryId: string;beneficiaryId: string;params?: RemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteParams}, TContext> => {
+
+const mutationKey = ['removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDelete'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDelete>>, {inquiryId: string;beneficiaryId: string;params?: RemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteParams}> = (props) => {
+          const {inquiryId,beneficiaryId,params} = props ?? {};
+
+          return  removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDelete(inquiryId,beneficiaryId,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDelete>>>
+
+    export type RemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteMutationError = ErrorResponse
+
+    /**
+ * @summary Remove a beneficiary
+ */
+export const useRemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDelete = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDelete>>, TError,{inquiryId: string;beneficiaryId: string;params?: RemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof removeBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDelete>>,
+        TError,
+        {inquiryId: string;beneficiaryId: string;params?: RemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteParams},
+        TContext
+      > => {
+      return useMutation(getRemoveBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdDeleteMutationOptions(options), queryClient);
+    }
+
+export type linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse200 = {
+  data: BeneficiaryRead
+  status: 200
+}
+
+export type linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponseSuccess = (linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse200) & {
+  headers: Headers;
+};
+export type linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponseError = (linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse400 | linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse401 | linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse403 | linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse404 | linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse409 | linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse422 | linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse429) & {
+  headers: Headers;
+};
+
+export type linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse = (linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponseSuccess | linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponseError)
+
+export const getLinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostUrl = (inquiryId: string,
+    beneficiaryId: string,
+    params?: LinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/inquiries/${inquiryId}/beneficiaries/${beneficiaryId}/link?${stringifiedParams}` : `/api/v1/verification/inquiries/${inquiryId}/beneficiaries/${beneficiaryId}/link`
+}
+
+/**
+ * @summary Link an existing KYC inquiry to a beneficiary
+ */
+export const linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPost = async (inquiryId: string,
+    beneficiaryId: string,
+    beneficiaryLink: BeneficiaryLink,
+    params?: LinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostParams, options?: Parameters<typeof customInstance>[1]): Promise<linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse> => {
+
+  return customInstance<linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostResponse>(getLinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostUrl(inquiryId,beneficiaryId,params),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(beneficiaryLink)
+  }
+);}
+
+
+
+
+
+export const getLinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPost>>, TError,{inquiryId: string;beneficiaryId: string;data: BeneficiaryLink;params?: LinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPost>>, TError,{inquiryId: string;beneficiaryId: string;data: BeneficiaryLink;params?: LinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostParams}, TContext> => {
+
+const mutationKey = ['linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPost>>, {inquiryId: string;beneficiaryId: string;data: BeneficiaryLink;params?: LinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostParams}> = (props) => {
+          const {inquiryId,beneficiaryId,data,params} = props ?? {};
+
+          return  linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPost(inquiryId,beneficiaryId,data,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostMutationResult = NonNullable<Awaited<ReturnType<typeof linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPost>>>
+    export type LinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostMutationBody = BeneficiaryLink
+    export type LinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostMutationError = ErrorResponse
+
+    /**
+ * @summary Link an existing KYC inquiry to a beneficiary
+ */
+export const useLinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPost = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPost>>, TError,{inquiryId: string;beneficiaryId: string;data: BeneficiaryLink;params?: LinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof linkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPost>>,
+        TError,
+        {inquiryId: string;beneficiaryId: string;data: BeneficiaryLink;params?: LinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostParams},
+        TContext
+      > => {
+      return useMutation(getLinkBeneficiaryApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdLinkPostMutationOptions(options), queryClient);
+    }
+
+export type startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse201 = {
+  data: InquiryRead
+  status: 201
+}
+
+export type startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponseSuccess = (startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse201) & {
+  headers: Headers;
+};
+export type startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponseError = (startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse400 | startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse401 | startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse403 | startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse404 | startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse409 | startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse422 | startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse429) & {
+  headers: Headers;
+};
+
+export type startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse = (startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponseSuccess | startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponseError)
+
+export const getStartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostUrl = (inquiryId: string,
+    beneficiaryId: string,
+    params?: StartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/inquiries/${inquiryId}/beneficiaries/${beneficiaryId}/start-kyc?${stringifiedParams}` : `/api/v1/verification/inquiries/${inquiryId}/beneficiaries/${beneficiaryId}/start-kyc`
+}
+
+/**
+ * Creates an inquiry on the business level's beneficiary_level_name, prefilled with the beneficiary's details, and links it. Send the person a one-time link for it. The business can't be approved until every required beneficiary is verified; their decisions re-evaluate the business automatically.
+ * @summary Start a beneficiary's own KYC
+ */
+export const startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPost = async (inquiryId: string,
+    beneficiaryId: string,
+    beneficiaryKycStart: BeneficiaryKycStart,
+    params?: StartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostParams, options?: Parameters<typeof customInstance>[1]): Promise<startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse> => {
+
+  return customInstance<startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostResponse>(getStartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostUrl(inquiryId,beneficiaryId,params),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(beneficiaryKycStart)
+  }
+);}
+
+
+
+
+
+export const getStartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPost>>, TError,{inquiryId: string;beneficiaryId: string;data: BeneficiaryKycStart;params?: StartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPost>>, TError,{inquiryId: string;beneficiaryId: string;data: BeneficiaryKycStart;params?: StartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostParams}, TContext> => {
+
+const mutationKey = ['startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPost>>, {inquiryId: string;beneficiaryId: string;data: BeneficiaryKycStart;params?: StartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostParams}> = (props) => {
+          const {inquiryId,beneficiaryId,data,params} = props ?? {};
+
+          return  startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPost(inquiryId,beneficiaryId,data,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostMutationResult = NonNullable<Awaited<ReturnType<typeof startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPost>>>
+    export type StartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostMutationBody = BeneficiaryKycStart
+    export type StartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostMutationError = ErrorResponse
+
+    /**
+ * @summary Start a beneficiary's own KYC
+ */
+export const useStartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPost = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPost>>, TError,{inquiryId: string;beneficiaryId: string;data: BeneficiaryKycStart;params?: StartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof startBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPost>>,
+        TError,
+        {inquiryId: string;beneficiaryId: string;data: BeneficiaryKycStart;params?: StartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostParams},
+        TContext
+      > => {
+      return useMutation(getStartBeneficiaryKycApiV1VerificationInquiriesInquiryIdBeneficiariesBeneficiaryIdStartKycPostMutationOptions(options), queryClient);
+    }
+
+export type listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse200 = {
+  data: VideoSessionRead[]
+  status: 200
+}
+
+export type listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponseSuccess = (listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse200) & {
+  headers: Headers;
+};
+export type listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponseError = (listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse400 | listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse401 | listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse403 | listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse404 | listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse409 | listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse422 | listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse429) & {
+  headers: Headers;
+};
+
+export type listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse = (listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponseSuccess | listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponseError)
+
+export const getListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetUrl = (inquiryId: string,
+    params?: ListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/inquiries/${inquiryId}/video-sessions?${stringifiedParams}` : `/api/v1/verification/inquiries/${inquiryId}/video-sessions`
+}
+
+/**
+ * @summary List video calls
+ */
+export const listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet = async (inquiryId: string,
+    params?: ListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetParams, options?: Parameters<typeof customInstance>[1]): Promise<listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse> => {
+
+  return customInstance<listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetResponse>(getListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetUrl(inquiryId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetQueryKey = (inquiryId: string,
+    params?: ListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetParams,) => {
+    return [
+    `/api/v1/verification/inquiries/${inquiryId}/video-sessions`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetQueryOptions = <TData = Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>, TError = ErrorResponse>(inquiryId: string,
+    params?: ListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetQueryKey(inquiryId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>> = ({ signal }) => listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet(inquiryId,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: inquiryId !== null && inquiryId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetQueryResult = NonNullable<Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>>
+export type ListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetQueryError = ErrorResponse
+
+
+export function useListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet<TData = Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>, TError = ErrorResponse>(
+ inquiryId: string,
+    params: undefined |  ListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>,
+          TError,
+          Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet<TData = Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>, TError = ErrorResponse>(
+ inquiryId: string,
+    params?: ListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>,
+          TError,
+          Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet<TData = Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>, TError = ErrorResponse>(
+ inquiryId: string,
+    params?: ListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List video calls
+ */
+
+export function useListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet<TData = Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>, TError = ErrorResponse>(
+ inquiryId: string,
+    params?: ListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListVideoSessionsApiV1VerificationInquiriesInquiryIdVideoSessionsGetQueryOptions(inquiryId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse201 = {
+  data: VideoSessionRead
+  status: 201
+}
+
+export type bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponseSuccess = (bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse201) & {
+  headers: Headers;
+};
+export type bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponseError = (bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse400 | bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse401 | bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse403 | bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse404 | bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse409 | bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse422 | bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse429) & {
+  headers: Headers;
+};
+
+export type bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse = (bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponseSuccess | bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponseError)
+
+export const getBookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostUrl = (inquiryId: string,
+    params?: BookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/inquiries/${inquiryId}/video-sessions?${stringifiedParams}` : `/api/v1/verification/inquiries/${inquiryId}/video-sessions`
+}
+
+/**
+ * @summary Book a video identification call
+ */
+export const bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPost = async (inquiryId: string,
+    videoSessionBook: VideoSessionBook,
+    params?: BookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostParams, options?: Parameters<typeof customInstance>[1]): Promise<bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse> => {
+
+  return customInstance<bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostResponse>(getBookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostUrl(inquiryId,params),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(videoSessionBook)
+  }
+);}
+
+
+
+
+
+export const getBookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPost>>, TError,{inquiryId: string;data: VideoSessionBook;params?: BookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPost>>, TError,{inquiryId: string;data: VideoSessionBook;params?: BookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostParams}, TContext> => {
+
+const mutationKey = ['bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPost>>, {inquiryId: string;data: VideoSessionBook;params?: BookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostParams}> = (props) => {
+          const {inquiryId,data,params} = props ?? {};
+
+          return  bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPost(inquiryId,data,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type BookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostMutationResult = NonNullable<Awaited<ReturnType<typeof bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPost>>>
+    export type BookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostMutationBody = VideoSessionBook
+    export type BookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostMutationError = ErrorResponse
+
+    /**
+ * @summary Book a video identification call
+ */
+export const useBookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPost = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPost>>, TError,{inquiryId: string;data: VideoSessionBook;params?: BookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof bookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPost>>,
+        TError,
+        {inquiryId: string;data: VideoSessionBook;params?: BookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostParams},
+        TContext
+      > => {
+      return useMutation(getBookVideoSessionApiV1VerificationInquiriesInquiryIdVideoSessionsPostMutationOptions(options), queryClient);
+    }
+
+export type startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse200 = {
+  data: VideoSessionRead
+  status: 200
+}
+
+export type startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponseSuccess = (startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse200) & {
+  headers: Headers;
+};
+export type startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponseError = (startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse400 | startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse401 | startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse403 | startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse404 | startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse409 | startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse422 | startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse429) & {
+  headers: Headers;
+};
+
+export type startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse = (startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponseSuccess | startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponseError)
+
+export const getStartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostUrl = (sessionId: string,
+    params?: StartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/video-sessions/${sessionId}/start?${stringifiedParams}` : `/api/v1/verification/video-sessions/${sessionId}/start`
+}
+
+/**
+ * Creates the room with the configured provider (VIDEO_IDENT_PROVIDER); returns the agent join URL.
+ * @summary Start a video call (agent)
+ */
+export const startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPost = async (sessionId: string,
+    params?: StartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostParams, options?: Parameters<typeof customInstance>[1]): Promise<startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse> => {
+
+  return customInstance<startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostResponse>(getStartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostUrl(sessionId,params),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getStartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPost>>, TError,{sessionId: string;params?: StartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPost>>, TError,{sessionId: string;params?: StartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostParams}, TContext> => {
+
+const mutationKey = ['startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPost>>, {sessionId: string;params?: StartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostParams}> = (props) => {
+          const {sessionId,params} = props ?? {};
+
+          return  startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPost(sessionId,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostMutationResult = NonNullable<Awaited<ReturnType<typeof startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPost>>>
+
+    export type StartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostMutationError = ErrorResponse
+
+    /**
+ * @summary Start a video call (agent)
+ */
+export const useStartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPost = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPost>>, TError,{sessionId: string;params?: StartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof startVideoSessionApiV1VerificationVideoSessionsSessionIdStartPost>>,
+        TError,
+        {sessionId: string;params?: StartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostParams},
+        TContext
+      > => {
+      return useMutation(getStartVideoSessionApiV1VerificationVideoSessionsSessionIdStartPostMutationOptions(options), queryClient);
+    }
+
+export type completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse200 = {
+  data: VideoSessionRead
+  status: 200
+}
+
+export type completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponseSuccess = (completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse200) & {
+  headers: Headers;
+};
+export type completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponseError = (completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse400 | completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse401 | completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse403 | completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse404 | completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse409 | completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse422 | completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse429) & {
+  headers: Headers;
+};
+
+export type completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse = (completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponseSuccess | completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponseError)
+
+export const getCompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostUrl = (sessionId: string,
+    params?: CompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/video-sessions/${sessionId}/complete?${stringifiedParams}` : `/api/v1/verification/video-sessions/${sessionId}/complete`
+}
+
+/**
+ * Only the agent who started the call. Every checklist item must be true for video_ident to pass.
+ * @summary Record a video call's outcome (agent)
+ */
+export const completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePost = async (sessionId: string,
+    videoSessionComplete: VideoSessionComplete,
+    params?: CompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostParams, options?: Parameters<typeof customInstance>[1]): Promise<completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse> => {
+
+  return customInstance<completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostResponse>(getCompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostUrl(sessionId,params),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(videoSessionComplete)
+  }
+);}
+
+
+
+
+
+export const getCompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePost>>, TError,{sessionId: string;data: VideoSessionComplete;params?: CompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePost>>, TError,{sessionId: string;data: VideoSessionComplete;params?: CompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostParams}, TContext> => {
+
+const mutationKey = ['completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePost>>, {sessionId: string;data: VideoSessionComplete;params?: CompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostParams}> = (props) => {
+          const {sessionId,data,params} = props ?? {};
+
+          return  completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePost(sessionId,data,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostMutationResult = NonNullable<Awaited<ReturnType<typeof completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePost>>>
+    export type CompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostMutationBody = VideoSessionComplete
+    export type CompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostMutationError = ErrorResponse
+
+    /**
+ * @summary Record a video call's outcome (agent)
+ */
+export const useCompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePost = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePost>>, TError,{sessionId: string;data: VideoSessionComplete;params?: CompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof completeVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePost>>,
+        TError,
+        {sessionId: string;data: VideoSessionComplete;params?: CompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostParams},
+        TContext
+      > => {
+      return useMutation(getCompleteVideoSessionApiV1VerificationVideoSessionsSessionIdCompletePostMutationOptions(options), queryClient);
+    }
+
+export type cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse200 = {
+  data: VideoSessionRead
+  status: 200
+}
+
+export type cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponseSuccess = (cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse200) & {
+  headers: Headers;
+};
+export type cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponseError = (cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse400 | cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse401 | cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse403 | cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse404 | cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse409 | cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse422 | cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse429) & {
+  headers: Headers;
+};
+
+export type cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse = (cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponseSuccess | cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponseError)
+
+export const getCancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostUrl = (sessionId: string,
+    params?: CancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/video-sessions/${sessionId}/cancel?${stringifiedParams}` : `/api/v1/verification/video-sessions/${sessionId}/cancel`
+}
+
+/**
+ * @summary Cancel a video call
+ */
+export const cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPost = async (sessionId: string,
+    params?: CancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostParams, options?: Parameters<typeof customInstance>[1]): Promise<cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse> => {
+
+  return customInstance<cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostResponse>(getCancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostUrl(sessionId,params),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getCancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPost>>, TError,{sessionId: string;params?: CancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPost>>, TError,{sessionId: string;params?: CancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostParams}, TContext> => {
+
+const mutationKey = ['cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPost>>, {sessionId: string;params?: CancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostParams}> = (props) => {
+          const {sessionId,params} = props ?? {};
+
+          return  cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPost(sessionId,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostMutationResult = NonNullable<Awaited<ReturnType<typeof cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPost>>>
+
+    export type CancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostMutationError = ErrorResponse
+
+    /**
+ * @summary Cancel a video call
+ */
+export const useCancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPost = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPost>>, TError,{sessionId: string;params?: CancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof cancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPost>>,
+        TError,
+        {sessionId: string;params?: CancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostParams},
+        TContext
+      > => {
+      return useMutation(getCancelVideoSessionApiV1VerificationVideoSessionsSessionIdCancelPostMutationOptions(options), queryClient);
+    }
+
+export type noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse200 = {
+  data: VideoSessionRead
+  status: 200
+}
+
+export type noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponseSuccess = (noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse200) & {
+  headers: Headers;
+};
+export type noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponseError = (noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse400 | noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse401 | noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse403 | noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse404 | noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse409 | noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse422 | noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse429) & {
+  headers: Headers;
+};
+
+export type noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse = (noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponseSuccess | noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponseError)
+
+export const getNoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostUrl = (sessionId: string,
+    params?: NoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/video-sessions/${sessionId}/no-show?${stringifiedParams}` : `/api/v1/verification/video-sessions/${sessionId}/no-show`
+}
+
+/**
+ * @summary Mark the applicant as a no-show
+ */
+export const noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPost = async (sessionId: string,
+    params?: NoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostParams, options?: Parameters<typeof customInstance>[1]): Promise<noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse> => {
+
+  return customInstance<noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostResponse>(getNoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostUrl(sessionId,params),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getNoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPost>>, TError,{sessionId: string;params?: NoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPost>>, TError,{sessionId: string;params?: NoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostParams}, TContext> => {
+
+const mutationKey = ['noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPost>>, {sessionId: string;params?: NoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostParams}> = (props) => {
+          const {sessionId,params} = props ?? {};
+
+          return  noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPost(sessionId,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type NoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostMutationResult = NonNullable<Awaited<ReturnType<typeof noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPost>>>
+
+    export type NoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostMutationError = ErrorResponse
+
+    /**
+ * @summary Mark the applicant as a no-show
+ */
+export const useNoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPost = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPost>>, TError,{sessionId: string;params?: NoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof noShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPost>>,
+        TError,
+        {sessionId: string;params?: NoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostParams},
+        TContext
+      > => {
+      return useMutation(getNoShowVideoSessionApiV1VerificationVideoSessionsSessionIdNoShowPostMutationOptions(options), queryClient);
     }
 
 export type assignInquiryApiV1VerificationInquiriesInquiryIdAssignPostResponse200 = {
@@ -135807,6 +138210,136 @@ export const useEvaluateProofOfAddressApiV1VerificationInquiriesInquiryIdProofOf
         TContext
       > => {
       return useMutation(getEvaluateProofOfAddressApiV1VerificationInquiriesInquiryIdProofOfAddressPostMutationOptions(options), queryClient);
+    }
+
+export type revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse200 = {
+  data: InquiryRead
+  status: 200
+}
+
+export type revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponseSuccess = (revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse200) & {
+  headers: Headers;
+};
+export type revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponseError = (revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse400 | revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse401 | revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse403 | revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse404 | revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse409 | revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse422 | revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse429) & {
+  headers: Headers;
+};
+
+export type revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse = (revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponseSuccess | revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponseError)
+
+export const getRevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostUrl = (inquiryId: string,
+    params?: RevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/verification/inquiries/${inquiryId}/applicant-access/revoke?${stringifiedParams}` : `/api/v1/verification/inquiries/${inquiryId}/applicant-access/revoke`
+}
+
+/**
+ * Use when a link went to the wrong person or a session may be compromised. Then issue a new link.
+ * @summary Revoke all applicant links and sessions
+ */
+export const revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePost = async (inquiryId: string,
+    params?: RevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostParams, options?: Parameters<typeof customInstance>[1]): Promise<revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse> => {
+
+  return customInstance<revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostResponse>(getRevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostUrl(inquiryId,params),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getRevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePost>>, TError,{inquiryId: string;params?: RevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePost>>, TError,{inquiryId: string;params?: RevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostParams}, TContext> => {
+
+const mutationKey = ['revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePost>>, {inquiryId: string;params?: RevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostParams}> = (props) => {
+          const {inquiryId,params} = props ?? {};
+
+          return  revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePost(inquiryId,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostMutationResult = NonNullable<Awaited<ReturnType<typeof revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePost>>>
+
+    export type RevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostMutationError = ErrorResponse
+
+    /**
+ * @summary Revoke all applicant links and sessions
+ */
+export const useRevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePost = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePost>>, TError,{inquiryId: string;params?: RevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof revokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePost>>,
+        TError,
+        {inquiryId: string;params?: RevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostParams},
+        TContext
+      > => {
+      return useMutation(getRevokeApplicantAccessApiV1VerificationInquiriesInquiryIdApplicantAccessRevokePostMutationOptions(options), queryClient);
     }
 
 export type placeLegalHoldApiV1VerificationInquiriesInquiryIdLegalHoldPostResponse200 = {
@@ -138984,7 +141517,7 @@ export type submitApplicantStepApiV1VerifySessionStepsStepTypePostResponseError 
 
 export type submitApplicantStepApiV1VerifySessionStepsStepTypePostResponse = (submitApplicantStepApiV1VerifySessionStepsStepTypePostResponseSuccess | submitApplicantStepApiV1VerifySessionStepsStepTypePostResponseError)
 
-export const getSubmitApplicantStepApiV1VerifySessionStepsStepTypePostUrl = (stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration',) => {
+export const getSubmitApplicantStepApiV1VerifySessionStepsStepTypePostUrl = (stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident',) => {
 
 
 
@@ -138995,7 +141528,7 @@ export const getSubmitApplicantStepApiV1VerifySessionStepsStepTypePostUrl = (ste
 /**
  * @summary Submit an applicant step
  */
-export const submitApplicantStepApiV1VerifySessionStepsStepTypePost = async (stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration',
+export const submitApplicantStepApiV1VerifySessionStepsStepTypePost = async (stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident',
     applicantStepSubmit: ApplicantStepSubmit, options?: Parameters<typeof customInstance>[1]): Promise<submitApplicantStepApiV1VerifySessionStepsStepTypePostResponse> => {
 
   return customInstance<submitApplicantStepApiV1VerifySessionStepsStepTypePostResponse>(getSubmitApplicantStepApiV1VerifySessionStepsStepTypePostUrl(stepType),
@@ -139012,8 +141545,8 @@ export const submitApplicantStepApiV1VerifySessionStepsStepTypePost = async (ste
 
 
 export const getSubmitApplicantStepApiV1VerifySessionStepsStepTypePostMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitApplicantStepApiV1VerifySessionStepsStepTypePost>>, TError,{stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration';data: ApplicantStepSubmit}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof submitApplicantStepApiV1VerifySessionStepsStepTypePost>>, TError,{stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration';data: ApplicantStepSubmit}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitApplicantStepApiV1VerifySessionStepsStepTypePost>>, TError,{stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: ApplicantStepSubmit}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitApplicantStepApiV1VerifySessionStepsStepTypePost>>, TError,{stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: ApplicantStepSubmit}, TContext> => {
 
 const mutationKey = ['submitApplicantStepApiV1VerifySessionStepsStepTypePost'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -139025,7 +141558,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitApplicantStepApiV1VerifySessionStepsStepTypePost>>, {stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration';data: ApplicantStepSubmit}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitApplicantStepApiV1VerifySessionStepsStepTypePost>>, {stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: ApplicantStepSubmit}> = (props) => {
           const {stepType,data} = props ?? {};
 
           return  submitApplicantStepApiV1VerifySessionStepsStepTypePost(stepType,data,requestOptions)
@@ -139046,14 +141579,528 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Submit an applicant step
  */
 export const useSubmitApplicantStepApiV1VerifySessionStepsStepTypePost = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitApplicantStepApiV1VerifySessionStepsStepTypePost>>, TError,{stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration';data: ApplicantStepSubmit}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitApplicantStepApiV1VerifySessionStepsStepTypePost>>, TError,{stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: ApplicantStepSubmit}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof submitApplicantStepApiV1VerifySessionStepsStepTypePost>>,
         TError,
-        {stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration';data: ApplicantStepSubmit},
+        {stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: ApplicantStepSubmit},
         TContext
       > => {
       return useMutation(getSubmitApplicantStepApiV1VerifySessionStepsStepTypePostMutationOptions(options), queryClient);
+    }
+
+export type uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse200 = {
+  data: ApplicantInquiryView
+  status: 200
+}
+
+export type uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponseSuccess = (uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse200) & {
+  headers: Headers;
+};
+export type uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponseError = (uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse400 | uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse401 | uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse403 | uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse404 | uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse409 | uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse422 | uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse429) & {
+  headers: Headers;
+};
+
+export type uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse = (uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponseSuccess | uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponseError)
+
+export const getUploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostUrl = (stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident',) => {
+
+
+
+
+  return `/api/v1/verify/session/steps/${stepType}/upload`
+}
+
+/**
+ * Multipart form with a `file` field (JPEG, PNG, WebP or PDF, up to 20 MB). For document, selfie, liveness and proof_of_address steps. The file is validated, malware-scanned and stored by DeepSense, then attached to the step as its evidence; document and proof-of-address files are queued for OCR extraction.
+ * @summary Upload a photo or PDF for a step
+ */
+export const uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPost = async (stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident',
+    uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostBody: UploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostBody, options?: Parameters<typeof customInstance>[1]): Promise<uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse> => {
+    const formData = new FormData();
+formData.append(`file`, uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostBody.file);
+
+  return customInstance<uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostResponse>(getUploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostUrl(stepType),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getUploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPost>>, TError,{stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: UploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPost>>, TError,{stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: UploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostBody}, TContext> => {
+
+const mutationKey = ['uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPost>>, {stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: UploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostBody}> = (props) => {
+          const {stepType,data} = props ?? {};
+
+          return  uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPost(stepType,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostMutationResult = NonNullable<Awaited<ReturnType<typeof uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPost>>>
+    export type UploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostMutationBody = UploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostBody
+    export type UploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostMutationError = ErrorResponse
+
+    /**
+ * @summary Upload a photo or PDF for a step
+ */
+export const useUploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPost = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPost>>, TError,{stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: UploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof uploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPost>>,
+        TError,
+        {stepType: 'document' | 'selfie' | 'liveness' | 'face_match' | 'kyc_registry' | 'kyb_registry' | 'screening' | 'proof_of_address' | 'questionnaire' | 'phone' | 'email' | 'consent' | 'ubo_declaration' | 'video_ident';data: UploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostBody},
+        TContext
+      > => {
+      return useMutation(getUploadApplicantStepApiV1VerifySessionStepsStepTypeUploadPostMutationOptions(options), queryClient);
+    }
+
+export type getApplicantVideoApiV1VerifySessionVideoGetResponse200 = {
+  data: ApplicantVideoSessionView | null
+  status: 200
+}
+
+export type getApplicantVideoApiV1VerifySessionVideoGetResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type getApplicantVideoApiV1VerifySessionVideoGetResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getApplicantVideoApiV1VerifySessionVideoGetResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type getApplicantVideoApiV1VerifySessionVideoGetResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getApplicantVideoApiV1VerifySessionVideoGetResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type getApplicantVideoApiV1VerifySessionVideoGetResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type getApplicantVideoApiV1VerifySessionVideoGetResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type getApplicantVideoApiV1VerifySessionVideoGetResponseSuccess = (getApplicantVideoApiV1VerifySessionVideoGetResponse200) & {
+  headers: Headers;
+};
+export type getApplicantVideoApiV1VerifySessionVideoGetResponseError = (getApplicantVideoApiV1VerifySessionVideoGetResponse400 | getApplicantVideoApiV1VerifySessionVideoGetResponse401 | getApplicantVideoApiV1VerifySessionVideoGetResponse403 | getApplicantVideoApiV1VerifySessionVideoGetResponse404 | getApplicantVideoApiV1VerifySessionVideoGetResponse409 | getApplicantVideoApiV1VerifySessionVideoGetResponse422 | getApplicantVideoApiV1VerifySessionVideoGetResponse429) & {
+  headers: Headers;
+};
+
+export type getApplicantVideoApiV1VerifySessionVideoGetResponse = (getApplicantVideoApiV1VerifySessionVideoGetResponseSuccess | getApplicantVideoApiV1VerifySessionVideoGetResponseError)
+
+export const getGetApplicantVideoApiV1VerifySessionVideoGetUrl = () => {
+
+
+
+
+  return `/api/v1/verify/session/video`
+}
+
+/**
+ * @summary Get the applicant's video call
+ */
+export const getApplicantVideoApiV1VerifySessionVideoGet = async ( options?: Parameters<typeof customInstance>[1]): Promise<getApplicantVideoApiV1VerifySessionVideoGetResponse> => {
+
+  return customInstance<getApplicantVideoApiV1VerifySessionVideoGetResponse>(getGetApplicantVideoApiV1VerifySessionVideoGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetApplicantVideoApiV1VerifySessionVideoGetQueryKey = () => {
+    return [
+    `/api/v1/verify/session/video`
+    ] as const;
+    }
+
+
+export const getGetApplicantVideoApiV1VerifySessionVideoGetQueryOptions = <TData = Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApplicantVideoApiV1VerifySessionVideoGetQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>> = ({ signal }) => getApplicantVideoApiV1VerifySessionVideoGet({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApplicantVideoApiV1VerifySessionVideoGetQueryResult = NonNullable<Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>>
+export type GetApplicantVideoApiV1VerifySessionVideoGetQueryError = ErrorResponse
+
+
+export function useGetApplicantVideoApiV1VerifySessionVideoGet<TData = Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>,
+          TError,
+          Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApplicantVideoApiV1VerifySessionVideoGet<TData = Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>,
+          TError,
+          Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApplicantVideoApiV1VerifySessionVideoGet<TData = Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get the applicant's video call
+ */
+
+export function useGetApplicantVideoApiV1VerifySessionVideoGet<TData = Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicantVideoApiV1VerifySessionVideoGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApplicantVideoApiV1VerifySessionVideoGetQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type bookApplicantVideoApiV1VerifySessionVideoPostResponse201 = {
+  data: ApplicantVideoSessionView
+  status: 201
+}
+
+export type bookApplicantVideoApiV1VerifySessionVideoPostResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type bookApplicantVideoApiV1VerifySessionVideoPostResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type bookApplicantVideoApiV1VerifySessionVideoPostResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type bookApplicantVideoApiV1VerifySessionVideoPostResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type bookApplicantVideoApiV1VerifySessionVideoPostResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type bookApplicantVideoApiV1VerifySessionVideoPostResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type bookApplicantVideoApiV1VerifySessionVideoPostResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type bookApplicantVideoApiV1VerifySessionVideoPostResponseSuccess = (bookApplicantVideoApiV1VerifySessionVideoPostResponse201) & {
+  headers: Headers;
+};
+export type bookApplicantVideoApiV1VerifySessionVideoPostResponseError = (bookApplicantVideoApiV1VerifySessionVideoPostResponse400 | bookApplicantVideoApiV1VerifySessionVideoPostResponse401 | bookApplicantVideoApiV1VerifySessionVideoPostResponse403 | bookApplicantVideoApiV1VerifySessionVideoPostResponse404 | bookApplicantVideoApiV1VerifySessionVideoPostResponse409 | bookApplicantVideoApiV1VerifySessionVideoPostResponse422 | bookApplicantVideoApiV1VerifySessionVideoPostResponse429) & {
+  headers: Headers;
+};
+
+export type bookApplicantVideoApiV1VerifySessionVideoPostResponse = (bookApplicantVideoApiV1VerifySessionVideoPostResponseSuccess | bookApplicantVideoApiV1VerifySessionVideoPostResponseError)
+
+export const getBookApplicantVideoApiV1VerifySessionVideoPostUrl = () => {
+
+
+
+
+  return `/api/v1/verify/session/video`
+}
+
+/**
+ * @summary Book a video identification call
+ */
+export const bookApplicantVideoApiV1VerifySessionVideoPost = async (videoSessionBook: VideoSessionBook, options?: Parameters<typeof customInstance>[1]): Promise<bookApplicantVideoApiV1VerifySessionVideoPostResponse> => {
+
+  return customInstance<bookApplicantVideoApiV1VerifySessionVideoPostResponse>(getBookApplicantVideoApiV1VerifySessionVideoPostUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(videoSessionBook)
+  }
+);}
+
+
+
+
+
+export const getBookApplicantVideoApiV1VerifySessionVideoPostMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bookApplicantVideoApiV1VerifySessionVideoPost>>, TError,{data: VideoSessionBook}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof bookApplicantVideoApiV1VerifySessionVideoPost>>, TError,{data: VideoSessionBook}, TContext> => {
+
+const mutationKey = ['bookApplicantVideoApiV1VerifySessionVideoPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof bookApplicantVideoApiV1VerifySessionVideoPost>>, {data: VideoSessionBook}> = (props) => {
+          const {data} = props ?? {};
+
+          return  bookApplicantVideoApiV1VerifySessionVideoPost(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type BookApplicantVideoApiV1VerifySessionVideoPostMutationResult = NonNullable<Awaited<ReturnType<typeof bookApplicantVideoApiV1VerifySessionVideoPost>>>
+    export type BookApplicantVideoApiV1VerifySessionVideoPostMutationBody = VideoSessionBook
+    export type BookApplicantVideoApiV1VerifySessionVideoPostMutationError = ErrorResponse
+
+    /**
+ * @summary Book a video identification call
+ */
+export const useBookApplicantVideoApiV1VerifySessionVideoPost = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof bookApplicantVideoApiV1VerifySessionVideoPost>>, TError,{data: VideoSessionBook}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof bookApplicantVideoApiV1VerifySessionVideoPost>>,
+        TError,
+        {data: VideoSessionBook},
+        TContext
+      > => {
+      return useMutation(getBookApplicantVideoApiV1VerifySessionVideoPostMutationOptions(options), queryClient);
+    }
+
+export type cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse204 = {
+  data: void
+  status: 204
+}
+
+export type cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type cancelApplicantVideoApiV1VerifySessionVideoDeleteResponseSuccess = (cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse204) & {
+  headers: Headers;
+};
+export type cancelApplicantVideoApiV1VerifySessionVideoDeleteResponseError = (cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse400 | cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse401 | cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse403 | cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse404 | cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse409 | cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse422 | cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse429) & {
+  headers: Headers;
+};
+
+export type cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse = (cancelApplicantVideoApiV1VerifySessionVideoDeleteResponseSuccess | cancelApplicantVideoApiV1VerifySessionVideoDeleteResponseError)
+
+export const getCancelApplicantVideoApiV1VerifySessionVideoDeleteUrl = () => {
+
+
+
+
+  return `/api/v1/verify/session/video`
+}
+
+/**
+ * @summary Cancel the applicant's booked video call
+ */
+export const cancelApplicantVideoApiV1VerifySessionVideoDelete = async ( options?: Parameters<typeof customInstance>[1]): Promise<cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse> => {
+
+  return customInstance<cancelApplicantVideoApiV1VerifySessionVideoDeleteResponse>(getCancelApplicantVideoApiV1VerifySessionVideoDeleteUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getCancelApplicantVideoApiV1VerifySessionVideoDeleteMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelApplicantVideoApiV1VerifySessionVideoDelete>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelApplicantVideoApiV1VerifySessionVideoDelete>>, TError,void, TContext> => {
+
+const mutationKey = ['cancelApplicantVideoApiV1VerifySessionVideoDelete'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelApplicantVideoApiV1VerifySessionVideoDelete>>, void> = () => {
+
+
+          return  cancelApplicantVideoApiV1VerifySessionVideoDelete(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelApplicantVideoApiV1VerifySessionVideoDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof cancelApplicantVideoApiV1VerifySessionVideoDelete>>>
+
+    export type CancelApplicantVideoApiV1VerifySessionVideoDeleteMutationError = ErrorResponse
+
+    /**
+ * @summary Cancel the applicant's booked video call
+ */
+export const useCancelApplicantVideoApiV1VerifySessionVideoDelete = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelApplicantVideoApiV1VerifySessionVideoDelete>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof cancelApplicantVideoApiV1VerifySessionVideoDelete>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getCancelApplicantVideoApiV1VerifySessionVideoDeleteMutationOptions(options), queryClient);
     }
 
 export type listThresholdsApiV1TravelRuleThresholdsGetResponse200 = {

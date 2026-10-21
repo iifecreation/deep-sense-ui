@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
@@ -70,6 +70,13 @@ if (process.argv.includes('--write-baseline')) {
   writeFileSync(baselinePath, `${JSON.stringify(rows(current), null, 2)}\n`);
   console.log(`Wrote ${[...current.values()].reduce((a, b) => a + b, 0)} findings across ${current.size} file/rule/severity groups.`);
   process.exit(0);
+}
+
+if (!existsSync(baselinePath)) {
+  console.error(
+    `No ESLint baseline at ${relative(root, baselinePath)}. Create it with "npm run lint:baseline:write" and commit it.`,
+  );
+  process.exit(1);
 }
 
 const baselineRows = JSON.parse(readFileSync(baselinePath, 'utf8'));

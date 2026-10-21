@@ -1,6 +1,8 @@
 import type {
   ActionCreate,
   ApplicantProfileRead,
+  BeneficiaryCreate,
+  BeneficiaryRead,
   InquiryCreate,
   InquiryEventRead,
   InquiryListItem,
@@ -8,6 +10,9 @@ import type {
   InquiryPage,
   InquiryRead,
   InquiryReviewCreate,
+  ReviewerRead,
+  VideoSessionComplete,
+  VideoSessionRead,
   MonitoringResolve,
   MonitoringRunResult,
   OneTimeLinkCreate,
@@ -47,6 +52,7 @@ export const STEP_TYPES = [
   'email',
   'consent',
   'ubo_declaration',
+  'video_ident',
 ] as const;
 export type StepType = (typeof STEP_TYPES)[number];
 
@@ -248,6 +254,48 @@ export const verificationFlowsService = {
     post<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/review/reject-proposal`, { reason }),
 
   // Queue management
+  // Business beneficiaries (KYB)
+  listBeneficiaries: (inquiryId: string, includePii = false) =>
+    get<BeneficiaryRead[]>(`/verification/inquiries/${enc(inquiryId)}/beneficiaries`, {
+      params: { include_pii: includePii },
+    }),
+  addBeneficiary: (inquiryId: string, body: BeneficiaryCreate) =>
+    post<BeneficiaryRead>(`/verification/inquiries/${enc(inquiryId)}/beneficiaries`, body),
+  removeBeneficiary: (inquiryId: string, beneficiaryId: string) =>
+    del<void>(`/verification/inquiries/${enc(inquiryId)}/beneficiaries/${enc(beneficiaryId)}`),
+  linkBeneficiary: (inquiryId: string, beneficiaryId: string, personInquiryId: string) =>
+    post<BeneficiaryRead>(`/verification/inquiries/${enc(inquiryId)}/beneficiaries/${enc(beneficiaryId)}/link`, {
+      person_inquiry_id: personInquiryId,
+    }),
+  startBeneficiaryKyc: (inquiryId: string, beneficiaryId: string, referenceId?: string) =>
+    post<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/beneficiaries/${enc(beneficiaryId)}/start-kyc`, {
+      reference_id: referenceId || null,
+    }),
+
+  /**
+   * A file the applicant uploaded through /verify (evidence_ref_source "upload"), fetched with the
+   * user's credentials (works on every storage backend; each download is audited). Returns an
+   * object URL the caller should revoke when done.
+   */
+  openUploadedFile: async (documentId: string): Promise<string> => {
+    const blob = await get<Blob>(`/document-uploads/${enc(documentId)}/content`, { responseType: 'blob' }, false);
+    return URL.createObjectURL(blob);
+  },
+
+  // Video identification
+  listVideoSessions: (inquiryId: string) =>
+    get<VideoSessionRead[]>(`/verification/inquiries/${enc(inquiryId)}/video-sessions`),
+  bookVideoSession: (inquiryId: string, scheduledAt: string) =>
+    post<VideoSessionRead>(`/verification/inquiries/${enc(inquiryId)}/video-sessions`, { scheduled_at: scheduledAt }),
+  startVideoSession: (sessionId: string) => post<VideoSessionRead>(`/verification/video-sessions/${enc(sessionId)}/start`, {}),
+  completeVideoSession: (sessionId: string, body: VideoSessionComplete) =>
+    post<VideoSessionRead>(`/verification/video-sessions/${enc(sessionId)}/complete`, body),
+  cancelVideoSession: (sessionId: string) => post<VideoSessionRead>(`/verification/video-sessions/${enc(sessionId)}/cancel`, {}),
+  noShowVideoSession: (sessionId: string) =>
+    post<VideoSessionRead>(`/verification/video-sessions/${enc(sessionId)}/no-show`, {}),
+
+  /** Active members who can review (onboarding:write): the only valid assignees. */
+  listReviewers: () => get<ReviewerRead[]>('/verification/reviewers'),
   assignInquiry: (inquiryId: string, userId: string | null) =>
     post<InquiryRead>(`/verification/inquiries/${enc(inquiryId)}/assign`, { user_id: userId }),
   listNotes: (inquiryId: string) => get<InquiryNoteRead[]>(`/verification/inquiries/${enc(inquiryId)}/notes`),

@@ -56,7 +56,7 @@ export interface TransactionDecision {
   effective_decision: string;
   shadow_mode: boolean;
   reason_codes_json: string[];
-  explainability_json: Record<string, any>;
+  explainability_json: Record<string, unknown>;
   created_at: string;
 }
 

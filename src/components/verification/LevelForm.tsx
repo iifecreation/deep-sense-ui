@@ -120,6 +120,8 @@ function buildConfig(step: StepDraft): Record<string, unknown> {
   return extra;
 }
 
+const BENEFICIARY_ROLES = ["ubo", "director", "shareholder", "representative"] as const;
+
 const num = (value: string, fallback: number) => (value.trim() === "" ? fallback : Number(value));
 const numOrNull = (value: string) => (value.trim() === "" ? null : Number(value));
 
@@ -170,6 +172,8 @@ export function LevelForm({
   const [retentionDays, setRetentionDays] = useState(initial?.retention_days ? String(initial.retention_days) : "");
   const [monitoring, setMonitoring] = useState(initial?.ongoing_monitoring_enabled ?? false);
   const [monitoringMin, setMonitoringMin] = useState(String(initial?.monitoring_min_score ?? 0.85));
+  const [beneficiaryLevel, setBeneficiaryLevel] = useState(initial?.beneficiary_level_name ?? "");
+  const [requiredRoles, setRequiredRoles] = useState<string[]>(initial?.required_beneficiary_roles ?? ["ubo"]);
   const [formError, setFormError] = useState<string | null>(null);
 
   const availableSteps = useMemo(
@@ -230,6 +234,12 @@ export function LevelForm({
         // Monitoring re-screens approved onboarding applicants; actions have nothing to monitor.
         ongoing_monitoring_enabled: kind === "onboarding" && monitoring,
         monitoring_min_score: num(monitoringMin, 0.85),
+        // Beneficiary settings only exist for business levels; the API rejects them on individual ones.
+        beneficiary_level_name: applicantType === "business" && beneficiaryLevel.trim() ? beneficiaryLevel.trim() : null,
+        required_beneficiary_roles:
+          applicantType === "business"
+            ? (requiredRoles as NonNullable<VerificationLevelBody["required_beneficiary_roles"]>)
+            : null,
       };
       onSubmit({ name: name.trim(), kind, body });
     } catch (cause) {
@@ -490,6 +500,45 @@ export function LevelForm({
                 <Input id="level-monitoring-min" type="number" step="0.01" min={0.55} max={1} value={monitoringMin} onChange={(e) => setMonitoringMin(e.target.value)} disabled={!monitoring} />
               </div>
             </>
+          )}
+          {applicantType === "business" && kind === "onboarding" && (
+            <div className="space-y-3 md:col-span-3 rounded-2xl border p-4" data-testid="level-beneficiaries">
+              <div className="space-y-1.5">
+                <Label htmlFor="level-beneficiary-level">Beneficiary KYC level</Label>
+                <Input
+                  id="level-beneficiary-level"
+                  value={beneficiaryLevel}
+                  onChange={(e) => setBeneficiaryLevel(e.target.value)}
+                  placeholder="e.g. kyc-standard"
+                />
+                <p className="text-xs text-muted-foreground">
+                  The individual onboarding level each beneficiary&apos;s own KYC runs on.
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Roles that must pass KYC before the business can be approved</Label>
+                <div className="flex flex-wrap gap-4">
+                  {BENEFICIARY_ROLES.map((role) => (
+                    <label key={role} className="flex items-center gap-2 text-sm">
+                      <Checkbox
+                        checked={requiredRoles.includes(role)}
+                        onCheckedChange={(checked) =>
+                          setRequiredRoles((prev) =>
+                            checked ? [...prev.filter((item) => item !== role), role] : prev.filter((item) => item !== role),
+                          )
+                        }
+                        aria-label={`Require ${role}`}
+                      />
+                      {humanize(role)}
+                    </label>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  At least one beneficiary in these roles is required. Untick all to approve businesses without
+                  beneficiary checks.
+                </p>
+              </div>
+            </div>
           )}
           <label className="flex items-center gap-2 text-sm md:col-span-3">
             <Switch checked={duplicateCheck} onCheckedChange={setDuplicateCheck} aria-label="Duplicate applicant check" />

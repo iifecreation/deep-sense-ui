@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "lint:baseline": "node scripts/check-eslint-baseline.mjs",
+    "lint:baseline:write": "node scripts/check-eslint-baseline.mjs --write-baseline",
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",

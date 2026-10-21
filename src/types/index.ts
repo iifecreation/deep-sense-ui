@@ -275,22 +275,10 @@ export interface TransactionListFilters {
 }
 
 // Alert types
-export interface AlertRead {
-  id: string;
-  alert_type: string;
-  severity: string;
-  title: string;
-  description: string;
-  status: string;
-  risk_score?: number;
-  transaction_id?: string;
-  customer_id?: string;
-  customer_name?: string;
-  assigned_user_id?: string;
-  assigned_user_name?: string;
-  created_at: string;
-  updated_at: string;
-}
+// The alert shape the API actually returns (generated from the OpenAPI schema), so pages
+// can't drift from it again.
+export type { AlertRead } from '@/lib/api-client/api';
+import type { AlertRead } from '@/lib/api-client/api';
 
 export interface AlertDetail {
   alert: AlertRead;

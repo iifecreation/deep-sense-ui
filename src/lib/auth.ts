@@ -32,7 +32,10 @@ export function useAuth() {
 
       // Redirect to login if not authenticated and trying to access dashboard
       if (!token && pathname?.startsWith('/dashboard')) {
-        router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+        // window.location is the encoded URL (exactly what the login page should send the user
+        // back to), and keeps the query string; encode it once as a query parameter.
+        const returnTo = `${window.location.pathname}${window.location.search}`;
+        router.push(`/login?redirect=${encodeURIComponent(returnTo)}`);
       }
     };
     checkAuth();

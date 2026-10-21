@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import type { ApplicantInquiryView, LinkExchangeResponse } from '@/lib/api-client/api';
+import type { ApplicantInquiryView, ApplicantVideoSessionView, LinkExchangeResponse } from '@/lib/api-client/api';
 import { getRuntimeApiUrl } from '@/lib/runtime-environment';
 import type { StepType } from '@/services/verification-flows.service';
 
@@ -53,6 +53,56 @@ export const applicantVerificationService = {
       return data;
     } catch (error) {
       return normalize(error);
+    }
+  },
+
+  /** Upload a captured photo or PDF for a document/selfie/liveness/proof_of_address step. */
+  async uploadEvidence(sessionToken: string, stepType: StepType, file: Blob, filename: string): Promise<ApplicantInquiryView> {
+    const form = new FormData();
+    form.append('file', file, filename);
+    try {
+      // The client defaults to a JSON Content-Type, which makes axios serialize FormData as JSON.
+      // Declaring multipart keeps the FormData; axios then lets the browser add the boundary.
+      const { data } = await client().post<ApplicantInquiryView>(`/session/steps/${stepType}/upload`, form, {
+        headers: { ...sessionHeaders(sessionToken), 'Content-Type': 'multipart/form-data' },
+        timeout: 120000,
+      });
+      return data;
+    } catch (error) {
+      return normalize(error);
+    }
+  },
+
+  /** The applicant's booked or live video identification call, or null. */
+  async getVideo(sessionToken: string): Promise<ApplicantVideoSessionView | null> {
+    try {
+      const { data } = await client().get<ApplicantVideoSessionView | null>('/session/video', {
+        headers: sessionHeaders(sessionToken),
+      });
+      return data ?? null;
+    } catch (error) {
+      return normalize(error);
+    }
+  },
+
+  async bookVideo(sessionToken: string, scheduledAt: string): Promise<ApplicantVideoSessionView> {
+    try {
+      const { data } = await client().post<ApplicantVideoSessionView>(
+        '/session/video',
+        { scheduled_at: scheduledAt },
+        { headers: sessionHeaders(sessionToken) },
+      );
+      return data;
+    } catch (error) {
+      return normalize(error);
+    }
+  },
+
+  async cancelVideo(sessionToken: string): Promise<void> {
+    try {
+      await client().delete('/session/video', { headers: sessionHeaders(sessionToken) });
+    } catch (error) {
+      normalize(error);
     }
   },
 

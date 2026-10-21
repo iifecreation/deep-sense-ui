@@ -117,6 +117,10 @@ const STATUS_STYLES: Record<string, string> = {
   in_progress: "border-blue-300 text-blue-700 bg-blue-50",
   unverified: "border-slate-300 text-slate-600 bg-slate-50",
   monitoring_hit: "border-rose-600 text-white bg-rose-600",
+  // video call statuses
+  scheduled: "border-blue-300 text-blue-700 bg-blue-50",
+  cancelled: "border-neutral-300 text-neutral-500 bg-neutral-100",
+  no_show: "border-orange-300 text-orange-700 bg-orange-50",
   // ongoing monitoring statuses
   clear: "border-emerald-300 text-emerald-700 bg-emerald-50",
   hit: "border-rose-600 text-white bg-rose-600",

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Check, Lock, Radar, Unlock, UserCheck, X } from "lucide-react";
 import { toast } from "sonner";
-import type { InquiryNoteRead, InquiryRead } from "@/lib/api-client/api";
+import type { InquiryNoteRead, InquiryRead, ReviewerRead } from "@/lib/api-client/api";
 import type { TeamMember } from "@/types";
 import {
   AlertDialog,
@@ -309,13 +309,15 @@ export function QueueCard({
   members,
   currentUserId,
   onDone,
-}: CaseWorkProps & { currentUserId: string | undefined }) {
+  reviewers,
+}: CaseWorkProps & { currentUserId: string | undefined; reviewers: ReviewerRead[] | undefined }) {
   const [busy, setBusy] = useState(false);
   const [tagsInput, setTagsInput] = useState((inquiry.tags ?? []).join(", "));
   const [editingTags, setEditingTags] = useState(false);
   const redacted = inquiry.redacted_at !== null;
   const assignee = inquiry.assigned_to_user_id;
-  const options = (members ?? []).filter((member) => member.status === "active" || member.user_id === assignee);
+  const options = reviewers ?? [];
+  const canSelfAssign = !!currentUserId && options.some((reviewer) => reviewer.id === currentUserId);
 
   const assign = async (userId: string | null) => {
     setBusy(true);
@@ -361,14 +363,20 @@ export function QueueCard({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={UNASSIGNED}>Unassigned</SelectItem>
-                {options.map((member) => (
-                  <SelectItem key={member.user_id} value={member.user_id}>
-                    {member.full_name || member.email} · {humanize(member.role)}
+                {assignee && !options.some((reviewer) => reviewer.id === assignee) && (
+                  // Current assignee lost review access (or left): keep them visible, not selectable.
+                  <SelectItem value={assignee} disabled>
+                    {userLabel(assignee, members)} · no longer a reviewer
+                  </SelectItem>
+                )}
+                {options.map((reviewer) => (
+                  <SelectItem key={reviewer.id} value={reviewer.id}>
+                    {reviewer.full_name || reviewer.email} · {humanize(reviewer.role)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {currentUserId && assignee !== currentUserId && (
+            {canSelfAssign && assignee !== currentUserId && (
               <Button variant="outline" onClick={() => assign(currentUserId)} disabled={busy}>
                 <UserCheck className="w-3.5 h-3.5 mr-2" /> Assign to me
               </Button>

@@ -1,4 +1,11 @@
 import { get, post } from "@/lib/api/client";
+import type {
+  DeviceDetail as ApiDeviceDetail,
+  DeviceMutationResponse,
+  PaginatedDeviceListItem,
+  PaginatedDeviceTimelineEvent,
+  PaginatedLinkedCustomerItem,
+} from "@/lib/api-client/api";
 
 export interface DeviceInfo {
   browser?: string;
@@ -7,7 +14,7 @@ export interface DeviceInfo {
   isp?: string;
   geo?: string;
   lastSeen?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface DeviceSignal {
@@ -33,34 +40,34 @@ export interface DeviceDetail {
   status: string;
   info: DeviceInfo;
   signals: DeviceSignal[];
-  customers: any[];
-  transactions: any[];
-  timeline: any[];
-  [key: string]: any;
+  customers: unknown[];
+  transactions: unknown[];
+  timeline: unknown[];
+  [key: string]: unknown;
 }
 
 export const devicesService = {
-  listDevices: async (params?: Record<string, any>) => {
-    return get<any>('/devices', { params });
+  listDevices: async (params?: Record<string, unknown>) => {
+    return get<PaginatedDeviceListItem>('/devices', { params });
   },
 
   getDeviceDetail: async (deviceId: string) => {
-    return get<any>(`/devices/${deviceId}`);
+    return get<ApiDeviceDetail>(`/devices/${deviceId}`);
   },
 
-  getDeviceTimeline: async (deviceId: string, params?: Record<string, any>) => {
-    return get<any>(`/devices/${deviceId}/timeline`, { params });
+  getDeviceTimeline: async (deviceId: string, params?: Record<string, unknown>) => {
+    return get<PaginatedDeviceTimelineEvent>(`/devices/${deviceId}/timeline`, { params });
   },
 
   trustDevice: async (deviceId: string, reason: string) => {
-    return post<any>(`/devices/${deviceId}/trust`, { reason });
+    return post<DeviceMutationResponse>(`/devices/${deviceId}/trust`, { reason });
   },
 
   blockDevice: async (deviceId: string, reason: string) => {
-    return post<any>(`/devices/${deviceId}/block`, { reason });
+    return post<DeviceMutationResponse>(`/devices/${deviceId}/block`, { reason });
   },
 
-  getLinkedCustomers: async (deviceId: string, params?: Record<string, any>) => {
-    return get<any>(`/devices/${deviceId}/customers`, { params });
+  getLinkedCustomers: async (deviceId: string, params?: Record<string, unknown>) => {
+    return get<PaginatedLinkedCustomerItem>(`/devices/${deviceId}/customers`, { params });
   },
 };

@@ -39,11 +39,23 @@ export default function ContactPage() {
     setIsSubmitting(true);
     setSubmitError("");
     try {
-      await contentService.submitContact(formData);
+      // The API takes {name, email, company, subject, message}; fold the extra fields in.
+      const details = [
+        formData.title && `Role: ${formData.title}`,
+        formData.size && `Company size: ${formData.size}`,
+        formData.useCase && `Use case: ${formData.useCase}`,
+      ].filter(Boolean);
+      await contentService.submitContact({
+        name: formData.name,
+        email: formData.email,
+        company: formData.company || null,
+        subject: formData.useCase ? `Contact: ${formData.useCase}` : "Contact: general inquiry",
+        message: details.length ? `${formData.message}\n\n${details.join("\n")}` : formData.message,
+      });
       setIsSubmitted(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to submit contact form:", err);
-      setSubmitError(err.message || "Failed to send message.");
+      setSubmitError(err instanceof Error && err.message ? err.message : "Failed to send message.");
     } finally {
       setIsSubmitting(false);
     }

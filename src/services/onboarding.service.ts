@@ -1,12 +1,21 @@
 import { get, post } from "@/lib/api/client";
+import type {
+  OnboardingDocumentCreateRequest,
+  OnboardingMutationResponse,
+  OnboardingReviewDetail,
+  OnboardingRiskResultRead,
+  OnboardingScreeningSummary,
+  PaginatedAuditEventRead,
+  PaginatedOnboardingReviewListItem,
+} from "@/lib/api-client/api";
 
 export const onboardingService = {
-  listReviews: async (params?: Record<string, any>) => {
-    return get<any>('/onboarding/reviews', { params });
+  listReviews: async (params?: Record<string, unknown>) => {
+    return get<PaginatedOnboardingReviewListItem>('/onboarding/reviews', { params });
   },
 
   getReviewDetail: async (reviewId: string) => {
-    return get<any>(`/onboarding/reviews/${reviewId}`);
+    return get<OnboardingReviewDetail>(`/onboarding/reviews/${reviewId}`);
   },
 
   createReview: async (data: {
@@ -16,46 +25,46 @@ export const onboardingService = {
     applicant_phone?: string;
     onboarding_channel?: string;
   }) => {
-    return post<any>('/onboarding/reviews', data);
+    return post<OnboardingReviewDetail>('/onboarding/reviews', data);
   },
 
   approveReview: async (reviewId: string, data: { reason?: string; initialize_risk_profile?: boolean; idempotency_key?: string }) => {
-    return post<any>(`/onboarding/reviews/${reviewId}/approve`, data);
+    return post<OnboardingMutationResponse>(`/onboarding/reviews/${reviewId}/approve`, data);
   },
 
   rejectReview: async (reviewId: string, data: { reason: string; idempotency_key?: string }) => {
-    return post<any>(`/onboarding/reviews/${reviewId}/reject`, data);
+    return post<OnboardingMutationResponse>(`/onboarding/reviews/${reviewId}/reject`, data);
   },
 
   escalateReview: async (reviewId: string, data: { reason: string; escalate_to_edd?: boolean; create_case?: boolean; assigned_user_id?: string; idempotency_key?: string }) => {
-    return post<any>(`/onboarding/reviews/${reviewId}/escalate`, data);
+    return post<OnboardingMutationResponse>(`/onboarding/reviews/${reviewId}/escalate`, data);
   },
 
-  addDocument: async (reviewId: string, data: any) => {
-    return post<any>(`/onboarding/reviews/${reviewId}/documents`, data);
+  addDocument: async (reviewId: string, data: OnboardingDocumentCreateRequest) => {
+    return post<OnboardingMutationResponse>(`/onboarding/reviews/${reviewId}/documents`, data);
   },
 
   getScreeningSummary: async (reviewId: string) => {
-    return get<any>(`/onboarding/reviews/${reviewId}/screening`);
+    return get<OnboardingScreeningSummary>(`/onboarding/reviews/${reviewId}/screening`);
   },
 
   assignReviewer: async (reviewId: string, data: { assigned_user_id: string | null }) => {
-    return post<any>(`/onboarding/reviews/${reviewId}/assign`, data);
+    return post<OnboardingMutationResponse>(`/onboarding/reviews/${reviewId}/assign`, data);
   },
 
   addNote: async (reviewId: string, data: { body: string }) => {
-    return post<any>(`/onboarding/reviews/${reviewId}/notes`, data);
+    return post<OnboardingMutationResponse>(`/onboarding/reviews/${reviewId}/notes`, data);
   },
 
-  getAuditTrail: async (reviewId: string, params?: Record<string, any>) => {
-    return get<any>(`/onboarding/reviews/${reviewId}/audit`, { params });
+  getAuditTrail: async (reviewId: string, params?: Record<string, unknown>) => {
+    return get<PaginatedAuditEventRead>(`/onboarding/reviews/${reviewId}/audit`, { params });
   },
 
   getRiskHistory: async (reviewId: string) => {
-    return get<any>(`/onboarding/reviews/${reviewId}/risk`);
+    return get<OnboardingRiskResultRead[]>(`/onboarding/reviews/${reviewId}/risk`);
   },
 
   requestInfo: async (reviewId: string, data: { reason: string; fields_requested: string[] }) => {
-    return post<any>(`/onboarding/reviews/${reviewId}/request-info`, data);
+    return post<OnboardingMutationResponse>(`/onboarding/reviews/${reviewId}/request-info`, data);
   },
 };

@@ -99,7 +99,31 @@ export function useInquiryNotes(inquiryId: string) {
   return useResource(loader);
 }
 
-/** The organization's active users (not pending invites), for assignment and reviewer names. */
+/** A business inquiry's beneficiaries; names only when includePii (audited server-side). */
+export function useBeneficiaries(inquiryId: string, includePii: boolean, enabled: boolean) {
+  const loader = useCallback(
+    () => (enabled ? verificationFlowsService.listBeneficiaries(inquiryId, includePii) : Promise.resolve([])),
+    [inquiryId, includePii, enabled],
+  );
+  return useResource(loader);
+}
+
+/** Video identification calls for an inquiry that has a video_ident step. */
+export function useVideoSessions(inquiryId: string, enabled: boolean) {
+  const loader = useCallback(
+    () => (enabled ? verificationFlowsService.listVideoSessions(inquiryId) : Promise.resolve([])),
+    [inquiryId, enabled],
+  );
+  return useResource(loader);
+}
+
+/** Users the backend accepts as assignees (active, with onboarding:write). */
+export function useReviewers() {
+  const loader = useCallback(() => verificationFlowsService.listReviewers(), []);
+  return useResource(loader);
+}
+
+/** The organization's active users (not pending invites), for reviewer names. */
 export function useTeamMembers() {
   const loader = useCallback(
     () => settingsService.listTeam().then((team) => team.members.filter((member) => !member.is_invite)),

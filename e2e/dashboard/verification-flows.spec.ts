@@ -1,9 +1,11 @@
-import { expect, test } from '@playwright/test';
-import { loginTenant } from '../support/auth';
+import { expect, request, test } from '@playwright/test';
+import { loginTenant, tenantCredentials } from '../support/auth';
 import { collectConsoleErrors } from '../support/console';
 
 // Routes compile on first visit under `next dev`.
 const FIRST_VISIT = { timeout: 30_000 };
+const API_URL = process.env.NEXT_PUBLIC_SANDBOX_API_URL || 'http://127.0.0.1:18000';
+const APP_URL = process.env.BASE_URL || 'http://127.0.0.1:3100';
 
 test.describe('Verification flows', () => {
   test('create inquiry -> one-time link -> applicant consent', async ({ page, browser }) => {
@@ -87,5 +89,49 @@ test.describe('Verification flows', () => {
 
     expect(applicantErrors).toEqual([]);
     expect(dashboardErrors).toEqual([]);
+  });
+
+  test('reloading /verify after approval shows the outcome, not "session expired"', async ({ browser }) => {
+    test.setTimeout(120_000);
+    const suffix = Date.now().toString(36);
+    const api = await request.newContext({ baseURL: API_URL });
+    const login = await api.post('/api/v1/identity/login', {
+      data: { email: tenantCredentials.email, password: tenantCredentials.password, environment: 'sandbox' },
+    });
+    expect(login.ok()).toBeTruthy();
+    const headers = { Authorization: `Bearer ${(await login.json()).access_token}` };
+    const call = async (url: string, data: unknown) => {
+      const response = await api.post(`/api/v1/verification${url}`, { headers, data });
+      expect(response.ok(), await response.text()).toBeTruthy();
+      return response.json();
+    };
+    await call('/levels', {
+      name: `e2e-auto-${suffix}`,
+      display_name: `E2E auto ${suffix}`,
+      steps: [{ type: 'consent' }],
+      auto_approve_enabled: true,
+    });
+    const inquiry = await call('/inquiries', { level_name: `e2e-auto-${suffix}`, reference_id: `e2e-auto-${suffix}` });
+    const { code } = await call(`/inquiries/${inquiry.id}/one-time-links`, {});
+    await api.dispose();
+
+    const context = await browser.newContext();
+    const applicant = await context.newPage();
+    // The reload's GET /verify/session is an expected 401: approval revoked the session.
+    const errors = collectConsoleErrors(applicant);
+    await applicant.goto(`${APP_URL}/verify?code=${code}`);
+    const consentStep = applicant.getByTestId('applicant-step-consent');
+    await expect(consentStep).toBeVisible(FIRST_VISIT);
+    await consentStep.getByRole('checkbox', { name: 'I agree' }).click();
+    await consentStep.getByRole('button', { name: 'Give consent' }).click();
+    await expect(applicant.getByTestId('applicant-done')).toContainText("You're verified");
+
+    await applicant.reload();
+    const finished = applicant.getByTestId('applicant-finished');
+    await expect(finished).toContainText("You're verified", FIRST_VISIT);
+    await expect(finished).toContainText(`E2E auto ${suffix}`);
+    await expect(applicant.getByText(/session has expired/i)).toHaveCount(0);
+    expect(errors).toEqual([]);
+    await context.close();
   });
 });

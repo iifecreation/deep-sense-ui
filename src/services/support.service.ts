@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { get, post } from '@/lib/api/client';
 
 export interface SupportMessage {

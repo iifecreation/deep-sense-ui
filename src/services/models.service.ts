@@ -1,4 +1,5 @@
 import { get, post } from '@/lib/api/client';
+import type { ModelMutationResponse } from "@/lib/api-client/api";
 
 export interface MLModel {
   id: string;
@@ -43,7 +44,7 @@ export interface ModelMetricsResponse {
 
 export const modelsService = {
   async getModels(): Promise<{ items: MLModel[]; total: number }> {
-    return await get<any>('/models');
+    return await get<{ items: MLModel[]; total: number }>('/models');
   },
 
   async getModelMetrics(modelId: string): Promise<ModelMetricsResponse> {
@@ -54,12 +55,12 @@ export const modelsService = {
     return await get<MLModelDetail>(`/models/${modelId}`);
   },
 
-  async requestRetrain(modelId: string): Promise<any> {
-    return await post<any>(`/models/${modelId}/retrain`, {});
+  async requestRetrain(modelId: string): Promise<ModelMutationResponse> {
+    return await post<ModelMutationResponse>(`/models/${modelId}/retrain`, {});
   },
 
-  async deactivateModel(modelId: string, reason?: string): Promise<any> {
-    return await post<any>(`/models/${modelId}/deactivate`, { reason });
+  async deactivateModel(modelId: string, reason?: string): Promise<ModelMutationResponse> {
+    return await post<ModelMutationResponse>(`/models/${modelId}/deactivate`, { reason });
   },
 
   async registerModel(data: { name: string; slug: string; model_type: string; description?: string }): Promise<MLModel> {
