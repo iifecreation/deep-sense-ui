@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Shield, Zap, Lock, Earth as Globe, CircleCheck as CheckCircle2 } from "lucide-react";
+import { Zap, Lock, Earth as Globe } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 
 export default function AuthLayout({

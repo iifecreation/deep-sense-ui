@@ -1,19 +1,12 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  BarChart, 
-  ArrowRight, 
-  TrendingUp, 
-  CheckCircle2, 
-  Users, 
-  ShieldCheck, 
-  Layers, 
-  Zap,
-  ChevronRight,
-  Target
+import {
+  ArrowRight,
+  Target,
 } from "lucide-react";
 
 const caseStudies = [
@@ -107,10 +100,12 @@ export default function CaseStudiesPage() {
                       </div>
 
                       <div className="order-1 lg:order-2 relative h-[500px] lg:h-[800px] rounded-[100px] overflow-hidden group-hover:scale-[1.02] transition-transform duration-1000 shadow-2xl">
-                         <img 
-                           src={study.image} 
-                           alt={study.org} 
-                           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000"
+                         <Image
+                           src={study.image}
+                           alt={study.org}
+                           className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000"
+                           fill
+                           sizes="(min-width: 1024px) 50vw, 100vw"
                          />
                          <div className="absolute inset-0 bg-neutral-900/10 mix-blend-multiply" />
                          <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />

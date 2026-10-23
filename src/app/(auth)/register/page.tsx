@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Shield, Mail, ArrowRight, ArrowLeft, LoaderCircle as Loader2, BadgeInfo as Info, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { ArrowRight, ArrowLeft, LoaderCircle as Loader2, BadgeInfo as Info, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { authService } from "@/services/auth.service";
 import { ApiError } from "@/lib/api/client";

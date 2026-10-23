@@ -1,13 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  ShieldCheck, 
-  Search, 
-  Filter, 
-  Scan, 
-  ChevronRight,
-  MoreHorizontal,
+import {
+  ShieldCheck,
+  Search,
+  Filter,
   Upload,
   RefreshCcw,
   Download,
@@ -18,20 +15,12 @@ import {
   CheckCircle2,
   XCircle,
   BarChart3,
-  List,
-  History,
   Clock,
-  Settings,
   MoreVertical,
-  ExternalLink,
   Target,
-  ArrowRight,
   PieChart,
-  Activity,
-  Archive,
   Lock,
-  Plus,
-  RefreshCw
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -53,7 +42,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
@@ -64,6 +53,7 @@ import {
 } from "@/components/ui/dialog";
 import { useScreeningMatches, useWatchlists, useScreeningJobs } from "@/hooks/use-screening";
 import { screeningService } from "@/services/screening.service";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
 
 function timeAgo(value?: string | null): string {
   if (!value) return "Unknown";
@@ -163,7 +153,7 @@ export default function ScreeningCenterPage() {
     }
   };
 
-  const filteredMatches = matches?.filter((m: any) => {
+  const filteredMatches = matches?.filter((m) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -174,11 +164,11 @@ export default function ScreeningCenterPage() {
   }) || [];
 
   const allMatches = matches || [];
-  const pendingCount = allMatches.filter((m: any) => m.status === "pending_review").length;
-  const confirmedCount = allMatches.filter((m: any) => m.status === "confirmed").length;
-  const dismissedCount = allMatches.filter((m: any) => m.status === "dismissed").length;
-  const sanctionsCount = allMatches.filter((m: any) => m.match_type === "sanctions").length;
-  const pepCount = allMatches.filter((m: any) => m.match_type === "pep").length;
+  const pendingCount = allMatches.filter((m) => m.status === "pending_review").length;
+  const confirmedCount = allMatches.filter((m) => m.status === "confirmed").length;
+  const dismissedCount = allMatches.filter((m) => m.status === "dismissed").length;
+  const sanctionsCount = allMatches.filter((m) => m.match_type === "sanctions").length;
+  const pepCount = allMatches.filter((m) => m.match_type === "pep").length;
   const efficiencyRate = allMatches.length > 0 ? Math.round(((confirmedCount + dismissedCount) / allMatches.length) * 100) : 0;
 
   const kpis = [
@@ -201,7 +191,7 @@ export default function ScreeningCenterPage() {
   ];
   const analyticsStatsRight = [
     { l: "PEP", v: String(pepCount) },
-    { l: "Watchlist", v: String(allMatches.filter((m: any) => m.match_type === "watchlist").length) },
+    { l: "Watchlist", v: String(allMatches.filter((m) => m.match_type === "watchlist").length) },
   ];
 
   const matchVolumeByDay = (() => {
@@ -215,7 +205,7 @@ export default function ScreeningCenterPage() {
     return buckets;
   })();
 
-  const activeJobs = (screeningJobs || []).filter((j: any) => j.status === "running" || j.status === "pending");
+  const activeJobs = (screeningJobs || []).filter((j) => j.status === "running" || j.status === "pending");
   const latestJob = (screeningJobs || [])[0];
 
   if (isLoading) {
@@ -247,20 +237,7 @@ export default function ScreeningCenterPage() {
             Screening Center<span className="text-indigo-500">.</span>
           </h1>
         </div>
-        <Card className="rounded-3xl border border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load screening matches</p>
-                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
-              </div>
-            </div>
-            <Button onClick={() => refetch()} className="mt-4" variant="outline">
-              <RefreshCw className="w-4 h-4 mr-2" /> Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="screening matches" onRetry={() => refetch()} />
       </div>
     );
   }
@@ -397,7 +374,7 @@ export default function ScreeningCenterPage() {
                       <p className="text-sm text-slate-500">No matches found</p>
                     </TableCell>
                   </TableRow>
-                ) : filteredMatches.slice(0, 4).map((row: any, i: number) => (
+                ) : filteredMatches.slice(0, 4).map((row, i) => (
                   <TableRow key={i} className="group hover:bg-orange-50/30 dark:hover:bg-orange-950/20 transition-colors border-b border-border/50 cursor-pointer">
                     <TableCell className="px-8 py-5">
                       <Link href={`/dashboard/screening/matches/${row.id}`} className="flex flex-col">
@@ -509,7 +486,7 @@ export default function ScreeningCenterPage() {
                         <p className="text-sm text-slate-500">No matches found</p>
                       </TableCell>
                     </TableRow>
-                  ) : filteredMatches.map((row: any, i: number) => (
+                  ) : filteredMatches.map((row, i) => (
                     <TableRow key={i} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-4 font-black italic text-[11px] text-muted-foreground">{row.id}</TableCell>
                       <TableCell className="text-[11px] font-black italic">{row.customer_id ? row.customer_id.split('-')[0] : 'Unknown'}</TableCell>
@@ -604,7 +581,7 @@ export default function ScreeningCenterPage() {
                  <TableBody>
                    {(watchlists || []).length === 0 ? (
                      <TableRow><TableCell colSpan={3} className="text-center py-10 text-white/40">No watchlists configured.</TableCell></TableRow>
-                   ) : (watchlists || []).map((list: any) => (
+                   ) : (watchlists || []).map((list) => (
                      <TableRow key={list.id} className="group hover:bg-white/5 border-b border-white/5 transition-colors">
                        <TableCell className="px-8 py-4">
                           <div className="text-[11px] font-black italic tracking-tight">{list.name}</div>
@@ -663,7 +640,7 @@ export default function ScreeningCenterPage() {
                <div className="space-y-4">
                   {(screeningJobs || []).length === 0 ? (
                     <p className="text-xs text-muted-foreground italic text-center">No re-screening jobs recorded.</p>
-                  ) : (screeningJobs || []).slice(0, 5).map((job: any) => (
+                  ) : (screeningJobs || []).slice(0, 5).map((job) => (
                     <div key={job.id} className="flex justify-between items-center text-[10px] font-black uppercase italic tracking-widest">
                        <span className="text-muted-foreground">{job.scope}</span>
                        <span className={job.status === 'running' ? 'text-indigo-500 animate-pulse' : 'text-emerald-500'}>{job.status} • {timeAgo(job.started_at)}</span>
@@ -685,7 +662,7 @@ export default function ScreeningCenterPage() {
                   <div className="p-8 space-y-8">
                      {allMatches.length === 0 ? (
                        <p className="text-sm text-muted-foreground italic text-center">No recent screening activity.</p>
-                     ) : allMatches.slice(0, 10).map((m: any) => (
+                     ) : allMatches.slice(0, 10).map((m) => (
                        <div key={m.id} className="flex gap-4 relative">
                           <div className="w-7 h-7 rounded-full bg-background border border-border/50 flex items-center justify-center shrink-0 z-10 shadow-sm">
                              <Target className="w-3 h-3 text-indigo-500" />

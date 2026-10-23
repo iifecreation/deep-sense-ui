@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   FraudCaseRead,
   FraudCaseCreate,
@@ -13,6 +12,11 @@ import {
   ListQueryParams,
 } from '@/types';
 import { get, post, patch, del as deleteFn } from '@/lib/api/client';
+import type {
+  CaseExplanationRead,
+  DetectionFeedbackCreate,
+  DetectionFeedbackRead,
+} from '@/lib/api-client/api';
 
 export interface CaseNarrativeReasonCode {
   code: string;
@@ -140,8 +144,8 @@ export const casesService = {
   /**
    * Get case explanation
    */
-  async getCaseExplanation(caseId: string): Promise<any> {
-    return await get<any>(`/cases/${caseId}/explanation`);
+  async getCaseExplanation(caseId: string): Promise<CaseExplanationRead> {
+    return await get<CaseExplanationRead>(`/cases/${caseId}/explanation`);
   },
 
   /**
@@ -163,7 +167,7 @@ export const casesService = {
   /**
    * Create feedback for case
    */
-  async createCaseFeedback(caseId: string, data: any): Promise<any> {
-    return await post<any>(`/cases/${caseId}/feedback`, data);
+  async createCaseFeedback(caseId: string, data: DetectionFeedbackCreate): Promise<DetectionFeedbackRead> {
+    return await post<DetectionFeedbackRead>(`/cases/${caseId}/feedback`, data);
   },
 };

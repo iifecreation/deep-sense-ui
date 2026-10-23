@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Coins, ShieldAlert, Flag, Activity, TrendingUp, TrendingDown, Zap, ShieldCheck } from "lucide-react";
+import { Coins, Flag, TrendingUp, TrendingDown, Zap, ShieldCheck } from "lucide-react";
 
 export default function MarketplaceCards() {
   const stats = [

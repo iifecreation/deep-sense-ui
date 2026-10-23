@@ -1,25 +1,23 @@
 "use client";
 
 import React from "react";
-import { 
-  BadgeCheck, 
-  Shield, 
-  Search, 
-  UserCheck, 
-  AlertTriangle, 
-  ArrowRight, 
-  Zap, 
-  Database, 
-  Layers, 
-  UserPlus, 
+import {
+  BadgeCheck,
+  Shield,
+  Search,
+  UserCheck,
+  AlertTriangle,
+  ArrowRight,
+  Zap,
+  Database,
+  Layers,
+  UserPlus,
   FileSearch,
   BookOpen,
-  Network,
   Lock,
-  RefreshCw,
   Scale,
   CheckCircle2,
-  Users
+  Users,
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -66,7 +64,7 @@ export default function KYCOnboardingPage() {
                        <AlertTriangle className="w-24 h-24 text-red-50/50" />
                      </div>
                      <h3 className="text-2xl font-bold mb-8 italic text-neutral-900">Risk Starts at Onboarding</h3>
-                     <p className="text-zinc-500 text-sm leading-relaxed mb-10">"A risky customer should be identified before the first transaction."</p>
+                     <p className="text-zinc-500 text-sm leading-relaxed mb-10">&quot;A risky customer should be identified before the first transaction.&quot;</p>
                      <ul className="space-y-6">
                         {[
                           "Fraudsters exploit weak onboarding flows to bypass controls.",
@@ -86,7 +84,7 @@ export default function KYCOnboardingPage() {
                </div>
                <div className="order-1 lg:order-2 text-center lg:text-left">
                   <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight text-neutral-900 leading-[1.1]">The Vulnerability of Acquisition</h2>
-                  <p className="text-zinc-500 text-lg mb-12 max-w-xl mx-auto lg:mx-0">Acquisition is the most critical point in the customer lifecycle. If identity and risk aren't verified here, every subsequent monitoring effort becomes reactive.</p>
+                  <p className="text-zinc-500 text-lg mb-12 max-w-xl mx-auto lg:mx-0">Acquisition is the most critical point in the customer lifecycle. If identity and risk aren&apos;t verified here, every subsequent monitoring effort becomes reactive.</p>
                   <div className="inline-flex items-center gap-6 p-8 bg-white rounded-3xl border border-zinc-100 shadow-sm border-l-4 border-l-brand-lime text-left">
                      <UserPlus className="w-10 h-10 text-brand-lime shrink-0" />
                      <p className="text-sm font-bold text-neutral-800 italic">Fraudulent onboarding costs institutions billions in operational remediation and regulatory fines.</p>
@@ -112,7 +110,7 @@ export default function KYCOnboardingPage() {
               ].map((item, i) => (
                 <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 group">
                   <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                    {React.cloneElement(item.icon as any, { className: "w-7 h-7" })}
+                    {React.cloneElement(item.icon as React.ReactElement<{ className?: string }>, { className: "w-7 h-7" })}
                   </div>
                   <h3 className="text-xl font-bold mb-3 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-tight">{item.title}</h3>
                   <p className="text-zinc-500 text-sm leading-relaxed italic">{item.desc}</p>
@@ -138,7 +136,7 @@ export default function KYCOnboardingPage() {
                  ].map((item, i) => (
                    <div key={i} className="flex flex-col items-center group">
                       <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-[32px] flex items-center justify-center mb-8 relative group-hover:bg-brand-lime group-hover:text-black transition-all shadow-xl group-hover:scale-105">
-                         {React.cloneElement(item.icon as any, { className: "w-10 h-10" })}
+                         {React.cloneElement(item.icon as React.ReactElement<{ className?: string }>, { className: "w-10 h-10" })}
                          <div className="absolute -top-3 -right-3 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-black border-4 border-zinc-900">
                            {i+1}
                          </div>
@@ -234,7 +232,7 @@ export default function KYCOnboardingPage() {
                     ].map((item, i) => (
                       <div key={i} className="p-8 bg-white border border-zinc-100 rounded-[32px] group hover:bg-neutral-900 transition-all shadow-sm">
                          <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 group-hover:bg-brand-lime group-hover:text-neutral-900 transition-colors">
-                            {React.cloneElement(item.icon as any, { className: "w-6 h-6" })}
+                            {React.cloneElement(item.icon as React.ReactElement<{ className?: string }>, { className: "w-6 h-6" })}
                          </div>
                          <h4 className="font-bold group-hover:text-white transition-colors">{item.title}</h4>
                       </div>
@@ -308,7 +306,7 @@ export default function KYCOnboardingPage() {
                     ].map((item, i) => (
                       <div key={i} className="flex gap-6">
                          <div className="w-12 h-12 bg-white border border-zinc-100 rounded-2xl flex items-center justify-center shrink-0 shadow-sm group hover:bg-neutral-900 transition-colors">
-                            {React.cloneElement(item.icon as any, { className: "w-6 h-6 text-indigo-600" })}
+                            {React.cloneElement(item.icon as React.ReactElement<{ className?: string }>, { className: "w-6 h-6 text-indigo-600" })}
                          </div>
                          <div>
                             <h4 className="font-bold text-neutral-900 mb-1 leading-tight">{item.title}</h4>

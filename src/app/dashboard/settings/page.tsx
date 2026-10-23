@@ -1,21 +1,35 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Users, Key, Globe, ShieldCheck, Bell, Save, Copy, CheckCircle2,
-  Trash2, Plus, FileText, History, RefreshCcw, AlertCircle, MoreHorizontal,
-  Lock, Loader2, Link as LinkIcon, Rocket, Check, X
+import {
+  Users,
+  Key,
+  Globe,
+  ShieldCheck,
+  Bell,
+  Save,
+  Copy,
+  CheckCircle2,
+  Trash2,
+  Plus,
+  FileText,
+  History,
+  MoreHorizontal,
+  Lock,
+  Loader2,
+  Link as LinkIcon,
+  Rocket,
+  Check,
 } from "lucide-react";
-import { 
-  useApiKeys, useWebhooks, useTeam, 
-  useOrganizationSettings, useSecuritySettings, 
-  useRetentionSettings, useScreeningSettings, 
-  useReportingSettings, useNotificationSettings,
-  usePromotionStatus
+import {
+  useApiKeys,
+  useWebhooks,
+  useTeam,
+  useOrganizationSettings,
+  usePromotionStatus,
 } from "@/hooks";
 import { apiKeysService } from "@/services/api-keys.service";
 import { webhooksService } from "@/services/webhooks.service";
-import { settingsService } from "@/services/settings.service";
 import { authService } from "@/services/auth.service";
 import { organizationService } from "@/services/organization.service";
 import { promotionService } from "@/services/promotion.service";
@@ -23,6 +37,14 @@ import { AvailableService } from "@/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useRuntimeEnvironment } from "@/hooks/use-runtime-environment";
 import { toast } from "sonner";
+import {
+  NotificationSettingsPanel,
+  ReportingSettingsPanel,
+  RetentionSettingsPanel,
+  ScreeningSettingsPanel,
+  SecuritySettingsPanel,
+} from "@/components/settings/PolicySettingsPanels";
+import type { GoLiveRequestRead } from "@/lib/api-client/api";
 
 const SETTINGS_NAV = [
   { n: "Organization", i: <Globe className="w-4 h-4" /> },
@@ -38,7 +60,7 @@ const SETTINGS_NAV = [
   { n: "Notifications", i: <Bell className="w-4 h-4" /> },
 ];
 
-const GO_LIVE_CHECKLIST = [
+const GO_LIVE_CHECKLIST: Array<{ key: keyof GoLiveRequestRead; label: string }> = [
   { key: "sandbox_tests_passed", label: "Sandbox Tests Passed" },
   { key: "webhook_test_passed", label: "Webhook Test Passed" },
   { key: "scopes_approved", label: "Scopes Approved" },
@@ -82,11 +104,6 @@ export default function SettingsPage() {
     }
   }, [orgSettings]);
 
-  const { data: secSettings, isLoading: secLoading } = useSecuritySettings();
-  const { data: retSettings, isLoading: retLoading } = useRetentionSettings();
-  const { data: scrSettings, isLoading: scrLoading } = useScreeningSettings();
-  const { data: repSettings, isLoading: repLoading } = useReportingSettings();
-  const { data: notSettings, isLoading: notLoading } = useNotificationSettings();
 
   const [saving, setSaving] = useState(false);
 
@@ -168,12 +185,14 @@ export default function SettingsPage() {
     }
   };
 
-  const handleDeleteWebhook = async (webhookId: string) => {
+  // The API disables endpoints rather than deleting them, so delivery history is kept.
+  const handleDisableWebhook = async (webhookId: string) => {
     try {
-      await webhooksService.delete(webhookId);
+      await webhooksService.disable(webhookId);
+      toast.success("Webhook endpoint disabled.");
       refetchWebhooks();
-    } catch (err) {
-      console.error("Failed to delete webhook:", err);
+    } catch {
+      toast.error("Could not disable the webhook endpoint.");
     }
   };
 
@@ -213,7 +232,7 @@ export default function SettingsPage() {
       setShowAddApiKey(false);
       setNewApiKeyName("");
       refetchApiKeys();
-    } catch (err) {
+    } catch {
       toast.error("Failed to create API key");
     } finally {
       setAddingApiKey(false);
@@ -233,7 +252,7 @@ export default function SettingsPage() {
       setNewWebhookUrl("");
       setNewWebhookEvents("");
       refetchWebhooks();
-    } catch (err) {
+    } catch {
       toast.error("Failed to create Webhook");
     } finally {
       setAddingWebhook(false);
@@ -252,7 +271,7 @@ export default function SettingsPage() {
       setNewMemberEmail("");
       setNewMemberRole("analyst");
       refetchTeam();
-    } catch (err) {
+    } catch {
       toast.error("Failed to invite member");
     } finally {
       setAddingMember(false);
@@ -275,10 +294,6 @@ export default function SettingsPage() {
           }
         });
         toast.success("Organization profile saved successfully.");
-      } else {
-        // Stub for saving all active tab modifications
-        await new Promise((r) => setTimeout(r, 800));
-        toast.success("Settings saved successfully.");
       }
     } catch (e) {
       console.error(e);
@@ -296,9 +311,12 @@ export default function SettingsPage() {
            <h1 className="text-3xl md:text-4xl font-black italic tracking-tighter text-neutral-900 uppercase leading-tight mb-2">Institutional Settings.</h1>
            <p className="text-neutral-400 text-xs font-bold uppercase tracking-widest italic font-black">Organization Profile & Infrastructure</p>
         </div>
-        <button onClick={handleSaveAll} disabled={saving} className="px-12 py-5 bg-neutral-900 text-white rounded-[32px] font-black text-xs uppercase tracking-widest hover:bg-brand-lime hover:text-neutral-900 hover:scale-105 transition-all shadow-2xl flex items-center gap-3 italic disabled:opacity-50 disabled:cursor-not-allowed">
-           {saving ? "Saving..." : "Save All Changes"} <Save className="w-5 h-5" />
-        </button>
+        {/* Other tabs save through their own panels; this button only covers the organization profile. */}
+        {activeTab === "Organization" && (
+          <button onClick={handleSaveAll} disabled={saving} className="px-12 py-5 bg-neutral-900 text-white rounded-[32px] font-black text-xs uppercase tracking-widest hover:bg-brand-lime hover:text-neutral-900 hover:scale-105 transition-all shadow-2xl flex items-center gap-3 italic disabled:opacity-50 disabled:cursor-not-allowed">
+             {saving ? "Saving..." : "Save Organization Profile"} <Save className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
@@ -340,7 +358,7 @@ export default function SettingsPage() {
                    {apiKeysLoading ? (
                      <div className="text-center p-8 text-neutral-400"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>
                    ) : apiKeys && apiKeys.length > 0 ? (
-                     apiKeys.map((key: any, i: number) => (
+                     apiKeys.map((key, i) => (
                        <div key={key.id || i} className="p-8 bg-zinc-50 border border-neutral-100 rounded-[40px] flex flex-col sm:flex-row sm:items-center justify-between gap-4 group/key hover:bg-white hover:border-neutral-200 transition-all font-bold shadow-sm">
                           <div className="space-y-4 overflow-hidden">
                              <div className="flex items-center gap-4">
@@ -388,25 +406,25 @@ export default function SettingsPage() {
                    {webhooksLoading ? (
                      <div className="text-center p-8 text-neutral-400"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>
                    ) : webhooks && webhooks.length > 0 ? (
-                     webhooks.map((wh: any, i: number) => (
+                     webhooks.map((wh, i) => (
                        <div key={wh.id || i} className="p-8 bg-zinc-50 border border-neutral-100 rounded-[40px] flex flex-col gap-4 group/wh hover:bg-white hover:border-neutral-200 transition-all font-bold shadow-sm">
                           <div className="flex items-center justify-between">
                              <div className="flex items-center gap-4">
-                                <span className="text-[14px] font-black italic tracking-tight text-neutral-900">{wh.name || 'Unnamed Endpoint'}</span>
+                                <span className="text-[14px] font-black italic tracking-tight text-neutral-900">{wh.description || 'Unnamed Endpoint'}</span>
                                 <span className="text-[8px] font-black uppercase tracking-widest px-3 py-1 bg-emerald-500/5 border border-emerald-500/20 rounded-full text-emerald-500">{wh.status || 'Active'}</span>
                              </div>
                              <div className="flex gap-2">
                                 <button onClick={() => handleTestWebhook(wh.id)} className="p-3 bg-white border border-neutral-100 rounded-2xl text-neutral-400 hover:text-brand-lime transition-all shadow-sm text-[10px] uppercase tracking-widest">
                                    Test
                                 </button>
-                                <button onClick={() => handleDeleteWebhook(wh.id)} className="p-3 bg-white border border-neutral-100 rounded-2xl text-neutral-200 hover:text-red-500 transition-all shadow-sm">
+                                <button onClick={() => handleDisableWebhook(wh.id)} aria-label="Disable webhook endpoint" title="Disable endpoint" className="p-3 bg-white border border-neutral-100 rounded-2xl text-neutral-200 hover:text-red-500 transition-all shadow-sm">
                                    <Trash2 className="w-4 h-4" />
                                 </button>
                              </div>
                           </div>
                           <div className="text-[12px] font-mono text-neutral-400 truncate">{wh.url}</div>
                           <div className="flex flex-wrap gap-2 mt-2">
-                            {(wh.events || []).map((ev: string) => (
+                            {wh.event_types.map((ev) => (
                               <span key={ev} className="text-[8px] px-2 py-1 bg-neutral-100 rounded-md text-neutral-500 uppercase">{ev}</span>
                             ))}
                           </div>
@@ -436,7 +454,7 @@ export default function SettingsPage() {
                    {teamLoading ? (
                      <div className="text-center p-8 text-neutral-400"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>
                    ) : team && team.members?.length > 0 ? (
-                     team.members.map((tm: any, i: number) => (
+                     team.members.map((tm, i) => (
                        <div key={tm.user_id || i} className="flex flex-col sm:flex-row sm:items-center justify-between p-6 hover:bg-zinc-50 rounded-3xl transition-all cursor-crosshair border border-transparent hover:border-neutral-100 gap-4">
                           <div className="flex items-center gap-6">
                              <div className="w-14 h-14 rounded-2xl bg-zinc-50 border border-neutral-100 flex items-center justify-center font-black italic text-neutral-400 group-hover:bg-white transition-all shadow-sm uppercase">
@@ -651,7 +669,7 @@ export default function SettingsPage() {
                       <h4 className="text-lg font-black tracking-tight uppercase mb-4 text-neutral-900">Go-Live Checklist</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {GO_LIVE_CHECKLIST.map((item) => {
-                          const isComplete = (promotionStatus as any)[item.key];
+                          const isComplete = Boolean(promotionStatus[item.key]);
                           return (
                             <div key={item.key} className={`flex items-center gap-3 p-4 rounded-2xl border ${isComplete ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-white border-neutral-100'} transition-all`}>
                               <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${isComplete ? 'bg-emerald-500 text-white' : 'bg-neutral-100 text-neutral-400'}`}>
@@ -668,210 +686,11 @@ export default function SettingsPage() {
              </div>
            )}
 
-           {/* Security Settings */}
-           {activeTab === "Security & Access" && (
-             <div className="p-12 bg-white rounded-[64px] border border-neutral-100 shadow-2xl space-y-12 transition-all font-bold italic">
-                <div className="space-y-2">
-                   <h3 className="text-xl md:text-2xl font-black tracking-tighter text-neutral-900 uppercase leading-none">Security Policies.</h3>
-                   <p className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Enforce institution-wide protection</p>
-                </div>
-
-                {secLoading || !secSettings ? (
-                  <div className="text-center p-8 text-neutral-400"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>
-                ) : (
-                  <div className="space-y-8">
-                    <div className="flex items-center justify-between p-6 bg-zinc-50 border border-neutral-100 rounded-3xl">
-                      <div>
-                        <div className="text-sm font-black text-neutral-900 uppercase">Require Multi-Factor Auth (MFA)</div>
-                        <div className="text-xs text-neutral-400 font-medium">Force all institution users to configure MFA.</div>
-                      </div>
-                      <div className="relative inline-block w-12 h-6 rounded-full bg-emerald-500 cursor-pointer">
-                        <div className="absolute top-1 left-7 bg-white w-4 h-4 rounded-full transition-all"></div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between p-6 bg-zinc-50 border border-neutral-100 rounded-3xl">
-                      <div>
-                        <div className="text-sm font-black text-neutral-900 uppercase">Enforce Password Rotation</div>
-                        <div className="text-xs text-neutral-400 font-medium">Require password changes every 90 days.</div>
-                      </div>
-                      <div className="relative inline-block w-12 h-6 rounded-full bg-neutral-200 cursor-pointer">
-                        <div className="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all"></div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <label className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Session Timeout (Minutes)</label>
-                      <input type="number" defaultValue={secSettings?.session_timeout_minutes || 60} className="w-full max-w-md px-5 py-4 bg-zinc-50 border border-neutral-100 rounded-2xl text-sm text-neutral-900 font-bold focus:outline-none focus:border-brand-lime transition-all" />
-                    </div>
-
-                    <div className="space-y-3">
-                      <label className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">IP Allowlist</label>
-                      <textarea defaultValue={(secSettings?.ip_allowlist || []).join("\n")} placeholder="192.168.1.1&#10;10.0.0.0/24" className="w-full px-5 py-4 bg-zinc-50 border border-neutral-100 rounded-2xl text-sm text-neutral-900 font-bold focus:outline-none focus:border-brand-lime transition-all h-32" />
-                      <p className="text-[10px] text-neutral-400 font-medium italic mt-2">One IP or CIDR per line. Leaves empty to allow all IPs.</p>
-                    </div>
-                  </div>
-                )}
-             </div>
-           )}
-
-           {/* Retention Policies */}
-           {activeTab === "Retention Policies" && (
-             <div className="p-12 bg-white rounded-[64px] border border-neutral-100 shadow-2xl space-y-12 transition-all font-bold italic">
-                <div className="space-y-2">
-                   <h3 className="text-xl md:text-2xl font-black tracking-tighter text-neutral-900 uppercase leading-none">Data Retention.</h3>
-                   <p className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Configure automated data purging</p>
-                </div>
-
-                {retLoading || !retSettings ? (
-                  <div className="text-center p-8 text-neutral-400"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Transaction Retention (Days)</label>
-                      <input type="number" defaultValue={retSettings?.transaction_retention_days || 365} className="w-full px-5 py-4 bg-zinc-50 border border-neutral-100 rounded-2xl text-sm text-neutral-900 font-bold focus:outline-none focus:border-brand-lime transition-all" />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Case Retention (Days)</label>
-                      <input type="number" defaultValue={retSettings?.case_retention_days || 1825} className="w-full px-5 py-4 bg-zinc-50 border border-neutral-100 rounded-2xl text-sm text-neutral-900 font-bold focus:outline-none focus:border-brand-lime transition-all" />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Audit Log Retention (Days)</label>
-                      <input type="number" defaultValue={retSettings?.audit_retention_days || 365} className="w-full px-5 py-4 bg-zinc-50 border border-neutral-100 rounded-2xl text-sm text-neutral-900 font-bold focus:outline-none focus:border-brand-lime transition-all" />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Screening Hit Retention (Days)</label>
-                      <input type="number" defaultValue={retSettings?.screening_retention_days || 1825} className="w-full px-5 py-4 bg-zinc-50 border border-neutral-100 rounded-2xl text-sm text-neutral-900 font-bold focus:outline-none focus:border-brand-lime transition-all" />
-                    </div>
-                  </div>
-                )}
-             </div>
-           )}
-
-           {/* Screening Settings */}
-           {activeTab === "Screening Settings" && (
-             <div className="p-12 bg-white rounded-[64px] border border-neutral-100 shadow-2xl space-y-12 transition-all font-bold italic">
-                <div className="space-y-2">
-                   <h3 className="text-xl md:text-2xl font-black tracking-tighter text-neutral-900 uppercase leading-none">Compliance Controls.</h3>
-                   <p className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">AML / KYC Screening thresholds</p>
-                </div>
-
-                {scrLoading || !scrSettings ? (
-                  <div className="text-center p-8 text-neutral-400"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>
-                ) : (
-                  <div className="grid grid-cols-1 gap-8">
-                    <div className="flex flex-col gap-3">
-                      <label className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Fuzzy Match Threshold (%)</label>
-                      <input type="range" min="50" max="100" defaultValue={scrSettings?.match_threshold || 85} className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-brand-lime" />
-                      <div className="flex justify-between text-xs text-neutral-400"><span>50% (Loose)</span><span>85%</span><span>100% (Exact)</span></div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-3">
-                        <label className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">PEP Screening</label>
-                        <select defaultValue={scrSettings?.pep_level || "Class 1 & 2"} className="w-full px-5 py-4 bg-zinc-50 border border-neutral-100 rounded-2xl text-sm text-neutral-900 font-bold focus:outline-none focus:border-brand-lime transition-all">
-                          <option>Class 1 Only</option>
-                          <option>Class 1 & 2</option>
-                          <option>All Classes (1, 2, 3)</option>
-                          <option>Disabled</option>
-                        </select>
-                      </div>
-                      <div className="space-y-3">
-                        <label className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Continuous Rescreening Cadence</label>
-                        <select defaultValue={scrSettings?.rescreen_cadence || "Daily"} className="w-full px-5 py-4 bg-zinc-50 border border-neutral-100 rounded-2xl text-sm text-neutral-900 font-bold focus:outline-none focus:border-brand-lime transition-all">
-                          <option>Daily</option>
-                          <option>Weekly</option>
-                          <option>Monthly</option>
-                          <option>Upon Activity Only</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                )}
-             </div>
-           )}
-
-           {/* Reporting Settings */}
-           {activeTab === "Reporting Settings" && (
-             <div className="p-12 bg-white rounded-[64px] border border-neutral-100 shadow-2xl space-y-12 transition-all font-bold italic">
-                <div className="space-y-2">
-                   <h3 className="text-xl md:text-2xl font-black tracking-tighter text-neutral-900 uppercase leading-none">Regulatory Reporting.</h3>
-                   <p className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Configure STR / SAR automation</p>
-                </div>
-
-                {repLoading || !repSettings ? (
-                  <div className="text-center p-8 text-neutral-400"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>
-                ) : (
-                  <div className="space-y-8">
-                    <div className="flex items-center justify-between p-6 bg-zinc-50 border border-neutral-100 rounded-3xl">
-                      <div>
-                        <div className="text-sm font-black text-neutral-900 uppercase">Auto-File Confirmed Fraud</div>
-                        <div className="text-xs text-neutral-400 font-medium">Automatically draft SARs for cases closed as "Confirmed Fraud".</div>
-                      </div>
-                      <div className="relative inline-block w-12 h-6 rounded-full bg-emerald-500 cursor-pointer">
-                        <div className="absolute top-1 left-7 bg-white w-4 h-4 rounded-full transition-all"></div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between p-6 bg-zinc-50 border border-neutral-100 rounded-3xl">
-                      <div>
-                        <div className="text-sm font-black text-neutral-900 uppercase">Maker-Checker Workflow</div>
-                        <div className="text-xs text-neutral-400 font-medium">Require secondary review before electronic submission to FIU.</div>
-                      </div>
-                      <div className="relative inline-block w-12 h-6 rounded-full bg-emerald-500 cursor-pointer">
-                        <div className="absolute top-1 left-7 bg-white w-4 h-4 rounded-full transition-all"></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-             </div>
-           )}
-
-           {/* Notifications */}
-           {activeTab === "Notifications" && (
-             <div className="p-12 bg-white rounded-[64px] border border-neutral-100 shadow-2xl space-y-12 transition-all font-bold italic">
-                <div className="space-y-2">
-                   <h3 className="text-xl md:text-2xl font-black tracking-tighter text-neutral-900 uppercase leading-none">Notification Preferences.</h3>
-                   <p className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Manage alerts and digests</p>
-                </div>
-
-                {notLoading || !notSettings ? (
-                  <div className="text-center p-8 text-neutral-400"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>
-                ) : (
-                  <div className="space-y-8">
-                    <div className="flex items-center justify-between p-6 bg-zinc-50 border border-neutral-100 rounded-3xl">
-                      <div>
-                        <div className="text-sm font-black text-neutral-900 uppercase">Critical Fraud Alerts</div>
-                        <div className="text-xs text-neutral-400 font-medium">Send immediate emails for high-severity rule triggers.</div>
-                      </div>
-                      <div className="relative inline-block w-12 h-6 rounded-full bg-emerald-500 cursor-pointer">
-                        <div className="absolute top-1 left-7 bg-white w-4 h-4 rounded-full transition-all"></div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between p-6 bg-zinc-50 border border-neutral-100 rounded-3xl">
-                      <div>
-                        <div className="text-sm font-black text-neutral-900 uppercase">Compliance Digests</div>
-                        <div className="text-xs text-neutral-400 font-medium">Weekly summary of screening hits and case volumes.</div>
-                      </div>
-                      <div className="relative inline-block w-12 h-6 rounded-full bg-emerald-500 cursor-pointer">
-                        <div className="absolute top-1 left-7 bg-white w-4 h-4 rounded-full transition-all"></div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between p-6 bg-zinc-50 border border-neutral-100 rounded-3xl">
-                      <div>
-                        <div className="text-sm font-black text-neutral-900 uppercase">Webhook Error Alerts</div>
-                        <div className="text-xs text-neutral-400 font-medium">Notify technical contacts if webhooks fail delivery.</div>
-                      </div>
-                      <div className="relative inline-block w-12 h-6 rounded-full bg-neutral-200 cursor-pointer">
-                        <div className="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all"></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-             </div>
-           )}
+           {activeTab === "Security & Access" && <SecuritySettingsPanel />}
+           {activeTab === "Retention Policies" && <RetentionSettingsPanel />}
+           {activeTab === "Screening Settings" && <ScreeningSettingsPanel />}
+           {activeTab === "Reporting Settings" && <ReportingSettingsPanel />}
+           {activeTab === "Notifications" && <NotificationSettingsPanel />}
 
         </div>
       </div>

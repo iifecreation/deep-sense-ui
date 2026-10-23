@@ -1,12 +1,8 @@
 import { get } from '@/lib/api/client';
-
-/** GET /pricing/plans returns `{ plans: [...] }` (the API declares it as a free-form object). */
-export interface PricingPlansResponse {
-  plans?: Record<string, unknown>[];
-}
+import type { PublicPricingPlans } from '@/lib/api-client/api';
 
 export const pricingService = {
-  async getPlans(): Promise<PricingPlansResponse> {
-    return await get<PricingPlansResponse>('/pricing/plans');
+  async getPlans(): Promise<PublicPricingPlans> {
+    return await get<PublicPricingPlans>('/pricing/plans');
   }
 };

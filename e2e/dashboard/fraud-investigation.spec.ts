@@ -114,7 +114,7 @@ test.describe.skip('Dashboard - Fraud Investigation (superseded ambient contract
     await expect(page.locator('[data-testid="risk-score-chart"]')).toBeVisible();
   });
 
-  test('should handle empty state when no alerts', async ({ page }) => {
+  test('should handle empty state when no alerts', async () => {
     // This would require a test environment with no alerts
     // For now, we'll skip this test
     test.skip();

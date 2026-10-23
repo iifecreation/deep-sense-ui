@@ -1,25 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  ClipboardCheck, 
-  CheckSquare, 
-  CheckCircle2, 
-  ArrowRight, 
-  Download, 
-  Users, 
-  Activity, 
-  Target, 
-  Globe, 
-  ShieldCheck, 
-  Briefcase, 
-  FileText, 
-  History, 
-  Lock, 
-  RefreshCw, 
-  Zap,
-  Layers,
-  Building
+import {
+  ClipboardCheck,
+  CheckSquare,
+  CheckCircle2,
+  Users,
+  Activity,
+  Target,
+  Globe,
+  ShieldCheck,
+  Briefcase,
+  FileText,
+  History,
+  Lock,
+  RefreshCw,
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";

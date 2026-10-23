@@ -3,20 +3,17 @@
 import React from "react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Book, 
-  Terminal, 
-  Zap, 
-  Key, 
-  Shield, 
-  Layers, 
-  Activity, 
+import {
+  Book,
+  Terminal,
+  Zap,
+  Key,
   History,
   ArrowRight,
   Search,
   CodeXml,
   ChevronRight,
-  Database
+  Database,
 } from "lucide-react";
 
 export default function DocumentationPage() {

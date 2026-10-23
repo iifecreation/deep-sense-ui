@@ -1,24 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Zap, 
-  Terminal, 
-  ArrowRight, 
-  CheckCircle2, 
-  ChevronRight, 
-  Copy, 
-  Key, 
-  Layers, 
-  Database, 
-  Workflow, 
-  ShieldCheck, 
-  Cpu, 
-  Search, 
+import {
+  Zap,
+  ArrowRight,
+  Copy,
   AlertTriangle,
-  Code2,
   Lock,
-  MessageSquare
+  MessageSquare,
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -90,9 +79,9 @@ export default function QuickstartPage() {
                        {activeStep === 1 && (
                          <div className="animate-in fade-in duration-500">
                             <span className="text-zinc-600 italic"># Initialize with your institutional key</span>
-                            <div className="text-brand-lime mt-4">import <span className="text-white">DeepSense</span> from <span className="text-white">'@deepsense/sdk'</span>;</div>
+                            <div className="text-brand-lime mt-4">import <span className="text-white">DeepSense</span> from <span className="text-white">&apos;@deepsense/sdk&apos;</span>;</div>
                             <div className="mt-4">
-                               const ds = <span className="text-brand-lime">new</span> DeepSense(<span className="text-emerald-400">"ds_live_0x8f2..."</span>);
+                               const ds = <span className="text-brand-lime">new</span> DeepSense(<span className="text-emerald-400">&quot;ds_live_0x8f2...&quot;</span>);
                             </div>
                             <div className="mt-12 p-6 bg-brand-lime/5 border border-brand-lime/20 rounded-2xl flex justify-between items-center group">
                                <span className="text-xs text-zinc-400">DS_LIVE_KEY_PROVISIONED</span>
@@ -104,19 +93,19 @@ export default function QuickstartPage() {
                          <div className="animate-in fade-in duration-500">
                             <span className="text-zinc-600 italic"># Ingest a transaction event</span>
                             <div className="mt-4">
-                               await ds.ingest(<span className="text-emerald-400">"payment.authorized"</span>, {"{"}
+                               await ds.ingest(<span className="text-emerald-400">&quot;payment.authorized&quot;</span>, {"{"}
                             </div>
                             <div className="pl-6 text-zinc-400">
                                amount: <span className="text-brand-lime">250000</span>, <span className="text-zinc-600"># in cents</span>
                             </div>
                             <div className="pl-6 text-zinc-400">
-                               currency: <span className="text-emerald-400">"NGN"</span>,
+                               currency: <span className="text-emerald-400">&quot;NGN&quot;</span>,
                             </div>
                             <div className="pl-6 text-zinc-400">
-                               user_id: <span className="text-emerald-400">"user_882j9"</span>,
+                               user_id: <span className="text-emerald-400">&quot;user_882j9&quot;</span>,
                             </div>
                             <div className="pl-6 text-zinc-400 italic">
-                               ip_address: <span className="text-emerald-400">"197.210.64.120"</span>
+                               ip_address: <span className="text-emerald-400">&quot;197.210.64.120&quot;</span>
                             </div>
                             <div>{"}"});</div>
                          </div>
@@ -126,16 +115,16 @@ export default function QuickstartPage() {
                             <span className="text-zinc-600 italic"># Response Handling</span>
                             <div className="mt-4 text-brand-lime">{"{"}</div>
                             <div className="pl-6">
-                               <span className="text-white font-bold italic">"decision":</span> <span className="text-emerald-400">"APPROVED"</span>,
+                               <span className="text-white font-bold italic">&quot;decision&quot;:</span> <span className="text-emerald-400">&quot;APPROVED&quot;</span>,
                             </div>
                             <div className="pl-6">
-                               <span className="text-white font-bold italic">"score":</span> <span className="text-brand-lime">0.04</span>,
+                               <span className="text-white font-bold italic">&quot;score&quot;:</span> <span className="text-brand-lime">0.04</span>,
                             </div>
                             <div className="pl-6">
-                               <span className="text-white font-bold italic">"tags":</span> [<span className="text-emerald-400">"trusted_device"</span>, <span className="text-emerald-400">"low_velocity"</span>],
+                               <span className="text-white font-bold italic">&quot;tags&quot;:</span> [<span className="text-emerald-400">&quot;trusted_device&quot;</span>, <span className="text-emerald-400">&quot;low_velocity&quot;</span>],
                             </div>
                             <div className="pl-6 text-zinc-500 italic pb-8">
-                               "reason": "Entity resolution matched verified user profile."
+                               &quot;reason&quot;: &quot;Entity resolution matched verified user profile.&quot;
                             </div>
                             <div className="text-brand-lime">{"}"}</div>
                          </div>

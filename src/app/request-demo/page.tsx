@@ -3,18 +3,17 @@
 import React, { useState } from "react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Building2, 
-  Mail, 
-  User, 
-  Phone, 
-  Briefcase, 
-  Globe, 
+import {
+  Building2,
+  Mail,
+  User,
+  Briefcase,
+  Globe,
   ArrowRight,
   CheckCircle2,
   ShieldCheck,
   Zap,
-  Lock
+  Lock,
 } from "lucide-react";
 
 export default function RequestDemoPage() {

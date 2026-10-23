@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { ArrowBigUp, ArrowUp } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 
 export default function Hero() {
   return (

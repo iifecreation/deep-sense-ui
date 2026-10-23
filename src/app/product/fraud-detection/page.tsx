@@ -1,84 +1,34 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Zap, 
-  Activity, 
-  Cpu, 
-  Database, 
-  ArrowRight,
-  TrendingUp,
-  Lock,
+import {
+  Shield,
+  Zap,
+  Cpu,
   CheckCircle2,
-  LineChart,
-  BarChart3,
-  Network,
   Fingerprint,
   AlertTriangle,
   Globe,
   FileCheck,
   Layers,
-  Terminal,
   ChevronDown,
   ChevronUp,
-  Server,
-  HelpCircle,
-  Send,
-  Smartphone,
-  Eye,
-  Users,
-  BookOpen,
   Briefcase,
   Building2,
   ShoppingBag,
-  Wallet
+  Wallet,
 } from "lucide-react";
 
 export default function FraudDetectionPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   
-  // State for live fraud operations dashboard simulation
-  const [liveEvents, setLiveEvents] = useState<Array<{id: string, time: string, channel: string, amount: number, risk: number, status: string}>>([
-    { id: "tx_9103", time: "14:02:11", channel: "Card-Not-Present", amount: 1450.00, risk: 94, status: "BLOCKED" },
-    { id: "tx_9102", time: "14:02:08", channel: "Mobile P2P", amount: 280.00, risk: 42, status: "ALLOWED" },
-    { id: "tx_9101", time: "14:02:03", channel: "NFC Transaction", amount: 45.50, risk: 12, status: "ALLOWED" },
-    { id: "tx_9100", time: "14:01:57", channel: "Crypto Outflow", amount: 8900.00, risk: 87, status: "REVIEW" }
-  ]);
-
   const toggleFaq = (idx: number) => {
     setOpenFaq(openFaq === idx ? null : idx);
   };
-
-  // Simulating real-time incoming events
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const channels = ["Card-Not-Present", "Mobile P2P", "NFC Transaction", "Crypto Outflow", "Web Portal Login"];
-      const statuses = ["ALLOWED", "REVIEW", "BLOCKED"];
-      const randomChannel = channels[Math.floor(Math.random() * channels.length)];
-      const randomRisk = Math.floor(Math.random() * 95) + 5;
-      let randomStatus = "ALLOWED";
-      if (randomRisk > 80) randomStatus = "BLOCKED";
-      else if (randomRisk > 50) randomStatus = "REVIEW";
-
-      const newEvent = {
-        id: `tx_${Math.floor(Math.random() * 9000) + 1000}`,
-        time: new Date().toTimeString().split(" ")[0],
-        channel: randomChannel,
-        amount: parseFloat((Math.random() * 1200 + 5).toFixed(2)),
-        risk: randomRisk,
-        status: randomStatus
-      };
-
-      setLiveEvents(prev => [newEvent, ...prev.slice(0, 3)]);
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <>

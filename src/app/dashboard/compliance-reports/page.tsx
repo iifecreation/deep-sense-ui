@@ -1,28 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  FileText, 
-  Plus, 
-  Download, 
-  Play, 
-  CheckCircle2, 
-  XCircle, 
-  Clock,
+import {
+  FileText,
+  Plus,
+  Download,
+  CheckCircle2,
+  XCircle,
   MoreVertical,
   RefreshCcw,
-  BarChart3,
-  Calendar,
-  Filter,
-  Search,
-  Settings,
   Eye,
   Copy,
   Share2,
-  AlertTriangle,
   TrendingUp,
   FileCheck,
-  ShieldCheck
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -52,6 +44,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { complianceReportsService } from "@/services/compliance-reports.service";
+import { describeApiError, type ApiErrorDescription } from "@/lib/api/describe-error";
+import type { ComplianceFrameworkSummary, ComplianceReportRunRead } from "@/lib/api-client/api";
 
 function formatDate(value?: string | null): string {
   if (!value) return "N/A";
@@ -59,10 +53,10 @@ function formatDate(value?: string | null): string {
 }
 
 export default function ComplianceReportsPage() {
-  const [runs, setRuns] = useState<any[]>([]);
-  const [frameworks, setFrameworks] = useState<any[]>([]);
+  const [runs, setRuns] = useState<ComplianceReportRunRead[]>([]);
+  const [frameworks, setFrameworks] = useState<ComplianceFrameworkSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const [loadError, setLoadError] = useState<ApiErrorDescription | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("runs");
 
@@ -74,7 +68,7 @@ export default function ComplianceReportsPage() {
 
   const load = async () => {
     setIsLoading(true);
-    setIsError(false);
+    setLoadError(null);
     try {
       const [runsRes, frameworksRes] = await Promise.all([
         complianceReportsService.listRuns(),
@@ -83,8 +77,8 @@ export default function ComplianceReportsPage() {
       setRuns(runsRes.runs || []);
       setFrameworks(frameworksRes || []);
       if ((frameworksRes || []).length > 0) setGenFramework(frameworksRes[0].framework);
-    } catch {
-      setIsError(true);
+    } catch (err) {
+      setLoadError(describeApiError(err, "compliance reports"));
     } finally {
       setIsLoading(false);
     }
@@ -112,18 +106,17 @@ export default function ComplianceReportsPage() {
   };
 
   const refetch = load;
-  const error = isError ? { message: "Please check your connection and try again." } : null;
 
-  const filteredReports = runs.filter((report: any) =>
+  const filteredReports = runs.filter((report) =>
     report.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     report.framework?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const scoresAvailable = filteredReports
-    .map((r: any) => r.metrics_json?.compliance_score ?? r.metrics_json?.score)
-    .filter((s: any) => typeof s === 'number');
+    .map((r) => r.metrics_json?.compliance_score ?? r.metrics_json?.score)
+    .filter((s) => typeof s === 'number');
   const avgScore = scoresAvailable.length > 0 ? Math.round(scoresAvailable.reduce((a: number, b: number) => a + b, 0) / scoresAvailable.length) : null;
-  const completedCount = filteredReports.filter((r: any) => (r.status === 'completed' || r.status === 'generated')).length;
+  const completedCount = filteredReports.filter((r) => (r.status === 'completed' || r.status === 'generated')).length;
   const complianceRate = filteredReports.length > 0 ? Math.round((completedCount / filteredReports.length) * 100) : null;
 
   const getStatusColor = (status: string) => {
@@ -157,7 +150,7 @@ export default function ComplianceReportsPage() {
     );
   }
 
-  if (isError) {
+  if (loadError) {
     return (
       <div className="flex flex-col gap-10 pb-20">
         <div className="flex justify-between items-center">
@@ -165,18 +158,23 @@ export default function ComplianceReportsPage() {
             Compliance Reports<span className="text-brand-lime">.</span>
           </h1>
         </div>
-        <Card className="rounded-3xl border border-red-200 bg-red-50">
+        <Card
+          className={`rounded-3xl border ${loadError.retryable ? "border-red-200 bg-red-50" : "border-slate-200 bg-slate-50"}`}
+          data-error-kind={loadError.kind}
+        >
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <XCircle className="text-red-600 h-5 w-5" />
+              <XCircle className={`h-5 w-5 ${loadError.retryable ? "text-red-600" : "text-slate-500"}`} />
               <div>
-                <p className="font-semibold text-red-900">Failed to load compliance reports</p>
-                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
+                <p className={`font-semibold ${loadError.retryable ? "text-red-900" : "text-slate-900"}`}>{loadError.title}</p>
+                <p className={`text-sm ${loadError.retryable ? "text-red-700" : "text-slate-600"}`}>{loadError.detail}</p>
               </div>
             </div>
-            <Button onClick={() => refetch()} className="mt-4" variant="outline">
-              <RefreshCcw className="w-4 h-4 mr-2" /> Retry
-            </Button>
+            {loadError.retryable && (
+              <Button onClick={() => refetch()} className="mt-4" variant="outline">
+                <RefreshCcw className="w-4 h-4 mr-2" /> Retry
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -234,7 +232,7 @@ export default function ComplianceReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-black italic text-emerald-600">
-              {filteredReports.filter((r: any) => (r.status === 'completed' || r.status === 'generated')).length || 0}
+              {filteredReports.filter((r) => (r.status === 'completed' || r.status === 'generated')).length || 0}
             </div>
           </CardContent>
         </Card>
@@ -308,7 +306,7 @@ export default function ComplianceReportsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredReports.map((report: any) => (
+                  {filteredReports.map((report) => (
                     <TableRow key={report.id}>
                       <TableCell className="font-mono text-xs">{report.id}</TableCell>
                       <TableCell className="font-bold text-sm">{report.title}</TableCell>

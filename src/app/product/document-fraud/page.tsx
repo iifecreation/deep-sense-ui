@@ -1,75 +1,37 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Zap, 
-  Activity, 
-  Cpu, 
-  Database, 
-  ArrowRight,
-  TrendingUp,
+import {
+  Database,
   Lock,
   CheckCircle2,
-  LineChart,
-  BarChart3,
-  Network,
   Fingerprint,
   AlertTriangle,
   Globe,
   FileCheck,
-  Layers,
-  Terminal,
   ChevronDown,
   ChevronUp,
-  Server,
-  HelpCircle,
-  Send,
   Smartphone,
-  Eye,
   Users,
-  BookOpen,
   Briefcase,
-  Building2,
-  ShoppingBag,
   Wallet,
   History,
-  TrendingDown,
   Clock,
-  FileSpreadsheet,
   FileText,
-  Search
 } from "lucide-react";
 
 export default function DocumentFraudPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   
-  // Interactive Verification Dashboard state
-  const [activeStep, setActiveStep] = useState<string>("forensics");
-  const [riskLevel, setRiskLevel] = useState<number>(86);
-  const [livenessStatus, setLivenessStatus] = useState<string>("PASSED");
 
   const toggleFaq = (idx: number) => {
     setOpenFaq(openFaq === idx ? null : idx);
   };
 
-  const handleStepChange = (step: string) => {
-    setActiveStep(step);
-    if (step === "forensics") {
-      setRiskLevel(86);
-      setLivenessStatus("PASSED");
-    } else if (step === "biometrics") {
-      setRiskLevel(94);
-      setLivenessStatus("FAILED (MORPH_ATTEMPT)");
-    } else {
-      setRiskLevel(32);
-      setLivenessStatus("PASSED");
-    }
-  };
 
   return (
     <>

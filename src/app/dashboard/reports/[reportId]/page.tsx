@@ -290,7 +290,7 @@ export default function RegulatoryReportDetailPage() {
                      ) : (
                         <p className="text-sm font-medium text-slate-500 not-italic">No subjects recorded on this report.</p>
                      )}
-                     {metadata?.domains_involved?.length ? (
+                     {Array.isArray(metadata?.domains_involved) && metadata.domains_involved.length ? (
                         <div className="pt-4 font-black italic">
                            <h5 className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground mb-3">Domains Involved</h5>
                            <div className="flex flex-wrap gap-2 font-black italic">
@@ -314,7 +314,7 @@ export default function RegulatoryReportDetailPage() {
                      )}
                      {metadata?.total_amount ? (
                         <p className="text-[11px] font-black uppercase italic tracking-widest text-neutral-600 pt-2">
-                           Aggregate value: {Number(metadata.total_amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {metadata.currency || ""}
+                           Aggregate value: {Number(metadata.total_amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {typeof metadata.currency === "string" ? metadata.currency : ""}
                         </p>
                      ) : null}
                   </TabsContent>

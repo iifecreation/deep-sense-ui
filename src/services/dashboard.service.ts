@@ -1,10 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AlertRead,
   AnalyticsOverview,
   FraudCaseRead,
+  ScreeningMatchRead,
   TransactionRead,
 } from '@/types';
+import type { UsageCounterRead } from '@/lib/api-client/api';
 import { alertsService } from './alerts.service';
 import { analyticsService } from './analytics.service';
 import { billingService } from './billing.service';
@@ -35,8 +36,7 @@ export type TenantDashboardOverview = {
     alerts: AlertRead[];
     cases: FraudCaseRead[];
     transactions: TransactionRead[];
-    documents: any[];
-    screening: any[];
+    screening: ScreeningMatchRead[];
   };
   notConfigured: string[];
   sourceErrors: SourceError[];
@@ -56,20 +56,17 @@ const sourceError = (source: string, reason: unknown): SourceError => ({
 const fulfilledValue = <T>(result: PromiseSettledResult<T>): T | null =>
   result.status === 'fulfilled' ? result.value : null;
 
-const billingUsageCount = (usage: any[] | null, needles: string[]): number | null => {
+const billingUsageCount = (usage: UsageCounterRead[] | null, needles: string[]): number | null => {
   if (!usage || usage.length === 0) return null;
 
   const rows = usage.filter((item) => {
-    const key = String(item.feature_key ?? item.key ?? item.name ?? '').toLowerCase();
+    const key = item.feature_key.toLowerCase();
     return needles.some((needle) => key.includes(needle));
   });
 
   if (rows.length === 0) return null;
 
-  return rows.reduce((total, item) => {
-    const value = Number(item.used ?? item.usage ?? item.current_usage ?? item.count ?? 0);
-    return total + (Number.isFinite(value) ? value : 0);
-  }, 0);
+  return rows.reduce((total, item) => total + item.used, 0);
 };
 
 export const dashboardService = {
@@ -121,7 +118,6 @@ export const dashboardService = {
         alerts: alertData?.items ?? [],
         cases: caseData?.items ?? [],
         transactions: transactionData?.items ?? [],
-        documents: [],
         screening: screeningData?.items ?? [],
       },
       notConfigured: ['document_reviews'],

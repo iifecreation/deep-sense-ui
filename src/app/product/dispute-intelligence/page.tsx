@@ -4,42 +4,19 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Zap, 
-  Activity, 
-  Cpu, 
-  Database, 
+import {
   ArrowRight,
-  TrendingUp,
-  Lock,
   CheckCircle2,
-  LineChart,
-  BarChart3,
   Network,
-  Fingerprint,
-  AlertTriangle,
-  Globe,
-  Layers,
-  Server,
-  HelpCircle,
-  Smartphone,
   Eye,
-  Users,
   Building2,
-  Wallet,
-  Clock,
-  RefreshCw,
   Scale,
   ChevronDown,
   ChevronUp,
-  AlertCircle,
   Briefcase,
   FileSpreadsheet,
   Gauge,
   Workflow,
-  Search,
-  Check
 } from "lucide-react";
 
 export default function DisputeIntelligencePage() {
@@ -448,7 +425,7 @@ export default function DisputeIntelligencePage() {
                 <div className="space-y-6">
                   <h4 className="text-2xl font-bold font-manrope text-neutral-900">Manage delivery disputes, refund abuse, false chargebacks, and customer claims.</h4>
                   <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
-                    DeepSense parses shipping courier telemetry and correlates GPS data to demonstrate positive proof of delivery, defeating "item not received" claims with 100% certainty.
+                    DeepSense parses shipping courier telemetry and correlates GPS data to demonstrate positive proof of delivery, defeating &quot;item not received&quot; claims with 100% certainty.
                   </p>
                 </div>
               )}

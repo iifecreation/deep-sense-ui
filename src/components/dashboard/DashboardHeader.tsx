@@ -120,12 +120,17 @@ export default function DashboardHeader({ onMenuClick }: { onMenuClick?: () => v
 
           {/* Identity */}
           <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 p-1.5 rounded-lg shadow-sm">
-             <div className="w-8 h-8 rounded-md bg-slate-200 overflow-hidden shadow-sm">
-                <img 
-                   src="https://api.dicebear.com/7.x/pixel-art/svg?seed=FraudAgent" 
-                   alt="Agent" 
-                   className="w-full h-full bg-white" 
-                />
+             {/* Initials rather than a third-party avatar service, so no dashboard view leaks to an outside host. */}
+             <div
+               className="w-8 h-8 rounded-md bg-slate-900 text-white shadow-sm flex items-center justify-center text-[11px] font-bold uppercase"
+               aria-hidden="true"
+             >
+                {(user?.full_name || "DS")
+                  .split(/\s+/)
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .map((part) => part[0])
+                  .join("")}
              </div>
              <div className="hidden sm:block">
                 <p className="text-slate-900 text-xs font-bold leading-none">{user?.full_name || "Loading identity"}</p>

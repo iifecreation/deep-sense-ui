@@ -22,6 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { CurrentPlanRead } from "@/lib/api-client/api";
 
 export default function UsagePage() {
   const { data: planData, isLoading: planLoading, refetch: refetchPlan } = useCurrentPlan();
@@ -46,11 +47,11 @@ export default function UsagePage() {
   // current_period_start, current_period_end, stripe_customer_id, ...} - not
   // a dollar amount or payment-method detail, which only exist in Stripe's
   // own portal (reached via "Manage in Stripe" below).
-  const plan: Record<string, any> = planData || {};
+  const plan: Partial<CurrentPlanRead> = planData ?? {};
   const hasSubscription = plan.status && plan.status !== "none";
 
   // /billing/usage returns a list of per-feature counters.
-  const usage: any[] = Array.isArray(usageData) ? usageData : [];
+  const usage = Array.isArray(usageData) ? usageData : [];
 
   const handleManageBilling = async () => {
     setIsRedirecting(true);
@@ -137,7 +138,7 @@ export default function UsagePage() {
             <div className="space-y-8">
                {usage.length === 0 ? (
                  <p className="text-sm text-muted-foreground italic text-center py-6">No usage counters recorded yet.</p>
-               ) : usage.map((item: any, i: number) => {
+               ) : usage.map((item, i) => {
                  const percent = item.limit ? Math.min(100, Math.round((item.used / item.limit) * 100)) : 0;
                  return (
                    <div key={i} className="space-y-3">

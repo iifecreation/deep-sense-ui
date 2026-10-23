@@ -4,40 +4,20 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Zap, 
-  Activity, 
-  Cpu, 
-  Database, 
+import {
+  Shield,
+  Zap,
   ArrowRight,
-  TrendingUp,
-  Lock,
   CheckCircle2,
-  LineChart,
-  BarChart3,
   Network,
   Fingerprint,
-  AlertTriangle,
   Globe,
-  Layers,
   Server,
-  HelpCircle,
-  Smartphone,
-  Eye,
   Users,
   Building2,
-  Wallet,
-  Clock,
-  RefreshCw,
-  Scale,
   ChevronDown,
   ChevronUp,
-  AlertCircle,
   Cpu as HardwareIcon,
-  Wifi,
-  Search,
-  Check
 } from "lucide-react";
 
 export default function DeviceFingerprintingPage() {

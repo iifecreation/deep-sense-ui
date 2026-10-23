@@ -7,7 +7,6 @@ import {
   Activity,
   ShieldAlert,
   ChevronRight,
-  Code2,
   Zap,
   Cloud,
   RefreshCw,
@@ -40,6 +39,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useIntegration } from "@/hooks/use-integrations";
 import { integrationsService } from "@/services/integrations.service";
+import type { HealthEventRead } from "@/lib/api-client/api";
 
 function formatDate(value?: string | null): string {
   if (!value) return "Never";
@@ -56,7 +56,7 @@ export default function IntegrationDetailPage() {
   const [testMessage, setTestMessage] = useState<string | null>(null);
   const [toggling, setToggling] = useState(false);
 
-  const [logs, setLogs] = useState<any[]>([]);
+  const [logs, setLogs] = useState<HealthEventRead[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
 
   const [showEdit, setShowEdit] = useState(false);
@@ -78,7 +78,7 @@ export default function IntegrationDetailPage() {
     setTestMessage(null);
     try {
       const result = await integrationsService.test(integrationId);
-      setTestMessage(result.summary || result.message || "Test completed.");
+      setTestMessage(result.summary || "Test completed.");
       await refetch();
     } catch (err) {
       setTestMessage(err instanceof Error ? err.message : "Test failed.");
@@ -336,7 +336,7 @@ export default function IntegrationDetailPage() {
                        </div>
                      ) : (
                        <div className="space-y-3 max-h-80 overflow-y-auto">
-                         {logs.map((log: any) => (
+                         {logs.map((log) => (
                            <div key={log.id} className="flex justify-between gap-4 border-b border-white/5 pb-3 last:border-0">
                              <span className="text-white/70">{log.summary || log.event_type}</span>
                              <span className="text-white/30 shrink-0">{formatDate(log.created_at)}</span>

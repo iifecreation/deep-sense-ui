@@ -3,19 +3,21 @@
 import React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { 
-  Calendar, 
-  Clock, 
-  User, 
-  Tag, 
+import {
+  Calendar,
+  User,
   ArrowLeft,
   Share2,
-  BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useBlogPost, useBlogPosts } from "@/hooks";
+import { bodyParagraphs } from "@/lib/text/body-paragraphs";
+
+function formatPublished(value?: string | null): string {
+  return value ? new Date(value).toLocaleDateString() : "Unpublished";
+}
 
 export default function BlogPostPage() {
   const params = useParams();
@@ -72,7 +74,7 @@ export default function BlogPostPage() {
       {/* Post Header */}
       <section>
         <div className="flex items-center gap-2 mb-4">
-          <Badge variant="outline">{post.category_name}</Badge>
+          {post.category && <Badge variant="outline">{post.category.name}</Badge>}
           {post.featured && (
             <Badge className="bg-brand-lime text-neutral-900">Featured</Badge>
           )}
@@ -83,15 +85,11 @@ export default function BlogPostPage() {
         <div className="flex items-center gap-6 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <User className="w-4 h-4" />
-            <span>{post.author || 'DeepSense Team'}</span>
+            <span>{post.author_name || 'DeepSense Team'}</span>
           </div>
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
-            <span>{new Date(post.published_at).toLocaleDateString()}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4" />
-            <span>{post.read_time || '5 min read'}</span>
+            <span>{formatPublished(post.published_at)}</span>
           </div>
         </div>
       </section>
@@ -100,10 +98,11 @@ export default function BlogPostPage() {
       <section>
         <Card className="rounded-2xl border">
           <CardContent className="p-8">
-            <div 
-              className="prose prose-lg dark:prose-invert max-w-none"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
+            <div className="prose prose-lg dark:prose-invert max-w-none">
+              {bodyParagraphs(post.body).map((paragraph, index) => (
+                <p key={index} className="whitespace-pre-line">{paragraph}</p>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </section>
@@ -117,20 +116,22 @@ export default function BlogPostPage() {
       </section>
 
       {/* Related Posts */}
-      {relatedPosts?.items?.length > 0 && (
+      {relatedPosts && relatedPosts.items.some((p) => p.slug !== post.slug) && (
         <section>
           <h2 className="text-2xl font-black italic uppercase tracking-tighter mb-6">Related Posts</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {relatedPosts.items
-              .filter((p: any) => p.id !== post.id)
+              .filter((p) => p.slug !== post.slug)
               .slice(0, 3)
-              .map((relatedPost: any) => (
-                <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`}>
+              .map((relatedPost) => (
+                <Link key={relatedPost.slug} href={`/blog/${relatedPost.slug}`}>
                   <Card className="rounded-2xl border hover:border-brand-lime transition-all cursor-pointer group h-full flex flex-col">
                     <CardContent className="p-6">
-                      <Badge variant="outline" className="w-fit mb-3 text-xs">
-                        {relatedPost.category_name}
-                      </Badge>
+                      {relatedPost.category && (
+                        <Badge variant="outline" className="w-fit mb-3 text-xs">
+                          {relatedPost.category.name}
+                        </Badge>
+                      )}
                       <h3 className="font-bold italic group-hover:text-brand-lime transition-colors line-clamp-2 mb-2">
                         {relatedPost.title}
                       </h3>
@@ -139,7 +140,7 @@ export default function BlogPostPage() {
                       </p>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground mt-auto">
                         <Calendar className="w-3 h-3" />
-                        {new Date(relatedPost.published_at).toLocaleDateString()}
+                        {formatPublished(relatedPost.published_at)}
                       </div>
                     </CardContent>
                   </Card>

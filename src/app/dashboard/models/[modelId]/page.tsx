@@ -1,30 +1,24 @@
 "use client";
 
 import React from "react";
-import { 
-  ArrowLeft, 
-  Binary, 
-  Settings, 
-  Activity, 
-  ShieldCheck, 
-  Clock, 
-  Lock, 
+import {
+  ArrowLeft,
+  Binary,
+  Activity,
+  Clock,
   ChevronRight,
-  MoreHorizontal,
   Workflow,
   History,
-  Cpu,
   BarChart3,
   LineChart,
   PieChart,
-  Network,
   Database,
   RefreshCw,
   Zap,
   TrendingDown,
   TrendingUp,
   BrainCircuit,
-  Target
+  Target,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -34,17 +28,8 @@ import { modelsService } from "@/services/models.service";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,

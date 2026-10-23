@@ -1,5 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { get, post, patch } from '@/lib/api/client';
+import type {
+  IntegrationMutationResponse,
+  IntegrationTestResult,
+  PaginatedHealthEventRead,
+  PaginatedIntegrationListItem,
+} from '@/lib/api-client/api';
 
 export interface Integration {
   id: string;
@@ -43,7 +48,7 @@ export interface IntegrationDetail {
   description?: string | null;
   base_url?: string | null;
   auth_type?: string | null;
-  config_display?: Record<string, any> | null;
+  config_display?: Record<string, unknown> | null;
   health: IntegrationHealthSummary;
   webhook_count: number;
   api_key_count: number;
@@ -59,7 +64,7 @@ export interface IntegrationCreate {
   base_url?: string;
   auth_type?: string;
   description?: string;
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
 }
 
 export interface IntegrationUpdate {
@@ -68,12 +73,12 @@ export interface IntegrationUpdate {
   base_url?: string;
   auth_type?: string;
   description?: string;
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
 }
 
 export const integrationsService = {
   async list(params?: { page?: number; page_size?: number; type?: string; status?: string; search?: string }) {
-    return await get<any>('/integrations', { params });
+    return await get<PaginatedIntegrationListItem>('/integrations', { params });
   },
 
   async create(data: IntegrationCreate) {
@@ -89,22 +94,22 @@ export const integrationsService = {
   },
 
   async test(integrationId: string) {
-    return await post<any>(`/integrations/${integrationId}/test`);
+    return await post<IntegrationTestResult>(`/integrations/${integrationId}/test`);
   },
 
   async disable(integrationId: string) {
-    return await post<any>(`/integrations/${integrationId}/disable`);
+    return await post<IntegrationMutationResponse>(`/integrations/${integrationId}/disable`);
   },
 
   async enable(integrationId: string) {
-    return await post<any>(`/integrations/${integrationId}/enable`);
+    return await post<IntegrationMutationResponse>(`/integrations/${integrationId}/enable`);
   },
 
   async getHealth(integrationId: string) {
-    return await get<any>(`/integrations/${integrationId}/health`);
+    return await get<IntegrationHealthSummary>(`/integrations/${integrationId}/health`);
   },
 
   async getLogs(integrationId: string, params?: { page?: number; page_size?: number }) {
-    return await get<any>(`/integrations/${integrationId}/logs`, { params });
+    return await get<PaginatedHealthEventRead>(`/integrations/${integrationId}/logs`, { params });
   },
 };

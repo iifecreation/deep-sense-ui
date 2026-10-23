@@ -1,15 +1,9 @@
 import { get, post } from '@/lib/api/client';
+import type { ATOSignalRead } from '@/lib/api-client/api';
 
 export type JsonObject = Record<string, unknown>;
-export type Signal = {
-  id?: string;
-  signal_id?: string;
-  signal_type: string;
-  severity: string;
-  score?: number;
-  confidence?: number;
-  created_at: string;
-};
+// ATO signal as returned by GET /ato/signals.
+export type Signal = ATOSignalRead;
 
 export const deepfakeService = {
   check: (data: { image_url?: string; video_url?: string; check_type?: string }) =>
@@ -101,7 +95,7 @@ export const atoService = {
   ingestSessionEvent: (data: JsonObject) => post<JsonObject>('/ato/session-event', data),
   getRisk: (accountId: string) => get<JsonObject>(`/ato/risk/${accountId}`),
   listSignals: (params?: { limit?: number; offset?: number }) =>
-    get<Signal[]>('/ato/signals', { params }),
+    get<ATOSignalRead[]>('/ato/signals', { params }),
 };
 
 export const botDetectionService = {

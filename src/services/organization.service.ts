@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   OrganizationSettingsRead,
   OrganizationSettingsPatch,
@@ -7,6 +6,9 @@ import {
   OrganizationServiceSettingsPatch,
 } from '@/types';
 import { get, patch } from '@/lib/api/client';
+import type {
+  OrganizationAdminStatsResponse,
+} from '@/lib/api-client/api';
 
 export const organizationService = {
   /**
@@ -51,8 +53,8 @@ export const organizationService = {
     dateFrom?: string,
     dateTo?: string,
     interval: string = 'day'
-  ): Promise<any> {
-    return await get<any>('/organization/stats/overview', {
+  ): Promise<OrganizationAdminStatsResponse> {
+    return await get<OrganizationAdminStatsResponse>('/organization/stats/overview', {
       params: { date_from: dateFrom, date_to: dateTo, interval },
     });
   },

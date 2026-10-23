@@ -1,44 +1,26 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  ArrowLeft, 
-  Settings, 
-  Activity, 
-  ShieldCheck, 
+import {
+  ArrowLeft,
+  Activity,
   ShieldAlert,
-  Clock, 
-  Lock, 
+  Clock,
   ChevronRight,
-  MoreHorizontal,
-  Workflow,
   History,
-  Code2,
-  FileSearch,
-  Zap,
   Play,
   Copy,
   ToggleLeft,
   BarChart3,
   Terminal,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -47,6 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useFraudRule } from "@/hooks/use-fraud-rules";
 import { fraudRulesService } from "@/services/fraud-rules.service";
+import type { FraudRuleMetricRead } from "@/lib/api-client/api";
 
 function formatDate(value?: string | null): string {
   if (!value) return "Unknown";
@@ -58,7 +41,7 @@ export default function RuleDetailPage() {
   const ruleId = params.ruleId as string;
 
   const { data: ruleData, isLoading, isError, refetch } = useFraudRule(ruleId);
-  const [metrics, setMetrics] = useState<any[]>([]);
+  const [metrics, setMetrics] = useState<FraudRuleMetricRead[]>([]);
   const [actionBusy, setActionBusy] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 

@@ -69,7 +69,7 @@ export default function RulesEngineOverview() {
       .catch(() => setSummary(null));
   }, []);
 
-  const rulesList: FraudRuleRead[] = rules || [];
+  const rulesList: FraudRuleRead[] = useMemo(() => rules || [], [rules]);
 
   const filteredRules = useMemo(
     () =>

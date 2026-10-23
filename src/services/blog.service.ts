@@ -1,46 +1,27 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { get } from '@/lib/api/client';
+import type {
+  CategoryRead,
+  ListPostsApiV1PublicBlogPostsGetParams,
+  PaginatedPublicPostListItem,
+  PublicPostDetail,
+  PublicPostListItem,
+} from '@/lib/api-client/api';
 
+// Public, unauthenticated blog API (`/public/blog/*`); only published posts are returned.
 export const blogService = {
-  /**
-   * List all published blog posts
-   */
-  async listPosts(params?: any): Promise<any> {
-    return await get<any>('/content/posts', { params: { ...params, status: 'published' } });
+  async listPosts(params?: ListPostsApiV1PublicBlogPostsGetParams): Promise<PaginatedPublicPostListItem> {
+    return await get<PaginatedPublicPostListItem>('/public/blog/posts', { params });
   },
 
-  /**
-   * Get a single blog post by slug
-   */
-  async getPost(slug: string): Promise<any> {
-    return await get<any>(`/content/posts/${slug}`);
+  async getPost(slug: string): Promise<PublicPostDetail> {
+    return await get<PublicPostDetail>(`/public/blog/posts/${encodeURIComponent(slug)}`);
   },
 
-  /**
-   * List blog categories
-   */
-  async listCategories(): Promise<any[]> {
-    return await get<any[]>('/content/categories');
+  async listCategories(): Promise<CategoryRead[]> {
+    return await get<CategoryRead[]>('/public/blog/categories');
   },
 
-  /**
-   * Get posts by category
-   */
-  async getPostsByCategory(categorySlug: string, params?: any): Promise<any> {
-    return await get<any>(`/content/categories/${categorySlug}/posts`, { params });
-  },
-
-  /**
-   * Get featured posts
-   */
-  async getFeaturedPosts(params?: any): Promise<any> {
-    return await get<any>('/content/posts', { params: { ...params, featured: true, status: 'published' } });
-  },
-
-  /**
-   * Search blog posts
-   */
-  async searchPosts(query: string, params?: any): Promise<any> {
-    return await get<any>('/content/posts', { params: { ...params, search: query, status: 'published' } });
+  async getFeaturedPosts(limit?: number): Promise<PublicPostListItem[]> {
+    return await get<PublicPostListItem[]>('/public/blog/featured', { params: { limit } });
   },
 };

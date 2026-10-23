@@ -1,26 +1,18 @@
 "use client";
 
 import React from "react";
-import { 
-  Zap, 
-  Users, 
-  ArrowRight, 
-  CheckCircle2, 
-  Globe, 
-  Target, 
-  Cpu, 
-  Heart, 
-  Rocket, 
-  Briefcase, 
-  Code, 
-  BarChart3, 
-  Search, 
+import {
+  Globe,
+  Cpu,
+  Heart,
+  Rocket,
+  Code,
+  BarChart3,
   Building,
-  Star,
   ShieldCheck,
   Smartphone,
   Layers,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -43,7 +35,7 @@ export default function CareersPage() {
                Build the <br /><span className="text-zinc-300">Intelligence</span> of Finance.
             </h1>
             <p className="text-xl md:text-2xl text-zinc-500 font-inter leading-relaxed max-w-4xl mb-12 italic pr-12">
-               Deep Sense is looking for the world's most ambitious engineers, data scientists, and compliance experts to solve the global financial integrity problem.
+               Deep Sense is looking for the world&apos;s most ambitious engineers, data scientists, and compliance experts to solve the global financial integrity problem.
             </p>
             <div className="flex flex-col sm:flex-row gap-5 font-bold italic font-manrope">
               <button 
@@ -62,7 +54,7 @@ export default function CareersPage() {
               <div>
                  <span className="text-[10px] font-black uppercase text-brand-lime tracking-widest mb-4 block italic font-manrope">Why join us?</span>
                  <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase pr-10 leading-tight">Solving a $2 Trillion <br />Problem Daily.</h2>
-                 <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed font-manrope pr-12 pr-12">Financial crime is complex, evolving, and global. We are building the real-time intelligence layer to stop it. At Deep Sense, your work directly protects the integrity of the world's financial systems.</p>
+                 <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed font-manrope pr-12 pr-12">Financial crime is complex, evolving, and global. We are building the real-time intelligence layer to stop it. At Deep Sense, your work directly protects the integrity of the world&apos;s financial systems.</p>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 font-manrope italic">
                     {[
                        "Work on high-throughput, low-latency AI systems.",
@@ -81,7 +73,7 @@ export default function CareersPage() {
                  <div className="absolute inset-0 bg-brand-lime/10 blur-[150px] opacity-20 pointer-events-none" />
                  <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-10 border-b border-white/10 pb-10 font-manrope">The Impact</h3>
                  <div className="space-y-8 relative z-10 font-manrope italic pr-12">
-                    <p className="text-zinc-500 text-sm italic pr-12 italic font-manrope italic pr-24">"Working at Deep Sense means solving the intersection of high-frequency engineering and deep behavioral science."</p>
+                    <p className="text-zinc-500 text-sm italic pr-12 italic font-manrope italic pr-24">&quot;Working at Deep Sense means solving the intersection of high-frequency engineering and deep behavioral science.&quot;</p>
                     <div className="grid grid-cols-2 gap-6 italic shadow-black/20">
                        <div className="p-6 bg-white/5 border border-white/10 rounded-3xl group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all">
                           <span className="text-[9px] font-black uppercase text-brand-lime group-hover:text-neutral-900 tracking-widest italic font-manrope">Transactions / Day</span>
@@ -111,7 +103,7 @@ export default function CareersPage() {
                  ].map((it, i) => (
                    <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-3xl transition-all duration-700 hover:-translate-y-2 group overflow-hidden relative font-manrope italic pr-12 pr-6 group shadow-black/5">
                       <div className="w-14 h-14 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform shadow-lg shadow-black/10">
-                        {React.cloneElement(it.i as any, { className: "w-6 h-6 border-zinc-100" })}
+                        {React.cloneElement(it.i as React.ReactElement<{ className?: string }>, { className: "w-6 h-6 border-zinc-100" })}
                       </div>
                       <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope italic">{it.t}</h4>
                       <p className="text-zinc-500 font-inter italic leading-relaxed text-sm mb-10 italic pr-8 italic pr-6 group-hover:text-neutral-900 transition-colors">{it.d}</p>
@@ -133,7 +125,7 @@ export default function CareersPage() {
                   ].map((it, i) => (
                     <div key={i} className="flex gap-8 group font-manrope italic mb-10 last:mb-0">
                        <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all font-manrope">
-                          {React.cloneElement(it.i as any, { className: "w-6 h-6 border-white/10 font-manrope" })}
+                          {React.cloneElement(it.i as React.ReactElement<{ className?: string }>, { className: "w-6 h-6 border-white/10 font-manrope" })}
                        </div>
                        <div>
                           <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter font-manrope italic pr-6">{it.t}</h4>
@@ -146,7 +138,7 @@ export default function CareersPage() {
                  <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase italic leading-tight font-manrope pr-16 pr-12">Built For <br />The Builders.</h2>
                  <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed pr-8 font-manrope italic pr-16 pr-12 pr-12">We provide the technical and cultural support to help you achieve the best work of your career.</p>
                  <div className="p-10 bg-white/5 border border-white/10 rounded-[48px] font-bold text-xs uppercase italic tracking-tighter font-inter pr-12 leading-tight italic pr-10 pr-12 group hover:border-brand-lime transition-all">
-                    "Deep Sense is not a place to just have a job—it is a place to define the technological future of financial trust."
+                    &quot;Deep Sense is not a place to just have a job—it is a place to define the technological future of financial trust.&quot;
                  </div>
               </div>
            </div>
@@ -168,7 +160,7 @@ export default function CareersPage() {
                   <div key={idx} className="p-8 bg-white border border-zinc-100 rounded-[32px] hover:border-brand-lime hover:shadow-2xl transition-all group flex flex-col md:flex-row justify-between items-center text-left font-manrope">
                     <div className="flex gap-6 items-center mb-6 md:mb-0">
                        <div className="w-12 h-12 bg-zinc-50 border border-zinc-100 rounded-xl flex items-center justify-center text-zinc-400 group-hover:bg-neutral-900 group-hover:text-brand-lime transition-all">
-                          {React.cloneElement(role.i as any, { className: "w-6 h-6" })}
+                          {React.cloneElement(role.i as React.ReactElement<{ className?: string }>, { className: "w-6 h-6" })}
                        </div>
                        <div className="flex flex-col">
                           <span className="text-[9px] font-black uppercase text-brand-lime mb-1 tracking-widest">{role.cat}</span>
@@ -189,7 +181,7 @@ export default function CareersPage() {
               </div>
               
               <div className="mt-20 p-12 bg-zinc-50 border border-zinc-100 rounded-[56px] max-w-2xl group cursor-pointer hover:border-brand-lime transition-all">
-                 <h4 className="text-2xl font-black italic uppercase leading-tight mb-4 group-hover:text-emerald-600 transition-colors">Don't see a fit?</h4>
+                 <h4 className="text-2xl font-black italic uppercase leading-tight mb-4 group-hover:text-emerald-600 transition-colors">Don&apos;t see a fit?</h4>
                  <p className="text-zinc-500 text-sm mb-10 italic pr-8 italic font-manrope pr-6">We are always looking for non-conformist talent in engineering, design, and risk. Send us your work and tell us what you want to build.</p>
                  <span className="text-emerald-500 font-black uppercase tracking-widest text-xs underline underline-offset-8">General Application</span>
               </div>

@@ -1,38 +1,22 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { 
-  FileText, 
-  Search, 
-  Filter, 
-  ChevronRight,
+import {
+  FileText,
+  History,
+  Search,
   Download,
   Send,
-  MoreHorizontal,
   Plus,
   RefreshCcw,
   Clock,
-  CheckCircle2,
   XCircle,
   AlertTriangle,
   FileCheck,
   FileX,
-  History,
-  ArrowRight,
   BarChart3,
-  Archive,
-  Lock,
-  MessageSquare,
-  Paperclip,
-  Share2,
-  ExternalLink,
-  MoreVertical,
-  Activity,
-  Calendar,
   Users,
-  ShieldCheck,
   Zap,
-  RefreshCw
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -47,14 +31,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
@@ -65,8 +42,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useReports } from "@/hooks";
+import { useAuditEvents } from "@/hooks/use-audit";
 import { reportsService } from "@/services/reports.service";
 import { ReportSubmissionRead } from "@/types";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
 
 const REPORT_TYPES = ["CTR", "STR", "INTERNAL"];
 
@@ -87,6 +66,9 @@ const REGISTRY_TABS = ["all", "draft", "in_review", "ready_for_submission", "sub
 export default function RegulatoryReportsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [registryTab, setRegistryTab] = useState<(typeof REGISTRY_TABS)[number]>("all");
+  // Regulatory report actions are written to the audit log as `regulatory_report` events.
+  const { data: reportAudit } = useAuditEvents({ entity_type: "regulatory_report", page_size: 6 });
+  const reportAuditEvents = reportAudit?.items ?? [];
   const { data: reports, isLoading, isError, error, refetch } = useReports({
     query: { page: 1, page_size: 50 }
   });
@@ -121,18 +103,7 @@ export default function RegulatoryReportsPage() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'draft': return 'bg-slate-500 text-white';
-      case 'submitted': return 'bg-blue-500 text-white';
-      case 'under_review': return 'bg-amber-500 text-white';
-      case 'approved': return 'bg-emerald-500 text-white';
-      case 'rejected': return 'bg-red-500 text-white';
-      default: return 'bg-slate-400 text-white';
-    }
-  };
-
-  const filteredReports = reports?.filter((r: any) => {
+  const filteredReports = reports?.filter((r) => {
     if (registryTab !== "all" && r.status?.toLowerCase() !== registryTab) return false;
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -143,7 +114,7 @@ export default function RegulatoryReportsPage() {
     );
   }) || [];
 
-  const allReports: any[] = reports || [];
+  const allReports = useMemo(() => reports || [], [reports]);
 
   const kpiCards = useMemo(() => {
     const total = allReports.length;
@@ -162,13 +133,13 @@ export default function RegulatoryReportsPage() {
   const immediateActionQueue = useMemo(() => {
     return allReports
       .filter((r) => r.due_at && !r.submitted_at)
-      .sort((a, b) => new Date(a.due_at).getTime() - new Date(b.due_at).getTime())
+      .sort((a, b) => new Date(a.due_at ?? 0).getTime() - new Date(b.due_at ?? 0).getTime())
       .slice(0, 8);
   }, [allReports]);
 
   const reviewAnalytics = useMemo(() => {
     const submitted = allReports.filter((r) => r.submitted_at);
-    const leadTimes = submitted.map((r) => daysBetween(r.created_at, r.submitted_at));
+    const leadTimes = submitted.map((r) => daysBetween(r.created_at, r.submitted_at ?? r.created_at));
     const avgLeadTime = leadTimes.length > 0 ? (leadTimes.reduce((a, b) => a + b, 0) / leadTimes.length) : null;
     const rejected = allReports.filter((r) => r.status?.toLowerCase() === "rejected").length;
     const reworkRatio = allReports.length > 0 ? (rejected / allReports.length) * 100 : null;
@@ -217,20 +188,7 @@ export default function RegulatoryReportsPage() {
             Regulatory Reports<span className="text-brand-lime">.</span>
           </h1>
         </div>
-        <Card className="rounded-3xl border border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load reports</p>
-                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
-              </div>
-            </div>
-            <Button onClick={() => refetch()} className="mt-4" variant="outline">
-              <RefreshCw className="w-4 h-4 mr-2" /> Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="reports" onRetry={() => refetch()} />
       </div>
     );
   }
@@ -273,19 +231,6 @@ export default function RegulatoryReportsPage() {
               className="h-8 w-48 text-[10px] font-bold uppercase tracking-widest border-none shadow-none focus-visible:ring-0"
             />
           </div>
-          
-          {([] as any[]).map((filter: any, i: number) => (
-            <div key={i} className="flex items-center gap-2 px-3 py-1.5 hover:bg-background rounded-xl transition-colors cursor-pointer group">
-              <span className="text-[10px] font-black uppercase tracking-widest italic text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
-                {filter.label}: {filter.value}
-              </span>
-              <ChevronRight className="w-2.5 h-2.5 text-muted-foreground/50 rotate-90" />
-            </div>
-          ))}
-          
-          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg ml-auto mr-2">
-            <Filter className="w-3.5 h-3.5" />
-          </Button>
         </div>
       </section>
 
@@ -345,7 +290,7 @@ export default function RegulatoryReportsPage() {
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-10 text-slate-500">No reports with an approaching deadline.</TableCell>
                   </TableRow>
-                ) : immediateActionQueue.map((row: any) => {
+                ) : immediateActionQueue.map((row) => {
                   const dead = formatDeadline(row.due_at);
                   return (
                   <TableRow key={row.id} className="group hover:bg-muted/30 transition-colors border-b border-border/50 cursor-pointer">
@@ -432,7 +377,7 @@ export default function RegulatoryReportsPage() {
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-10 text-slate-500">No reports found.</TableCell>
                     </TableRow>
-                  ) : filteredReports.map((row: any) => (
+                  ) : filteredReports.map((row) => (
                     <TableRow key={row.id} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-4 font-black italic text-[11px] text-muted-foreground">{row.id}</TableCell>
                       <TableCell className="text-[10px] font-black italic">{row.report_type || 'Unknown'}</TableCell>
@@ -472,31 +417,16 @@ export default function RegulatoryReportsPage() {
               
               <div className="space-y-8">
                  <div className="grid grid-cols-2 gap-4">
-                    <Button variant="outline" className="h-24 rounded-3xl border-dashed flex flex-col items-center justify-center border-border hover:border-brand-lime hover:bg-brand-lime/5 transition-all group">
+                    <Button variant="outline" onClick={() => setShowCreate(true)} className="h-24 rounded-3xl border-dashed flex flex-col items-center justify-center border-border hover:border-brand-lime hover:bg-brand-lime/5 transition-all group">
                        <Plus className="w-6 h-6 text-muted-foreground group-hover:text-brand-lime mb-2" />
                        <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white">Create Manually</span>
                     </Button>
-                    <Button variant="outline" className="h-24 rounded-3xl border-dashed flex flex-col items-center justify-center border-border hover:border-indigo-500 hover:bg-indigo-500/5 transition-all group">
-                       <FileCheck className="w-6 h-6 text-muted-foreground group-hover:text-indigo-500 mb-2" />
-                       <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white">Pull from Case</span>
+                    <Button asChild variant="outline" className="h-24 rounded-3xl border-dashed flex flex-col items-center justify-center border-border hover:border-indigo-500 hover:bg-indigo-500/5 transition-all group">
+                       <Link href="/dashboard/cases">
+                         <FileCheck className="w-6 h-6 text-muted-foreground group-hover:text-indigo-500 mb-2" />
+                         <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground group-hover:text-neutral-900 dark:group-hover:text-white">Pull from Case</span>
+                       </Link>
                     </Button>
-                 </div>
-                 
-                 <div className="p-8 bg-neutral-900 text-white rounded-[32px] space-y-6 shadow-2xl">
-                    <h5 className="text-[10px] font-black uppercase italic tracking-widest text-white/40">Suggested for Reporting</h5>
-                    <div className="space-y-4">
-                       {([] as any[]).map((item, i) => (
-                         <div key={i} className="flex items-center justify-between group cursor-pointer border-b border-white/5 pb-4 last:border-0 hover:translate-x-1 transition-transform">
-                            <div className="space-y-1">
-                               <div className="text-[12px] font-black italic tracking-tight">{item.subject}</div>
-                               <div className="text-[8px] font-bold text-white/40 uppercase">{item.case} • {item.reason}</div>
-                            </div>
-                            <Button size="icon" className="h-8 w-8 bg-white/5 border border-white/10 text-white group-hover:bg-brand-lime group-hover:text-black rounded-xl">
-                               <Plus className="w-3.5 h-3.5" />
-                            </Button>
-                         </div>
-                       ))}
-                    </div>
                  </div>
               </div>
           </Card>
@@ -650,54 +580,26 @@ export default function RegulatoryReportsPage() {
                   <CardDescription className="text-white/40 text-[10px] font-black uppercase tracking-widest mt-1 italic">Disclosure lifecycle integrity logging</CardDescription>
                </CardHeader>
                <CardContent className="p-10 space-y-8 flex-1">
-                  {([] as any[]).map((log, i) => (
-                    <div key={i} className="flex gap-4 group">
-                       <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5 group-hover:border-white/20 transition-all">
-                          {React.cloneElement(log.icon as any, { className: "w-3.5 h-3.5" })}
-                       </div>
-                       <div>
-                          <div className="text-[11px] font-black italic tracking-tight">{log.e}</div>
-                          <div className="text-[8px] font-bold text-white/40 uppercase mt-0.5">{log.t} • {log.u}</div>
-                       </div>
-                    </div>
-                  ))}
-                  <Button variant="outline" className="w-full h-8 text-[9px] font-black uppercase italic bg-white/5 border-white/10 mt-auto hover:bg-white/10 decoration-white/20">Full Integrity Export</Button>
+                  {reportAuditEvents.length === 0 ? (
+                    <p className="text-[10px] font-bold text-white/40 uppercase">No report activity recorded yet.</p>
+                  ) : (
+                    reportAuditEvents.map((event) => (
+                      <div key={event.id} className="flex gap-4 group">
+                         <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5 group-hover:border-white/20 transition-all">
+                            <History className="w-3.5 h-3.5" />
+                         </div>
+                         <div>
+                            <div className="text-[11px] font-black italic tracking-tight">{event.description || event.action}</div>
+                            <div className="text-[8px] font-bold text-white/40 uppercase mt-0.5">
+                              {new Date(event.created_at).toLocaleString()} • {event.actor_role || "system"}
+                            </div>
+                         </div>
+                      </div>
+                    ))
+                  )}
+                  <Link href="/dashboard/audit" className="w-full h-8 flex items-center justify-center rounded-md border text-[9px] font-black uppercase italic bg-white/5 border-white/10 mt-auto hover:bg-white/10">Open Full Audit Trail</Link>
                </CardContent>
             </Card>
-         </section>
-      </div>
-
-      {/* 10. RECENT ACTIVITY & 11. QUICK ACTIONS */}
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-         <section className="xl:col-span-1">
-            <Card className="rounded-[40px] border-border/50 shadow-2xl overflow-hidden h-full bg-muted/20">
-               <CardHeader className="p-8 border-b border-border/50 bg-white dark:bg-neutral-950">
-                  <CardTitle className="text-lg font-black italic uppercase tracking-tighter">Reporting Pulse</CardTitle>
-               </CardHeader>
-               <ScrollArea className="h-[300px]">
-                  <div className="p-8 space-y-6">
-                     {([] as any[]).map((ac, i) => (
-                       <div key={i} className="flex justify-between items-center text-[10px] font-black italic tracking-tight border-b border-border/50 pb-3 last:border-0 last:pb-0">
-                          <span className="text-muted-foreground">{ac.l} <span className="text-neutral-900 dark:text-white ml-2 text-[9px] uppercase tracking-widest">{ac.c}</span></span>
-                          <span className="text-muted-foreground/40">{ac.t}</span>
-                       </div>
-                     ))}
-                  </div>
-               </ScrollArea>
-            </Card>
-         </section>
-
-         <section className="xl:col-span-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 h-full">
-               {([] as any[]).map((action, i) => (
-                 <button key={i} className={`flex flex-col items-center justify-center gap-3 p-6 rounded-3xl font-black text-[9px] uppercase tracking-widest italic hover:scale-105 active:scale-95 transition-all group ${action.color}`}>
-                    <div className="w-8 h-8 rounded-xl bg-black/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-all">
-                      {React.cloneElement(action.icon as any, { className: "w-4 h-4" })}
-                    </div>
-                    {action.label}
-                 </button>
-               ))}
-            </div>
          </section>
       </div>
 

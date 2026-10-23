@@ -5,8 +5,6 @@ import {
   Scale,
   Plus,
   CheckCircle2,
-  XCircle,
-  RefreshCcw,
   FlaskConical,
   Loader2,
 } from "lucide-react";
@@ -32,6 +30,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useDecisionPolicies, useDecisionPolicyVersions } from "@/hooks";
 import { decisionPoliciesService, DecisionPolicy, DecisionSimulateResponse } from "@/services/decision-policies.service";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
 
 function formatDate(value?: string | null): string {
   if (!value) return "Never";
@@ -307,20 +306,7 @@ export default function DecisionPoliciesPage() {
             Decision Policies<span className="text-brand-lime">.</span>
           </h1>
         </div>
-        <Card className="rounded-3xl border border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <XCircle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load decision policies</p>
-                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
-              </div>
-            </div>
-            <Button onClick={() => refetch()} className="mt-4" variant="outline">
-              <RefreshCcw className="w-4 h-4 mr-2" /> Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="decision policies" onRetry={() => refetch()} />
       </div>
     );
   }

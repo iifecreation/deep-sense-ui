@@ -1,13 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  CheckCircle2, 
-  Search, 
-  Filter, 
-  ChevronRight,
-  UserCheck,
-  MoreHorizontal,
+import {
+  Search,
+  Filter,
   Clock,
   Briefcase,
   AlertTriangle,
@@ -16,23 +12,11 @@ import {
   ShieldCheck,
   ShieldAlert,
   ArrowRight,
-  MoreVertical,
-  Download,
   Settings,
   RefreshCcw,
-  Zap,
-  LayoutGrid,
-  FileText,
-  Fingerprint,
   Activity,
-  BarChart3,
-  Calendar,
-  Globe,
   Plus,
   ArrowUpRight,
-  ExternalLink,
-  ChevronDown,
-  AlertCircle
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -47,14 +31,8 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -64,13 +42,14 @@ import {
 } from "@/components/ui/dialog";
 import { useOnboardingReviews } from "@/hooks";
 import { onboardingService } from "@/services/onboarding.service";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
 
 const STATUS_TABS = ["all", "pending", "in_review", "approved", "rejected", "escalated"] as const;
 
 export default function OnboardingReviewsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<(typeof STATUS_TABS)[number]>("all");
-  const { data: reviewsData, isLoading, isError, refetch } = useOnboardingReviews({
+  const { data: reviewsData, isLoading, isError, error, refetch } = useOnboardingReviews({
     search: searchQuery,
     status: activeTab === "all" ? undefined : activeTab,
   });
@@ -132,31 +111,18 @@ export default function OnboardingReviewsPage() {
             </div>
           </div>
         </section>
-        <Card className="rounded-3xl border border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load reviews</p>
-                <p className="text-sm text-red-700">Please check your connection and try again.</p>
-              </div>
-            </div>
-            <Button onClick={refetch} className="mt-4" variant="outline">
-              <RefreshCcw className="w-4 h-4 mr-2" /> Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="reviews" onRetry={refetch} />
       </div>
     );
   }
 
   const items = reviewsData?.items || [];
-  const pendingCount = items.filter((i: any) => i.status === 'pending' || i.status === 'in_review').length;
-  const approvedCount = items.filter((i: any) => i.status === 'approved').length;
-  const rejectedCount = items.filter((i: any) => i.status === 'rejected').length;
-  const escalatedCount = items.filter((i: any) => i.status === 'escalated').length;
-  const highRiskCount = items.filter((i: any) => i.risk_tier === 'high' || i.risk_tier === 'critical').length;
-  const flaggedCount = items.filter((i: any) => i.screening_flagged).length;
+  const pendingCount = items.filter((i) => i.status === 'pending' || i.status === 'in_review').length;
+  const approvedCount = items.filter((i) => i.status === 'approved').length;
+  const rejectedCount = items.filter((i) => i.status === 'rejected').length;
+  const escalatedCount = items.filter((i) => i.status === 'escalated').length;
+  const highRiskCount = items.filter((i) => i.risk_tier === 'high' || i.risk_tier === 'critical').length;
+  const flaggedCount = items.filter((i) => i.screening_flagged).length;
 
   const kpis = [
     { label: "Total Applications", value: items.length, icon: <Briefcase className="w-5 h-5" />, delta: "" },
@@ -268,7 +234,7 @@ export default function OnboardingReviewsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {items.filter((i: any) => i.risk_tier === 'critical' || i.risk_tier === 'high' || i.status === 'escalated').slice(0,4).map((row: any, i: number) => (
+                {items.filter((i) => i.risk_tier === 'critical' || i.risk_tier === 'high' || i.status === 'escalated').slice(0,4).map((row) => (
                   <TableRow key={row.id} className="group hover:bg-muted border-b border-border/50 transition-colors cursor-pointer">
                     <TableCell className="px-8 py-5">
                        <Link href={`/dashboard/onboarding/${row.id}`} className="flex flex-col">
@@ -311,7 +277,7 @@ export default function OnboardingReviewsPage() {
                     </TableCell>
                   </TableRow>
                 ))}
-                {items.filter((i: any) => i.risk_tier === 'critical' || i.risk_tier === 'high' || i.status === 'escalated').length === 0 && (
+                {items.filter((i) => i.risk_tier === 'critical' || i.risk_tier === 'high' || i.status === 'escalated').length === 0 && (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-10 text-slate-500">
                       No priority reviews in queue.
@@ -364,7 +330,7 @@ export default function OnboardingReviewsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {items.map((row: any) => (
+                    {items.map((row) => (
                       <TableRow key={row.id} className="group hover:bg-muted/30 border-b border-border/50 transition-colors cursor-pointer">
                         <TableCell className="px-8 py-5">
                            <div className="flex flex-col">
@@ -444,11 +410,11 @@ export default function OnboardingReviewsPage() {
                      </div>
                      <div className="flex justify-between items-center text-[11px] font-black italic">
                         <span>Auto-Approved (Low)</span>
-                        <span className="text-brand-lime">{items.filter((i:any) => i.status === 'approved').length}</span>
+                        <span className="text-brand-lime">{items.filter((i) => i.status === 'approved').length}</span>
                      </div>
                      <div className="flex justify-between items-center text-[11px] font-black italic">
                         <span>Manual Review Queue</span>
-                        <span className="text-rose-500">{items.filter((i:any) => i.status === 'pending' || i.status === 'in_review').length}</span>
+                        <span className="text-rose-500">{items.filter((i) => i.status === 'pending' || i.status === 'in_review').length}</span>
                      </div>
                   </div>
                </div>
@@ -473,9 +439,9 @@ export default function OnboardingReviewsPage() {
              </div>
              
              <div className="space-y-0 relative z-10 font-bold italic font-black">
-                {items.slice(0, 4).map((act: any, i: number) => {
+                {items.slice(0, 4).map((act, i) => {
                   const statusColor = act.status === 'approved' ? 'success' : act.status === 'rejected' ? 'danger' : act.status === 'escalated' ? 'info' : 'warning';
-                  const actionMap: any = {
+                  const actionMap: Record<string, string> = {
                     approved: "Approved Application",
                     rejected: "Rejected Application",
                     escalated: "Escalated to EDD",

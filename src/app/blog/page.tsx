@@ -2,23 +2,22 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { 
-  FileText, 
-  Calendar, 
-  Clock, 
-  User, 
-  Tag, 
+import {
+  Calendar,
+  User,
   Search,
-  Filter,
-  ArrowRight,
   TrendingUp,
-  BookOpen
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useBlogPosts, useBlogCategories, useFeaturedPosts } from "@/hooks";
+
+function formatPublished(value?: string | null): string {
+  return value ? new Date(value).toLocaleDateString() : "Unpublished";
+}
 
 export default function BlogPage() {
   const { data: posts, isLoading: postsLoading, isError: postsError } = useBlogPosts();
@@ -27,10 +26,10 @@ export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const filteredPosts = posts?.items?.filter((post: any) => {
+  const filteredPosts = posts?.items?.filter((post) => {
     const matchesSearch = post.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          post.excerpt?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = !selectedCategory || post.category_slug === selectedCategory;
+    const matchesCategory = !selectedCategory || post.category?.slug === selectedCategory;
     return matchesSearch && matchesCategory;
   }) || [];
 
@@ -89,15 +88,15 @@ export default function BlogPage() {
       </section>
 
       {/* Featured Posts */}
-      {featuredPosts?.items?.length > 0 && (
+      {featuredPosts && featuredPosts.length > 0 && (
         <section>
           <div className="flex items-center gap-2 mb-6">
             <TrendingUp className="w-5 h-5 text-brand-lime" />
             <h2 className="text-xl font-black italic uppercase tracking-tighter">Featured Posts</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {featuredPosts.items.slice(0, 2).map((post: any) => (
-              <Link key={post.id} href={`/blog/${post.slug}`}>
+            {featuredPosts.slice(0, 2).map((post) => (
+              <Link key={post.slug} href={`/blog/${post.slug}`}>
                 <Card className="rounded-2xl border hover:border-brand-lime transition-all cursor-pointer group">
                   <CardHeader>
                     <Badge className="w-fit mb-2 bg-brand-lime text-neutral-900">Featured</Badge>
@@ -110,12 +109,14 @@ export default function BlogPage() {
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        {new Date(post.published_at).toLocaleDateString()}
+                        {formatPublished(post.published_at)}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        {post.read_time || '5 min read'}
-                      </div>
+                      {post.author_name && (
+                        <div className="flex items-center gap-1">
+                          <User className="w-4 h-4" />
+                          {post.author_name}
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -144,7 +145,7 @@ export default function BlogPage() {
           >
             All
           </Button>
-          {categories?.map((category: any) => (
+          {categories?.map((category) => (
             <Button
               key={category.id}
               variant={selectedCategory === category.slug ? "default" : "outline"}
@@ -159,14 +160,16 @@ export default function BlogPage() {
 
       {/* Blog Posts Grid */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {filteredPosts.map((post: any) => (
-          <Link key={post.id} href={`/blog/${post.slug}`}>
+        {filteredPosts.map((post) => (
+          <Link key={post.slug} href={`/blog/${post.slug}`}>
             <Card className="rounded-2xl border hover:border-brand-lime transition-all cursor-pointer group h-full flex flex-col">
               <CardHeader>
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="outline" className="text-xs">
-                    {post.category_name}
-                  </Badge>
+                  {post.category && (
+                    <Badge variant="outline" className="text-xs">
+                      {post.category.name}
+                    </Badge>
+                  )}
                   {post.featured && (
                     <Badge className="bg-brand-lime text-neutral-900 text-xs">Featured</Badge>
                   )}
@@ -180,12 +183,14 @@ export default function BlogPage() {
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
-                    {new Date(post.published_at).toLocaleDateString()}
+                    {formatPublished(post.published_at)}
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {post.read_time || '5 min'}
-                  </div>
+                  {post.author_name && (
+                    <div className="flex items-center gap-1">
+                      <User className="w-3 h-3" />
+                      {post.author_name}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

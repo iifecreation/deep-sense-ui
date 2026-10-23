@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   TeamListResponse,
   TeamInviteRequest,
@@ -8,6 +7,24 @@ import {
   TeamMutationResponse,
 } from '@/types';
 import { get, post, patch } from '@/lib/api/client';
+import type {
+  FeatureFlagsPatch,
+  FeatureFlagsRead,
+  OrganizationSettingsPatch,
+  OrganizationSettingsRead,
+  PermissionsSummaryResponse,
+  ReportingSettingsPatch,
+  ReportingSettingsRead,
+  RetentionSettingsPatch,
+  RetentionSettingsRead,
+  ScreeningSettingsPatch,
+  ScreeningSettingsRead,
+  SecuritySettingsPatch,
+  SecuritySettingsRead,
+  SettingsAuditResponse,
+  WebhookSettingsPatch,
+  WebhookSettingsRead,
+} from '@/lib/api-client/api';
 
 export const settingsService = {
   /**
@@ -55,126 +72,126 @@ export const settingsService = {
   /**
    * Get webhook settings
    */
-  async getWebhookSettings(): Promise<any> {
-    return await get<any>('/settings/webhooks');
+  async getWebhookSettings(): Promise<WebhookSettingsRead> {
+    return await get<WebhookSettingsRead>('/settings/webhooks');
   },
 
   /**
    * Update webhook settings
    */
-  async updateWebhookSettings(data: any): Promise<any> {
-    return await patch<any>('/settings/webhooks', data);
+  async updateWebhookSettings(data: WebhookSettingsPatch): Promise<WebhookSettingsRead> {
+    return await patch<WebhookSettingsRead>('/settings/webhooks', data);
   },
 
   /**
    * Get screening settings
    */
-  async getScreeningSettings(): Promise<any> {
-    return await get<any>('/settings/screening');
+  async getScreeningSettings(): Promise<ScreeningSettingsRead> {
+    return await get<ScreeningSettingsRead>('/settings/screening');
   },
 
   /**
    * Update screening settings
    */
-  async updateScreeningSettings(data: any): Promise<any> {
-    return await patch<any>('/settings/screening', data);
+  async updateScreeningSettings(data: ScreeningSettingsPatch): Promise<ScreeningSettingsRead> {
+    return await patch<ScreeningSettingsRead>('/settings/screening', data);
   },
 
   /**
    * Get reporting settings
    */
-  async getReportingSettings(): Promise<any> {
-    return await get<any>('/settings/reporting');
+  async getReportingSettings(): Promise<ReportingSettingsRead> {
+    return await get<ReportingSettingsRead>('/settings/reporting');
   },
 
   /**
    * Update reporting settings
    */
-  async updateReportingSettings(data: any): Promise<any> {
-    return await patch<any>('/settings/reporting', data);
+  async updateReportingSettings(data: ReportingSettingsPatch): Promise<ReportingSettingsRead> {
+    return await patch<ReportingSettingsRead>('/settings/reporting', data);
   },
 
   /**
    * Get retention settings
    */
-  async getRetentionSettings(): Promise<any> {
-    return await get<any>('/settings/retention');
+  async getRetentionSettings(): Promise<RetentionSettingsRead> {
+    return await get<RetentionSettingsRead>('/settings/retention');
   },
 
   /**
    * Update retention settings
    */
-  async updateRetentionSettings(data: any): Promise<any> {
-    return await patch<any>('/settings/retention', data);
+  async updateRetentionSettings(data: RetentionSettingsPatch): Promise<RetentionSettingsRead> {
+    return await patch<RetentionSettingsRead>('/settings/retention', data);
   },
 
   /**
    * Get security settings
    */
-  async getSecuritySettings(): Promise<any> {
-    return await get<any>('/settings/security');
+  async getSecuritySettings(): Promise<SecuritySettingsRead> {
+    return await get<SecuritySettingsRead>('/settings/security');
   },
 
   /**
    * Update security settings
    */
-  async updateSecuritySettings(data: any): Promise<any> {
-    return await patch<any>('/settings/security', data);
+  async updateSecuritySettings(data: SecuritySettingsPatch): Promise<SecuritySettingsRead> {
+    return await patch<SecuritySettingsRead>('/settings/security', data);
   },
 
   /**
    * Get feature flags
    */
-  async getFeatureFlags(): Promise<any> {
-    return await get<any>('/settings/feature-flags');
+  async getFeatureFlags(): Promise<FeatureFlagsRead> {
+    return await get<FeatureFlagsRead>('/settings/feature-flags');
   },
 
   /**
    * Update feature flags
    */
-  async updateFeatureFlags(data: any): Promise<any> {
-    return await patch<any>('/settings/feature-flags', data);
+  async updateFeatureFlags(data: FeatureFlagsPatch): Promise<FeatureFlagsRead> {
+    return await patch<FeatureFlagsRead>('/settings/feature-flags', data);
   },
 
   /**
    * Get permissions summary
    */
-  async getPermissionsSummary(): Promise<any> {
-    return await get<any>('/settings/permissions');
+  async getPermissionsSummary(): Promise<PermissionsSummaryResponse> {
+    return await get<PermissionsSummaryResponse>('/settings/permissions');
   },
 
   /**
    * Get settings audit trail
    */
-  async getSettingsAudit(limit: number = 50, offset: number = 0): Promise<any> {
-    return await get<any>('/settings/audit', { params: { limit, offset } });
+  async getSettingsAudit(limit: number = 50, offset: number = 0): Promise<SettingsAuditResponse> {
+    return await get<SettingsAuditResponse>('/settings/audit', { params: { limit, offset } });
   },
 
   /**
    * Get organization settings
    */
-  async getOrganizationSettings(): Promise<any> {
-    return await get<any>('/organization/settings');
+  async getOrganizationSettings(): Promise<OrganizationSettingsRead> {
+    return await get<OrganizationSettingsRead>('/organization/settings');
   },
 
   /**
    * Update organization settings
    */
-  async updateOrganizationSettings(data: any): Promise<any> {
-    return await patch<any>('/organization/settings', data);
+  async updateOrganizationSettings(data: OrganizationSettingsPatch): Promise<OrganizationSettingsRead> {
+    return await patch<OrganizationSettingsRead>('/organization/settings', data);
   },
 
   /**
    * Get notification settings
    */
-  async getNotificationSettings(): Promise<any> {
-    return await get<any>('/settings/notifications');
+  async getNotificationSettings(): Promise<Record<string, unknown>> {
+    return await get<Record<string, unknown>>('/settings/notifications');
   },
 
   /**
    * Update notification settings
    */
-  async updateNotificationSettings(data: any): Promise<any> {
-    return await patch<any>('/settings/notifications', data);
+  async updateNotificationSettings(data: Record<string, unknown>): Promise<Record<string, unknown>> {
+    return await patch<Record<string, unknown>>('/settings/notifications', data);
   },
 };

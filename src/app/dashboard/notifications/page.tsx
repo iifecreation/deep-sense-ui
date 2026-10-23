@@ -1,9 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { 
-  Bell, Mail, BookOpen, Clock, Loader2, CheckSquare, 
-  Eye, EyeOff, Inbox, AlertCircle 
+import React, { useState, useEffect, useEffectEvent } from "react";
+import {
+  Bell,
+  Clock,
+  Loader2,
+  CheckSquare,
+  Eye,
+  EyeOff,
+  Inbox,
 } from "lucide-react";
 import { notificationsService, UserNotification } from "@/services/notifications.service";
 
@@ -17,9 +22,14 @@ export default function NotificationsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
 
-  useEffect(() => {
+  // Effect event: reruns when the filter or page changes, always with the latest loaders.
+  const reload = useEffectEvent(() => {
     loadNotifications();
     loadUnreadCount();
+  });
+
+  useEffect(() => {
+    reload();
   }, [filterUnreadOnly, currentPage]);
 
   async function loadNotifications() {

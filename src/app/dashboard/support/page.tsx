@@ -1,11 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { 
-  HelpCircle, AlertCircle, Plus, Send, Clock, User, ShieldAlert,
-  Loader2, CheckCircle2, MessageSquare, ChevronRight, Inbox, HelpCircle as HelpIcon 
+import React, { useState, useEffect, useEffectEvent } from "react";
+import {
+  AlertCircle,
+  Plus,
+  Send,
+  Clock,
+  User,
+  Loader2,
+  MessageSquare,
+  Inbox,
 } from "lucide-react";
-import { supportService, SupportTicket, SupportMessage } from "@/services/support.service";
+import { supportService, SupportTicket } from "@/services/support.service";
 import { toast } from "sonner";
 
 export default function SupportPage() {
@@ -25,8 +31,12 @@ export default function SupportPage() {
   const [isSubmittingTicket, setIsSubmittingTicket] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadOnMount = useEffectEvent(() => {
     loadTickets();
+  });
+
+  useEffect(() => {
+    loadOnMount();
   }, []);
 
   async function loadTickets() {

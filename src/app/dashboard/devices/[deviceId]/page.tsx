@@ -5,11 +5,8 @@ import {
   ArrowLeft,
   ShieldCheck,
   ShieldAlert,
-  ChevronRight,
-  Share2,
   Lock,
   AlertCircle,
-  RefreshCcw
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -35,6 +32,8 @@ import {
 } from "@/components/ui/table";
 import { useDevice } from "@/hooks";
 import { devicesService } from "@/services/devices.service";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
+import type { DeviceTimelineEvent, LinkedCustomerItem } from "@/lib/api-client/api";
 
 function formatDate(value?: string | null): string {
   if (!value) return "Never";
@@ -45,10 +44,10 @@ export default function DeviceDetailView() {
   const params = useParams();
   const deviceId = params.deviceId as string;
 
-  const { data: device, isLoading, isError, refetch } = useDevice(deviceId);
+  const { data: device, isLoading, isError, error, refetch } = useDevice(deviceId);
 
-  const [timeline, setTimeline] = useState<any[]>([]);
-  const [linkedCustomers, setLinkedCustomers] = useState<any[]>([]);
+  const [timeline, setTimeline] = useState<DeviceTimelineEvent[]>([]);
+  const [linkedCustomers, setLinkedCustomers] = useState<LinkedCustomerItem[]>([]);
 
   useEffect(() => {
     if (!deviceId) return;
@@ -103,20 +102,7 @@ export default function DeviceDetailView() {
         <Link href="/dashboard/devices" className="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors mb-1">
           <ArrowLeft className="w-3 h-3" /> Hardware Registry
         </Link>
-        <Card className="rounded-3xl border border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load device details</p>
-                <p className="text-sm text-red-700">Please check your connection and try again.</p>
-              </div>
-            </div>
-            <Button onClick={refetch} className="mt-4" variant="outline">
-              <RefreshCcw className="w-4 h-4 mr-2" /> Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="device details" onRetry={refetch} />
       </div>
     );
   }
@@ -259,7 +245,7 @@ export default function DeviceDetailView() {
             <TabsContent value="history" className="mt-6">
               <Card className="rounded-xl shadow-sm border bg-white p-6">
                 <div className="space-y-6">
-                  {timeline.map((event: any) => (
+                  {timeline.map((event) => (
                     <div key={event.id} className="flex gap-4">
                       <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 shrink-0" />
                       <div>
@@ -285,7 +271,7 @@ export default function DeviceDetailView() {
           <Card className="rounded-xl shadow-sm border bg-white p-6 space-y-4">
             <h4 className="text-sm font-bold text-slate-900">Linked Customers</h4>
             <div className="space-y-3">
-              {linkedCustomers.map((cust: any) => (
+              {linkedCustomers.map((cust) => (
                 <Link key={cust.id} href={`/dashboard/users/${cust.id}`} className="block p-4 rounded-lg border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors">
                   <div className="flex justify-between mb-1">
                     <span className="text-xs font-bold text-slate-900">{cust.display_name || cust.id}</span>

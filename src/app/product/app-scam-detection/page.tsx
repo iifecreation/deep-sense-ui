@@ -4,45 +4,19 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Zap, 
-  Activity, 
-  Cpu, 
-  Database, 
+import {
+  Shield,
+  Zap,
+  Database,
   ArrowRight,
-  TrendingUp,
-  Lock,
   CheckCircle2,
-  LineChart,
-  BarChart3,
   Network,
-  Fingerprint,
-  AlertTriangle,
-  Globe,
-  Layers,
-  Server,
-  HelpCircle,
-  Send,
-  Smartphone,
-  Eye,
   Users,
-  BookOpen,
-  Briefcase,
-  Building2,
-  ShoppingBag,
   Wallet,
-  History,
-  Clock,
-  Search,
-  RefreshCw,
-  Scale,
   ChevronDown,
   ChevronUp,
   AlertCircle,
   PhoneCall,
-  Heart,
-  ArrowUpRight
 } from "lucide-react";
 
 export default function APPScamDetectionPage() {
@@ -50,10 +24,8 @@ export default function APPScamDetectionPage() {
   
   // Interactive Scam Simulator States
   const [scamType, setScamType] = useState<string>("safe_account");
-  const [simulationActive, setSimulationActive] = useState<boolean>(true);
   const [riskScore, setRiskScore] = useState<number>(89);
   const [muleSignal, setMuleSignal] = useState<string>("HIGH VELOCITY (Many-to-One incoming)");
-  const [typologyDetails, setTypologyDetails] = useState<string>("Victim urged to move funds to a new 'Safe' reserve");
   const [warningText, setWarningText] = useState<string>("DeepSense Alert: Payee account has high receiving frequency from unrelated sources. We recommend step-up biometric verification.");
   const [simulatorStatus, setSimulatorStatus] = useState<string>("PENDING_INTERVENTION");
   const [actionLogged, setActionLogged] = useState<string>("");
@@ -64,29 +36,24 @@ export default function APPScamDetectionPage() {
 
   const handleScamTypeChange = (type: string) => {
     setScamType(type);
-    setSimulationActive(true);
     setSimulatorStatus("PENDING_INTERVENTION");
     setActionLogged("");
     
     if (type === "safe_account") {
       setRiskScore(94);
       setMuleSignal("CRITICAL: New account with immediate fund routing");
-      setTypologyDetails("Victim convinced their bank profile is compromised; moving funds to safe vault");
       setWarningText("Warning: Bank personnel will never ask you to move funds to another account. This matches a known safe-account scam pattern.");
     } else if (type === "bank_impersonation") {
       setRiskScore(89);
       setMuleSignal("HIGH: Beneficiary linked to recent peer reports");
-      setTypologyDetails("Fraudster pretending to be security support; demanding immediate transfer");
       setWarningText("Intervention Trigger: Outgoing payment is to a newly registered domestic recipient under high pressure. Verify call authenticity.");
     } else if (type === "romance") {
       setRiskScore(78);
       setMuleSignal("MEDIUM: Recipient with high cash-out frequency");
-      setTypologyDetails("Victim has high session duration; repeated screen pauses during transfer");
       setWarningText("Unusual Behavior: Session interaction cadence shows long hesitations. Recipient matches typical overseas proxy.");
     } else if (type === "investment") {
       setRiskScore(92);
       setMuleSignal("CRITICAL: Unregistered high-yield crypto platform gateway");
-      setTypologyDetails("Victim moved funds through fiat-to-crypto proxy inside 15 minutes of session start");
       setWarningText("Scam Signature: Payment destination has been identified as a high-risk crypto intermediary with high velocity.");
     }
   };

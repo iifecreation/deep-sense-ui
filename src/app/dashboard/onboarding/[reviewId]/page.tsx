@@ -1,35 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  ArrowLeft, 
-  CheckCircle2, 
-  XCircle, 
-  AlertTriangle, 
-  Clock, 
-  UserCheck, 
-  ShieldCheck, 
-  ShieldAlert, 
-  FileText, 
-  MoreHorizontal, 
-  Workflow, 
-  ChevronRight, 
-  ArrowRight, 
-  Download, 
-  Users, 
-  Settings, 
-  Briefcase, 
-  MessageSquare,
-  Zap,
+import {
+  ArrowLeft,
+  XCircle,
+  AlertTriangle,
+  Clock,
+  ShieldCheck,
+  ShieldAlert,
+  FileText,
+  Download,
+  Briefcase,
   ExternalLink,
-  Search,
-  Fingerprint,
   Calendar,
   Globe,
   Upload,
-  MoreVertical,
-  Check,
-  AlertCircle
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -37,9 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
@@ -50,11 +33,12 @@ import {
 } from "@/components/ui/dialog";
 import { useOnboardingReview } from "@/hooks";
 import { onboardingService } from "@/services/onboarding.service";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
 
 export default function OnboardingReviewDetailPage() {
   const params = useParams();
   const reviewId = params.reviewId as string;
-  const { data: reviewData, isLoading, isError, refetch } = useOnboardingReview(reviewId);
+  const { data: reviewData, isLoading, isError, error, refetch } = useOnboardingReview(reviewId);
 
   const [pendingAction, setPendingAction] = useState<"approve" | "reject" | "escalate" | null>(null);
   const [actionReason, setActionReason] = useState("");
@@ -107,29 +91,17 @@ export default function OnboardingReviewDetailPage() {
               Back to Application Queue
            </Link>
         </div>
-        <Card className="rounded-3xl border border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load review details</p>
-                <p className="text-sm text-red-700">Please check your connection and try again.</p>
-              </div>
-            </div>
-            <Button onClick={refetch} className="mt-4" variant="outline">
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="review details" onRetry={refetch} />
       </div>
     );
   }
 
-  const review = reviewData.review || reviewData;
+  const review = reviewData;
   const kycDocs = reviewData.documents || [];
   const notes = reviewData.notes || [];
-  const riskTier = review.risk_summary?.risk_tier || "low";
-  const riskScore = review.risk_summary?.risk_score;
+  // risk_summary is a free-form object on the API, so narrow each field before use.
+  const riskTier = typeof review.risk_summary?.risk_tier === "string" ? review.risk_summary.risk_tier : "low";
+  const riskScore = typeof review.risk_summary?.risk_score === "number" ? review.risk_summary.risk_score : null;
   const screening = review.screening_summary || {};
   const availableActions: string[] = review.available_actions || [];
   const canApprove = availableActions.includes("approve");
@@ -222,7 +194,7 @@ export default function OnboardingReviewDetailPage() {
                   <CardContent className="p-0">
                      <TabsContent value="kyc" className="m-0 p-10 space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 leading-none">
-                           {kycDocs.map((doc: any, i: number) => (
+                           {kycDocs.map((doc, i) => (
                              <div key={doc.id || i} className="p-6 bg-muted/20 border border-border/50 rounded-3xl group hover:border-brand-lime transition-all cursor-pointer font-bold italic">
                                 <div className="flex items-center justify-between mb-4">
                                    <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center border border-border shadow-sm text-neutral-400 group-hover:text-brand-lime transition-colors">
@@ -295,12 +267,12 @@ export default function OnboardingReviewDetailPage() {
                </div>
 
                {(() => {
-                 const factors = (reviewData.risk_results || []).flatMap((r: any) => r.risk_factors_json || []);
+                 const factors = (reviewData.risk_results || []).flatMap((r) => r.risk_factors_json || []);
                  return factors.length > 0 && (
                    <div className="space-y-6 leading-none">
                       <h5 className="text-[11px] font-black uppercase italic tracking-widest text-muted-foreground leading-none">Primary Risk Factors</h5>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                         {factors.map((factor: any, i: number) => (
+                         {factors.map((factor, i) => (
                            <div key={i} className="flex items-center gap-4 p-5 bg-muted/20 border border-border/50 rounded-3xl group hover:bg-muted font-bold italic h-16 leading-none whitespace-nowrap">
                               <div className="w-8 h-8 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center shrink-0">
                                  <ShieldAlert className="w-3.5 h-3.5" />
@@ -320,7 +292,7 @@ export default function OnboardingReviewDetailPage() {
             <div className="space-y-6 font-bold italic font-black uppercase leading-none">
                <h4 className="text-[11px] font-black uppercase tracking-widest px-4 italic underline underline-offset-8 decoration-border">Collaboration & Decision History</h4>
                <div className="space-y-4 font-bold italic font-black uppercase leading-none">
-                  {notes.map((note: any, i: number) => (
+                  {notes.map((note, i) => (
                     <div key={i} className="flex gap-6 items-start p-6 bg-white dark:bg-neutral-900 border border-border/50 rounded-[32px] hover:shadow-xl transition-all font-bold italic leading-none h-32 uppercase font-black whitespace-nowrap">
                        <div className="w-12 h-12 rounded-[20px] bg-muted flex items-center justify-center shrink-0 border border-border h-12 font-bold font-black">
                           {note.author_user_id ? note.author_user_id.substring(0, 1).toUpperCase() : "S"}

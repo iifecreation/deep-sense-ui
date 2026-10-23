@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ScreeningMatchRead,
   ScreeningMatchDetail,
@@ -14,6 +13,16 @@ import {
   ListQueryParams,
 } from '@/types';
 import { get, post } from '@/lib/api/client';
+import type {
+  FuzzyScreeningCheckRequest,
+  FuzzyScreeningCheckResponse,
+  InternalUploadResponse,
+  PaginatedWatchlistEntryUnified,
+  ScreeningCheckRequest,
+  ScreeningCheckResponse,
+  TransactionFuzzyScreeningCheckRequest,
+  WatchlistDetailRead,
+} from '@/lib/api-client/api';
 
 export const screeningService = {
   /**
@@ -79,8 +88,8 @@ export const screeningService = {
   /**
    * Get watchlist detail
    */
-  async getWatchlist(watchlistId: string): Promise<any> {
-    return await get<any>(`/screening/watchlists/${watchlistId}`);
+  async getWatchlist(watchlistId: string): Promise<WatchlistDetailRead> {
+    return await get<WatchlistDetailRead>(`/screening/watchlists/${watchlistId}`);
   },
 
   /**
@@ -107,8 +116,8 @@ export const screeningService = {
   async listWatchlistEntries(
     query: ListQueryParams = {},
     source?: string
-  ): Promise<PaginatedResponse<any>> {
-    return await get<PaginatedResponse<any>>('/screening/watchlist-entries', {
+  ): Promise<PaginatedWatchlistEntryUnified> {
+    return await get<PaginatedWatchlistEntryUnified>('/screening/watchlist-entries', {
       params: { ...query, source },
     });
   },
@@ -116,8 +125,8 @@ export const screeningService = {
   /**
    * Upload internal watchlist CSV
    */
-  async uploadInternalWatchlist(csvText: string, watchlistName: string, replace: boolean = false): Promise<any> {
-    return await post<any>('/screening/watchlists/internal/upload', {
+  async uploadInternalWatchlist(csvText: string, watchlistName: string, replace: boolean = false): Promise<InternalUploadResponse> {
+    return await post<InternalUploadResponse>('/screening/watchlists/internal/upload', {
       csv_text: csvText,
       watchlist_name: watchlistName,
       replace,
@@ -127,28 +136,28 @@ export const screeningService = {
   /**
    * Ad-hoc screening check
    */
-  async check(data: any): Promise<any> {
-    return await post<any>('/screening/check', data);
+  async check(data: ScreeningCheckRequest): Promise<ScreeningCheckResponse> {
+    return await post<ScreeningCheckResponse>('/screening/check', data);
   },
 
   /**
    * Fuzzy check customer
    */
-  async fuzzyCheckCustomer(data: any): Promise<any> {
-    return await post<any>('/screening/check/customer', data);
+  async fuzzyCheckCustomer(data: FuzzyScreeningCheckRequest): Promise<FuzzyScreeningCheckResponse> {
+    return await post<FuzzyScreeningCheckResponse>('/screening/check/customer', data);
   },
 
   /**
    * Fuzzy check counterparty
    */
-  async fuzzyCheckCounterparty(data: any): Promise<any> {
-    return await post<any>('/screening/check/counterparty', data);
+  async fuzzyCheckCounterparty(data: FuzzyScreeningCheckRequest): Promise<FuzzyScreeningCheckResponse> {
+    return await post<FuzzyScreeningCheckResponse>('/screening/check/counterparty', data);
   },
 
   /**
    * Fuzzy check transaction
    */
-  async fuzzyCheckTransaction(data: any): Promise<any> {
-    return await post<any>('/screening/check/transaction', data);
+  async fuzzyCheckTransaction(data: TransactionFuzzyScreeningCheckRequest): Promise<FuzzyScreeningCheckResponse> {
+    return await post<FuzzyScreeningCheckResponse>('/screening/check/transaction', data);
   },
 };

@@ -1,29 +1,21 @@
 "use client";
 
 import React from "react";
-import { 
-  Shield, 
-  Lock, 
-  CheckCircle2, 
-  ArrowRight, 
-  Database, 
-  Key, 
-  EyeOff, 
-  Server, 
-  ShieldCheck, 
-  Globe, 
-  Zap, 
-  FileText,
-  BadgeCheck,
+import {
+  Shield,
+  Lock,
+  CheckCircle2,
+  Database,
+  Key,
+  EyeOff,
+  ShieldCheck,
   Cpu,
   History,
   LockIcon,
   HardDrive,
   Users,
-  Settings,
   Activity,
   UserCheck,
-  Code
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -67,7 +59,7 @@ export default function DataSecurityPage() {
                   <div className="absolute inset-0 bg-indigo-600/5 blur-[100px] rounded-full" />
                   <div className="relative z-10 bg-white p-12 lg:p-16 rounded-[56px] border border-zinc-200 shadow-2xl overflow-hidden group">
                      <h3 className="text-2xl font-bold mb-8 italic text-neutral-900">Security Built into the Platform</h3>
-                     <p className="text-zinc-500 text-sm leading-relaxed mb-10 italic">"Security is embedded across the Deep Sense platform — from data ingestion to storage, processing, and access."</p>
+                     <p className="text-zinc-500 text-sm leading-relaxed mb-10 italic">&quot;Security is embedded across the Deep Sense platform — from data ingestion to storage, processing, and access.&quot;</p>
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         {[
                           { l: "Least Privilege Access", d: "Users only see the data they need.", i: <UserCheck /> },
@@ -77,7 +69,7 @@ export default function DataSecurityPage() {
                         ].map((item, i) => (
                           <div key={i} className="flex flex-col gap-3 group/p">
                              <div className="text-indigo-600 group-hover/p:text-brand-lime transition-colors">
-                                {React.cloneElement(item.i as any, { className: "w-5 h-5" })}
+                                {React.cloneElement(item.i as React.ReactElement<{ className?: string }>, { className: "w-5 h-5" })}
                              </div>
                              <h4 className="font-bold text-sm uppercase tracking-tight italic">{item.l}</h4>
                              <p className="text-[10px] text-zinc-400 font-inter italic leading-relaxed">{item.d}</p>
@@ -160,7 +152,7 @@ export default function DataSecurityPage() {
                  ].map((it, i) => (
                    <div key={i} className="p-12 bg-white/5 border border-white/10 rounded-[56px] text-left hover:bg-brand-lime hover:text-neutral-900 transition-all group">
                       <div className="text-brand-lime group-hover:text-neutral-900 mb-8 transition-colors">
-                         {React.cloneElement(it.icon as any, { className: "w-8 h-8" })}
+                         {React.cloneElement(it.icon as React.ReactElement<{ className?: string }>, { className: "w-8 h-8" })}
                       </div>
                       <h4 className="text-2xl font-bold mb-4 uppercase italic tracking-tighter">{it.title}</h4>
                       <p className="text-zinc-500 group-hover:text-neutral-800 italic text-sm leading-relaxed">{it.desc}</p>
@@ -194,8 +186,8 @@ export default function DataSecurityPage() {
                      <div>Authorization: Bearer ds_****************</div>
                      <div className="text-brand-lime">Content-Type: application/json</div>
                      <div className="text-white/20">{"{"}</div>
-                     <div className="text-white/20 pl-4">"signature": "hmac_sha256_e3b0c442...",</div>
-                     <div className="text-white/20 pl-4">"payload": "encrypted_blob"</div>
+                     <div className="text-white/20 pl-4">&quot;signature&quot;: &quot;hmac_sha256_e3b0c442...&quot;,</div>
+                     <div className="text-white/20 pl-4">&quot;payload&quot;: &quot;encrypted_blob&quot;</div>
                      <div className="text-white/20">{"}"}</div>
                   </div>
                </div>
@@ -219,7 +211,7 @@ export default function DataSecurityPage() {
               ].map((it, i) => (
                 <div key={i} className="p-8 bg-zinc-50 border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative">
                    <div className="w-12 h-12 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                      {React.cloneElement(it.icon as any, { className: "w-6 h-6" })}
+                      {React.cloneElement(it.icon as React.ReactElement<{ className?: string }>, { className: "w-6 h-6" })}
                    </div>
                    <h4 className="text-lg font-bold mb-4 uppercase italic tracking-tighter leading-tight font-manrope">{it.title}</h4>
                    <p className="text-zinc-500 italic text-[11px] leading-relaxed">{it.desc}</p>

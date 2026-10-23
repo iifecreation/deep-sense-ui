@@ -36,7 +36,7 @@ export default function SecurityTrust() {
                   Enterprise-Ready <span className="text-white/40">Security</span>
                 </h2>
                 <p className="text-base md:text-lg text-white/60 font-inter leading-relaxed">
-                  Deep Sense is built to exceed the rigorous security requirements of the world's leading financial institutions.
+                  Deep Sense is built to exceed the rigorous security requirements of the world&apos;s leading financial institutions.
                 </p>
              </div>
              

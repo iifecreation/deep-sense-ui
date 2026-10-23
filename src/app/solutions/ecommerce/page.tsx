@@ -1,25 +1,15 @@
 "use client";
 
 import React from "react";
-import { 
-  Zap, 
-  ShoppingBag, 
-  ShoppingCart, 
-  Globe, 
-  ShieldCheck, 
-  Activity, 
-  CheckCircle2, 
-  ArrowRight, 
-  Layers, 
-  Smartphone, 
-  Cpu, 
-  Network, 
-  Users, 
-  BarChart3,
+import {
+  ShoppingBag,
+  CheckCircle2,
+  Smartphone,
+  Network,
   MousePointer2,
   Tag,
   CreditCard,
-  Lock
+  Lock,
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -79,7 +69,7 @@ export default function EcommerceSolutionPage() {
                  <MousePointer2 className="w-64 h-64 absolute top-0 right-0 p-12 text-white/5 animate-pulse opacity-20" />
                  <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-10 border-b border-white/10 pb-10">Conversion Impact</h3>
                  <div className="space-y-8 relative z-10">
-                    <p className="text-zinc-500 text-sm italic pr-12 italic font-inter font-manrope">"Every extra second at checkout can lead to a 7% drop in conversion."</p>
+                    <p className="text-zinc-500 text-sm italic pr-12 italic font-inter font-manrope">&quot;Every extra second at checkout can lead to a 7% drop in conversion.&quot;</p>
                     <div className="grid grid-cols-2 gap-6">
                        <div className="p-6 bg-white/5 border border-white/10 rounded-3xl">
                           <span className="text-[9px] font-black uppercase text-brand-lime tracking-widest italic font-manrope">Decision Speed</span>
@@ -109,7 +99,7 @@ export default function EcommerceSolutionPage() {
                  ].map((it, i) => (
                    <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-3xl transition-all duration-700 hover:-translate-y-2 group overflow-hidden relative font-manrope italic pr-6 group">
                       <div className="w-14 h-14 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform shadow-lg shadow-black/10">
-                        {React.cloneElement(it.i as any, { className: "w-6 h-6 border-zinc-100" })}
+                        {React.cloneElement(it.i as React.ReactElement<{ className?: string }>, { className: "w-6 h-6 border-zinc-100" })}
                       </div>
                       <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope italic">{it.t}</h4>
                       <p className="text-zinc-500 font-inter italic leading-relaxed text-sm mb-10 italic pr-8 italic">{it.d}</p>
@@ -134,7 +124,7 @@ export default function EcommerceSolutionPage() {
                   ].map((it, i) => (
                     <div key={i} className="flex gap-8 group font-manrope italic">
                        <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all shadow-sm">
-                          {React.cloneElement(it.i as any, { className: "w-6 h-6 border-white/10" })}
+                          {React.cloneElement(it.i as React.ReactElement<{ className?: string }>, { className: "w-6 h-6 border-white/10" })}
                        </div>
                        <div>
                           <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter font-manrope italic">{it.t}</h4>
@@ -147,7 +137,7 @@ export default function EcommerceSolutionPage() {
                  <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase italic pr-16 leading-tight">Identify <br />The Invisible.</h2>
                  <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed pr-8 font-manrope italic pr-16 pr-12">Fraudsters look like good users on the surface. Deep Sense looks underneath to catch the anomalies in behavior and technical signals.</p>
                  <div className="p-10 bg-white/5 border border-white/10 rounded-[48px] font-bold text-xs uppercase italic tracking-tighter font-inter pr-12 leading-tight italic pr-10">
-                    "During peak flash sales, Deep Sense maintains real-time decisioning accuracy at 100k+ transactions per second — ensuring zero revenue loss."
+                    &quot;During peak flash sales, Deep Sense maintains real-time decisioning accuracy at 100k+ transactions per second — ensuring zero revenue loss.&quot;
                  </div>
               </div>
            </div>

@@ -1,13 +1,12 @@
 "use client";
 
 import React from "react";
-import { 
-  ArrowLeft, 
-  User, 
-  ShieldCheck, 
+import {
+  ArrowLeft,
+  User,
+  ShieldCheck,
   ShieldAlert,
-  Clock, 
-  MapPin, 
+  MapPin,
   Activity,
   Smartphone,
   CreditCard,
@@ -15,35 +14,19 @@ import {
   Mail,
   Phone,
   Calendar,
-  MoreHorizontal,
   ChevronRight,
   Share2,
   Lock,
-  Zap,
-  Fingerprint,
-  Users,
   Globe,
-  Briefcase,
   AlertTriangle,
   FileText,
-  BadgeCheck
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 

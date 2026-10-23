@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import { ArrowRight, CheckCircle2, ChevronRight } from "lucide-react";
+import { CheckCircle2, ChevronRight } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
 
@@ -21,7 +20,6 @@ export default function CategoryPageTemplate({
   description, 
   features = ["Scalable Architecture", "Real-time Processing", "AI-Powered", "Enterprise Ready"],
   ctaText = "Get Started Now",
-  image
 }: PageProps) {
   return (
     <div className="min-h-screen bg-white">

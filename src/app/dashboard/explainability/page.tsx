@@ -229,7 +229,7 @@ function ModelCardsTab() {
     setNotFound(false);
     try {
       setCard(await explainabilityService.getModelCard(versionId.trim()));
-    } catch (e) {
+    } catch {
       setNotFound(true);
       setError(null);
     } finally {

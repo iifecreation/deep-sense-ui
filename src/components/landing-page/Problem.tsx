@@ -54,7 +54,7 @@ export default function Problem() {
 
         <div className="mt-20 pt-10 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-xl md:text-2xl font-manrope font-semibold text-white/90 italic">
-            "You need intelligence — not just alerts."
+            &quot;You need intelligence — not just alerts.&quot;
           </p>
         </div>
       </div>

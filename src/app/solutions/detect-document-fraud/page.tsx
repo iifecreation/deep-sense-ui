@@ -4,46 +4,20 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Zap, 
-  Activity, 
-  Cpu, 
-  Database, 
+import {
+  Shield,
   ArrowRight,
-  TrendingUp,
-  Lock,
   CheckCircle2,
-  LineChart,
-  BarChart3,
-  Network,
-  Fingerprint,
-  AlertTriangle,
-  Globe,
-  Layers,
-  Server,
-  HelpCircle,
   Smartphone,
-  Eye,
   Users,
-  Building2,
-  Wallet,
   Clock,
   RefreshCw,
-  Scale,
   ChevronDown,
   ChevronUp,
-  AlertCircle,
-  FileSpreadsheet,
   Workflow,
-  Search,
-  Check,
   Building,
   Sliders,
-  ClipboardCheck,
-  Briefcase,
   Upload,
-  FileText
 } from "lucide-react";
 
 export default function DetectDocumentFraudPage() {
@@ -363,7 +337,7 @@ export default function DetectDocumentFraudPage() {
               Digital Onboarding Systems Face Growing Document Fraud Risks
             </h2>
             <p className="max-w-[800px] text-zinc-600 text-base md:text-lg font-inter leading-relaxed mb-20">
-              Modern onboarding and verification ecosystems process identity documents, passports, driver's licenses, utility bills, bank statements, business registration files, tax documents, and compliance paperwork. Fraudsters increasingly exploit onboarding systems using forged IDs, synthetic identities, manipulated PDFs, AI-generated documents, deepfake identity artifacts, metadata tampering, document template cloning, and stolen identity records. Traditional verification systems often struggle with sophisticated forgery detection, real-time OCR intelligence, AI-generated manipulation, onboarding scalability, manual review bottlenecks, and cross-document consistency analysis. Without intelligent document verification, organizations face onboarding fraud, account abuse, AML exposure, synthetic identity losses, compliance failures, reputational damage, and operational inefficiency.
+              Modern onboarding and verification ecosystems process identity documents, passports, driver&apos;s licenses, utility bills, bank statements, business registration files, tax documents, and compliance paperwork. Fraudsters increasingly exploit onboarding systems using forged IDs, synthetic identities, manipulated PDFs, AI-generated documents, deepfake identity artifacts, metadata tampering, document template cloning, and stolen identity records. Traditional verification systems often struggle with sophisticated forgery detection, real-time OCR intelligence, AI-generated manipulation, onboarding scalability, manual review bottlenecks, and cross-document consistency analysis. Without intelligent document verification, organizations face onboarding fraud, account abuse, AML exposure, synthetic identity losses, compliance failures, reputational damage, and operational inefficiency.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left w-full mb-20">

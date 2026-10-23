@@ -1,28 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
 import { pricingService } from '@/services/pricing.service';
+import { useAsyncResource } from './use-async-resource';
 
 export function usePricingPlans() {
-  const [data, setData] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-
-  const fetchPlans = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setIsError(false);
-      const res = await pricingService.getPlans();
-      setData(res?.plans || []);
-    } catch (err) {
-      console.error('Failed to fetch pricing plans:', err);
-      setIsError(true);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchPlans();
-  }, [fetchPlans]);
-
-  return { data, isLoading, isError, refetch: fetchPlans };
+  const { data, isLoading, isError, error, refetch } = useAsyncResource(
+    async () => (await pricingService.getPlans())?.plans || [],
+    '',
+    { label: 'pricing plans' },
+  );
+  return { data: data ?? [], isLoading, isError, error, refetch };
 }

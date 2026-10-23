@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Globe, Mail, Link as LinkIcon, Send, ShieldCheck } from "lucide-react";
+import { Send, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 
 export default function Footer() {

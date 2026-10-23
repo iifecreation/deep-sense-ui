@@ -1,63 +1,26 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  ArrowLeft, 
-  ShieldCheck, 
-  ShieldAlert, 
-  AlertTriangle, 
-  Clock, 
-  CreditCard, 
-  User, 
-  Globe, 
-  Cpu, 
-  Zap, 
-  MoreHorizontal, 
-  ChevronRight, 
-  ArrowRight, 
-  Download, 
-  Terminal, 
-  Settings, 
-  Briefcase, 
+import {
+  ArrowLeft,
+  ShieldAlert,
+  AlertTriangle,
+  User,
+  Globe,
+  ChevronRight,
+  Briefcase,
   MessageSquare,
-  Network,
-  Fingerprint,
-  Calendar,
-  ExternalLink,
-  Search,
-  Plus,
-  ArrowUpRight,
-  LayoutGrid,
   FileText,
   Activity,
-  BarChart3,
-  MapPin,
-  Laptop,
-  CheckCircle2,
-  XCircle,
-  Eye,
   Info,
-  History,
-  TrendingUp,
-  Link as LinkIcon
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -66,13 +29,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTransaction } from "@/hooks/use-transactions";
 import { transactionsService } from "@/services/transactions.service";
+import type { TransactionScoreBreakdown } from "@/lib/api-client/api";
 
 export default function TransactionDetailPage() {
   const params = useParams();
   const transactionId = params.transactionId as string;
 
   const { data, isLoading, isError, refetch } = useTransaction(transactionId);
-  const [breakdown, setBreakdown] = useState<any>(null);
+  const [breakdown, setBreakdown] = useState<TransactionScoreBreakdown | null>(null);
 
   useEffect(() => {
     if (!transactionId) return;
@@ -118,9 +82,9 @@ export default function TransactionDetailPage() {
     ]
   };
 
-  const ruleEvaluations: any[] = breakdown?.rule_evaluations || [];
-  const compositeScores: Record<string, any> = breakdown?.composite || {};
-  const anomalyScores: Record<string, any> = breakdown?.anomaly || {};
+  const ruleEvaluations = breakdown?.rule_evaluations || [];
+  const compositeScores: Record<string, unknown> = breakdown?.composite || {};
+  const anomalyScores: Record<string, unknown> = breakdown?.anomaly || {};
   const graphSummary = breakdown?.graph_link_summary;
 
   const fusedScores = [
@@ -294,7 +258,7 @@ export default function TransactionDetailPage() {
                           <div className="divide-y divide-border/50">
                             {ruleEvaluations.map((r, i) => (
                               <div key={i} className="p-6 flex justify-between items-center">
-                                 <span className="text-xs font-black italic">{r.rule_name || r.rule_slug || `Rule ${i + 1}`}</span>
+                                 <span className="text-xs font-black italic">{String(r.rule_name || r.rule_slug || `Rule ${i + 1}`)}</span>
                                  <Badge className={r.triggered ? "bg-rose-500 text-white" : "bg-muted text-muted-foreground"}>{r.triggered ? "Triggered" : "Not Triggered"}</Badge>
                               </div>
                             ))}

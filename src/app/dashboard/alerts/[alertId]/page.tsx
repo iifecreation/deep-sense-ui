@@ -1,47 +1,28 @@
 "use client";
 
-import { 
-  ArrowLeft, 
-  ShieldCheck, 
-  ShieldAlert, 
-  AlertTriangle, 
-  Clock, 
-  User, 
-  Zap, 
-  MoreHorizontal, 
-  ChevronRight, 
-  Download, 
-  Briefcase, 
-  MessageSquare,
-  FileText,
+import {
+  ArrowLeft,
+  ShieldCheck,
+  ShieldAlert,
+  AlertTriangle,
+  Clock,
+  User,
+  ChevronRight,
   Activity,
   Plus,
   ArrowUpRight,
-  CheckCircle2,
-  XCircle,
-  Eye,
   Info,
   History,
-  TrendingUp,
-  Link as LinkIcon,
   Fingerprint,
-  Globe,
-  MoreVertical,
-  CheckSquare,
-  Terminal,
   Calendar,
   CreditCard,
-  AlertCircle,
-  Smartphone,
-  BadgeCheck
+  BadgeCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAlert } from "@/hooks/use-alerts";
 import { 
@@ -50,8 +31,6 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 function formatDateTime(value?: string | null): string {
   if (!value) return "Unknown";

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ShieldCheck, Activity, Cpu, Zap, BarChart3, Database, Globe, History, TrendingUp } from "lucide-react";
+import { ShieldCheck, Activity, Cpu, Zap, Globe, History } from "lucide-react";
 
 export default function StatsOverview() {
   const metrics = [

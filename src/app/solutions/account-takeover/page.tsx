@@ -1,25 +1,15 @@
 "use client";
 
 import React from "react";
-import { 
-  Zap, 
-  Lock, 
-  ArrowRight, 
-  CheckCircle2, 
-  ShieldCheck, 
-  Activity, 
-  Layers, 
-  Cpu, 
-  Network, 
-  BarChart3, 
+import {
+  Lock,
+  CheckCircle2,
+  ShieldCheck,
+  Network,
+  BarChart3,
   Smartphone,
   MousePointer2,
-  AlertTriangle,
-  History,
   Key,
-  Eye,
-  ScanFace,
-  UserCheck
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -42,7 +32,7 @@ export default function AccountTakeoverPage() {
                Defeat Account <br /><span className="text-indigo-600">Takeover</span> For Good.
             </h1>
             <p className="text-xl md:text-2xl text-zinc-500 font-inter leading-relaxed max-w-4xl mb-12 italic">
-               Deep Sense identifies compromised credentials and bot-driven attacks at the point of login, protecting your users' assets and your institutional reputation.
+               Deep Sense identifies compromised credentials and bot-driven attacks at the point of login, protecting your users&apos; assets and your institutional reputation.
             </p>
             <div className="flex flex-col sm:flex-row gap-5 font-bold italic font-manrope">
               <button className="px-12 py-6 bg-neutral-900 text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all text-lg tracking-tighter uppercase">
@@ -79,7 +69,7 @@ export default function AccountTakeoverPage() {
                  <div className="absolute inset-0 bg-indigo-600/10 blur-[150px] opacity-20 pointer-events-none" />
                  <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-10 border-b border-white/10 pb-10">Identity Exposure</h3>
                  <div className="space-y-8 relative z-10 font-manrope italic pr-12">
-                    <p className="text-zinc-500 text-sm italic pr-12 italic font-manrope italic pr-24">"Over 80% of data breaches involve technical credential theft or social engineering targeting account access."</p>
+                    <p className="text-zinc-500 text-sm italic pr-12 italic font-manrope italic pr-24">&quot;Over 80% of data breaches involve technical credential theft or social engineering targeting account access.&quot;</p>
                     <div className="grid grid-cols-2 gap-6 italic">
                        {[
                          { l: "Credential Stuffing", v: "Instant Detect" },
@@ -110,7 +100,7 @@ export default function AccountTakeoverPage() {
                  ].map((it, i) => (
                    <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-3xl transition-all duration-700 hover:-translate-y-2 group overflow-hidden relative font-manrope italic pr-12 pr-6 group">
                       <div className="w-14 h-14 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform shadow-lg shadow-black/10">
-                        {React.cloneElement(it.i as any, { className: "w-6 h-6 border-zinc-100" })}
+                        {React.cloneElement(it.i as React.ReactElement<{ className?: string }>, { className: "w-6 h-6 border-zinc-100" })}
                       </div>
                       <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope italic">{it.t}</h4>
                       <p className="text-zinc-500 font-inter italic leading-relaxed text-sm mb-10 italic pr-8 italic pr-6">{it.d}</p>
@@ -135,7 +125,7 @@ export default function AccountTakeoverPage() {
                   ].map((it, i) => (
                     <div key={i} className="flex gap-8 group font-manrope italic mb-10 last:mb-0">
                        <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all font-manrope">
-                          {React.cloneElement(it.i as any, { className: "w-6 h-6 border-white/10 font-manrope" })}
+                          {React.cloneElement(it.i as React.ReactElement<{ className?: string }>, { className: "w-6 h-6 border-white/10 font-manrope" })}
                        </div>
                        <div>
                           <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter font-manrope italic">{it.t}</h4>
@@ -148,7 +138,7 @@ export default function AccountTakeoverPage() {
                  <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase italic leading-tight font-manrope pr-16">The Person, <br />Not the Password.</h2>
                  <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed pr-8 font-manrope italic pr-16 pr-12">Account Takeover (ATO) happens when an attacker has the right password but the wrong behavior. Deep Sense identifies that mismatch in real-time.</p>
                  <div className="p-10 bg-white/5 border border-white/10 rounded-[48px] font-bold text-xs uppercase italic tracking-tighter font-inter pr-12 leading-tight italic pr-10 pr-12 group hover:border-indigo-400 transition-all">
-                    "Deep Sense analyzes behavioral signals during the login flow to return an immediate risk score before the user even enters their MFA code."
+                    &quot;Deep Sense analyzes behavioral signals during the login flow to return an immediate risk score before the user even enters their MFA code.&quot;
                  </div>
               </div>
            </div>

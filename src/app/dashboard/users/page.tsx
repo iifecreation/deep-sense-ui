@@ -1,8 +1,7 @@
 "use client";
 
-import { 
-  Users, 
-  Search, 
+import {
+  Search,
   ChevronRight,
   Filter,
   Plus,
@@ -10,14 +9,14 @@ import {
   Download,
   UserCheck,
   UserMinus,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
 import { useCustomers } from "@/hooks/use-customers";
 import { useState } from "react";
@@ -35,8 +34,8 @@ export default function CustomerRegistry() {
   });
 
   const allCustomers = customers || [];
-  const highRiskCount = allCustomers.filter((c: any) => c.risk_tier === "high" || c.risk_tier === "critical").length;
-  const flaggedCount = allCustomers.filter((c: any) => ["under_review", "watchlisted", "restricted"].includes((c.status || "").toLowerCase())).length;
+  const highRiskCount = allCustomers.filter((c) => c.risk_tier === "high" || c.risk_tier === "critical").length;
+  const flaggedCount = allCustomers.filter((c) => ["under_review", "watchlisted", "restricted"].includes((c.status || "").toLowerCase())).length;
 
   const kpis = [
     { label: "Total Customers", value: allCustomers.length, subtext: "Managed entities", icon: <UserCheck className="w-5 h-5 text-blue-500" />, color: "border-slate-100" },
@@ -77,6 +76,22 @@ export default function CustomerRegistry() {
             <Card key={i} className="rounded-xl shadow-sm border bg-white h-24 animate-pulse" />
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="space-y-6 pb-20">
+        <h1 className="text-4xl font-black italic tracking-tighter text-neutral-900 uppercase leading-none mb-2">Customer Registry.</h1>
+        <Card className="rounded-xl shadow-sm border bg-white">
+          <CardContent className="p-8 flex flex-col items-start gap-4">
+            <p className="text-sm font-semibold text-red-600">Customers could not be loaded. Nothing is shown rather than an incomplete list.</p>
+            <Button variant="outline" size="sm" className="font-semibold" onClick={() => refetch()}>
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -160,7 +175,7 @@ export default function CustomerRegistry() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {customers && customers.length > 0 ? customers.map((row: any) => (
+            {customers && customers.length > 0 ? customers.map((row) => (
               <TableRow key={row.id} className="group hover:bg-slate-50 transition-colors cursor-pointer">
                 <TableCell className="pl-6 py-4">
                   <div className="flex items-center gap-3">

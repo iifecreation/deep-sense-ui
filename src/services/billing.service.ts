@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   CheckoutRequest,
   PortalRequest,
@@ -7,6 +6,10 @@ import {
   QuotaCheckRequest,
 } from '@/types';
 import { get, post } from '@/lib/api/client';
+import type {
+  CurrentPlanRead,
+  UsageCounterRead,
+} from '@/lib/api-client/api';
 
 export const billingService = {
   /**
@@ -26,29 +29,29 @@ export const billingService = {
   /**
    * Cancel subscription
    */
-  async cancelSubscription(data: CancelRequest): Promise<any> {
-    return await post<any>('/billing/cancel', data);
+  async cancelSubscription(data: CancelRequest): Promise<Record<string, unknown>> {
+    return await post<Record<string, unknown>>('/billing/cancel', data);
   },
 
   /**
    * Change subscription plan
    */
-  async changePlan(data: ChangePlanRequest): Promise<any> {
-    return await post<any>('/billing/change-plan', data);
+  async changePlan(data: ChangePlanRequest): Promise<Record<string, unknown>> {
+    return await post<Record<string, unknown>>('/billing/change-plan', data);
   },
 
   /**
    * Get current plan details
    */
-  async getCurrentPlan(): Promise<any> {
-    return await get<any>('/billing/current-plan');
+  async getCurrentPlan(): Promise<CurrentPlanRead> {
+    return await get<CurrentPlanRead>('/billing/current-plan');
   },
 
   /**
    * Get usage counters and quotas
    */
-  async getUsage(): Promise<any[]> {
-    return await get<any[]>('/billing/usage');
+  async getUsage(): Promise<UsageCounterRead[]> {
+    return await get<UsageCounterRead[]>('/billing/usage');
   },
 
   /**

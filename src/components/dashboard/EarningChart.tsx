@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { TrendingUp, BarChart3, Activity, Download, ChevronRight, Zap } from "lucide-react";
+import { Download, ChevronRight, Zap } from "lucide-react";
 
 export default function EarningChart() {
   return (

@@ -12,7 +12,6 @@ import {
   Loader2,
   AlertCircle
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -191,7 +190,7 @@ export default function ModelsPage() {
           <Activity className="w-10 h-10 text-zinc-300" />
           <div>
             <h2 className="text-xl font-black italic tracking-tighter uppercase text-neutral-900">No Models Configured</h2>
-            <p className="text-zinc-500 mt-2 text-sm">You haven't trained or deployed any custom models for this tenant yet.</p>
+            <p className="text-zinc-500 mt-2 text-sm">You haven&apos;t trained or deployed any custom models for this tenant yet.</p>
           </div>
         </div>
       ) : (

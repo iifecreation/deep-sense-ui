@@ -1,49 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Zap, 
-  Activity, 
-  Cpu, 
-  Database, 
-  ArrowRight,
-  TrendingUp,
+import {
   Lock,
   CheckCircle2,
-  LineChart,
-  BarChart3,
   Network,
-  Fingerprint,
   AlertTriangle,
   Globe,
-  FileCheck,
-  Layers,
-  Terminal,
   ChevronDown,
   ChevronUp,
-  Server,
-  HelpCircle,
-  Send,
-  Smartphone,
-  Eye,
   Users,
-  BookOpen,
-  Briefcase,
-  Building2,
-  ShoppingBag,
-  Wallet,
-  History,
-  TrendingDown,
   Clock,
-  FileSpreadsheet,
   FileText,
-  Search,
-  RefreshCw,
-  Scale
 } from "lucide-react";
 
 export default function PepScreeningPage() {

@@ -1,25 +1,18 @@
 'use client';
 
-import { 
-  ShieldAlert, 
-  Search, 
-  Filter, 
+import {
+  ShieldAlert,
+  Search,
+  Filter,
   Download,
   Plus,
   RefreshCcw,
   Users,
-  AlertTriangle,
   TrendingUp,
-  UserPlus,
-  ShieldCheck,
-  MoreVertical,
   PieChart,
-  ArrowRight,
   ChevronRight,
-  AlertCircle,
-  RefreshCw
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -27,6 +20,12 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useCustomers } from "@/hooks/use-customers";
 import { useState } from "react";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
+
+// The API returns first/last name separately; there is no full_name field.
+function customerName(customer: { first_name?: string | null; last_name?: string | null }): string {
+  return [customer.first_name, customer.last_name].filter(Boolean).join(" ");
+}
 
 export default function CustomerRiskRegistry() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -46,19 +45,19 @@ export default function CustomerRiskRegistry() {
     }
   };
 
-  const filteredCustomers = customers?.filter((c: any) => {
+  const filteredCustomers = customers?.filter((c) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
       c.id?.toLowerCase().includes(query) ||
-      c.full_name?.toLowerCase().includes(query) ||
+      customerName(c).toLowerCase().includes(query) ||
       c.status?.toLowerCase().includes(query)
     );
   }) || [];
 
   const segments = ["low", "medium", "high", "critical"].map((tier) => ({
     label: tier,
-    value: (customers || []).filter((c: any) => (c.risk_tier || "low") === tier).length,
+    value: (customers || []).filter((c) => (c.risk_tier || "low") === tier).length,
     color: tier === "critical" ? "bg-red-900" : tier === "high" ? "bg-red-500" : tier === "medium" ? "bg-amber-500" : "bg-emerald-500",
   })).filter((s) => s.value > 0);
 
@@ -87,20 +86,7 @@ export default function CustomerRiskRegistry() {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Customer Risk Registry</h1>
         </div>
-        <Card className="rounded-xl shadow-sm border border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load customers</p>
-                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
-              </div>
-            </div>
-            <Button onClick={() => refetch()} className="mt-4" variant="outline">
-              <RefreshCw className="w-4 h-4 mr-2" /> Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="customers" onRetry={() => refetch()} />
       </div>
     );
   }
@@ -133,7 +119,7 @@ export default function CustomerRiskRegistry() {
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">High-Risk Portfolio</p>
               <div className="text-xl font-bold text-slate-900">
-                {customers?.filter((c: any) => c.risk_tier === 'high' || c.risk_tier === 'critical').length || 0}
+                {customers?.filter((c) => c.risk_tier === 'high' || c.risk_tier === 'critical').length || 0}
               </div>
               <p className="text-[10px] text-slate-400 font-medium">Total customers</p>
             </div>
@@ -148,7 +134,7 @@ export default function CustomerRiskRegistry() {
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Critical Risk</p>
               <div className="text-xl font-bold text-slate-900">
-                {customers?.filter((c: any) => c.risk_tier === 'critical').length || 0}
+                {customers?.filter((c) => c.risk_tier === 'critical').length || 0}
               </div>
               <p className="text-[10px] text-slate-400 font-medium">Immediate attention</p>
             </div>
@@ -220,11 +206,11 @@ export default function CustomerRiskRegistry() {
                   <p className="text-sm text-slate-500">No customers found</p>
                 </TableCell>
               </TableRow>
-            ) : filteredCustomers.map((customer: any, i: number) => (
+            ) : filteredCustomers.map((customer, i) => (
               <TableRow key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer">
                 <TableCell className="pl-6">
                   <div className="flex flex-col">
-                    <span className="text-xs font-bold text-slate-900">{customer.full_name || 'Unknown'}</span>
+                    <span className="text-xs font-bold text-slate-900">{customerName(customer) || 'Unknown'}</span>
                     <div className="flex gap-2 text-[10px] font-medium text-slate-400 uppercase">
                       <span>{customer.id}</span>
                     </div>

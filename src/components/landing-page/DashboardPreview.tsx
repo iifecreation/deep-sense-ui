@@ -1,5 +1,5 @@
 import React from "react";
-import { BarChart2, Bell, Share2, MousePointer2 } from "lucide-react";
+import { Bell, Share2, MousePointer2 } from "lucide-react";
 
 export default function DashboardPreview() {
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ShieldAlert, Zap, History, ChevronRight, UserPlus, Fingerprint, Activity, Clock } from "lucide-react";
+import { ChevronRight, Activity, Clock } from "lucide-react";
 
 export default function RecentActivity() {
   const activities = [

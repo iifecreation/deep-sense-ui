@@ -145,8 +145,8 @@ export default function RuleBuilder() {
         setSimError((res.errors || []).join("; ") || "Conditions are invalid.");
       } else if (res.test_result) {
         setTestResult({
-          matched: res.test_result.matched,
-          message: res.test_result.matched
+          matched: res.test_result.matched === true,
+          message: res.test_result.matched === true
             ? "Rule conditions matched the test payload."
             : "Rule conditions did not match the test payload.",
         });

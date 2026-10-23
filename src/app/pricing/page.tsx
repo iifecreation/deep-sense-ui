@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import React from "react";
 import Image from "next/image";
 import Navbar from "@/components/landing-page/Navbar";
@@ -59,6 +60,15 @@ function FaqItem({ q, a }: { q: string, a: string }) {
       )}
     </div>
   );
+}
+
+function formatPrice(amount?: number | null, currency?: string | null): string {
+  if (amount == null) return "Custom";
+  try {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: currency || "USD", maximumFractionDigits: 0 }).format(amount);
+  } catch {
+    return `${currency ?? ""} ${amount}`.trim();
+  }
 }
 
 export default function PricingPage() {
@@ -142,8 +152,8 @@ export default function PricingPage() {
 
               {!isLoading && !isError && pricingPlans && pricingPlans.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                   {pricingPlans.map((plan: any, i: number) => {
-                     const isPopular = plan.popular || plan.name?.toLowerCase() === 'growth';
+                   {pricingPlans.map((plan, i) => {
+                     const isPopular = Boolean(plan.highlighted);
                      return (
                      <div key={i} className={`p-12 lg:p-16 rounded-[72px] border transition-all duration-700 relative overflow-hidden flex flex-col ${isPopular ? "bg-neutral-900 text-white border-white/5 scale-105 shadow-3xl" : "bg-white border-gray-100 text-neutral-900 hover:shadow-2xl"}`}>
                         {isPopular && (
@@ -160,19 +170,19 @@ export default function PricingPage() {
                            <p className={`text-sm leading-relaxed mb-12 h-14 italic font-inter ${isPopular ? "text-white/40" : "text-zinc-400"}`}>{plan.description}</p>
                            
                            <div className="flex items-baseline gap-2 mb-10">
-                              <span className="text-6xl font-black italic tracking-tighter">{plan.price}</span>
-                              <span className={`text-sm font-bold uppercase tracking-widest ${isPopular ? "text-white/20" : "text-zinc-300"}`}>{plan.period}</span>
+                              <span className="text-6xl font-black italic tracking-tighter">{formatPrice(plan.monthly_price, plan.currency)}</span>
+                              <span className={`text-sm font-bold uppercase tracking-widest ${isPopular ? "text-white/20" : "text-zinc-300"}`}>{plan.monthly_price != null ? "/ month" : ""}</span>
                            </div>
                            
-                           <button className={`w-full py-6 rounded-full font-bold text-lg transition-all active:scale-95 group ${isPopular ? "bg-brand-lime text-neutral-900 hover:bg-white" : "bg-neutral-900 text-white hover:bg-neutral-800"}`}>
-                              {plan.cta || "Get Started"}
+                           <Link href={plan.monthly_price != null ? "/register" : "/company/contact"} className={`w-full block text-center py-6 rounded-full font-bold text-lg transition-all active:scale-95 group ${isPopular ? "bg-brand-lime text-neutral-900 hover:bg-white" : "bg-neutral-900 text-white hover:bg-neutral-800"}`}>
+                              {plan.monthly_price != null ? "Get Started" : "Contact Sales"}
                               <ArrowRight className="w-5 h-5 ml-2 inline group-hover:translate-x-1" />
-                           </button>
+                           </Link>
                         </div>
 
                         <div className="space-y-6 pt-12 border-t border-current/5 mt-auto">
                            <span className={`text-[10px] font-bold uppercase tracking-[0.2em] block mb-4 ${isPopular ? "text-white/10" : "text-zinc-300"}`}>What&apos;s Included</span>
-                           {(plan.features || []).map((feat: string, j: number) => (
+                           {plan.features.map((feat, j) => (
                              <div key={j} className="flex gap-4 items-center">
                                 <CheckCircle2 className={`w-4 h-4 ${isPopular ? "text-brand-lime" : "text-zinc-200"}`} />
                                 <span className={`text-[11px] font-bold uppercase tracking-wider ${isPopular ? "text-white/60" : "text-zinc-500"}`}>{feat}</span>

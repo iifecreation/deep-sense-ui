@@ -4,38 +4,24 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Activity, 
-  UserCheck, 
-  AlertTriangle, 
-  Settings, 
-  Cpu, 
-  Zap, 
-  Database, 
-  Lock, 
-  Terminal, 
-  Eye, 
-  Users, 
-  BookOpen, 
-  FileSpreadsheet, 
-  Clock, 
-  TrendingDown, 
-  Briefcase, 
-  Building2, 
-  Coins, 
-  ShoppingBag, 
-  Wallet, 
-  CheckCircle2, 
-  ArrowRight, 
+import {
+  Shield,
+  Activity,
+  AlertTriangle,
+  Cpu,
+  Lock,
+  Terminal,
+  FileSpreadsheet,
+  TrendingDown,
+  Building2,
+  Wallet,
+  CheckCircle2,
   Globe,
   FileCheck,
   ChevronDown,
   ChevronUp,
-  HelpCircle,
   Layers,
-  Send,
-  Fingerprint
+  Fingerprint,
 } from "lucide-react";
 
 export default function ProductOverviewPage() {

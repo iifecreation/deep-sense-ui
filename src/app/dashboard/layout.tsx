@@ -6,6 +6,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useAuth } from "@/lib/auth";
 import { useRuntimeEnvironment } from "@/hooks/use-runtime-environment";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function DashboardLayout({
   children,
@@ -64,6 +65,8 @@ export default function DashboardLayout({
           </main>
         </div>
       </div>
+      {/* One toaster for every dashboard page, so toast() feedback is always visible. */}
+      <Toaster richColors position="top-right" />
     </div>
   );
 }

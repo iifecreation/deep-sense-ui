@@ -1,19 +1,17 @@
 "use client";
 
-import { 
-  Smartphone, 
-  Search, 
-  Filter, 
+import {
+  Smartphone,
+  Search,
+  Filter,
   Download,
-  ShieldCheck, 
-  ShieldAlert, 
+  ShieldCheck,
+  ShieldAlert,
   ChevronRight,
-  Zap,
   RefreshCcw,
   Plus,
-  AlertCircle
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -21,10 +19,11 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useDevices } from "@/hooks";
 import { useState } from "react";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
 
 export default function DevicesRegistry() {
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: devicesData, isLoading, isError, refetch } = useDevices({ search: searchQuery });
+  const { data: devicesData, isLoading, isError, error, refetch } = useDevices({ search: searchQuery });
 
   if (isLoading) {
     return (
@@ -47,27 +46,14 @@ export default function DevicesRegistry() {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Device Registry</h1>
         </div>
-        <Card className="rounded-3xl border border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load devices</p>
-                <p className="text-sm text-red-700">Please check your connection and try again.</p>
-              </div>
-            </div>
-            <Button onClick={refetch} className="mt-4" variant="outline">
-              <RefreshCcw className="w-4 h-4 mr-2" /> Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="devices" onRetry={refetch} />
       </div>
     );
   }
 
   const items = devicesData?.items || [];
-  const highRiskCount = items.filter((d: any) => (d.risk_score || 0) > 0.8).length;
-  const trustedCount = items.filter((d: any) => (d.risk_score || 0) <= 0.4).length;
+  const highRiskCount = items.filter((d) => (d.risk_score || 0) > 0.8).length;
+  const trustedCount = items.filter((d) => (d.risk_score || 0) <= 0.4).length;
 
   const kpis = [
     { label: "Total Devices", value: items.length, subtext: "Registered fingerprints", icon: <Smartphone className="w-5 h-5 text-blue-500" />, color: "border-slate-100" },
@@ -144,7 +130,7 @@ export default function DevicesRegistry() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {items.map((device: any) => (
+            {items.map((device) => (
               <TableRow key={device.id} className="group hover:bg-slate-50 transition-colors cursor-pointer">
                 <TableCell className="pl-6 py-4">
                   <div className="flex items-center gap-3">

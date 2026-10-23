@@ -1,75 +1,31 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Zap, 
-  Activity, 
-  Cpu, 
-  Database, 
-  ArrowRight,
-  TrendingUp,
-  Lock,
+import {
+  Shield,
   CheckCircle2,
-  LineChart,
-  BarChart3,
   Network,
-  Fingerprint,
   AlertTriangle,
-  Globe,
   FileCheck,
-  Layers,
-  Terminal,
   ChevronDown,
   ChevronUp,
-  Server,
-  HelpCircle,
-  Send,
-  Smartphone,
-  Eye,
   Users,
-  BookOpen,
-  Briefcase,
-  Building2,
-  ShoppingBag,
-  Wallet,
   History,
-  TrendingDown,
   Clock,
-  FileSpreadsheet,
-  FileText,
-  Search
 } from "lucide-react";
 
 export default function AmlMonitoringPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   
-  // Interactive Compliance Dashboard mockup state
-  const [activeTypology, setActiveTypology] = useState<string>("structuring");
-  const [alertSeverity, setAlertSeverity] = useState<string>("HIGH");
-  const [sarStatus, setSarStatus] = useState<string>("DRAFT_CREATED");
 
   const toggleFaq = (idx: number) => {
     setOpenFaq(openFaq === idx ? null : idx);
   };
 
-  const handleTypologyChange = (type: string) => {
-    setActiveTypology(type);
-    if (type === "structuring") {
-      setAlertSeverity("HIGH");
-      setSarStatus("DRAFT_READY (Structuring Anomaly)");
-    } else if (type === "mule") {
-      setAlertSeverity("CRITICAL");
-      setSarStatus("AUTO_ESCALATED (Mule Network Ring)");
-    } else {
-      setAlertSeverity("MEDIUM");
-      setSarStatus("MONITORING (Rapid Transfer Flow)");
-    }
-  };
 
   return (
     <>

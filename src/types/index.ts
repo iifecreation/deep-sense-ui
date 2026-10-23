@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // Core types based on server DTOs/schemas
 
 export interface UUID {
@@ -183,7 +182,7 @@ export interface CustomerTimelineEvent {
   actor_user_id?: string;
   actor_full_name?: string;
   created_at: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CustomerNoteCreateRequest {
@@ -249,7 +248,7 @@ export interface TransactionIngest {
   occurred_at: string;
   external_reference?: string;
   idempotency_key?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface TransactionIngestResult {
@@ -258,7 +257,7 @@ export interface TransactionIngestResult {
   decision: string;
   final_score: number;
   triggered_rule_slugs: string[];
-  evaluations: any[];
+  evaluations: unknown[];
 }
 
 export interface TransactionListFilters {
@@ -308,7 +307,7 @@ export interface AlertListFilters {
 export interface AlertSuppressionRuleCreate {
   name: string;
   description?: string;
-  condition_json: Record<string, any>;
+  condition_json: Record<string, unknown>;
   duration_minutes: number;
   enabled: boolean;
 }
@@ -317,7 +316,7 @@ export interface AlertSuppressionRuleRead {
   id: string;
   name: string;
   description?: string;
-  condition_json: Record<string, any>;
+  condition_json: Record<string, unknown>;
   duration_minutes: number;
   enabled: boolean;
   created_by_user_id: string;
@@ -328,7 +327,7 @@ export interface AlertSuppressionRuleRead {
 export interface AlertSuppressionRuleUpdate {
   name?: string;
   description?: string;
-  condition_json?: Record<string, any>;
+  condition_json?: Record<string, unknown>;
   duration_minutes?: number;
   enabled?: boolean;
 }
@@ -382,7 +381,7 @@ export interface CaseActionRead {
   id: string;
   fraud_case_id: string;
   action_type: string;
-  payload_json?: Record<string, any> | null;
+  payload_json?: Record<string, unknown> | null;
   actor_user_id?: string;
   created_at: string;
 }
@@ -437,8 +436,8 @@ export interface TopEntityRow {
   count?: number;
   value?: number;
   risk_score?: number | null;
-  metadata?: Record<string, any>;
-  extra?: Record<string, any> | null;
+  metadata?: Record<string, unknown>;
+  extra?: Record<string, unknown> | null;
 }
 
 export interface AnalyticsOverview {
@@ -524,7 +523,7 @@ export interface IdentityVerificationSessionCreate {
   customer_id?: string;
   account_id?: string;
   applicant_reference?: string;
-  metadata_json?: Record<string, any>;
+  metadata_json?: Record<string, unknown>;
 }
 
 export interface IdentityVerificationSessionRead {
@@ -533,7 +532,7 @@ export interface IdentityVerificationSessionRead {
   account_id?: string;
   applicant_reference?: string;
   status: string;
-  metadata_json?: Record<string, any>;
+  metadata_json?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -557,7 +556,7 @@ export interface BiometricCheckRead {
   status: string;
   score: number;
   confidence: number;
-  result_json?: Record<string, any>;
+  result_json?: Record<string, unknown>;
   error_message?: string;
   created_at: string;
 }
@@ -587,7 +586,7 @@ export interface KYCCheckRead {
   status: string;
   score: number;
   confidence: number;
-  result_json?: Record<string, any>;
+  result_json?: Record<string, unknown>;
   error_message?: string;
   created_at: string;
 }
@@ -607,18 +606,18 @@ export interface KYBCheckRead {
   status: string;
   score: number;
   confidence: number;
-  result_json?: Record<string, any>;
+  result_json?: Record<string, unknown>;
   error_message?: string;
   created_at: string;
 }
 
 // Organization types
 export interface OrganizationSettingsRead {
-  settings: Record<string, any>;
+  settings: Record<string, unknown>;
 }
 
 export interface OrganizationSettingsPatch {
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
 }
 
 export interface OrganizationStatsResponse {
@@ -640,25 +639,8 @@ export interface OrganizationServiceSettingsPatch {
 }
 
 // Fraud Rule types
-export interface FraudRuleRead {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  category?: string;
-  severity: string;
-  weight: number;
-  conditions_json: Record<string, any>;
-  action_json?: Record<string, any>;
-  enabled: boolean;
-  dry_run_only: boolean;
-  version: number;
-  rule_status: string;
-  priority?: number;
-  created_by_user_id: string;
-  created_at: string;
-  updated_at: string;
-}
+// Generated from the API schema; a hand-written copy here had drifted (rule_status, created_by_user_id).
+export type FraudRuleRead = import('@/lib/api-client/api').FraudRuleRead;
 
 export interface FraudRuleCreate {
   name: string;
@@ -667,8 +649,8 @@ export interface FraudRuleCreate {
   category?: string;
   severity: string;
   weight: number;
-  conditions_json: Record<string, any>;
-  action_json?: Record<string, any>;
+  conditions_json: Record<string, unknown>;
+  action_json?: Record<string, unknown>;
   enabled: boolean;
   dry_run_only: boolean;
   version: number;
@@ -681,8 +663,8 @@ export interface FraudRuleUpdate {
   category?: string;
   severity?: string;
   weight?: number;
-  conditions_json?: Record<string, any>;
-  action_json?: Record<string, any>;
+  conditions_json?: Record<string, unknown>;
+  action_json?: Record<string, unknown>;
   enabled?: boolean;
   dry_run_only?: boolean;
   rule_status?: string;
@@ -698,13 +680,13 @@ export interface FraudRuleListFilters {
 }
 
 export interface FraudRuleTestRequest {
-  context: Record<string, any>;
+  context: Record<string, unknown>;
 }
 
 export interface FraudRuleTestResponse {
   total_rules_evaluated: number;
   total_triggered: number;
-  triggered_rules: any[];
+  triggered_rules: unknown[];
   total_score: number;
 }
 
@@ -726,16 +708,7 @@ export interface ScreeningMatchRead {
   updated_at: string;
 }
 
-export interface ScreeningMatchDetail {
-  match: ScreeningMatchRead;
-  matched_fields: Record<string, any>;
-  confidence_explanation: Record<string, any>;
-  customer_summary?: CustomerDetail;
-  prior_screenings: any[];
-  prior_decisions: any[];
-  linked_case?: FraudCaseRead;
-  notes: any[];
-}
+export type ScreeningMatchDetail = import('@/lib/api-client/api').ScreeningMatchDetail;
 
 export interface ScreeningMatchFilters {
   match_type?: string;
@@ -782,7 +755,7 @@ export interface WatchlistCreateRequest {
 export interface RescreenRequest {
   scope: 'all' | 'single';
   customer_id?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ScreeningJobRead {
@@ -795,7 +768,7 @@ export interface ScreeningJobRead {
   total_customers: number;
   processed_customers: number;
   matches_found: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ScreeningJobFilters {
@@ -838,7 +811,7 @@ export interface ReportCreateRequest {
   reviewer_user_id?: string;
   due_at?: string;
   external_reference?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ReportUpdateRequest {
@@ -849,7 +822,7 @@ export interface ReportUpdateRequest {
   linked_transaction_ids?: string[];
   due_at?: string;
   external_reference?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ReportReviewRead {
@@ -863,18 +836,7 @@ export interface ReportReviewRead {
   created_at: string;
 }
 
-export interface ReportSubmissionRead {
-  id: string;
-  report_id: string;
-  submitted_by_user_id: string;
-  destination: string;
-  status: string;
-  submitted_at: string;
-  response_json?: Record<string, any>;
-  external_reference?: string;
-  request_id?: string;
-  created_at: string;
-}
+export type ReportSubmissionRead = import('@/lib/api-client/api').ReportSubmissionRead;
 
 export interface ReportDetail {
   report: ReportRead;
@@ -895,7 +857,7 @@ export interface ReportDetail {
   reviews: ReportReviewRead[];
   submissions: ReportSubmissionRead[];
   attachments: ReportAttachmentRead[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ReportListFilters {

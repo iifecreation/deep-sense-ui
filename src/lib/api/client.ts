@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { getControlApiUrl, getRuntimeApiUrl } from '@/lib/runtime-environment';
 
@@ -12,7 +11,7 @@ export class ApiError extends Error {
     message: string,
     public statusCode?: number,
     public code?: string,
-    public details?: any
+    public details?: unknown
   ) {
     super(message);
     this.name = 'ApiError';
@@ -115,9 +114,11 @@ const createApiClient = (): AxiosInstance => {
       }
 
       // Normalize error to ApiError
-      const errorMessage = (error.response?.data as any)?.message || (error.response?.data as any)?.detail || error.message || 'An error occurred';
+      const body = (error.response?.data ?? {}) as { message?: string; detail?: unknown; error_code?: string; code?: string };
+      const errorMessage = body.message || (typeof body.detail === 'string' ? body.detail : undefined) || error.message || 'An error occurred';
       const statusCode = error.response?.status;
-      const code = (error.response?.data as any)?.code;
+      // DeepSense error bodies are {error_code, message, details}; `code` is the legacy field name.
+      const code = body.error_code ?? body.code;
       const details = error.response?.data;
 
       return Promise.reject(
@@ -167,17 +168,17 @@ export const get = async <T>(url: string, config?: AxiosRequestConfig, retry = t
   return retry ? fetchWithRetry(fn) : fn().then(res => res.data);
 };
 
-export const post = async <T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> => {
+export const post = async <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> => {
   const response = await apiClient.post<T>(url, data, config);
   return response.data;
 };
 
-export const put = async <T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> => {
+export const put = async <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> => {
   const response = await apiClient.put<T>(url, data, config);
   return response.data;
 };
 
-export const patch = async <T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> => {
+export const patch = async <T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> => {
   const response = await apiClient.patch<T>(url, data, config);
   return response.data;
 };

@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -29,6 +28,7 @@ export const Logo: React.FC<LogoProps> = ({
   return (
     <div className={cn("flex items-center gap-2", className)}>
       <div className={cn("relative flex-shrink-0", iconClassName)}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- sized only by height from the caller; next/image fill would collapse the width */}
         <img
           src={iconSrc}
           alt="Deep Sense Icon"
@@ -37,6 +37,7 @@ export const Logo: React.FC<LogoProps> = ({
       </div>
       {!iconOnly && showName && (
         <div className={cn("relative flex-shrink-0", nameClassName)}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- sized only by height from the caller; next/image fill would collapse the width */}
           <img
             src={nameSrc}
             alt="Deep Sense"

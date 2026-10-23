@@ -1,25 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Webhook, 
-  Plus, 
-  Trash2, 
-  Edit, 
-  Copy, 
-  CheckCircle2, 
-  XCircle, 
-  Clock,
+import {
+  Webhook,
+  Plus,
+  Trash2,
+  Edit,
+  Copy,
+  CheckCircle2,
+  XCircle,
   MoreVertical,
-  RefreshCcw,
-  Key,
   Zap,
   Activity,
-  Calendar,
-  Code,
-  ExternalLink,
   TestTube,
-  Bell
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -40,13 +33,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { useWebhooks } from "@/hooks";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
 
 export default function WebhooksPage() {
   const { data: webhooks, isLoading, isError, error, refetch } = useWebhooks();
+  // Captured once per mount so render stays pure.
+  const [now] = useState(() => Date.now());
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredWebhooks = webhooks?.filter((webhook: any) =>
-    webhook.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredWebhooks = webhooks?.filter((webhook) =>
+    (webhook.description || webhook.url).toLowerCase().includes(searchQuery.toLowerCase()) ||
     webhook.url?.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
 
@@ -88,20 +84,7 @@ export default function WebhooksPage() {
             Webhooks<span className="text-brand-lime">.</span>
           </h1>
         </div>
-        <Card className="rounded-3xl border border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <XCircle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load webhooks</p>
-                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
-              </div>
-            </div>
-            <Button onClick={() => refetch()} className="mt-4" variant="outline">
-              <RefreshCcw className="w-4 h-4 mr-2" /> Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="webhooks" onRetry={() => refetch()} />
       </div>
     );
   }
@@ -157,7 +140,7 @@ export default function WebhooksPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-black italic text-emerald-600">
-              {webhooks?.filter((w: any) => w.status === 'active').length || 0}
+              {webhooks?.filter((w) => w.status === 'active').length || 0}
             </div>
           </CardContent>
         </Card>
@@ -166,12 +149,13 @@ export default function WebhooksPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
               <Zap className="w-4 h-4" />
-              Deliveries (24h)
+              Delivered (24h)
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-black italic text-neutral-900 dark:text-white">
-              {webhooks?.reduce((acc: number, w: any) => acc + (w.deliveries_24h || 0), 0) || 0}
+              {/* Endpoints that delivered at least once in the last 24 hours. */}
+              {webhooks?.filter((w) => w.last_delivery_at && now - new Date(w.last_delivery_at).getTime() < 86_400_000).length ?? 0}
             </div>
           </CardContent>
         </Card>
@@ -180,12 +164,12 @@ export default function WebhooksPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
               <XCircle className="w-4 h-4" />
-              Failed (24h)
+              Failed Deliveries
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-black italic text-red-600">
-              {webhooks?.reduce((acc: number, w: any) => acc + (w.failed_24h || 0), 0) || 0}
+              {webhooks?.reduce((acc, w) => acc + (w.failure_count ?? 0), 0) ?? 0}
             </div>
           </CardContent>
         </Card>
@@ -226,22 +210,22 @@ export default function WebhooksPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredWebhooks.map((webhook: any) => (
+              {filteredWebhooks.map((webhook) => (
                 <TableRow key={webhook.id}>
-                  <TableCell className="font-bold text-sm">{webhook.name}</TableCell>
+                  <TableCell className="font-bold text-sm">{webhook.description || webhook.url}</TableCell>
                   <TableCell className="font-mono text-xs text-muted-foreground max-w-xs truncate">
                     {webhook.url}
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {webhook.events?.slice(0, 2).map((event: string, idx: number) => (
+                      {webhook.event_types.slice(0, 2).map((event, idx) => (
                         <Badge key={idx} variant="outline" className="text-xs">
                           {event}
                         </Badge>
                       ))}
-                      {webhook.events?.length > 2 && (
+                      {webhook.event_types.length > 2 && (
                         <Badge variant="outline" className="text-xs">
-                          +{webhook.events.length - 2}
+                          +{webhook.event_types.length - 2}
                         </Badge>
                       )}
                     </div>
@@ -252,7 +236,7 @@ export default function WebhooksPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {webhook.last_delivery || 'Never'}
+                    {webhook.last_delivery_at ? new Date(webhook.last_delivery_at).toLocaleString() : 'Never'}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

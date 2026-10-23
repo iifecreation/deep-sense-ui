@@ -1,13 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Zap, 
+import {
+  TrendingUp,
+  Zap,
   Download,
   Activity,
-  History
 } from "lucide-react";
 import { useDashboardMetrics } from "@/hooks/use-analytics";
 

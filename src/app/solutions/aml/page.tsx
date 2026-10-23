@@ -1,26 +1,16 @@
 "use client";
 
 import React from "react";
-import { 
-  Zap, 
-  ShieldCheck, 
-  ArrowRight, 
-  CheckCircle2, 
-  Activity, 
-  Layers, 
-  Cpu, 
-  Network, 
-  BarChart3, 
-  Workflow,
-  Search,
+import {
+  ShieldCheck,
+  CheckCircle2,
+  Activity,
+  Network,
+  BarChart3,
   FileText,
   Users,
-  Building,
-  Scale,
   Globe,
-  Database,
   History,
-  Lock
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -80,7 +70,7 @@ export default function AmlSolutionPage() {
                  <div className="absolute inset-0 bg-indigo-600/10 blur-[150px] opacity-20 pointer-events-none" />
                  <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-10 border-b border-white/10 pb-10 font-manrope">Compliance Tax</h3>
                  <div className="space-y-8 relative z-10 font-manrope italic pr-12">
-                    <p className="text-zinc-500 text-sm italic pr-12 italic font-manrope italic pr-24">"Institutional compliance costs have risen 60% in the last decade, primarily driven by manual efforts and technical fragmentation."</p>
+                    <p className="text-zinc-500 text-sm italic pr-12 italic font-manrope italic pr-24">&quot;Institutional compliance costs have risen 60% in the last decade, primarily driven by manual efforts and technical fragmentation.&quot;</p>
                     <div className="grid grid-cols-2 gap-6 italic">
                        {[
                          { l: "Manual Effort", v: "70% Reduc." },
@@ -112,7 +102,7 @@ export default function AmlSolutionPage() {
                  ].map((it, i) => (
                    <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[48px] shadow-sm hover:shadow-3xl transition-all duration-700 hover:-translate-y-2 group overflow-hidden relative font-manrope italic pr-12 pr-6 group">
                       <div className="w-12 h-12 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform shadow-lg shadow-black/10">
-                        {React.cloneElement(it.i as any, { className: "w-5 h-5 border-zinc-100" })}
+                        {React.cloneElement(it.i as React.ReactElement<{ className?: string }>, { className: "w-5 h-5 border-zinc-100" })}
                       </div>
                       <h4 className="text-xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope italic pr-4">{it.t}</h4>
                       <p className="text-zinc-500 font-inter italic leading-relaxed text-xs mb-10 italic pr-8 italic pr-6 group-hover:text-neutral-900 transition-colors">{it.d}</p>
@@ -137,7 +127,7 @@ export default function AmlSolutionPage() {
                   ].map((it, i) => (
                     <div key={i} className="flex gap-8 group font-manrope italic mb-10 last:mb-0">
                        <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all font-manrope">
-                          {React.cloneElement(it.i as any, { className: "w-6 h-6 border-white/10 font-manrope" })}
+                          {React.cloneElement(it.i as React.ReactElement<{ className?: string }>, { className: "w-6 h-6 border-white/10 font-manrope" })}
                        </div>
                        <div>
                           <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter font-manrope italic">{it.t}</h4>
@@ -148,9 +138,9 @@ export default function AmlSolutionPage() {
               </div>
               <div className="order-1 lg:order-2 font-manrope italic pr-12">
                  <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase italic leading-tight font-manrope pr-16 pr-12">The Ecosystem, <br />Not the Rule.</h2>
-                 <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed pr-8 font-manrope italic pr-16 pr-12">AML is not a series of checkpoints—it's a continuous institutional culture. Deep Sense provides the infrastructure to operationalize that culture with total technical integrity.</p>
+                 <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed pr-8 font-manrope italic pr-16 pr-12">AML is not a series of checkpoints—it&apos;s a continuous institutional culture. Deep Sense provides the infrastructure to operationalize that culture with total technical integrity.</p>
                  <div className="p-10 bg-white/5 border border-white/10 rounded-[48px] font-bold text-xs uppercase italic tracking-tighter font-inter pr-12 leading-tight italic pr-10 pr-12 group hover:border-brand-lime transition-all">
-                    "Deep Sense unifies disparate compliance workflows into a single data stream, providing a 360-degree view of institutional risk."
+                    &quot;Deep Sense unifies disparate compliance workflows into a single data stream, providing a 360-degree view of institutional risk.&quot;
                  </div>
               </div>
            </div>

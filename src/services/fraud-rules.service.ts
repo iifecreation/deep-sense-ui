@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  FraudRuleRead,
   FraudRuleCreate,
   FraudRuleUpdate,
   FraudRuleListFilters,
@@ -10,6 +8,14 @@ import {
   ListQueryParams,
 } from '@/types';
 import { get, post, patch, del as deleteFn } from '@/lib/api/client';
+import type {
+  ConditionValidateRequest,
+  ConditionValidateResponse,
+  FraudRuleMetricRead,
+  FraudRuleMetricsSummary,
+  FraudRuleRead,
+  PaginatedDictStrAny,
+} from '@/lib/api-client/api';
 
 export const fraudRulesService = {
   /**
@@ -40,50 +46,50 @@ export const fraudRulesService = {
   /**
    * Get fraud rule detail
    */
-  async getRuleDetail(ruleId: string): Promise<any> {
-    return await get<any>(`/fraud-rules/${ruleId}/detail`);
+  async getRuleDetail(ruleId: string): Promise<Record<string, unknown>> {
+    return await get<Record<string, unknown>>(`/fraud-rules/${ruleId}/detail`);
   },
 
   /**
    * Get fraud rule analytics
    */
-  async getRuleAnalytics(ruleId: string): Promise<any> {
-    return await get<any>(`/fraud-rules/${ruleId}/analytics`);
+  async getRuleAnalytics(ruleId: string): Promise<Record<string, unknown>> {
+    return await get<Record<string, unknown>>(`/fraud-rules/${ruleId}/analytics`);
   },
 
   /**
    * Get fraud rule metrics
    */
-  async getRuleMetrics(ruleId: string, days: number = 30): Promise<any[]> {
-    return await get<any[]>(`/fraud-rules/${ruleId}/metrics`, { params: { days } });
+  async getRuleMetrics(ruleId: string, days: number = 30): Promise<FraudRuleMetricRead[]> {
+    return await get<FraudRuleMetricRead[]>(`/fraud-rules/${ruleId}/metrics`, { params: { days } });
   },
 
   /**
    * Get fraud rule metrics summary
    */
-  async getMetricsSummary(days: number = 30): Promise<any> {
-    return await get<any>('/fraud-rules/metrics/summary', { params: { days } });
+  async getMetricsSummary(days: number = 30): Promise<FraudRuleMetricsSummary> {
+    return await get<FraudRuleMetricsSummary>('/fraud-rules/metrics/summary', { params: { days } });
   },
 
   /**
    * Get noisy fraud rules
    */
-  async getNoisyRules(days: number = 30, minTriggers: number = 10): Promise<any[]> {
-    return await get<any[]>('/fraud-rules/noisy', { params: { days, min_triggers: minTriggers } });
+  async getNoisyRules(days: number = 30, minTriggers: number = 10): Promise<FraudRuleRead> {
+    return await get<FraudRuleRead>('/fraud-rules/noisy', { params: { days, min_triggers: minTriggers } });
   },
 
   /**
    * Get stale fraud rules
    */
-  async getStaleRules(days: number = 30): Promise<any[]> {
-    return await get<any[]>('/fraud-rules/stale', { params: { days } });
+  async getStaleRules(days: number = 30): Promise<FraudRuleRead> {
+    return await get<FraudRuleRead>('/fraud-rules/stale', { params: { days } });
   },
 
   /**
    * Get high-impact fraud rules
    */
-  async getHighImpactRules(days: number = 30, limit: number = 20): Promise<any[]> {
-    return await get<any[]>('/fraud-rules/high-impact', { params: { days, limit } });
+  async getHighImpactRules(days: number = 30, limit: number = 20): Promise<FraudRuleRead> {
+    return await get<FraudRuleRead>('/fraud-rules/high-impact', { params: { days, limit } });
   },
 
   /**
@@ -92,17 +98,17 @@ export const fraudRulesService = {
   async getRuleTriggers(
     ruleId: string,
     query: ListQueryParams = {},
-    filters: any = {}
-  ): Promise<PaginatedResponse<any>> {
+    filters: Record<string, unknown> = {}
+  ): Promise<PaginatedDictStrAny> {
     const params = { ...query, ...filters };
-    return await get<PaginatedResponse<any>>(`/fraud-rules/${ruleId}/triggers`, { params });
+    return await get<PaginatedDictStrAny>(`/fraud-rules/${ruleId}/triggers`, { params });
   },
 
   /**
    * Get fraud rule audit
    */
-  async getRuleAudit(ruleId: string, query: ListQueryParams = {}): Promise<PaginatedResponse<any>> {
-    return await get<PaginatedResponse<any>>(`/fraud-rules/${ruleId}/audit`, { params: query });
+  async getRuleAudit(ruleId: string, query: ListQueryParams = {}): Promise<PaginatedDictStrAny> {
+    return await get<PaginatedDictStrAny>(`/fraud-rules/${ruleId}/audit`, { params: query });
   },
 
   /**
@@ -157,14 +163,14 @@ export const fraudRulesService = {
   /**
    * Test single rule
    */
-  async testSingleRule(ruleId: string, data: FraudRuleTestRequest): Promise<any> {
-    return await post<any>(`/fraud-rules/${ruleId}/test`, data);
+  async testSingleRule(ruleId: string, data: FraudRuleTestRequest): Promise<Record<string, unknown>> {
+    return await post<Record<string, unknown>>(`/fraud-rules/${ruleId}/test`, data);
   },
 
   /**
    * Validate conditions
    */
-  async validateConditions(data: any): Promise<any> {
-    return await post<any>('/fraud-rules/validate-conditions', data);
+  async validateConditions(data: ConditionValidateRequest): Promise<ConditionValidateResponse> {
+    return await post<ConditionValidateResponse>('/fraud-rules/validate-conditions', data);
   },
 };

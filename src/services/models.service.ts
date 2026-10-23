@@ -1,5 +1,5 @@
 import { get, post } from '@/lib/api/client';
-import type { ModelMutationResponse } from "@/lib/api-client/api";
+import type { ModelMutationResponse, RetrainingJobRead } from "@/lib/api-client/api";
 
 export interface MLModel {
   id: string;
@@ -55,8 +55,8 @@ export const modelsService = {
     return await get<MLModelDetail>(`/models/${modelId}`);
   },
 
-  async requestRetrain(modelId: string): Promise<ModelMutationResponse> {
-    return await post<ModelMutationResponse>(`/models/${modelId}/retrain`, {});
+  async requestRetrain(modelId: string): Promise<RetrainingJobRead> {
+    return await post<RetrainingJobRead>(`/models/${modelId}/retrain`, {});
   },
 
   async deactivateModel(modelId: string, reason?: string): Promise<ModelMutationResponse> {

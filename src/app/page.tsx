@@ -10,18 +10,14 @@ import {
   UserCheck,
   AlertTriangle,
   Settings,
-  Cpu,
   Zap,
   Database,
   Lock,
   Terminal,
   Eye,
   Users,
-  BookOpen,
   FileSpreadsheet,
   Clock,
-  TrendingDown,
-  Briefcase,
   Building2,
   Coins,
   ShoppingBag,
@@ -32,10 +28,8 @@ import {
   FileCheck,
   ChevronDown,
   ChevronUp,
-  HelpCircle,
-  Link as LinkIcon,
   Fingerprint,
-  Smartphone
+  Smartphone,
 } from "lucide-react";
 
 export default function Home() {

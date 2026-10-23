@@ -1,24 +1,14 @@
 "use client";
 
 import React from "react";
-import { 
-  Zap, 
-  CreditCard, 
-  ArrowRight, 
-  CheckCircle2, 
-  ShieldCheck, 
-  Activity, 
-  Layers, 
-  Cpu, 
-  Network, 
-  BarChart3, 
-  Lock, 
-  Smartphone,
+import {
+  Zap,
+  CreditCard,
+  CheckCircle2,
+  Activity,
   RefreshCw,
-  Search,
   MousePointer2,
-  AlertTriangle,
-  History
+  History,
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -78,7 +68,7 @@ export default function TransactionFraudPage() {
                  <div className="absolute inset-0 bg-red-600/10 blur-[150px] opacity-20 pointer-events-none" />
                  <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-10 border-b border-white/10 pb-10">Operational Leakage</h3>
                  <div className="space-y-8 relative z-10 font-manrope italic pr-12">
-                    <p className="text-zinc-500 text-sm italic pr-12 italic font-manrope italic pr-24">"False positives cost businesses $443B in lost revenue annually — far more than actual fraud."</p>
+                    <p className="text-zinc-500 text-sm italic pr-12 italic font-manrope italic pr-24">&quot;False positives cost businesses $443B in lost revenue annually — far more than actual fraud.&quot;</p>
                     <div className="grid grid-cols-2 gap-6">
                        <div className="p-6 bg-white/5 border border-white/10 rounded-3xl group-hover:border-red-400 transition-all">
                           <span className="text-[9px] font-black uppercase text-brand-lime tracking-widest italic font-manrope">False Declines</span>
@@ -108,7 +98,7 @@ export default function TransactionFraudPage() {
                  ].map((it, i) => (
                    <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-3xl transition-all duration-700 hover:-translate-y-2 group overflow-hidden relative font-manrope italic pr-12 pr-6 group">
                       <div className="w-14 h-14 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform shadow-lg shadow-black/10">
-                        {React.cloneElement(it.i as any, { className: "w-6 h-6 border-zinc-100" })}
+                        {React.cloneElement(it.i as React.ReactElement<{ className?: string }>, { className: "w-6 h-6 border-zinc-100" })}
                       </div>
                       <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope italic">{it.t}</h4>
                       <p className="text-zinc-500 font-inter italic leading-relaxed text-sm mb-10 italic pr-8 italic pr-6">{it.d}</p>
@@ -133,7 +123,7 @@ export default function TransactionFraudPage() {
                   ].map((it, i) => (
                     <div key={i} className="flex gap-8 group font-manrope italic mb-10 last:mb-0">
                        <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all font-manrope">
-                          {React.cloneElement(it.i as any, { className: "w-6 h-6 border-white/10 font-manrope" })}
+                          {React.cloneElement(it.i as React.ReactElement<{ className?: string }>, { className: "w-6 h-6 border-white/10 font-manrope" })}
                        </div>
                        <div>
                           <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter font-manrope italic">{it.t}</h4>
@@ -146,7 +136,7 @@ export default function TransactionFraudPage() {
                  <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight italic uppercase italic leading-tight">Beyond The <br />Point-of-Sale.</h2>
                  <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed pr-8 font-manrope italic pr-16 pr-12">Transaction fraud is rarely a single isolated event. Deep Sense looks across the entire user journey to identify the precursor signals of high-value fraud.</p>
                  <div className="p-10 bg-white/5 border border-white/10 rounded-[48px] font-bold text-xs uppercase italic tracking-tighter font-inter pr-12 leading-tight italic pr-10 pr-12 group hover:border-red-400 transition-all">
-                    "Deep Sense calculates risk before the customer even clicks 'Pay', by analyzing behavioral signals during form fill."
+                    &quot;Deep Sense calculates risk before the customer even clicks &apos;Pay&apos;, by analyzing behavioral signals during form fill.&quot;
                  </div>
               </div>
            </div>

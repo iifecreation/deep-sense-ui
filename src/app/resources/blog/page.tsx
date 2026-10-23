@@ -1,17 +1,16 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Search, 
-  ArrowRight, 
-  Clock, 
-  Tag, 
-  Calendar, 
-  TrendingUp,
+import {
+  Search,
+  ArrowRight,
+  Clock,
+  Calendar,
   Newspaper,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 
 const blogCategories = [
@@ -96,10 +95,12 @@ export default function BlogPage() {
                  </button>
               </div>
               <div className="w-full lg:w-1/2 relative h-[400px] lg:h-[600px] rounded-[60px] overflow-hidden group-hover:scale-[1.02] transition-transform duration-1000">
-                 <img 
-                   src="https://images.unsplash.com/photo-1558494949-ef0109404d45?q=80&w=2684&auto=format&fit=crop" 
-                   alt="Featured Blog" 
-                   className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 transition-all duration-1000"
+                 <Image
+                   src="https://images.unsplash.com/photo-1558494949-ef0109404d45?q=80&w=2684&auto=format&fit=crop"
+                   alt="Featured Blog"
+                   className="object-cover grayscale opacity-80 group-hover:grayscale-0 transition-all duration-1000"
+                   fill
+                   sizes="(min-width: 1024px) 50vw, 100vw"
                  />
                  <div className="absolute inset-0 bg-neutral-900/40 mix-blend-overlay" />
               </div>
@@ -139,10 +140,12 @@ export default function BlogPage() {
               {blogPosts.map((post, i) => (
                 <div key={i} className="group cursor-pointer">
                    <div className="relative h-[350px] rounded-[56px] overflow-hidden mb-10 shadow-sm group-hover:shadow-3xl transition-all duration-700">
-                      <img 
-                        src={post.image} 
-                        alt={post.title} 
-                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000"
+                      <Image
+                        src={post.image}
+                        alt={post.title}
+                        className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000"
+                        fill
+                        sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                       />
                       <div className="absolute top-8 right-8 px-4 py-2 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest text-neutral-900 shadow-xl">
                         {post.category}

@@ -76,7 +76,7 @@ export default function ForgotPasswordForm() {
       <div className="mb-10">
         <h1 className="text-3xl font-bold font-heading mb-3 tracking-tight">Reset Password</h1>
         <p className="text-muted-foreground text-[15px] leading-relaxed">
-          Enter your email address and we'll send you a 6-digit PIN code to verify and reset your password.
+          Enter your email address and we&apos;ll send you a 6-digit PIN code to verify and reset your password.
         </p>
       </div>
 

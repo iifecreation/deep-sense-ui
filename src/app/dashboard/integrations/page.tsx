@@ -3,12 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  TerminalSquare,
   Copy,
-  RefreshCw,
   Plus,
   ShieldCheck,
-  Activity,
   AlertTriangle,
   Code2,
   Webhook,
@@ -68,8 +65,8 @@ export default function IntegrationsDashboard() {
   };
 
   const list = integrations || [];
-  const activeCount = list.filter((i: any) => i.status === "active").length;
-  const errorCount = list.reduce((sum: number, i: any) => sum + (i.error_count || 0), 0);
+  const activeCount = list.filter((i) => i.status === "active").length;
+  const errorCount = list.reduce((sum, i) => sum + (i.error_count || 0), 0);
 
   return (
     <div className="space-y-8 pb-8">
@@ -169,7 +166,7 @@ export default function IntegrationsDashboard() {
                         <TableRow>
                           <TableCell colSpan={4} className="text-center py-10 text-slate-400">No integrations registered yet.</TableCell>
                         </TableRow>
-                      ) : list.map((integration: any) => (
+                      ) : list.map((integration) => (
                         <TableRow key={integration.id} className="group hover:bg-slate-50/80 dark:hover:bg-slate-900/50 transition-colors border-slate-100/50 dark:border-slate-800/50">
                           <TableCell className="pl-6 py-4">
                             <Link href={`/dashboard/integrations/${integration.id}`} className="flex flex-col gap-1">
@@ -219,14 +216,14 @@ export default function IntegrationsDashboard() {
                   <div className="p-4 bg-black/40 font-mono text-xs text-indigo-200 overflow-x-auto">
                     <pre className="leading-relaxed text-indigo-300">
 <span className="text-pink-400">curl</span> -X POST https://api.deepsense.ai/v1/score \
-  -H <span className="text-green-300">"Authorization: Bearer ds_live_YOUR_KEY"</span> \
-  -H <span className="text-green-300">"Content-Type: application/json"</span> \
-  -d <span className="text-green-300">'{'{'}
-    "transaction": {'{'}
-      "amount": 150.00,
-      "currency": "USD"
+  -H <span className="text-green-300">&quot;Authorization: Bearer ds_live_YOUR_KEY&quot;</span> \
+  -H <span className="text-green-300">&quot;Content-Type: application/json&quot;</span> \
+  -d <span className="text-green-300">&apos;{'{'}
+    &quot;transaction&quot;: {'{'}
+      &quot;amount&quot;: 150.00,
+      &quot;currency&quot;: &quot;USD&quot;
     {'}'}
-  {'}'}'</span>
+  {'}'}&apos;</span>
                     </pre>
                   </div>
                   <div className="p-3 bg-indigo-900/50 border-t border-white/10 flex justify-end">
@@ -239,13 +236,13 @@ export default function IntegrationsDashboard() {
                 <TabsContent value="node" className="m-0">
                   <div className="p-4 bg-black/40 font-mono text-xs text-indigo-200 overflow-x-auto">
                     <pre className="leading-relaxed text-indigo-300">
-<span className="text-purple-400">const</span> deepsense = <span className="text-blue-300">require</span>(<span className="text-green-300">'@deepsense/node'</span>);
+<span className="text-purple-400">const</span> deepsense = <span className="text-blue-300">require</span>(<span className="text-green-300">&apos;@deepsense/node&apos;</span>);
 
-<span className="text-purple-400">const</span> client = <span className="text-purple-400">new</span> deepsense.<span className="text-yellow-200">Client</span>(<span className="text-green-300">'ds_live_YOUR_KEY'</span>);
+<span className="text-purple-400">const</span> client = <span className="text-purple-400">new</span> deepsense.<span className="text-yellow-200">Client</span>(<span className="text-green-300">&apos;ds_live_YOUR_KEY&apos;</span>);
 
 <span className="text-purple-400">const</span> score = <span className="text-purple-400">await</span> client.fraud.<span className="text-blue-300">scoreTransaction</span>({'{'}
   amount: <span className="text-orange-300">150.00</span>,
-  currency: <span className="text-green-300">'USD'</span>
+  currency: <span className="text-green-300">&apos;USD&apos;</span>
 {'}'});
                     </pre>
                   </div>

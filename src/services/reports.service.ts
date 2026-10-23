@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ReportRead,
   ReportCreateRequest,
@@ -15,6 +14,11 @@ import {
 } from '@/types';
 import { get, getToken, patch, post } from '@/lib/api/client';
 import { getRuntimeApiUrl } from '@/lib/runtime-environment';
+import type {
+  AuditEntryRead,
+  ReportReviewRead,
+  ReportSubmissionRead,
+} from '@/lib/api-client/api';
 
 export const reportsService = {
   /**
@@ -87,7 +91,7 @@ export const reportsService = {
   /**
    * Export report
    */
-  async exportReport(reportId: string, formatType: string): Promise<any> {
+  async exportReport(reportId: string, formatType: string): Promise<Response> {
     const response = await fetch(
       `${getRuntimeApiUrl()}/api/v1/reports/${reportId}/export?format_type=${formatType}`,
       {
@@ -96,6 +100,7 @@ export const reportsService = {
         },
       }
     );
+    if (!response.ok) throw new Error(`Report export failed (${response.status})`);
     return response;
   },
 
@@ -141,22 +146,22 @@ export const reportsService = {
   /**
    * Get report audit trail
    */
-  async getReportAudit(reportId: string): Promise<any[]> {
-    return await get<any[]>(`/reports/${reportId}/audit`);
+  async getReportAudit(reportId: string): Promise<AuditEntryRead[]> {
+    return await get<AuditEntryRead[]>(`/reports/${reportId}/audit`);
   },
 
   /**
    * List report submissions
    */
-  async listSubmissions(): Promise<any[]> {
-    return await get<any[]>('/reports/submissions');
+  async listSubmissions(): Promise<ReportSubmissionRead[]> {
+    return await get<ReportSubmissionRead[]>('/reports/submissions');
   },
 
   /**
    * Get report version history
    */
-  async getReportVersions(reportId: string): Promise<any[]> {
-    return await get<any[]>(`/reports/${reportId}/versions`);
+  async getReportVersions(reportId: string): Promise<ReportReviewRead[]> {
+    return await get<ReportReviewRead[]>(`/reports/${reportId}/versions`);
   },
 
   /**

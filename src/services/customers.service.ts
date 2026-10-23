@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   CustomerListItem,
   CustomerDetail,
@@ -14,6 +13,17 @@ import {
   ListQueryParams,
 } from '@/types';
 import { get, post, patch } from '@/lib/api/client';
+import type {
+  AppSchemasCustomerCustomerRiskDetail,
+  CustomerOnboardingSummary,
+  CustomerScreeningDetail,
+  PaginatedAuditEventRead,
+  PaginatedLinkedCustomerAlert,
+  PaginatedLinkedCustomerCase,
+  PaginatedLinkedCustomerDevice,
+  PaginatedLinkedCustomerReport,
+  PaginatedLinkedCustomerTransaction,
+} from '@/lib/api-client/api';
 
 export const customersService = {
   /**
@@ -53,8 +63,8 @@ export const customersService = {
   async getCustomerTransactions(
     customerId: string,
     query: ListQueryParams = {}
-  ): Promise<PaginatedResponse<any>> {
-    return await get<PaginatedResponse<any>>(
+  ): Promise<PaginatedLinkedCustomerTransaction> {
+    return await get<PaginatedLinkedCustomerTransaction>(
       `/customers/${customerId}/transactions`,
       { params: query }
     );
@@ -66,8 +76,8 @@ export const customersService = {
   async getCustomerDevices(
     customerId: string,
     query: ListQueryParams = {}
-  ): Promise<PaginatedResponse<any>> {
-    return await get<PaginatedResponse<any>>(
+  ): Promise<PaginatedLinkedCustomerDevice> {
+    return await get<PaginatedLinkedCustomerDevice>(
       `/customers/${customerId}/devices`,
       { params: query }
     );
@@ -79,8 +89,8 @@ export const customersService = {
   async getCustomerAlerts(
     customerId: string,
     query: ListQueryParams = {}
-  ): Promise<PaginatedResponse<any>> {
-    return await get<PaginatedResponse<any>>(
+  ): Promise<PaginatedLinkedCustomerAlert> {
+    return await get<PaginatedLinkedCustomerAlert>(
       `/customers/${customerId}/alerts`,
       { params: query }
     );
@@ -92,8 +102,8 @@ export const customersService = {
   async getCustomerCases(
     customerId: string,
     query: ListQueryParams = {}
-  ): Promise<PaginatedResponse<any>> {
-    return await get<PaginatedResponse<any>>(
+  ): Promise<PaginatedLinkedCustomerCase> {
+    return await get<PaginatedLinkedCustomerCase>(
       `/customers/${customerId}/cases`,
       { params: query }
     );
@@ -105,8 +115,8 @@ export const customersService = {
   async getCustomerReports(
     customerId: string,
     query: ListQueryParams = {}
-  ): Promise<PaginatedResponse<any>> {
-    return await get<PaginatedResponse<any>>(
+  ): Promise<PaginatedLinkedCustomerReport> {
+    return await get<PaginatedLinkedCustomerReport>(
       `/customers/${customerId}/reports`,
       { params: query }
     );
@@ -171,22 +181,22 @@ export const customersService = {
   /**
    * Get customer risk detail
    */
-  async getCustomerRisk(customerId: string): Promise<any> {
-    return await get<any>(`/customers/${customerId}/risk`);
+  async getCustomerRisk(customerId: string): Promise<AppSchemasCustomerCustomerRiskDetail> {
+    return await get<AppSchemasCustomerCustomerRiskDetail>(`/customers/${customerId}/risk`);
   },
 
   /**
    * Get customer screening detail
    */
-  async getCustomerScreening(customerId: string): Promise<any> {
-    return await get<any>(`/customers/${customerId}/screening`);
+  async getCustomerScreening(customerId: string): Promise<CustomerScreeningDetail> {
+    return await get<CustomerScreeningDetail>(`/customers/${customerId}/screening`);
   },
 
   /**
    * Get customer onboarding summary
    */
-  async getCustomerOnboarding(customerId: string): Promise<any> {
-    return await get<any>(`/customers/${customerId}/onboarding`);
+  async getCustomerOnboarding(customerId: string): Promise<CustomerOnboardingSummary> {
+    return await get<CustomerOnboardingSummary>(`/customers/${customerId}/onboarding`);
   },
 
   /**
@@ -195,8 +205,8 @@ export const customersService = {
   async getCustomerAudit(
     customerId: string,
     query: ListQueryParams = {}
-  ): Promise<PaginatedResponse<any>> {
-    return await get<PaginatedResponse<any>>(
+  ): Promise<PaginatedAuditEventRead> {
+    return await get<PaginatedAuditEventRead>(
       `/customers/${customerId}/audit`,
       { params: query }
     );

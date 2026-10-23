@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AlertRead,
   AlertDetail,
@@ -10,6 +9,10 @@ import {
   ListQueryParams,
 } from '@/types';
 import { get, post, patch, del as deleteFn } from '@/lib/api/client';
+import type {
+  AlertGroupRead,
+  PaginatedAlertGroupRead,
+} from '@/lib/api-client/api';
 
 export const alertsService = {
   /**
@@ -35,15 +38,15 @@ export const alertsService = {
    */
   async listAlertGroups(
     query: ListQueryParams = {}
-  ): Promise<PaginatedResponse<any>> {
-    return await get<PaginatedResponse<any>>('/alerts/groups', { params: query });
+  ): Promise<PaginatedAlertGroupRead> {
+    return await get<PaginatedAlertGroupRead>('/alerts/groups', { params: query });
   },
 
   /**
    * Get alert group by ID
    */
-  async getAlertGroup(groupId: string): Promise<any> {
-    return await get<any>(`/alerts/groups/${groupId}`);
+  async getAlertGroup(groupId: string): Promise<AlertGroupRead> {
+    return await get<AlertGroupRead>(`/alerts/groups/${groupId}`);
   },
 
   /**

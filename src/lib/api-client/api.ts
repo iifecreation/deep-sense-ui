@@ -894,6 +894,8 @@ export interface AuditEventRead {
   entity_label?: string | null;
   description?: string | null;
   source_module?: string | null;
+  ip_address?: string | null;
+  user_agent?: string | null;
   created_at: string;
 }
 
@@ -910,6 +912,12 @@ export interface AuditLogEntry {
   resource_type: string;
   resource_id: string;
   metadata: AuditLogEntryMetadata;
+  organization_id?: string | null;
+  severity?: string | null;
+  category?: string | null;
+  ip_address?: string | null;
+  user_agent?: string | null;
+  request_id?: string | null;
 }
 
 export type AuditSummaryResponseCategoryBreakdown = {[key: string]: number};
@@ -2291,6 +2299,30 @@ export interface CreateDisputeRequest {
   network: string;
   reason_code: string;
   currency?: string;
+}
+
+export interface CredentialTrustConfig {
+  /** @maxItems 200 */
+  trusted_issuers?: string[];
+  require_status_list?: boolean;
+}
+
+/**
+ * The tenant's subscription. With no subscription only plan/status/current_period_end are set.
+ */
+export interface CurrentPlanRead {
+  plan: string;
+  status: string;
+  plan_id?: string | null;
+  plan_name?: string | null;
+  subscription_status?: string | null;
+  billing_cycle?: string | null;
+  current_period_start?: string | null;
+  current_period_end?: string | null;
+  cancel_at_period_end?: boolean | null;
+  stripe_customer_id?: string | null;
+  stripe_subscription_id?: string | null;
+  stripe_price_id?: string | null;
 }
 
 /**
@@ -4435,6 +4467,16 @@ export interface FraudRuleMetricRead {
   last_triggered_at?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
+}
+
+export interface FraudRuleMetricsSummary {
+  days: number;
+  trigger_count: number;
+  confirmed_fraud_count: number;
+  false_positive_count: number;
+  block_count: number;
+  review_count: number;
+  allow_count: number;
 }
 
 export type FraudRuleReadConditionsJson = { [key: string]: unknown };
@@ -10811,6 +10853,22 @@ export interface PublicPostDetail {
   published_at?: string | null;
 }
 
+export interface PublicPricingPlan {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  monthly_price?: number | null;
+  yearly_price?: number | null;
+  currency?: string | null;
+  features: string[];
+  highlighted?: boolean;
+}
+
+export interface PublicPricingPlans {
+  plans: PublicPricingPlan[];
+}
+
 /**
  * Safe success response for public endpoints — never leaks internal IDs.
  */
@@ -10822,6 +10880,16 @@ export interface PublicSubmissionResponse {
 export interface QuotaCheckRequest {
   feature_key: string;
   increment?: number;
+}
+
+export interface QuotaCheckResult {
+  allowed: boolean;
+  used: number;
+  limit_value: number | null;
+  period: string;
+  remaining: number | null;
+  message: string | null;
+  feature_key?: string;
 }
 
 /**
@@ -14254,6 +14322,29 @@ export interface UsageAnalyticsResponse {
   top_orgs_by_alerts?: TopEntityRow[];
 }
 
+export interface UsageCounterRead {
+  feature_key: string;
+  used: number;
+  limit?: number | null;
+  remaining?: number | null;
+  period_start?: string | null;
+  period_end?: string | null;
+  exceeded?: boolean;
+}
+
+export type UsageRecordInputMetadata = { [key: string]: unknown } | null;
+
+export interface UsageRecordInput {
+  /**
+     * @minLength 1
+     * @maxLength 128
+     */
+  feature_key: string;
+  /** @minimum 1 */
+  quantity?: number;
+  metadata?: UsageRecordInputMetadata;
+}
+
 /**
  * User's API usage patterns.
  */
@@ -14841,6 +14932,17 @@ export interface Verify2FARequest {
   code: string;
 }
 
+export interface VerifyCredentialRequest {
+  /**
+     * Compact VC-JWT presented by the holder
+     * @minLength 20
+     * @maxLength 64000
+     */
+  vc_jwt: string;
+  expected_holder_did?: string | null;
+  expected_type?: string | null;
+}
+
 export interface VerifyEmailRequest {
   email: string;
   token: string;
@@ -15106,6 +15208,19 @@ export interface WalletRiskResponse {
   risk_level: string;
   reasons: string[];
   action: string;
+}
+
+export type WalletStatusResponseStatus = typeof WalletStatusResponseStatus[keyof typeof WalletStatusResponseStatus];
+
+
+export const WalletStatusResponseStatus = {
+  suspended: 'suspended',
+  revoked: 'revoked',
+} as const;
+
+export interface WalletStatusResponse {
+  status: WalletStatusResponseStatus;
+  wallet_id: string;
 }
 
 export interface WalletSuspendRequest {
@@ -15473,25 +15588,23 @@ limit?: number;
 
 export type SubmitContactFormApiV1ContentContactPost201 = { [key: string]: unknown };
 
-export type GetPublicPricingPlansApiV1PricingPlansGet200 = { [key: string]: unknown };
+export type LogoutApiV1AuthLogoutPost200 = {[key: string]: string};
 
-export type LogoutApiV1AuthLogoutPost200 = { [key: string]: unknown };
+export type ForgotPasswordApiV1AuthForgotPasswordPost200 = {[key: string]: string};
 
-export type ForgotPasswordApiV1AuthForgotPasswordPost200 = { [key: string]: unknown };
+export type ResetPasswordEndpointApiV1AuthResetPasswordPost200 = {[key: string]: string};
 
-export type ResetPasswordEndpointApiV1AuthResetPasswordPost200 = { [key: string]: unknown };
+export type VerifyEmailEndpointApiV1AuthVerifyEmailPost200 = {[key: string]: string};
 
-export type VerifyEmailEndpointApiV1AuthVerifyEmailPost200 = { [key: string]: unknown };
+export type ResendVerifyEmailApiV1AuthResendVerifyEmailPost200 = {[key: string]: string};
 
-export type ResendVerifyEmailApiV1AuthResendVerifyEmailPost200 = { [key: string]: unknown };
-
-export type Confirm2faApiV1AuthConfirm2faPost200 = { [key: string]: unknown };
+export type Confirm2faApiV1AuthConfirm2faPost200 = {[key: string]: string};
 
 export type IdentityJwksApiV1IdentityWellKnownJwksJsonGet200Item = { [key: string]: unknown };
 
 export type IdentityJwksApiV1IdentityWellKnownJwksJsonGet200 = {[key: string]: IdentityJwksApiV1IdentityWellKnownJwksJsonGet200Item[]};
 
-export type CentralLogoutApiV1IdentityLogoutPost200 = { [key: string]: unknown };
+export type CentralLogoutApiV1IdentityLogoutPost200 = {[key: string]: string};
 
 export type CentralVerifyEmailApiV1IdentityVerifyEmailPost200 = {[key: string]: string};
 
@@ -15743,8 +15856,6 @@ days?: number;
  */
 organization_id?: string | null;
 };
-
-export type GetFraudRuleMetricsSummaryApiV1FraudRulesMetricsSummaryGet200 = { [key: string]: unknown };
 
 export type GetNoisyFraudRulesApiV1FraudRulesNoisyGetParams = {
 days?: number;
@@ -19035,6 +19146,8 @@ export type RecordProvisioningEventApiV1NfcWalletsProvisioningEventsPostParams =
 organization_id?: string | null;
 };
 
+export type RecordProvisioningEventApiV1NfcWalletsProvisioningEventsPost201 = { [key: string]: unknown };
+
 export type GetWalletRiskApiV1NfcWalletsIdRiskGetParams = {
 /**
  * Required when caller is super_admin
@@ -20456,16 +20569,12 @@ paid_to?: string | null;
 
 export type GetOrganizationUsageApiV1PlatformOrganizationsOrganizationIdUsageGet200 = { [key: string]: unknown };
 
-export type RecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostBody = { [key: string]: unknown };
-
 export type RecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost200 = { [key: string]: unknown };
 
 export type CheckQuotaApiV1PlatformOrganizationsOrganizationIdUsageCheckQuotaPostParams = {
 feature_key?: string | null;
 quantity?: number;
 };
-
-export type CheckQuotaApiV1PlatformOrganizationsOrganizationIdUsageCheckQuotaPost200 = { [key: string]: unknown };
 
 export type ListNotificationsApiV1PlatformNotificationsGetParams = {
 /**
@@ -21789,16 +21898,12 @@ export type GetPlanApiV1BillingCurrentPlanGetParams = {
 organization_id?: string | null;
 };
 
-export type GetPlanApiV1BillingCurrentPlanGet200 = { [key: string]: unknown };
-
 export type GetBillingUsageApiV1BillingUsageGetParams = {
 /**
  * Required when caller is super_admin
  */
 organization_id?: string | null;
 };
-
-export type GetBillingUsageApiV1BillingUsageGet200Item = { [key: string]: unknown };
 
 export type PostCheckQuotaApiV1BillingCheckQuotaPostParams = {
 /**
@@ -22106,6 +22211,27 @@ credential_type?: string | null;
  */
 limit?: number;
 offset?: number;
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type VerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type GetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetParams = {
+/**
+ * Required when caller is super_admin
+ */
+organization_id?: string | null;
+};
+
+export type PutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutParams = {
 /**
  * Required when caller is super_admin
  */
@@ -24465,11 +24591,11 @@ organization_id?: string | null;
 
 export type GetCheckoutSessionRiskApiV1CheckoutSessionsSessionIdRiskGet200 = { [key: string]: unknown };
 
-export type PlatformLogoutApiV1PlatformAuthLogoutPost200 = { [key: string]: unknown };
+export type PlatformLogoutApiV1PlatformAuthLogoutPost200 = {[key: string]: string};
 
-export type PlatformForgotPasswordApiV1PlatformAuthForgotPasswordPost200 = { [key: string]: unknown };
+export type PlatformForgotPasswordApiV1PlatformAuthForgotPasswordPost200 = {[key: string]: string};
 
-export type PlatformResetPasswordApiV1PlatformAuthResetPasswordPost200 = { [key: string]: unknown };
+export type PlatformResetPasswordApiV1PlatformAuthResetPasswordPost200 = {[key: string]: string};
 
 export type ListTicketsApiV1SupportTicketsGetParams = {
 status?: string | null;
@@ -25000,8 +25126,6 @@ offset?: number;
  */
 organization_id?: string | null;
 };
-
-export type ListAnomaliesApiV1AnomaliesGet200 = { [key: string]: unknown };
 
 export type ListIncidentsApiV1IncidentsGetParams = {
 /**
@@ -26686,7 +26810,7 @@ export const useSubmitContactFormApiV1ContentContactPost = <TError = ErrorRespon
     }
 
 export type getPublicPricingPlansApiV1PricingPlansGetResponse200 = {
-  data: GetPublicPricingPlansApiV1PricingPlansGet200
+  data: PublicPricingPlans
   status: 200
 }
 
@@ -26743,7 +26867,7 @@ export const getGetPublicPricingPlansApiV1PricingPlansGetUrl = () => {
 }
 
 /**
- * Retrieve available subscription plans for the public website.
+ * Active subscription plans for the public website, as configured in the control plane.
  * @summary Get public pricing plans
  */
 export const getPublicPricingPlansApiV1PricingPlansGet = async ( options?: Parameters<typeof customInstance>[1]): Promise<getPublicPricingPlansApiV1PricingPlansGetResponse> => {
@@ -32914,7 +33038,7 @@ export function useGetFraudRuleMetricsApiV1FraudRulesRuleIdMetricsGet<TData = Aw
 
 
 export type getFraudRuleMetricsSummaryApiV1FraudRulesMetricsSummaryGetResponse200 = {
-  data: GetFraudRuleMetricsSummaryApiV1FraudRulesMetricsSummaryGet200
+  data: FraudRuleMetricsSummary
   status: 200
 }
 
@@ -79897,7 +80021,7 @@ export const useRevokeTokenApiV1NfcTokensIdRevokePost = <TError = ErrorResponse,
     }
 
 export type recordProvisioningEventApiV1NfcWalletsProvisioningEventsPostResponse201 = {
-  data: unknown
+  data: RecordProvisioningEventApiV1NfcWalletsProvisioningEventsPost201
   status: 201
 }
 
@@ -80192,7 +80316,7 @@ export function useGetWalletRiskApiV1NfcWalletsIdRiskGet<TData = Awaited<ReturnT
 
 
 export type suspendWalletApiV1NfcWalletsIdSuspendPostResponse200 = {
-  data: unknown
+  data: WalletStatusResponse
   status: 200
 }
 
@@ -80323,7 +80447,7 @@ export const useSuspendWalletApiV1NfcWalletsIdSuspendPost = <TError = ErrorRespo
     }
 
 export type revokeWalletApiV1NfcWalletsIdRevokePostResponse200 = {
-  data: unknown
+  data: WalletStatusResponse
   status: 200
 }
 
@@ -122909,14 +123033,14 @@ export const getRecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPo
  * @summary Record usage event
  */
 export const recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost = async (organizationId: string,
-    recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostBody: RecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostBody, options?: Parameters<typeof customInstance>[1]): Promise<recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostResponse> => {
+    usageRecordInput: UsageRecordInput, options?: Parameters<typeof customInstance>[1]): Promise<recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostResponse> => {
 
   return customInstance<recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostResponse>(getRecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostUrl(organizationId),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostBody)
+    body: JSON.stringify(usageRecordInput)
   }
 );}
 
@@ -122925,8 +123049,8 @@ export const recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost 
 
 
 export const getRecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost>>, TError,{organizationId: string;data: RecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostBody}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost>>, TError,{organizationId: string;data: RecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostBody}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost>>, TError,{organizationId: string;data: UsageRecordInput}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost>>, TError,{organizationId: string;data: UsageRecordInput}, TContext> => {
 
 const mutationKey = ['recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -122938,7 +123062,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost>>, {organizationId: string;data: RecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostBody}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost>>, {organizationId: string;data: UsageRecordInput}> = (props) => {
           const {organizationId,data} = props ?? {};
 
           return  recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost(organizationId,data,requestOptions)
@@ -122952,25 +123076,25 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type RecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostMutationResult = NonNullable<Awaited<ReturnType<typeof recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost>>>
-    export type RecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostMutationBody = RecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostBody
+    export type RecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostMutationBody = UsageRecordInput
     export type RecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostMutationError = ErrorResponse
 
     /**
  * @summary Record usage event
  */
 export const useRecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost>>, TError,{organizationId: string;data: RecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost>>, TError,{organizationId: string;data: UsageRecordInput}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof recordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPost>>,
         TError,
-        {organizationId: string;data: RecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostBody},
+        {organizationId: string;data: UsageRecordInput},
         TContext
       > => {
       return useMutation(getRecordUsageApiV1PlatformOrganizationsOrganizationIdUsageRecordPostMutationOptions(options), queryClient);
     }
 
 export type checkQuotaApiV1PlatformOrganizationsOrganizationIdUsageCheckQuotaPostResponse200 = {
-  data: CheckQuotaApiV1PlatformOrganizationsOrganizationIdUsageCheckQuotaPost200
+  data: QuotaCheckResult
   status: 200
 }
 
@@ -149446,7 +149570,7 @@ export const usePostChangePlanApiV1BillingChangePlanPost = <TError = ErrorRespon
     }
 
 export type getPlanApiV1BillingCurrentPlanGetResponse200 = {
-  data: GetPlanApiV1BillingCurrentPlanGet200
+  data: CurrentPlanRead
   status: 200
 }
 
@@ -149603,7 +149727,7 @@ export function useGetPlanApiV1BillingCurrentPlanGet<TData = Awaited<ReturnType<
 
 
 export type getBillingUsageApiV1BillingUsageGetResponse200 = {
-  data: GetBillingUsageApiV1BillingUsageGet200Item[]
+  data: UsageCounterRead[]
   status: 200
 }
 
@@ -155164,6 +155288,422 @@ export function useListVerifiableCredentialsApiV1BiometricsVerifiableCredentials
 
 
 
+
+export type verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse200 = {
+  data: unknown
+  status: 200
+}
+
+export type verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponseSuccess = (verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse200) & {
+  headers: Headers;
+};
+export type verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponseError = (verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse400 | verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse401 | verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse403 | verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse404 | verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse409 | verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse422 | verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse429) & {
+  headers: Headers;
+};
+
+export type verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse = (verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponseSuccess | verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponseError)
+
+export const getVerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostUrl = (params?: VerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/biometrics/verifiable-credentials/verify?${stringifiedParams}` : `/api/v1/biometrics/verifiable-credentials/verify`
+}
+
+/**
+ * Verify a VC-JWT: issuer DID, signature, dates, trusted issuer and revocation status.
+ * @summary Verify Verifiable Credential
+ */
+export const verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPost = async (verifyCredentialRequest: VerifyCredentialRequest,
+    params?: VerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostParams, options?: Parameters<typeof customInstance>[1]): Promise<verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse> => {
+
+  return customInstance<verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostResponse>(getVerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostUrl(params),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(verifyCredentialRequest)
+  }
+);}
+
+
+
+
+
+export const getVerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPost>>, TError,{data: VerifyCredentialRequest;params?: VerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPost>>, TError,{data: VerifyCredentialRequest;params?: VerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostParams}, TContext> => {
+
+const mutationKey = ['verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPost'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPost>>, {data: VerifyCredentialRequest;params?: VerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostParams}> = (props) => {
+          const {data,params} = props ?? {};
+
+          return  verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPost(data,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostMutationResult = NonNullable<Awaited<ReturnType<typeof verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPost>>>
+    export type VerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostMutationBody = VerifyCredentialRequest
+    export type VerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostMutationError = ErrorResponse
+
+    /**
+ * @summary Verify Verifiable Credential
+ */
+export const useVerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPost = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPost>>, TError,{data: VerifyCredentialRequest;params?: VerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof verifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPost>>,
+        TError,
+        {data: VerifyCredentialRequest;params?: VerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostParams},
+        TContext
+      > => {
+      return useMutation(getVerifyVerifiableCredentialApiV1BiometricsVerifiableCredentialsVerifyPostMutationOptions(options), queryClient);
+    }
+
+export type getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse200 = {
+  data: CredentialTrustConfig
+  status: 200
+}
+
+export type getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponseSuccess = (getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse200) & {
+  headers: Headers;
+};
+export type getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponseError = (getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse400 | getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse401 | getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse403 | getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse404 | getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse409 | getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse422 | getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse429) & {
+  headers: Headers;
+};
+
+export type getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse = (getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponseSuccess | getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponseError)
+
+export const getGetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetUrl = (params?: GetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/biometrics/verifiable-credentials/trust-config?${stringifiedParams}` : `/api/v1/biometrics/verifiable-credentials/trust-config`
+}
+
+/**
+ * Trusted credential issuers and revocation policy for this tenant.
+ * @summary Get Credential Trust Config
+ */
+export const getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet = async (params?: GetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetParams, options?: Parameters<typeof customInstance>[1]): Promise<getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse> => {
+
+  return customInstance<getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetResponse>(getGetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetQueryKey = (params?: GetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetParams,) => {
+    return [
+    `/api/v1/biometrics/verifiable-credentials/trust-config`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetQueryOptions = <TData = Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>, TError = ErrorResponse>(params?: GetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>> = ({ signal }) => getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetQueryResult = NonNullable<Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>>
+export type GetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetQueryError = ErrorResponse
+
+
+export function useGetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet<TData = Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>, TError = ErrorResponse>(
+ params: undefined |  GetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>,
+          TError,
+          Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet<TData = Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>, TError = ErrorResponse>(
+ params?: GetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>,
+          TError,
+          Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet<TData = Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>, TError = ErrorResponse>(
+ params?: GetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Credential Trust Config
+ */
+
+export function useGetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet<TData = Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>, TError = ErrorResponse>(
+ params?: GetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGet>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigGetQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse200 = {
+  data: CredentialTrustConfig
+  status: 200
+}
+
+export type putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse429 = {
+  data: ErrorResponse
+  status: 429
+}
+
+export type putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponseSuccess = (putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse200) & {
+  headers: Headers;
+};
+export type putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponseError = (putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse400 | putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse401 | putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse403 | putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse404 | putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse409 | putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse422 | putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse429) & {
+  headers: Headers;
+};
+
+export type putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse = (putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponseSuccess | putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponseError)
+
+export const getPutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutUrl = (params?: PutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/biometrics/verifiable-credentials/trust-config?${stringifiedParams}` : `/api/v1/biometrics/verifiable-credentials/trust-config`
+}
+
+/**
+ * Replace the trusted issuer list. Only did:key, did:jwk and did:web issuers are accepted.
+ * @summary Put Credential Trust Config
+ */
+export const putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPut = async (credentialTrustConfig: CredentialTrustConfig,
+    params?: PutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutParams, options?: Parameters<typeof customInstance>[1]): Promise<putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse> => {
+
+  return customInstance<putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutResponse>(getPutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutUrl(params),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(credentialTrustConfig)
+  }
+);}
+
+
+
+
+
+export const getPutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPut>>, TError,{data: CredentialTrustConfig;params?: PutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPut>>, TError,{data: CredentialTrustConfig;params?: PutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutParams}, TContext> => {
+
+const mutationKey = ['putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPut'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPut>>, {data: CredentialTrustConfig;params?: PutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutParams}> = (props) => {
+          const {data,params} = props ?? {};
+
+          return  putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPut(data,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutMutationResult = NonNullable<Awaited<ReturnType<typeof putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPut>>>
+    export type PutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutMutationBody = CredentialTrustConfig
+    export type PutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutMutationError = ErrorResponse
+
+    /**
+ * @summary Put Credential Trust Config
+ */
+export const usePutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPut = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPut>>, TError,{data: CredentialTrustConfig;params?: PutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPut>>,
+        TError,
+        {data: CredentialTrustConfig;params?: PutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutParams},
+        TContext
+      > => {
+      return useMutation(getPutCredentialTrustConfigApiV1BiometricsVerifiableCredentialsTrustConfigPutMutationOptions(options), queryClient);
+    }
 
 export type getModelStatusApiV1BiometricsDeepfakeModelStatusGetResponse200 = {
   data: unknown
@@ -205751,7 +206291,7 @@ export function useListAlertsApiV1AdaptiveAccessHoneytokensAlertsGet<TData = Awa
 
 
 export type listAnomaliesApiV1AnomaliesGetResponse200 = {
-  data: ListAnomaliesApiV1AnomaliesGet200
+  data: UEBAAnomalyList
   status: 200
 }
 
@@ -205816,8 +206356,6 @@ export const getListAnomaliesApiV1AnomaliesGetUrl = (params?: ListAnomaliesApiV1
 
 /**
  * Top-level alias for /ueba/anomalies.
- *
- * Returns UEBA entity baseline anomaly records for the organization.
  * @summary List UEBA behavioural anomalies (alias)
  */
 export const listAnomaliesApiV1AnomaliesGet = async (params?: ListAnomaliesApiV1AnomaliesGetParams, options?: Parameters<typeof customInstance>[1]): Promise<listAnomaliesApiV1AnomaliesGetResponse> => {
@@ -206133,7 +206671,7 @@ export const getListAgentSessionsApiV1MonitoringAgentsGetUrl = (params?: ListAge
 }
 
 /**
- * Returns a live summary of active agent investigation sessions.
+ * Returns a live summary of agent investigation sessions.
  * @summary Live agent investigation session summary
  */
 export const listAgentSessionsApiV1MonitoringAgentsGet = async (params?: ListAgentSessionsApiV1MonitoringAgentsGetParams, options?: Parameters<typeof customInstance>[1]): Promise<listAgentSessionsApiV1MonitoringAgentsGetResponse> => {
@@ -206291,7 +206829,7 @@ export const getListDriftEventsApiV1MonitoringDriftEventsGetUrl = (params?: List
 }
 
 /**
- * Returns recent model drift monitoring snapshots.
+ * Returns recent model drift monitoring snapshots for the caller's organization.
  * @summary Recent model drift snapshots
  */
 export const listDriftEventsApiV1MonitoringDriftEventsGet = async (params?: ListDriftEventsApiV1MonitoringDriftEventsGetParams, options?: Parameters<typeof customInstance>[1]): Promise<listDriftEventsApiV1MonitoringDriftEventsGetResponse> => {
@@ -206450,7 +206988,7 @@ export const getGetCurrentTrustScoreApiV1TrustScoreEntityIdCurrentGetUrl = (enti
 }
 
 /**
- * Returns the most recent adaptive access decision as a trust score proxy.
+ * The most recent adaptive access decision for this user, as a trust score proxy.
  * @summary Current adaptive access trust score
  */
 export const getCurrentTrustScoreApiV1TrustScoreEntityIdCurrentGet = async (entityId: string,
@@ -206616,7 +207154,7 @@ export const getGetTrustScoreHistoryApiV1TrustScoreEntityIdHistoryGetUrl = (enti
 }
 
 /**
- * Returns recent adaptive access decisions as a trust score history.
+ * This user's recent adaptive access decisions.
  * @summary Adaptive access decision history
  */
 export const getTrustScoreHistoryApiV1TrustScoreEntityIdHistoryGet = async (entityId: string,

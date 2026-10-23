@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   TransactionRead,
   TransactionIngest,
@@ -8,6 +7,11 @@ import {
   ListQueryParams,
 } from '@/types';
 import { get, post } from '@/lib/api/client';
+import type {
+  BulkTransactionResult,
+  DecisionExplanationRead,
+  TransactionScoreBreakdown,
+} from '@/lib/api-client/api';
 
 export const transactionsService = {
   /**
@@ -38,21 +42,21 @@ export const transactionsService = {
   /**
    * Get transaction score breakdown
    */
-  async getTransactionScoreBreakdown(transactionId: string): Promise<any> {
-    return await get<any>(`/transactions/${transactionId}/score-breakdown`);
+  async getTransactionScoreBreakdown(transactionId: string): Promise<TransactionScoreBreakdown> {
+    return await get<TransactionScoreBreakdown>(`/transactions/${transactionId}/score-breakdown`);
   },
 
   /**
    * Get transaction explanation
    */
-  async getTransactionExplanation(transactionId: string): Promise<any> {
-    return await get<any>(`/transactions/${transactionId}/explanation`);
+  async getTransactionExplanation(transactionId: string): Promise<DecisionExplanationRead> {
+    return await get<DecisionExplanationRead>(`/transactions/${transactionId}/explanation`);
   },
 
   /**
    * Bulk ingest transactions
    */
-  async bulkIngestTransactions(items: TransactionIngest[]): Promise<any> {
-    return await post<any>('/transactions/bulk', { items });
+  async bulkIngestTransactions(items: TransactionIngest[]): Promise<BulkTransactionResult> {
+    return await post<BulkTransactionResult>('/transactions/bulk', { items });
   },
 };

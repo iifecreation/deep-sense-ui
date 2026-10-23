@@ -1,24 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  BookOpen, 
-  CheckCircle2, 
-  ArrowRight, 
-  Download, 
-  ShieldCheck, 
-  Users, 
-  FileText, 
-  Zap, 
-  Layers, 
-  Scale, 
-  Activity, 
-  Lock, 
-  Mail, 
-  Building, 
-  Briefcase,
+import {
+  BookOpen,
+  CheckCircle2,
+  ShieldCheck,
+  FileText,
+  Zap,
+  Layers,
+  Building,
   Quote,
-  History
+  History,
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -136,7 +128,7 @@ export default function CbnGuidePage() {
                  ].map((sec, i) => (
                    <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all group overflow-hidden">
                       <div className="w-12 h-12 bg-zinc-50 border border-zinc-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-10 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-sm">
-                         {React.cloneElement(sec.i as any, { className: "w-6 h-6" })}
+                         {React.cloneElement(sec.i as React.ReactElement<{ className?: string }>, { className: "w-6 h-6" })}
                       </div>
                       <h4 className="text-emerald-500 font-extrabold uppercase text-[10px] tracking-widest mb-4">Section {i+1}</h4>
                       <h5 className="text-lg font-bold uppercase italic tracking-tighter mb-4 leading-tight">{sec.t}</h5>
@@ -222,7 +214,7 @@ export default function CbnGuidePage() {
                  ].map((quote, i) => (
                     <div key={i} className="p-12 bg-zinc-50 border border-zinc-100 rounded-[56px] relative group overflow-hidden">
                        <Quote className="w-24 h-24 absolute top-0 right-0 p-8 text-emerald-100 group-hover:scale-110 transition-transform opacity-40 font-manrope" />
-                       <p className="text-xl font-bold italic mb-8 relative z-10 font-manrope">"{quote.q}"</p>
+                       <p className="text-xl font-bold italic mb-8 relative z-10 font-manrope">&quot;{quote.q}&quot;</p>
                        <span className="text-xs font-black uppercase text-zinc-400 italic font-manrope">{quote.a}</span>
                     </div>
                  ))}

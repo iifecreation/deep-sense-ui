@@ -1,32 +1,26 @@
 "use client";
 
 import React from "react";
-import { 
-  LayoutDashboard, 
-  Shield, 
-  Zap, 
-  Search, 
-  Activity, 
-  ArrowRight, 
-  BarChart3, 
-  CheckCircle2, 
-  Layers, 
+import {
+  LayoutDashboard,
+  Shield,
+  Zap,
+  Search,
+  Activity,
+  CheckCircle2,
+  Layers,
   Bell,
   PieChart,
-  LineChart,
   Target,
   Users,
   Briefcase,
   History,
   Cpu,
-  Lock,
-  Globe,
   Network,
   Settings,
   Smartphone,
   Send,
-  Eye,
-  Monitor
+  Monitor,
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -203,7 +197,7 @@ export default function ComplianceDashboardPage() {
               ].map((it, i) => (
                 <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 relative group overflow-hidden">
                    <div className="w-14 h-14 bg-indigo-600 text-white rounded-[24px] flex items-center justify-center mb-10 group-hover:scale-110 transition-transform">
-                      {React.cloneElement(it.icon as any, { className: "w-7 h-7" })}
+                      {React.cloneElement(it.icon as React.ReactElement<{ className?: string }>, { className: "w-7 h-7" })}
                    </div>
                    <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight">{it.title}</h4>
                    <p className="text-zinc-500 font-inter italic leading-relaxed text-sm">{it.desc}</p>
@@ -274,7 +268,7 @@ export default function ComplianceDashboardPage() {
               ].map((it, i) => (
                 <div key={i} className="flex gap-6 items-start group">
                    <div className="w-14 h-14 bg-indigo-50 border border-indigo-100 rounded-[28px] flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
-                      {React.cloneElement(it.icon as any, { className: "w-6 h-6 border-indigo-100" })}
+                      {React.cloneElement(it.icon as React.ReactElement<{ className?: string }>, { className: "w-6 h-6 border-indigo-100" })}
                    </div>
                    <div>
                       <h4 className="text-xl font-bold mb-2 uppercase italic tracking-tighter">{it.title}</h4>
@@ -349,25 +343,5 @@ export default function ComplianceDashboardPage() {
 
       <Footer />
     </div>
-  );
-}
-
-function SendIcon({ className }: { className?: string }) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <line x1="22" y1="2" x2="11" y2="13" />
-      <polygon points="22 2 15 22 11 13 2 9 22 2" />
-    </svg>
   );
 }

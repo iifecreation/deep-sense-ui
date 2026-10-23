@@ -1,35 +1,29 @@
 "use client";
 
-import { 
-  ArrowLeft, 
-  ShieldCheck, 
-  ShieldAlert, 
-  User, 
-  Zap, 
-  ChevronRight, 
+import {
+  ArrowLeft,
+  ShieldAlert,
+  User,
+  Zap,
+  ChevronRight,
   MessageSquare,
   Info,
   Globe,
-  Calendar,
   Lock,
   MapPin,
   AlertCircle,
-  RefreshCw,
   Activity,
   CreditCard,
   Building2,
   FileCheck2,
   Search,
   CheckCircle2,
-  XCircle,
-  MoreHorizontal
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
   DropdownMenu, 
@@ -40,6 +34,7 @@ import {
   DropdownMenuLabel
 } from "@/components/ui/dropdown-menu";
 import { useCustomer, useCustomerRisk } from "@/hooks/use-customers";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
 
 type RiskFactor = {
   label?: string;
@@ -79,20 +74,7 @@ export default function CustomerRiskProfile() {
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Customer Risk Profile</h1>
         </div>
-        <Card className="rounded-2xl shadow-sm border border-red-200 bg-red-50/50 backdrop-blur-xl">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load customer profile</p>
-                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
-              </div>
-            </div>
-            <Button onClick={() => refetch()} className="mt-4" variant="outline">
-              <RefreshCw className="w-4 h-4 mr-2" /> Retry Connection
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="customer profile" onRetry={() => refetch()} />
       </div>
     );
   }
@@ -215,7 +197,9 @@ export default function CustomerRiskProfile() {
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Screening Status</p>
               <div className="text-xl font-black text-slate-900 dark:text-white mt-1 truncate">
-                {riskData?.screening_status || 'Pending'}
+                {riskData?.sanctions_status || riskData?.pep_status
+                  ? `Sanctions: ${riskData?.sanctions_status ?? '—'} · PEP: ${riskData?.pep_status ?? '—'}`
+                  : 'Not screened'}
               </div>
             </div>
           </CardContent>

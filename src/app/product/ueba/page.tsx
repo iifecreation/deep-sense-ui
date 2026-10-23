@@ -4,43 +4,19 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Zap, 
-  Activity, 
-  Cpu, 
-  Database, 
+import {
+  Shield,
+  Activity,
   ArrowRight,
-  TrendingUp,
-  Lock,
   CheckCircle2,
-  LineChart,
-  BarChart3,
-  Network,
-  Fingerprint,
-  AlertTriangle,
-  Globe,
-  Layers,
-  Server,
-  HelpCircle,
-  Smartphone,
-  Eye,
   Users,
   Building2,
-  Wallet,
   Clock,
-  RefreshCw,
-  Scale,
   ChevronDown,
   ChevronUp,
-  AlertCircle,
-  FileSpreadsheet,
   Workflow,
-  Search,
-  Check,
   Building,
   Sliders,
-  ClipboardCheck
 } from "lucide-react";
 
 export default function UEBAPage() {
@@ -433,7 +409,7 @@ export default function UEBAPage() {
                 <div className="space-y-6">
                   <h4 className="text-2xl font-bold font-manrope text-neutral-900">Identify service account abuse, anomalous admin activity, operational drift, and risky system access.</h4>
                   <p className="text-zinc-600 text-sm font-inter leading-relaxed max-w-3xl">
-                    Monitor machine integrations. Automatically flag service account executions that don't match stable code patterns.
+                    Monitor machine integrations. Automatically flag service account executions that don&apos;t match stable code patterns.
                   </p>
                 </div>
               )}

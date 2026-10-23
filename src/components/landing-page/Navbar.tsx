@@ -2,25 +2,24 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { 
-  ChevronDown, 
-  Menu, 
-  X, 
-  ArrowRight, 
-  Zap, 
-  Shield, 
-  BarChart2, 
-  Cpu, 
-  Database, 
-  Users, 
-  Code, 
-  BookOpen, 
-  Layers, 
-  Globe, 
-  BadgeCheck, 
-  LayoutDashboard, 
-  History, 
-  Lock, 
+import {
+  ChevronDown,
+  Menu,
+  X,
+  ArrowRight,
+  Zap,
+  Shield,
+  BarChart2,
+  Cpu,
+  Database,
+  Users,
+  BookOpen,
+  Layers,
+  Globe,
+  BadgeCheck,
+  LayoutDashboard,
+  History,
+  Lock,
   AlertTriangle,
   Terminal,
   FileText,
@@ -45,7 +44,7 @@ import {
   FileCheck,
   Network,
   Workflow,
-  Scale
+  Scale,
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 

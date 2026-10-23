@@ -1,21 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  History, 
-  Search, 
-  Filter, 
+import {
+  Search,
+  Filter,
   ChevronRight,
   Database,
   Lock,
-  Clock,
   ArrowRight,
   Download,
-  ShieldCheck,
   ShieldAlert,
-  Users,
   Settings,
-  MoreVertical,
   Activity,
   BarChart3,
   SearchCode,
@@ -23,15 +18,7 @@ import {
   CheckCircle2,
   XCircle,
   FileText,
-  Key,
-  Globe,
-  Plus,
   RefreshCcw,
-  Zap,
-  MoreHorizontal,
-  ChevronDown,
-  LayoutGrid,
-  AlertCircle
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -47,23 +34,17 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuditEvents, useAuditSummary } from "@/hooks";
 import { auditService } from "@/services/audit.service";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
+import type { AuditSummaryResponse } from "@/lib/api-client/api";
 
 export default function AuditTrailsPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [isExporting, setIsExporting] = useState(false);
-  const { data: auditData, isLoading, isError, refetch } = useAuditEvents({ search: searchQuery });
+  const { data: auditData, isLoading, isError, error, refetch } = useAuditEvents({ search: searchQuery });
   const { data: summaryData, isLoading: isSummaryLoading } = useAuditSummary();
 
   const handleExport = async () => {
@@ -109,26 +90,13 @@ export default function AuditTrailsPage() {
             <h1 className="text-3xl font-black italic tracking-tighter uppercase">Audit Trails<span className="text-brand-lime">.</span></h1>
           </div>
         </section>
-        <Card className="rounded-3xl border border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load audit trails</p>
-                <p className="text-sm text-red-700">Please check your connection and try again.</p>
-              </div>
-            </div>
-            <Button onClick={refetch} className="mt-4" variant="outline">
-              <RefreshCcw className="w-4 h-4 mr-2" /> Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="audit trails" onRetry={refetch} />
       </div>
     );
   }
 
   const items = auditData?.items || [];
-  const summary: Record<string, any> = summaryData || {};
+  const summary: Partial<AuditSummaryResponse> = summaryData ?? {};
 
   const kpiCards = [
     { icon: <Activity className="w-5 h-5 text-neutral-400" />, label: "Total Events", value: summary.total_events ?? 0 },
@@ -297,7 +265,7 @@ export default function AuditTrailsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {items.filter((i: any) => i.severity === 'critical' || i.severity === 'warning').slice(0, 4).map((row: any, i: number) => (
+                {items.filter((i) => i.severity === 'critical' || i.severity === 'warning').slice(0, 4).map((row) => (
                   <TableRow key={row.id} className="group hover:bg-rose-500/10 border-b border-rose-500/10 transition-colors cursor-pointer">
                     <TableCell className="px-8 py-5 font-black italic text-xs text-rose-500">{row.id.split('-')[0]}</TableCell>
                     <TableCell className="text-[11px] font-black italic">{row.resource_type} {row.resource_id}</TableCell>
@@ -310,7 +278,7 @@ export default function AuditTrailsPage() {
                     <TableCell className="px-8 text-right text-[10px] font-black text-rose-500 italic">{new Date(row.created_at).toLocaleString()}</TableCell>
                   </TableRow>
                 ))}
-                {items.filter((i: any) => i.severity === 'critical' || i.severity === 'warning').length === 0 && (
+                {items.filter((i) => i.severity === 'critical' || i.severity === 'warning').length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-10 text-rose-500/50">
                       No critical events found.
@@ -359,7 +327,7 @@ export default function AuditTrailsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {items.map((row: any) => (
+                  {items.map((row) => (
                     <TableRow key={row.id} className="group hover:bg-muted/30 border-b border-border/50 transition-colors cursor-pointer">
                       <TableCell className="px-8 py-5">
                          <div className="flex flex-col">
@@ -422,7 +390,7 @@ export default function AuditTrailsPage() {
               </div>
               
               <div className="space-y-6 flex-1">
-                 {items.filter((i: any) => i.category === 'system_event' || i.category === 'config_change').slice(0, 3).map((change: any, i: number) => (
+                 {items.filter((i) => i.category === 'system_event' || i.category === 'config_change').slice(0, 3).map((change, i) => (
                    <div key={i} className="p-6 bg-muted/20 border border-border/50 rounded-3xl space-y-4 hover:border-orange-500/30 transition-all group">
                       <div className="flex justify-between items-start">
                          <div className="space-y-1">
@@ -450,7 +418,7 @@ export default function AuditTrailsPage() {
               </div>
               
               <div className="space-y-6 flex-1 relative z-10">
-                 {items.filter((i: any) => i.category === 'security_event').slice(0, 4).map((ev: any, i: number) => (
+                 {items.filter((i) => i.category === 'security_event').slice(0, 4).map((ev, i) => (
                    <div key={i} className="flex gap-6 items-center border-b border-white/5 pb-6 last:border-0 last:pb-0 font-bold italic">
                       <div className={`w-12 h-12 rounded-[20px] flex items-center justify-center shrink-0 border ${
                         ev.severity === 'warning' || ev.severity === 'critical' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-white/5 border-white/10 text-white/40'
@@ -479,7 +447,7 @@ export default function AuditTrailsPage() {
                  <div className="p-5 bg-white/5 border border-white/10 rounded-3xl text-center">
                     <div className="text-[8px] font-black uppercase text-white/40 italic mb-1">Critical Security Events</div>
                     <div className="text-2xl font-black italic">
-                      {items.filter((i: any) => i.category === 'security_event' && i.severity === 'critical').length}
+                      {items.filter((i) => i.category === 'security_event' && i.severity === 'critical').length}
                     </div>
                  </div>
               </div>
@@ -501,7 +469,7 @@ export default function AuditTrailsPage() {
                
                <div className="flex-1 space-y-1 relative">
                   <div className="absolute left-[39px] top-4 bottom-4 w-px bg-muted/60 z-0" />
-                  {items.filter((i: any) => i.category === 'compliance_action').slice(0, 4).map((trace: any, i: number) => (
+                  {items.filter((i) => i.category === 'compliance_action').slice(0, 4).map((trace, i) => (
                     <div key={i} className="flex gap-8 relative z-10 pb-10 last:pb-0 group font-bold italic">
                        <div className="w-20 text-[9px] font-black uppercase text-muted-foreground italic pt-2 shrink-0">{new Date(trace.created_at).toLocaleTimeString()}</div>
                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-3.5 shrink-0 shadow-[0_0_8px_#6366f1] group-hover:scale-150 transition-transform" />
@@ -525,7 +493,7 @@ export default function AuditTrailsPage() {
                   <CardDescription className="text-[10px] font-black uppercase tracking-widest mt-1 italic italic text-muted-foreground">Disclosure submission and regulator lifecycle trace</CardDescription>
                </CardHeader>
                <CardContent className="p-10 space-y-12 flex-1 italic font-bold">
-                  {items.filter((i: any) => i.resource_type === 'regulatory_report').slice(0, 4).map((rep: any, i: number) => (
+                  {items.filter((i) => i.resource_type === 'regulatory_report').slice(0, 4).map((rep, i) => (
                     <div key={i} className="flex gap-4 items-center group">
                        <div className="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center shrink-0 border border-border/50 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/30 transition-all">
                           <FileText className="w-5 h-5 text-muted-foreground group-hover:text-indigo-500" />
@@ -592,7 +560,7 @@ export default function AuditTrailsPage() {
                  <button key={i} onClick={action.onClick} className={`flex-1 p-6 rounded-3xl font-black text-[10px] uppercase tracking-widest italic hover:scale-[1.03] active:scale-95 transition-all group flex items-center justify-between min-h-[80px] ${action.color}`}>
                     <div className="flex items-center gap-4">
                        <div className="w-10 h-10 rounded-2xl bg-black/5 flex items-center justify-center shrink-0 group-hover:scale-110 transition-all">
-                          {React.cloneElement(action.icon as any, { className: "w-5 h-5" })}
+                          {React.cloneElement(action.icon as React.ReactElement<{ className?: string }>, { className: "w-5 h-5" })}
                        </div>
                        {action.label}
                     </div>

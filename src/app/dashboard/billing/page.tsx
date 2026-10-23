@@ -1,40 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  CreditCard, 
-  Download, 
-  FileText, 
-  TrendingUp, 
-  AlertCircle,
-  CheckCircle2,
-  Clock,
+import {
+  TrendingUp,
   DollarSign,
-  RefreshCcw,
   Settings,
   Plus,
-  ChevronRight,
   Calendar,
-  User,
   Package,
-  BarChart3,
-  Activity,
-  Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { useCurrentPlan, useBillingUsage } from "@/hooks";
 import { billingService } from "@/services/billing.service";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
 
 export default function BillingPage() {
   const { data: subscription, isLoading: subscriptionLoading, isError: subscriptionError, refetch: refetchSubscription } = useCurrentPlan();
@@ -73,7 +54,7 @@ export default function BillingPage() {
   // /billing/usage returns a list of per-feature counters (feature_key, used,
   // limit, remaining, exceeded) - there is no single aggregate object, so the
   // "total requests" figure is derived from a representative counter.
-  const usageList: any[] = Array.isArray(usage) ? usage : [];
+  const usageList = Array.isArray(usage) ? usage : [];
   const requestCounter = usageList.find((u) => u.feature_key === 'api_requests') || usageList[0];
   const totalUsed = usageList.reduce((sum, u) => sum + (u.used || 0), 0);
   const requestPct = requestCounter?.limit ? Math.min(100, Math.round((requestCounter.used / requestCounter.limit) * 100)) : 0;
@@ -117,20 +98,7 @@ export default function BillingPage() {
             Billing<span className="text-brand-lime">.</span>
           </h1>
         </div>
-        <Card className="rounded-3xl border border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load billing data</p>
-                <p className="text-sm text-red-700">Please check your connection and try again.</p>
-              </div>
-            </div>
-            <Button onClick={() => { refetchSubscription(); refetchUsage(); }} className="mt-4" variant="outline">
-              <RefreshCcw className="w-4 h-4 mr-2" /> Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={subscriptionError ?? usageError} what="billing data" onRetry={() => { refetchSubscription(); refetchUsage(); }} />
       </div>
     );
   }
@@ -182,10 +150,10 @@ export default function BillingPage() {
           <CardContent className="p-0">
             <div className="space-y-4">
               <div className="text-4xl font-black italic text-neutral-900 tracking-tighter uppercase">
-                {subscription?.plan_name || 'Enterprise'}
+                {subscription?.plan_name || (subscription?.status === 'none' ? 'No active plan' : subscription?.plan || '—')}
               </div>
-              <Badge className={`text-[10px] font-black uppercase italic tracking-widest ${getStatusColor(subscription?.status || 'active')}`}>
-                {subscription?.status || 'Active'}
+              <Badge className={`text-[10px] font-black uppercase italic tracking-widest ${getStatusColor(subscription?.status || 'none')}`}>
+                {subscription?.status === 'none' || !subscription ? 'No subscription' : subscription.status}
               </Badge>
             </div>
           </CardContent>
@@ -244,7 +212,7 @@ export default function BillingPage() {
         </CardHeader>
         <CardContent className="p-0">
           <div className="space-y-6">
-            {usageList.length > 0 ? usageList.map((item: any, index: number) => {
+            {usageList.length > 0 ? usageList.map((item, index) => {
               const pct = item.limit ? Math.min(100, Math.round((item.used / item.limit) * 100)) : 0;
               return (
               <div key={index} className="flex items-center justify-between p-6 bg-muted/20 border border-border/50 rounded-3xl group hover:border-brand-lime transition-all">

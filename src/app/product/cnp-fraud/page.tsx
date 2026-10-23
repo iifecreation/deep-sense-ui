@@ -4,46 +4,17 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Zap, 
-  Activity, 
-  Cpu, 
-  Database, 
+import {
+  Zap,
+  Cpu,
   ArrowRight,
-  TrendingUp,
   Lock,
   CheckCircle2,
-  LineChart,
-  BarChart3,
-  Network,
-  Fingerprint,
-  AlertTriangle,
-  Globe,
-  Layers,
-  Server,
-  HelpCircle,
-  Send,
-  Smartphone,
-  Eye,
-  Users,
-  BookOpen,
-  Briefcase,
-  Building2,
-  ShoppingBag,
-  Wallet,
-  History,
-  Clock,
-  Search,
-  RefreshCw,
   Scale,
   ChevronDown,
   ChevronUp,
-  AlertCircle,
   CreditCard,
   Truck,
-  Filter,
-  Check
 } from "lucide-react";
 
 export default function CNPFraudPage() {

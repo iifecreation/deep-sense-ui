@@ -9,7 +9,7 @@ export { useFraudRules, useFraudRule, useFraudRuleMetrics } from './use-fraud-ru
 export { useDecisionPolicies, useDecisionPolicyVersions } from './use-decision-policies';
 export { useInterventions } from './use-interventions';
 export { useIntegrations, useIntegration } from './use-integrations';
-export { useWebhooks, useWebhook, useWebhookDeliveries } from './use-webhooks';
+export { useWebhooks, useWebhookDeliveries } from './use-webhooks';
 export * from './use-promotion';
 export { useReports, useReport } from './use-reports';
 export { 
@@ -28,7 +28,6 @@ export { useDevices, useDevice } from './use-devices';
 export { useOnboardingReviews, useOnboardingReview } from './use-onboarding';
 export { useAuditEvents, useAuditEvent, useAuditSummary } from './use-audit';
 export { useApiKeys } from './use-api-keys';
-export { useWhitepapers, useCaseStudies, useGuides } from './use-resources';
 export { usePricingPlans } from './use-pricing';
 export { useContentPage } from './use-content';
 export { useModels, useModelMetrics } from './use-models';

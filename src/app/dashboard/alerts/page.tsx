@@ -1,24 +1,19 @@
 'use client';
 
-import { 
-  AlertCircle, 
-  Search, 
-  ArrowRight,
+import {
+  AlertCircle,
+  Search,
   ShieldAlert,
   Filter,
   Download,
-  CheckCircle2,
   Clock,
-  ArrowUpRight,
   UserCheck,
-  ChevronRight,
   RefreshCw,
-  AlertTriangle,
   MoreHorizontal,
   ShieldCheck,
-  Activity
+  Activity,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -42,6 +37,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { alertsService } from "@/services/alerts.service";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
 
 
 export default function AlertsCenter() {
@@ -82,7 +78,7 @@ export default function AlertsCenter() {
     }
   };
 
-  const filteredAlerts = alerts?.filter((alert: any) => {
+  const filteredAlerts = alerts?.filter((alert) => {
     if (severityFilter && alert.severity !== severityFilter) return false;
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -114,9 +110,9 @@ export default function AlertsCenter() {
   };
 
   // Derived Analytics Data
-  const criticalCount = alerts?.filter((a: any) => a.severity === 'critical').length || 0;
-  const highCount = alerts?.filter((a: any) => a.severity === 'high').length || 0;
-  const mediumCount = alerts?.filter((a: any) => a.severity === 'medium').length || 0;
+  const criticalCount = alerts?.filter((a) => a.severity === 'critical').length || 0;
+  const highCount = alerts?.filter((a) => a.severity === 'high').length || 0;
+  const mediumCount = alerts?.filter((a) => a.severity === 'medium').length || 0;
   const totalCount = alerts?.length || 1;
 
   const severityData = [
@@ -150,20 +146,7 @@ export default function AlertsCenter() {
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Alerts Queue</h1>
         </div>
-        <Card className="rounded-2xl shadow-sm border border-red-200 bg-red-50/50 backdrop-blur-xl">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load alerts</p>
-                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
-              </div>
-            </div>
-            <Button onClick={() => refetch()} className="mt-4" variant="outline">
-              <RefreshCw className="w-4 h-4 mr-2" /> Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="alerts" onRetry={() => refetch()} />
       </div>
     );
   }
@@ -282,7 +265,7 @@ export default function AlertsCenter() {
                       <p className="text-sm font-medium text-slate-500">No alerts found</p>
                     </TableCell>
                   </TableRow>
-                ) : filteredAlerts.map((alert: any) => (
+                ) : filteredAlerts.map((alert) => (
                   <TableRow key={alert.id} className="group hover:bg-slate-50/80 dark:hover:bg-slate-900/50 transition-colors border-slate-100/50 dark:border-slate-800/50">
                     <TableCell className="pl-6 py-4">
                       <div className="flex flex-col gap-1">

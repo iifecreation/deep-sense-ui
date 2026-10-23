@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
-  Webhook,
   Clock,
   Plus,
   RefreshCw,
@@ -31,6 +30,7 @@ import {
 import { useWebhooks, useWebhookDeliveries } from "@/hooks";
 import { useIntegrations } from "@/hooks/use-integrations";
 import { webhooksService } from "@/services/webhooks.service";
+import type { WebhookDeliveryDetailRead, WebhookRead } from "@/lib/api-client/api";
 
 const ENDPOINT_STATUS_STYLES: Record<string, string> = {
   active: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400",
@@ -62,7 +62,7 @@ export default function WebhooksDashboard() {
   const [actionMessage, setActionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const [testingId, setTestingId] = useState<string | null>(null);
-  const [disableTarget, setDisableTarget] = useState<any>(null);
+  const [disableTarget, setDisableTarget] = useState<WebhookRead | null>(null);
   const [disabling, setDisabling] = useState(false);
   const [disableError, setDisableError] = useState<string | null>(null);
 
@@ -85,11 +85,11 @@ export default function WebhooksDashboard() {
     }
   }, [deliveries, selectedLogId]);
 
-  const failingDeliveries = (deliveries || []).filter((d: any) => RETRYABLE_STATUSES.includes(d.status));
-  const selectedLog = (deliveries || []).find((d: any) => d.id === selectedLogId) || null;
+  const failingDeliveries = (deliveries || []).filter((d) => RETRYABLE_STATUSES.includes(d.status));
+  const selectedLog = (deliveries || []).find((d) => d.id === selectedLogId) || null;
 
   const endpointUrlFor = (endpointId: string) =>
-    (endpoints || []).find((e: any) => e.id === endpointId)?.url || endpointId;
+    (endpoints || []).find((e) => e.id === endpointId)?.url || endpointId;
 
   const resetAddEndpointForm = () => {
     setNewUrl("");
@@ -133,7 +133,7 @@ export default function WebhooksDashboard() {
     }
   };
 
-  const handleTest = async (endpoint: any) => {
+  const handleTest = async (endpoint: WebhookRead) => {
     setTestingId(endpoint.id);
     setActionMessage(null);
     try {
@@ -165,7 +165,7 @@ export default function WebhooksDashboard() {
     }
   };
 
-  const handleRetry = async (delivery: any) => {
+  const handleRetry = async (delivery: WebhookDeliveryDetailRead) => {
     setRetryingLogId(delivery.id);
     setActionMessage(null);
     try {
@@ -184,7 +184,7 @@ export default function WebhooksDashboard() {
     setRetryingAll(true);
     setActionMessage(null);
     try {
-      await Promise.all(failingDeliveries.map((d: any) => webhooksService.replayDelivery(d.id)));
+      await Promise.all(failingDeliveries.map((d) => webhooksService.replayDelivery(d.id)));
       setActionMessage({ type: "success", text: `Queued ${failingDeliveries.length} failed event(s) for replay.` });
       await refetchDeliveries();
     } catch (err) {
@@ -280,7 +280,7 @@ export default function WebhooksDashboard() {
                       <TableRow>
                         <TableCell colSpan={4} className="text-center py-10 text-slate-400">No webhook endpoints configured yet.</TableCell>
                       </TableRow>
-                    ) : (endpoints || []).map((endpoint: any) => (
+                    ) : (endpoints || []).map((endpoint) => (
                       <TableRow key={endpoint.id} className="group hover:bg-slate-50/80 dark:hover:bg-slate-900/50 transition-colors border-slate-100/50 dark:border-slate-800/50">
                         <TableCell className="pl-6 py-4">
                           <div className="flex flex-col gap-1">
@@ -361,7 +361,7 @@ export default function WebhooksDashboard() {
                           <TableRow>
                             <TableCell colSpan={4} className="text-center py-10 text-slate-400">No delivery events yet.</TableCell>
                           </TableRow>
-                        ) : (deliveries || []).map((log: any) => (
+                        ) : (deliveries || []).map((log) => (
                           <TableRow
                             key={log.id}
                             onClick={() => setSelectedLogId(log.id)}
@@ -548,7 +548,7 @@ export default function WebhooksDashboard() {
                       className="w-full h-10 rounded-md border border-neutral-200 px-3 text-sm"
                     >
                       <option value="">None</option>
-                      {integrations.map((i: any) => (
+                      {integrations.map((i) => (
                         <option key={i.id} value={i.id}>{i.name}</option>
                       ))}
                     </select>

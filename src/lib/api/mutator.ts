@@ -10,7 +10,7 @@ const getAuthToken = () => {
 
 export const customInstance = <T>(
   config: AxiosRequestConfig | string,
-  options?: AxiosRequestConfig & { body?: any }
+  options?: AxiosRequestConfig & { body?: unknown }
 ): Promise<T> => {
   const source = axios.CancelToken.source();
   const token = getAuthToken();
@@ -19,7 +19,7 @@ export const customInstance = <T>(
   const isString = typeof config === 'string';
   const url = isString ? config : config.url;
   const method = isString ? options?.method || 'GET' : config.method || 'GET';
-  const data = isString ? options?.data || (options as any)?.body : config.data;
+  const data = isString ? options?.data || options?.body : config.data;
   const mergedOptions = isString ? options : { ...config, ...options };
 
   const promise = axios({
@@ -35,7 +35,7 @@ export const customInstance = <T>(
     },
   }).then(({ data }) => data);
 
-  // @ts-ignore
+  // @ts-expect-error orval expects a cancel() on the returned promise
   promise.cancel = () => {
     source.cancel('Query was cancelled');
   };

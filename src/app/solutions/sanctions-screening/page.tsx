@@ -1,27 +1,22 @@
 "use client";
 
 import React from "react";
-import { 
-  ShieldCheck, 
-  Globe, 
-  Zap, 
-  ArrowRight, 
-  CheckCircle2, 
-  Search, 
-  Users, 
-  Activity, 
-  RefreshCw, 
-  Bell, 
-  Layers, 
-  Scale, 
-  FileText, 
-  Lock, 
-  Target, 
+import {
+  Globe,
+  Zap,
+  ArrowRight,
+  CheckCircle2,
+  Users,
+  RefreshCw,
+  Bell,
+  FileText,
+  Lock,
+  Target,
   Filter,
   Briefcase,
   History,
   ShieldAlert,
-  Database
+  Database,
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -68,7 +63,7 @@ export default function SanctionsSolutionPage() {
                        <ShieldAlert className="w-24 h-24 text-zinc-100 group-hover:text-red-100 transition-all" />
                      </div>
                      <h3 className="text-2xl font-bold mb-8 italic text-neutral-900">Sanctions Risk Is Constant and Evolving</h3>
-                     <p className="text-zinc-500 text-sm leading-relaxed mb-10 italic font-manrope">"Missing a sanctioned entity can have serious consequences."</p>
+                     <p className="text-zinc-500 text-sm leading-relaxed mb-10 italic font-manrope">&quot;Missing a sanctioned entity can have serious consequences.&quot;</p>
                      <ul className="space-y-6 text-sm font-bold text-zinc-600 italic">
                         {[
                           "Global sanctions lists are frequently updated without warning.",
@@ -113,7 +108,7 @@ export default function SanctionsSolutionPage() {
               ].map((item, i) => (
                 <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 group">
                   <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-indigo-500/10">
-                    {React.cloneElement(item.icon as any, { className: "w-7 h-7" })}
+                    {React.cloneElement(item.icon as React.ReactElement<{ className?: string }>, { className: "w-7 h-7" })}
                   </div>
                   <h3 className="text-xl font-bold mb-3 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-tight italic">{item.title}</h3>
                   <p className="text-zinc-500 text-sm leading-relaxed italic">{item.desc}</p>
@@ -138,7 +133,7 @@ export default function SanctionsSolutionPage() {
                  ].map((it, i) => (
                    <div key={i} className="flex flex-col items-center group">
                       <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-[32px] flex items-center justify-center mb-6 relative group-hover:bg-brand-lime group-hover:text-neutral-900 transition-all shadow-xl group-hover:scale-105">
-                         {React.cloneElement(it.i as any, { className: "w-10 h-10" })}
+                         {React.cloneElement(it.i as React.ReactElement<{ className?: string }>, { className: "w-10 h-10" })}
                          <div className="absolute -top-3 -right-3 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-black border-4 border-zinc-900">
                            {i+1}
                          </div>
@@ -175,7 +170,7 @@ export default function SanctionsSolutionPage() {
                  </div>
 
                  <h2 className="text-4xl md:text-5xl font-bold font-manrope mb-8 tracking-tight">Reduce False Positives</h2>
-                 <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed">Don't let manual review slow you down. Our matching engine uses advanced entity resolution to distinguish real threats from noise.</p>
+                 <p className="text-zinc-500 text-lg mb-12 italic leading-relaxed">Don&apos;t let manual review slow you down. Our matching engine uses advanced entity resolution to distinguish real threats from noise.</p>
                  <div className="space-y-4 font-bold text-zinc-600 italic">
                     {[
                       "Advanced Fuzzy Name Matching",
@@ -230,7 +225,7 @@ export default function SanctionsSolutionPage() {
               ].map((it, i) => (
                 <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-3xl transition-all duration-700 hover:-translate-y-2 relative group overflow-hidden">
                    <div className="w-16 h-16 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform">
-                      {React.cloneElement(it.icon as any, { className: "w-8 h-8" })}
+                      {React.cloneElement(it.icon as React.ReactElement<{ className?: string }>, { className: "w-8 h-8" })}
                    </div>
                    <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope">{it.title}</h4>
                    <p className="text-zinc-500 font-inter italic leading-relaxed text-sm italic pr-4">{it.desc}</p>

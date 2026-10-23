@@ -4,44 +4,18 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Zap, 
-  Activity, 
-  Cpu, 
-  Database, 
+import {
+  Shield,
   ArrowRight,
-  TrendingUp,
-  Lock,
   CheckCircle2,
-  LineChart,
-  BarChart3,
-  Network,
-  Fingerprint,
-  AlertTriangle,
-  Globe,
-  Layers,
-  Server,
-  HelpCircle,
   Smartphone,
-  Eye,
   Users,
-  Building2,
-  Wallet,
   Clock,
-  RefreshCw,
-  Scale,
   ChevronDown,
   ChevronUp,
-  AlertCircle,
-  FileSpreadsheet,
   Workflow,
-  Search,
-  Check,
   Building,
   Sliders,
-  ClipboardCheck,
-  Briefcase
 } from "lucide-react";
 
 export default function VerifyCustomerIdentityPage() {
@@ -189,7 +163,7 @@ export default function VerifyCustomerIdentityPage() {
                         <span>• passports</span>
                         <span>• national IDs</span>
                         <span>• residency permits</span>
-                        <span>• driver's licenses</span>
+                        <span>• driver&apos;s licenses</span>
                         <span>• utility bills</span>
                         <span>• liveness verification</span>
                       </div>

@@ -6,25 +6,31 @@ export function useModels() {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
-  const fetchModels = () => {
-    setIsLoading(true);
-    setIsError(false);
+  // State only changes once the request settles, so the effect never sets state synchronously.
+  const loadModels = useCallback(() => {
     return modelsService.getModels()
       .then(res => {
         setData(res.items || []);
+        setIsError(false);
         setIsLoading(false);
       })
       .catch(() => {
         setIsError(true);
         setIsLoading(false);
       });
+  }, []);
+
+  const refetch = () => {
+    setIsLoading(true);
+    setIsError(false);
+    return loadModels();
   };
 
   useEffect(() => {
-    fetchModels();
-  }, []);
+    loadModels();
+  }, [loadModels]);
 
-  return { data, isLoading, isError, refetch: fetchModels };
+  return { data, isLoading, isError, refetch };
 }
 
 export function useModelMetrics(modelId?: string) {
@@ -65,13 +71,12 @@ export function useModelDetail(modelId?: string) {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
-  const fetchDetail = useCallback(() => {
+  const loadDetail = useCallback(() => {
     if (!modelId) return;
-    setIsLoading(true);
-    setIsError(false);
     return modelsService.getModelDetail(modelId)
       .then(res => {
         setData(res);
+        setIsError(false);
         setIsLoading(false);
       })
       .catch(() => {
@@ -80,9 +85,16 @@ export function useModelDetail(modelId?: string) {
       });
   }, [modelId]);
 
-  useEffect(() => {
-    fetchDetail();
-  }, [fetchDetail]);
+  const refetch = () => {
+    if (!modelId) return;
+    setIsLoading(true);
+    setIsError(false);
+    return loadDetail();
+  };
 
-  return { data, isLoading, isError, refetch: fetchDetail };
+  useEffect(() => {
+    loadDetail();
+  }, [loadDetail]);
+
+  return { data, isLoading, isError, refetch };
 }

@@ -8,7 +8,6 @@ import {
   XCircle,
   History,
   ShieldQuestion,
-  ExternalLink,
   UserPlus,
   Loader2,
 } from "lucide-react";
@@ -17,7 +16,6 @@ import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -33,6 +31,11 @@ import { screeningService } from "@/services/screening.service";
 function formatDate(value?: string | null): string {
   if (!value) return "Unknown";
   return new Date(value).toLocaleString();
+}
+
+// linked_customer and prior_screenings are free-form objects on the API; read string fields safely.
+function text(value: unknown): string | undefined {
+  return typeof value === "string" && value ? value : undefined;
 }
 
 export default function ScreeningMatchDetailPage() {
@@ -79,10 +82,10 @@ export default function ScreeningMatchDetailPage() {
     );
   }
 
-  const match = (detail as any).match;
+  const match = detail.match;
   const riskLevel = match.risk_level || "medium";
-  const matchedFields: Record<string, any> = (detail as any).matched_fields || {};
-  const linkedCustomer = (detail as any).linked_customer || {};
+  const matchedFields: Record<string, unknown> = detail.matched_fields || {};
+  const linkedCustomer = detail.linked_customer || {};
 
   const kpis = [
     { label: "Confidence", value: match.confidence_score != null ? `${(match.confidence_score * 100).toFixed(1)}%` : "N/A", icon: <ShieldQuestion className="w-5 h-5" /> },
@@ -108,7 +111,7 @@ export default function ScreeningMatchDetailPage() {
                <ArrowLeft className="w-3 h-3" /> Global Screening Hub
             </Link>
             <div className="flex items-center gap-4">
-              <h1 className="text-3xl font-black italic tracking-tighter uppercase leading-none">{linkedCustomer.label || "Unknown Entity"}</h1>
+              <h1 className="text-3xl font-black italic tracking-tighter uppercase leading-none">{text(linkedCustomer.label) || "Unknown Entity"}</h1>
               <Badge className={`h-6 px-4 text-[9px] font-black uppercase italic tracking-widest border-none ${
                 riskLevel === 'critical' ? 'bg-rose-500 text-white shadow-xl shadow-rose-500/20' : riskLevel === 'high' ? 'bg-orange-500 text-white' : 'bg-slate-400 text-white'
               }`}>
@@ -168,7 +171,7 @@ export default function ScreeningMatchDetailPage() {
                      </div>
                   </div>
                   <p className="text-[14px] text-white/70 italic leading-relaxed font-medium">
-                     {(detail as any).confidence_explanation || "No explanation provided by the matching engine."}
+                     {detail.confidence_explanation || "No explanation provided by the matching engine."}
                   </p>
                   {Object.keys(matchedFields).length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -214,8 +217,8 @@ export default function ScreeningMatchDetailPage() {
                               <UserPlus className="w-8 h-8 text-neutral-300" />
                            </div>
                            <div className="text-center font-black italic">
-                              <h4 className="text-xl font-black italic tracking-tighter text-neutral-900">{linkedCustomer.label || "Unlinked"}</h4>
-                              <p className="text-[10px] font-black uppercase text-muted-foreground italic mt-1">{linkedCustomer.external_id || match.customer_id || "No customer linked"}</p>
+                              <h4 className="text-xl font-black italic tracking-tighter text-neutral-900">{text(linkedCustomer.label) || "Unlinked"}</h4>
+                              <p className="text-[10px] font-black uppercase text-muted-foreground italic mt-1">{text(linkedCustomer.external_id) || match.customer_id || "No customer linked"}</p>
                            </div>
                            {match.customer_id && (
                              <Link href={`/dashboard/users/${match.customer_id}`} className="w-full">
@@ -229,17 +232,17 @@ export default function ScreeningMatchDetailPage() {
 
                <TabsContent value="history" className="m-0">
                   <Card className="rounded-[40px] border-border shadow-md p-12 bg-white font-black italic">
-                     {((detail as any).prior_screenings || []).length === 0 ? (
+                     {(detail.prior_screenings || []).length === 0 ? (
                        <p className="text-center text-muted-foreground italic text-sm">No prior screening history for this entity.</p>
                      ) : (
                        <div className="space-y-8">
-                         {(detail as any).prior_screenings.map((ps: any, i: number) => (
+                         {detail.prior_screenings.map((ps, i) => (
                            <div key={i} className="flex gap-6 items-start border-b border-border/50 pb-6 last:border-0">
                               <div className="w-12 h-12 rounded-2xl bg-zinc-50 border border-neutral-100 flex items-center justify-center shrink-0">
                                  <History className="w-5 h-5 text-neutral-400" />
                               </div>
                               <div className="flex-1">
-                                 <p className="text-sm font-black italic">{ps.summary || JSON.stringify(ps)}</p>
+                                 <p className="text-sm font-black italic">{text(ps.summary) || JSON.stringify(ps)}</p>
                               </div>
                            </div>
                          ))}

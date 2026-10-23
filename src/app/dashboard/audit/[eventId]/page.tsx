@@ -1,70 +1,28 @@
 "use client";
 
 import React from "react";
-import { 
-  ArrowLeft, 
-  ShieldCheck, 
-  ShieldAlert, 
-  AlertTriangle, 
-  Clock, 
-  User, 
-  Zap, 
-  MoreHorizontal, 
-  ChevronRight, 
-  Download, 
-  Briefcase, 
-  MessageSquare,
-  FileText,
+import {
+  ArrowLeft,
+  Clock,
+  User,
+  Zap,
+  ChevronRight,
+  Download,
   Activity,
-  BarChart3,
-  Search,
-  Plus,
-  ArrowUpRight,
-  LayoutGrid,
-  CheckCircle2,
-  XCircle,
-  Eye,
-  Info,
-  History,
-  TrendingUp,
-  Link as LinkIcon,
   Fingerprint,
-  Globe,
-  MoreVertical,
-  CheckSquare,
-  Slash,
-  GanttChart,
-  FileCheck,
-  Flag,
-  Calendar,
-  Layers,
-  Archive,
-  Star,
-  Paperclip,
-  Share2,
-  Lock,
-  MessageCircle,
   Hash,
   Terminal,
   Cpu,
   MapPin,
-  Laptop,
   Box,
-  Key,
-  Database,
-  SearchCode,
-  AlertCircle
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuditEvent } from "@/hooks";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
 
 function formatDate(value?: string | null): string {
   if (!value) return "Unknown";
@@ -75,7 +33,7 @@ export default function AuditEventDetailPage() {
   const params = useParams();
   const eventId = params.eventId as string;
 
-  const { data: event, isLoading, isError, refetch } = useAuditEvent(eventId);
+  const { data: event, isLoading, isError, error, refetch } = useAuditEvent(eventId);
 
   if (isLoading) {
     return (
@@ -106,20 +64,7 @@ export default function AuditEventDetailPage() {
             </div>
           </div>
         </section>
-        <Card className="rounded-3xl border border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load audit event</p>
-                <p className="text-sm text-red-700">Please check your connection and try again.</p>
-              </div>
-            </div>
-            <Button onClick={refetch} className="mt-4" variant="outline">
-              Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="audit event" onRetry={refetch} />
       </div>
     );
   }

@@ -34,7 +34,7 @@ export default function TrustedBy() {
                <Quote className="w-10 h-10 text-brand-lime group-hover:scale-110 transition-transform" />
                <div className="flex flex-col gap-4">
                   <p className="text-lg md:text-xl font-manrope font-semibold text-neutral-800 leading-relaxed italic">
-                    "{t.quote}"
+                    &quot;{t.quote}&quot;
                   </p>
                   <span className="text-sm font-bold font-inter text-zinc-400 uppercase tracking-widest">{t.author}</span>
                </div>

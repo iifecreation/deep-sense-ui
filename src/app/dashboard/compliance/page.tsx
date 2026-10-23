@@ -1,25 +1,22 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React from "react";
 import Link from "next/link";
 import {
   ShieldCheck,
   Activity,
-  Clock,
   CheckCircle2,
   AlertTriangle,
   ChevronRight,
   Filter,
-  Download,
   Plus,
   RefreshCcw,
   Search,
-  MoreVertical,
   ExternalLink,
   Users,
   FileText,
   Calendar,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -34,12 +31,6 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
 import { useAlerts } from "@/hooks/use-alerts";
 import { useCases } from "@/hooks/use-cases";
 import { useScreeningMatches } from "@/hooks/use-screening";
@@ -84,13 +75,11 @@ export default function ComplianceWorkspacePage() {
   const openCases = allCases.filter((c) => c.status !== "closed" && c.status !== "resolved");
   const unresolvedMatches = allMatches.filter((m) => m.status === "pending" || m.status === "open" || m.status === "unresolved");
   const highRiskCustomers = allCustomers.filter((c) => c.risk_tier === "high" || c.risk_tier === "critical");
-  const pendingReports = allReports.filter((r: any) => !r.submitted_at);
+  const pendingReports = allReports.filter((r) => !r.submitted_at);
 
-  const priorityQueue = useMemo(() => {
-    return [...criticalAlerts]
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      .slice(0, 8);
-  }, [criticalAlerts]);
+  const priorityQueue = [...criticalAlerts]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 8);
 
   const isLoading = alertsLoading || casesLoading || matchesLoading || customersLoading || reportsLoading;
 
@@ -103,16 +92,13 @@ export default function ComplianceWorkspacePage() {
     { label: "Critical Alerts", value: criticalAlerts.length, icon: <AlertTriangle className="w-5 h-5" />, href: "/dashboard/alerts" },
   ];
 
-  const alertVolumeByDay = useMemo(() => {
-    const buckets = new Array(14).fill(0);
-    const now = new Date();
-    for (const a of allAlerts) {
-      const days = Math.floor((now.getTime() - new Date(a.created_at).getTime()) / 86400000);
-      const bucket = 13 - Math.min(13, days);
-      if (bucket >= 0) buckets[bucket]++;
-    }
-    return buckets;
-  }, [allAlerts]);
+  const alertVolumeByDay = new Array(14).fill(0);
+  const now = new Date();
+  for (const a of allAlerts) {
+    const days = Math.floor((now.getTime() - new Date(a.created_at).getTime()) / 86400000);
+    const bucket = 13 - Math.min(13, days);
+    if (bucket >= 0) alertVolumeByDay[bucket]++;
+  }
 
   return (
     <div className="flex flex-col gap-10 pb-20">
@@ -498,7 +484,7 @@ export default function ComplianceWorkspacePage() {
                 <TableBody>
                    {pendingReports.length === 0 ? (
                      <TableRow><TableCell colSpan={5} className="text-center py-10 text-slate-500">No pending reports.</TableCell></TableRow>
-                   ) : pendingReports.slice(0, 8).map((report: any) => (
+                   ) : pendingReports.slice(0, 8).map((report) => (
                     <TableRow key={report.id} className="group hover:bg-muted/30 border-b border-border/50 transition-colors">
                       <TableCell className="px-8 py-5 text-xs font-black italic text-neutral-400">{report.id.slice(0, 8)}</TableCell>
                       <TableCell>

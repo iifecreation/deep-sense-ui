@@ -1,21 +1,11 @@
 "use client";
 
 import React from "react";
-import { 
-  ArrowLeft, 
-  Settings, 
-  Activity, 
-  ShieldCheck, 
-  Clock, 
-  Lock, 
-  ChevronRight,
+import {
+  ArrowLeft,
   MoreHorizontal,
-  Workflow,
-  History,
-  Code2,
-  FileSearch
+  FileSearch,
 } from "lucide-react";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 
 export default function GenericDetailPage() {

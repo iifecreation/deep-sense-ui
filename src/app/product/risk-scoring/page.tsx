@@ -4,34 +4,18 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Zap, 
-  Activity, 
-  Cpu, 
-  Database, 
-  ArrowRight,
-  TrendingUp,
+import {
+  Shield,
+  Cpu,
   Lock,
-  CheckCircle2,
-  LineChart,
-  BarChart3,
-  Network,
   Fingerprint,
   AlertTriangle,
   Globe,
   FileCheck,
   Layers,
-  Terminal,
   ChevronDown,
   ChevronUp,
-  Server,
-  HelpCircle,
-  Send,
   Smartphone,
-  Eye,
-  Users,
-  BookOpen,
   Briefcase,
   Building2,
   Coins,
@@ -39,7 +23,7 @@ import {
   Wallet,
   TrendingDown,
   Clock,
-  FileSpreadsheet
+  FileSpreadsheet,
 } from "lucide-react";
 
 export default function RiskScoringPage() {

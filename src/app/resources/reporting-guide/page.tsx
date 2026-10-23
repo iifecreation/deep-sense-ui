@@ -1,27 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  FileText, 
-  Search, 
-  Workflow, 
-  CheckCircle2, 
-  ArrowRight, 
-  Download, 
-  Clock, 
-  ShieldCheck, 
-  Briefcase, 
-  Send, 
-  History, 
-  AlertTriangle, 
-  Database, 
-  Layers, 
-  Activity, 
-  Scale, 
-  Lock, 
-  BookOpen,
+import {
+  FileText,
+  Search,
+  Workflow,
+  CheckCircle2,
+  ArrowRight,
+  Clock,
+  ShieldCheck,
+  Briefcase,
+  Send,
+  History,
+  AlertTriangle,
+  Database,
+  Layers,
+  Lock,
   Building,
-  Zap
+  Zap,
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -93,7 +89,7 @@ export default function ReportingGuidePage() {
               <div className="p-16 bg-white border border-zinc-200 rounded-[56px] shadow-3xl text-left relative overflow-hidden group">
                  <Clock className="w-48 h-48 absolute top-0 right-0 p-12 text-zinc-50 group-hover:text-red-50 transition-colors" />
                  <h3 className="text-3xl font-bold italic uppercase tracking-tighter mb-8 border-b border-zinc-50 pb-8">The Criticality of Speed</h3>
-                 <p className="text-zinc-500 text-sm mb-12 italic pr-12 italic">"Delays in suspicious transaction reporting are often cited as a primary failure during regulatory enforcement actions."</p>
+                 <p className="text-zinc-500 text-sm mb-12 italic pr-12 italic">&quot;Delays in suspicious transaction reporting are often cited as a primary failure during regulatory enforcement actions.&quot;</p>
                  <div className="flex items-center gap-6 p-8 bg-neutral-900 rounded-3xl text-white transform hover:translate-x-4 transition-transform border border-white/5 relative z-10">
                     <Send className="text-brand-lime w-10 h-10 shrink-0" />
                     <p className="text-xs font-bold italic pr-8 italic uppercase tracking-tight font-manrope leading-tight">Prompt disclosure is a mandatory procedural requirement across all major financial jurisdictions.</p>
@@ -114,7 +110,7 @@ export default function ReportingGuidePage() {
                  ].map((it, i) => (
                    <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[48px] shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative">
                       <div className="w-16 h-16 bg-zinc-50 border border-zinc-100 rounded-2xl flex items-center justify-center mb-10 group-hover:bg-neutral-900 group-hover:text-white transition-all shadow-sm">
-                         {React.cloneElement(it.icon as any, { className: "w-8 h-8" })}
+                         {React.cloneElement(it.icon as React.ReactElement<{ className?: string }>, { className: "w-8 h-8" })}
                       </div>
                       <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope">{it.title}</h4>
                       <p className="text-zinc-500 font-inter italic leading-relaxed text-sm pr-6 italic">{it.d}</p>
@@ -140,7 +136,7 @@ export default function ReportingGuidePage() {
                  ].map((step, i) => (
                    <div key={i} className="flex flex-col items-center gap-6 group">
                       <div className="w-20 h-20 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-all shadow-xl font-manrope">
-                         {React.cloneElement(step.i as any, { className: "w-8 h-8 font-manrope" })}
+                         {React.cloneElement(step.i as React.ReactElement<{ className?: string }>, { className: "w-8 h-8 font-manrope" })}
                          <div className="absolute -top-3 -right-3 w-8 h-8 bg-white text-neutral-900 rounded-full flex items-center justify-center text-[10px] font-black italic">
                            {i+1}
                          </div>
@@ -219,7 +215,7 @@ export default function ReportingGuidePage() {
               ].map((it, i) => (
                 <div key={i} className="p-12 bg-white border border-zinc-100 rounded-[56px] shadow-sm hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 relative group overflow-hidden font-manrope italic">
                    <div className="w-16 h-16 bg-neutral-900 text-brand-lime rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform shadow-lg">
-                      {React.cloneElement(it.icon as any, { className: "w-8 h-8" })}
+                      {React.cloneElement(it.icon as React.ReactElement<{ className?: string }>, { className: "w-8 h-8" })}
                    </div>
                    <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope">{it.title}</h4>
                    <p className="text-zinc-500 font-inter italic leading-relaxed text-sm pr-6 italic">{it.desc}</p>

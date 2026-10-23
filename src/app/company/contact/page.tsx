@@ -7,13 +7,15 @@ import {
   CheckCircle2, 
   Send,
   Loader2,
-  ServerOff
 } from "lucide-react";
 import { useContentPage } from "@/hooks";
 import { contentService } from "@/services/content.service";
+import { bodyParagraphs, plainText } from "@/lib/text/body-paragraphs";
 
 export default function ContactPage() {
-  const { data: pageData, isLoading, isError } = useContentPage("contact");
+  // CMS copy is optional: the form must work even when no "contact" page has been published.
+  const { data: pageData } = useContentPage("contact");
+  const intro = bodyParagraphs(pageData?.body);
   
   const [formData, setFormData] = useState({
     name: "",
@@ -61,38 +63,6 @@ export default function ContactPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white font-manrope text-neutral-900 flex flex-col">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center pt-48 pb-24">
-          <Loader2 className="w-12 h-12 animate-spin text-brand-lime" />
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (isError || !pageData) {
-    return (
-      <div className="min-h-screen bg-white font-manrope text-neutral-900 flex flex-col">
-        <Navbar />
-        <main className="flex-1 flex flex-col items-center justify-center pt-48 pb-24 px-8 text-center">
-          <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20 shadow-[0_0_40px_rgba(239,68,68,0.2)] mb-6">
-            <ServerOff className="w-12 h-12 text-red-500" />
-          </div>
-          <h1 className="text-4xl font-black italic tracking-tighter uppercase text-neutral-900 mb-4">
-            Content Not Configured (501)
-          </h1>
-          <p className="text-zinc-500 max-w-lg">
-            The Contact page content could not be loaded from the server. The dynamic content endpoint is not yet implemented.
-          </p>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-white font-manrope">
       <Navbar />
@@ -105,9 +75,11 @@ export default function ContactPage() {
              <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 rounded-full text-brand-lime text-[11px] font-bold uppercase tracking-widest mb-10 shadow-2xl">
                Get in Touch
              </div>
-             <h1 className="text-6xl lg:text-[100px] font-bold leading-[0.9] mb-10 tracking-tight text-neutral-900 uppercase italic" dangerouslySetInnerHTML={{ __html: pageData.title }} />
+             <h1 className="text-6xl lg:text-[100px] font-bold leading-[0.9] mb-10 tracking-tight text-neutral-900 uppercase italic">
+               {plainText(pageData?.title) || "Talk to DeepSense"}
+             </h1>
              <p className="text-xl text-zinc-500 font-inter leading-relaxed max-w-[650px] mx-auto">
-               {pageData.subtitle}
+               {plainText(pageData?.excerpt) || "Tell us about your institution and we'll set up a walkthrough of verification, screening and monitoring for your use case."}
              </p>
           </div>
         </section>
@@ -118,7 +90,11 @@ export default function ContactPage() {
               <div className="space-y-12 h-full flex flex-col justify-center">
                  <h2 className="text-4xl lg:text-7xl font-bold font-manrope uppercase italic tracking-tighter leading-tight underline decoration-brand-lime decoration-8 underline-offset-16">Request a Demo.</h2>
                  
-                 <div className="prose prose-lg" dangerouslySetInnerHTML={{ __html: pageData.content }} />
+                 {intro.length > 0 && (
+                   <div className="prose prose-lg">
+                     {intro.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+                   </div>
+                 )}
               </div>
 
               <div className="relative">

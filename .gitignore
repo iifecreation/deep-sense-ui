@@ -77,3 +77,11 @@ playwright/.cache/
 clean-mock.js
 fix-ts.js
 *.log
+
+# Secrets and key material (SECURITY_REMEDIATION)
+*.pem
+*.key
+.dev-keys/
+.env*
+!.env.example
+!.env.*.example

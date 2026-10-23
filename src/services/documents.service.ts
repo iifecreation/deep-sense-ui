@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   IdentityVerificationSessionCreate,
   IdentityVerificationSessionRead,
@@ -13,6 +12,11 @@ import {
 } from '@/types';
 import { get, getToken, post, patch } from '@/lib/api/client';
 import { getRuntimeApiUrl } from '@/lib/runtime-environment';
+import type {
+  DataRetentionPolicyRead,
+  DocumentExtractionRead,
+  DocumentPrivacyPolicyPatch,
+} from '@/lib/api-client/api';
 
 export type PortraitDocumentType = 'passport' | 'national_id' | 'drivers_license';
 
@@ -20,15 +24,15 @@ export const documentsService = {
   /**
    * Get document privacy policy
    */
-  async getDocumentPrivacyPolicy(): Promise<any> {
-    return await get<any>('/documents/privacy/policy');
+  async getDocumentPrivacyPolicy(): Promise<DataRetentionPolicyRead> {
+    return await get<DataRetentionPolicyRead>('/documents/privacy/policy');
   },
 
   /**
    * Update document privacy policy
    */
-  async updateDocumentPrivacyPolicy(data: any): Promise<any> {
-    return await patch<any>('/documents/privacy/policy', data);
+  async updateDocumentPrivacyPolicy(data: DocumentPrivacyPolicyPatch): Promise<DataRetentionPolicyRead> {
+    return await patch<DataRetentionPolicyRead>('/documents/privacy/policy', data);
   },
 
   /**
@@ -180,14 +184,14 @@ export const documentsService = {
   /**
    * Request document extraction
    */
-  async requestDocumentExtraction(documentId: string, data?: any): Promise<any> {
-    return await post<any>(`/documents/${documentId}/extract`, data);
+  async requestDocumentExtraction(documentId: string, data?: Record<string, unknown>): Promise<DocumentExtractionRead> {
+    return await post<DocumentExtractionRead>(`/documents/${documentId}/extract`, data);
   },
 
   /**
    * Get document extraction
    */
-  async getDocumentExtraction(documentId: string): Promise<any> {
-    return await get<any>(`/documents/${documentId}/extraction`);
+  async getDocumentExtraction(documentId: string): Promise<DocumentExtractionRead> {
+    return await get<DocumentExtractionRead>(`/documents/${documentId}/extraction`);
   },
 };

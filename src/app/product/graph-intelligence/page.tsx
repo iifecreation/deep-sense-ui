@@ -1,45 +1,26 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
-import { 
-  Shield, 
-  Zap, 
-  Activity, 
-  Cpu, 
-  Database, 
-  ArrowRight,
-  TrendingUp,
-  Lock,
+import {
+  Shield,
+  Zap,
   CheckCircle2,
-  LineChart,
-  BarChart3,
   Network,
-  Fingerprint,
   AlertTriangle,
   Globe,
   FileCheck,
   Layers,
-  Terminal,
   ChevronDown,
   ChevronUp,
-  Server,
-  HelpCircle,
-  Send,
   Smartphone,
-  Eye,
   Users,
-  BookOpen,
   Briefcase,
   Building2,
-  ShoppingBag,
   Wallet,
-  History,
-  TrendingDown,
   Clock,
-  FileSpreadsheet
 } from "lucide-react";
 
 export default function GraphIntelligencePage() {
@@ -48,7 +29,6 @@ export default function GraphIntelligencePage() {
   // Interactive graph demo state
   const [selectedNode, setSelectedNode] = useState<string>("Card-1");
   const [graphRiskScore, setGraphRiskScore] = useState<number>(94);
-  const [propagationStep, setPropagationStep] = useState<number>(1);
 
   const toggleFaq = (idx: number) => {
     setOpenFaq(openFaq === idx ? null : idx);
@@ -69,13 +49,6 @@ export default function GraphIntelligencePage() {
     else if (riskStr === "high") setGraphRiskScore(89);
     else setGraphRiskScore(62);
   };
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setPropagationStep((prev) => (prev % 3) + 1);
-    }, 3500);
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <>

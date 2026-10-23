@@ -3,20 +3,12 @@
 import {
   AlertCircle,
   AlertTriangle,
-  ArrowRight,
-  ArrowUpRight,
-  BriefcaseBusiness,
-  CreditCard,
-  FileSearch,
-  Gauge,
   RefreshCw,
   SearchCheck,
-  ShieldAlert,
-  WalletCards,
   TrendingUp,
   Shield,
   Activity,
-  ShieldCheck
+  ShieldCheck,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useDashboard } from '@/hooks/use-dashboard';
@@ -24,14 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
-type ScreeningActivity = {
-  id: string;
-  entity_name?: string;
-  name?: string;
-  status?: string;
-  created_at?: string;
-};
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
 
 // Generate some mock chart data for the last 7 days of transactions
 const chartData = [
@@ -48,8 +33,6 @@ const formatNumber = (value: number | null) => {
   if (value === null) return 'Not configured';
   return new Intl.NumberFormat().format(value);
 };
-
-const formatPercent = (value: number) => `${(value * 100).toFixed(2)}%`;
 
 const formatTimeAgo = (dateString?: string) => {
   if (!dateString) return 'No timestamp';
@@ -108,21 +91,7 @@ export default function DashboardOverview() {
     return (
       <div className="space-y-6">
         <h1 className="text-3xl font-bold tracking-tight">Command Center</h1>
-        <Card className="rounded-xl border-red-200 bg-red-50/50 backdrop-blur-xl">
-          <CardContent className="flex flex-col gap-4 p-6">
-            <div className="flex gap-3">
-              <AlertTriangle className="mt-0.5 h-5 w-5 text-red-600" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load command center data</p>
-                <p className="text-sm text-red-700">{error?.message ?? 'Please check your connection and try again.'}</p>
-              </div>
-            </div>
-            <Button onClick={refetch} variant="outline" className="w-fit">
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Retry Connection
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="command center data" onRetry={refetch} />
       </div>
     );
   }

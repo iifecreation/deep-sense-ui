@@ -1,21 +1,15 @@
 'use client';
 
-import { 
-  Search, 
-  Filter, 
-  ArrowUpRight, 
+import {
+  Search,
+  Filter,
+  ArrowUpRight,
   Download,
   AlertCircle,
-  FileText,
   Activity,
-  History,
-  ArrowDownLeft,
-  Calendar,
   Layers,
-  MoreVertical,
-  RefreshCw
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -23,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useState } from "react";
 import Link from "next/link";
+import { LoadErrorCard } from "@/components/common/LoadErrorCard";
 
 export default function TransactionsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -67,7 +62,7 @@ export default function TransactionsPage() {
     }
   };
 
-  const filteredTransactions = transactions?.filter((t: any) => {
+  const filteredTransactions = transactions?.filter((t) => {
     if (statusFilter && t.decision !== statusFilter) return false;
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -102,20 +97,7 @@ export default function TransactionsPage() {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Transactions</h1>
         </div>
-        <Card className="rounded-xl shadow-sm border border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="text-red-600 h-5 w-5" />
-              <div>
-                <p className="font-semibold text-red-900">Failed to load transactions</p>
-                <p className="text-sm text-red-700">{error?.message || 'Please check your connection and try again.'}</p>
-              </div>
-            </div>
-            <Button onClick={() => refetch()} className="mt-4" variant="outline">
-              <RefreshCw className="w-4 h-4 mr-2" /> Retry
-            </Button>
-          </CardContent>
-        </Card>
+        <LoadErrorCard error={error} what="transactions" onRetry={() => refetch()} />
       </div>
     );
   }
@@ -160,7 +142,7 @@ export default function TransactionsPage() {
             <div className="flex-1">
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">High Risk</p>
               <div className="text-xl font-bold text-slate-900">
-                {transactions?.filter((t: any) => t.final_score >= 0.65).length || 0}
+                {transactions?.filter((t) => (t.final_score ?? 0) >= 0.65).length || 0}
               </div>
             </div>
           </CardContent>
@@ -174,7 +156,7 @@ export default function TransactionsPage() {
             <div className="flex-1">
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pending Review</p>
               <div className="text-xl font-bold text-slate-900">
-                {transactions?.filter((t: any) => t.decision === 'review').length || 0}
+                {transactions?.filter((t) => t.decision === 'review').length || 0}
               </div>
             </div>
           </CardContent>
@@ -240,7 +222,7 @@ export default function TransactionsPage() {
                   <p className="text-sm text-slate-500">No transactions found</p>
                 </TableCell>
               </TableRow>
-            ) : filteredTransactions.map((tx: any, i: number) => (
+            ) : filteredTransactions.map((tx, i) => (
               <TableRow key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer">
                 <TableCell className="pl-6">
                   <div className="flex flex-col">

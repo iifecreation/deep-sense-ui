@@ -1,27 +1,24 @@
 "use client";
 
 import React from "react";
-import { 
-  Users, 
-  Shield, 
-  BarChart3, 
-  UserCheck, 
-  Activity, 
-  Zap, 
-  Database, 
-  Scale, 
-  ArrowRight, 
-  CheckCircle2, 
+import {
+  Users,
+  Shield,
+  UserCheck,
+  Activity,
+  Zap,
+  Database,
+  Scale,
+  ArrowRight,
+  CheckCircle2,
   Search,
-  LayoutDashboard,
   Brain,
   History,
-  Target,
   Network,
   Lock,
   RefreshCw,
   FileSearch,
-  Layers
+  Layers,
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -68,7 +65,7 @@ export default function RiskProfilingPage() {
                        <History className="w-24 h-24 text-zinc-100 group-hover:text-brand-lime/20 transition-colors" />
                      </div>
                      <h3 className="text-2xl font-bold mb-8">The Erosion of Validity</h3>
-                     <p className="text-zinc-500 text-sm leading-relaxed mb-10 italic">"A low-risk customer today can become high-risk tomorrow."</p>
+                     <p className="text-zinc-500 text-sm leading-relaxed mb-10 italic">&quot;A low-risk customer today can become high-risk tomorrow.&quot;</p>
                      <ul className="space-y-6">
                         {[
                           "Customer risk changes over time as financial behaviors shift.",
@@ -112,7 +109,7 @@ export default function RiskProfilingPage() {
               ].map((item, i) => (
                 <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 group">
                   <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                    {React.cloneElement(item.icon as any, { className: "w-7 h-7" })}
+                    {React.cloneElement(item.icon as React.ReactElement<{ className?: string }>, { className: "w-7 h-7" })}
                   </div>
                   <h3 className="text-xl font-bold mb-3 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{item.title}</h3>
                   <p className="text-zinc-500 text-sm leading-relaxed">{item.desc}</p>
@@ -158,7 +155,7 @@ export default function RiskProfilingPage() {
                  ].map((item, i) => (
                    <div key={i} className="flex flex-col items-center group">
                       <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-[32px] flex items-center justify-center mb-8 relative group-hover:bg-brand-lime group-hover:text-black transition-all shadow-xl group-hover:scale-105">
-                         {React.cloneElement(item.icon as any, { className: "w-10 h-10" })}
+                         {React.cloneElement(item.icon as React.ReactElement<{ className?: string }>, { className: "w-10 h-10" })}
                          <div className="absolute -top-3 -right-3 w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-black border-4 border-zinc-900">
                            {i+1}
                          </div>
@@ -252,7 +249,7 @@ export default function RiskProfilingPage() {
                     ].map((item, i) => (
                       <div key={i} className="flex gap-6 group">
                         <div className="w-12 h-12 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-indigo-600 transition-colors">
-                           {React.cloneElement(item.icon as any, { className: "w-6 h-6 text-indigo-600 group-hover:text-white transition-colors" })}
+                           {React.cloneElement(item.icon as React.ReactElement<{ className?: string }>, { className: "w-6 h-6 text-indigo-600 group-hover:text-white transition-colors" })}
                         </div>
                         <div>
                            <h4 className="font-bold text-neutral-900 mb-2">{item.title}</h4>
@@ -316,7 +313,7 @@ export default function RiskProfilingPage() {
                  ].map((item, i) => (
                    <div key={i} className="p-10 bg-white border border-zinc-200 rounded-[40px] shadow-sm">
                       <div className="w-12 h-12 mb-8 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600">
-                         {React.cloneElement(item.icon as any, { className: "w-6 h-6" })}
+                         {React.cloneElement(item.icon as React.ReactElement<{ className?: string }>, { className: "w-6 h-6" })}
                       </div>
                       <h4 className="text-xl font-bold mb-4">{item.title}</h4>
                       <p className="text-zinc-500 text-sm leading-relaxed">{item.desc}</p>

@@ -1,30 +1,23 @@
 "use client";
 
 import React from "react";
-import { 
-  Building, 
-  ShieldCheck, 
-  Zap, 
-  ArrowRight, 
-  CheckCircle2, 
-  Globe, 
-  Search, 
-  Layers, 
-  Activity, 
-  FileText, 
-  Briefcase, 
-  History, 
-  Lock, 
-  Scale, 
-  Database, 
-  Server, 
-  RefreshCw, 
-  Check, 
-  AlertTriangle,
+import {
+  Building,
+  Zap,
+  CheckCircle2,
+  Globe,
+  Layers,
+  Activity,
+  FileText,
+  Briefcase,
+  History,
+  Server,
+  RefreshCw,
+  Check,
   BadgeCheck,
   Building2,
   PieChart,
-  Users
+  Users,
 } from "lucide-react";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -71,7 +64,7 @@ export default function CbnComplianceSolutionPage() {
                        <Building className="w-24 h-24 text-zinc-100 group-hover:text-emerald-100 transition-all" />
                      </div>
                      <h3 className="text-2xl font-bold mb-8 italic text-neutral-900">Meeting CBN AML Requirements Is Complex</h3>
-                     <p className="text-zinc-500 text-sm leading-relaxed mb-10 italic font-manrope">"CBN compliance requires a complete, integrated AML system."</p>
+                     <p className="text-zinc-500 text-sm leading-relaxed mb-10 italic font-manrope">&quot;CBN compliance requires a complete, integrated AML system.&quot;</p>
                      <ul className="space-y-6 text-sm font-bold text-zinc-600 italic">
                         {[
                           "Regulations require multiple complex systems working in perfect synchronization.",
@@ -118,7 +111,7 @@ export default function CbnComplianceSolutionPage() {
               ].map((item, i) => (
                 <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 group">
                   <div className="w-14 h-14 bg-emerald-600 text-white rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-emerald-500/10 shadow-lg">
-                    {React.cloneElement(item.icon as any, { className: "w-7 h-7" })}
+                    {React.cloneElement(item.icon as React.ReactElement<{ className?: string }>, { className: "w-7 h-7" })}
                   </div>
                   <h3 className="text-xl font-bold mb-3 group-hover:text-emerald-600 transition-colors uppercase tracking-tight leading-tight italic">{item.title}</h3>
                   <p className="text-zinc-500 text-sm leading-relaxed italic">{item.desc}</p>
@@ -242,7 +235,7 @@ export default function CbnComplianceSolutionPage() {
               ].map((it, i) => (
                 <div key={i} className="p-10 bg-white border border-zinc-100 rounded-[40px] shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative">
                    <div className="w-14 h-14 bg-neutral-900 text-emerald-500 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-lg">
-                      {React.cloneElement(it.icon as any, { className: "w-6 h-6" })}
+                      {React.cloneElement(it.icon as React.ReactElement<{ className?: string }>, { className: "w-6 h-6" })}
                    </div>
                    <h4 className="text-2xl font-bold mb-4 italic uppercase tracking-tighter leading-tight font-manrope">{it.title}</h4>
                    <p className="text-zinc-500 font-inter italic leading-relaxed text-[11px] italic pr-4">{it.desc}</p>
